@@ -1,1 +1,1 @@
-$package->dependencies['required']->package['zfcampus.org/packages/{PACKAGE_DEPENDENCY}-devel']->save();
+$package->dependencies['required']->package['packages.zendframework.com/{PACKAGE_DEPENDENCY}-devel']->save();

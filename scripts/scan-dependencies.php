@@ -64,6 +64,6 @@ foreach (array_unique($deps) as $dep) {
 
 file_put_contents(
     ROOT . '/data/dependencies/' . $package_name . '-scanned.php',
-    '<?php return ' . str_replace('\\\\', '\\', var_export($dependencies, true))
+    '<?php return ' . str_replace('\\\\', '\\', var_export($dependencies, true)) . ';' . "\n"
 );
 exit(0);

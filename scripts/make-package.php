@@ -98,10 +98,18 @@ $file_replacements['{PACKAGE_RELEASE}'] = $release;
 $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] = null;
 
 if (file_exists(ROOT . '/data/dependencies/' . $package_name . '.php')) {
-    $package_info = include ROOT . '/data/dependencies/' . $package_name . '.php';
-    if (isset($package_info['dependencies'])) {
+    $dependency_file = ROOT . '/data/dependencies/' . $package_name . '.php';
+} elseif (file_exists(ROOT . '/data/dependencies/' . $package_name . '-scanned.php')) {
+    $dependency_file = ROOT . '/data/dependencies/' . $package_name . '-scanned.php';
+}
+
+
+
+if (isset($dependency_file)) {
+    $package_info = include $dependency_file;
+    if (isset($package_info['required'])) {
         $packagexmlsetup_content = '<?php' . PHP_EOL;
-        foreach ($package_info['dependencies'] as $dependency) {
+        foreach ($package_info['required'] as $dependency) {
             $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] .= 'require_once \'' . $dependency . '-' . trim($release) . '.phar\';' . "\n";
             $file_replacements['{PACKAGE_DEPENDENCY}'] = trim($dependency);
             $packagexmlsetup_content .= apply_replacements(file_get_contents(ROOT . '/data/templates/packagexmlsetup.php'), $file_replacements);
