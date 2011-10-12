@@ -55,11 +55,11 @@ if (!count($deps)) {
     exit(0);
 }
 
-$dependencies = array('required' => array());
+$dependencies = array('optional' => array());
 
 foreach (array_unique($deps) as $dep) {
     if (strpos($dep, 'Zend') !== 0) continue;
-    $dependencies['required'][] = $dep;
+    $dependencies['optional'][] = str_replace('\\', '_', $dep);
 }
 
 file_put_contents(

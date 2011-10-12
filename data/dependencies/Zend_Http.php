@@ -1,6 +1,6 @@
 <?php return array(
     'required' => array(
-        'Zend_Uri',
-        'Zend_Stdlib'
-    ),
+        'Zend_Stdlib',
+        'Zend_Uri'
+    )
 );

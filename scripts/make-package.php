@@ -107,17 +107,25 @@ if (file_exists(ROOT . '/data/dependencies/' . $package_name . '.php')) {
 
 if (isset($dependency_file)) {
     $package_info = include $dependency_file;
-    if (isset($package_info['required'])) {
+    if ($package_info) {
         $packagexmlsetup_content = '<?php' . PHP_EOL;
-        foreach ($package_info['required'] as $dependency) {
-            $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] .= 'require_once \'' . $dependency . '-' . trim($release) . '.phar\';' . "\n";
-            $file_replacements['{PACKAGE_DEPENDENCY}'] = trim($dependency);
-            $packagexmlsetup_content .= apply_replacements(file_get_contents(ROOT . '/data/templates/packagexmlsetup.php'), $file_replacements);
+        if (isset($package_info['required'])) {
+            foreach ($package_info['required'] as $dependency) {
+                $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] .= 'require_once \'' . $dependency . '-' . trim($release) . '.phar\';' . "\n";
+                $file_replacements['{PACKAGE_DEPENDENCY}'] = trim($dependency);
+                $packagexmlsetup_content .= apply_replacements(file_get_contents(ROOT . '/data/templates/packagexmlsetup-required.php'), $file_replacements);
+            }
+        }
+        if (isset($package_info['optional'])) {
+            foreach ($package_info['optional'] as $dependency) {
+                $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] .= 'require_once \'' . $dependency . '-' . trim($release) . '.phar\';' . "\n";
+                $file_replacements['{PACKAGE_DEPENDENCY}'] = trim($dependency);
+                $packagexmlsetup_content .= apply_replacements(file_get_contents(ROOT . '/data/templates/packagexmlsetup-optional.php'), $file_replacements);
+            }
         }
         echo 'Writing: packagexmlsetup.php' . PHP_EOL;
         file_put_contents('packagexmlsetup.php', $packagexmlsetup_content);
     }
-
 }
 
 echo 'Writing: stub.php' . PHP_EOL;
