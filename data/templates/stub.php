@@ -28,9 +28,4 @@ spl_autoload_register(function ($class) {
     }
 });
 
-$phar = new Phar(__FILE__);
-$sig = $phar->getSignature();
-define('{PACKAGE_NAME}_SIG', $sig['hash']);
-define('{PACKAGE_NAME}_SIGTYPE', $sig['hash_type']);
-
 __HALT_COMPILER();
