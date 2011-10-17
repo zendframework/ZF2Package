@@ -43,13 +43,37 @@ $paths = array(
     'INSTALL.txt',
     'LICENSE.txt',
     'bin/',
-    'library/',
     'resources/',
 );
 foreach ($paths as $file)  {
     $origin_path = $zf2_path  . '/' . $file;
     $copy_path   = $work_path . '/' . $file;
     script_run_command('cp -a ' . $origin_path . ' ' . $copy_path);
+}
+
+// Create library and sync in components
+if (!file_exists($work_path . '/library/Zend')) {
+    script_run_command('mkdir -p ' . $work_path . '/library/Zend');
+}
+$components = explode(', ', $ini['package_list']);
+foreach ($components as $component) {
+    $component = str_replace('Zend_', '', $component);
+    if (false === strstr($component, '_')) {
+        $origin = $zf2_path . '/library/Zend/' . $component;
+        $target = $work_path . '/library/Zend/';
+        script_run_command('cp -a ' . $origin . ' ' . $target);
+        continue;
+    }
+
+    $subcomponents = explode('_', $component);
+    $component     = array_pop($subcomponents);
+    $subpath       = implode('/', $subcomponents);
+    $target        = $work_path . '/library/Zend/' . $subpath;
+    if (!file_exists($target)) {
+        script_run_command('mkdir -p ' . $target);
+    }
+    $origin = $zf2_path . '/library/Zend/' . $subpath . '/' . $component;
+    script_run_command('cp -a ' . $origin . ' ' . $target);
 }
 
 // Create archives
