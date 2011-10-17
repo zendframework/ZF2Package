@@ -1,8 +1,8 @@
 README
 ======
 
-Building packages
------------------
+Building Pyrus packages
+-----------------------
 
 It's just a couple of steps
 
@@ -19,6 +19,26 @@ It's just a couple of steps
 
   `php scripts/release-all-packages.php`
 
-That's it. Then commit to the github repository, and checkout
-from the server (where the actual channel is located)
+That's it. Then add the new files, commit, and push to the 
+github repository.
  
+Building full/minimal packages
+------------------------------
+
+Two steps:
+
+* Run:
+
+  `php scripts/make-zf-package.php`
+
+* Run:
+
+  `php scripts/make-zf-minimal-package.php`
+
+Add and commit the new `public/releases/ZendFramework-<version>/`
+subdirectory that was created.
+
+Deploying
+---------
+
+Checkout from the server, where the actual channel is located.
