@@ -38,6 +38,16 @@ Two steps:
 Add and commit the new `public/releases/ZendFramework-<version>/`
 subdirectory that was created.
 
+Building the end-user manual
+----------------------------
+
+* Run:
+
+  `php scripts/make-zf-manual.php`
+
+Add and commit the new `public/releases/ZendFramework-<version>/*-manual.*`
+files that were created.
+
 Deploying
 ---------
 
