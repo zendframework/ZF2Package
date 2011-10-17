@@ -45,8 +45,20 @@ Building the end-user manual
 
   `php scripts/make-zf-manual.php`
 
-Add and commit the new `public/releases/ZendFramework-<version>/*-manual.*`
+Add and commit the new `public/releases/ZendFramework-<version>/*-manual*`
 files that were created.
+
+Building the API documenation
+-----------------------------
+
+* Run:
+
+  `php scripts/make-zf-apidoc.php`
+
+Add and commit the new `public/releases/ZendFramework-<version>/*-apidoc.*`
+files that were created.
+
+**Note:** this command takes some time to run!
 
 Deploying
 ---------
