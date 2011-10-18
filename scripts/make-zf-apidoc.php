@@ -42,8 +42,30 @@ if (file_exists($work_path)) {
 }
 script_run_command('mkdir -p ' . $work_path . '/manual');
 
-// Copy files to working directory
-script_run_command('cp -a ' . $zf2_path . '/library ' . $work_path);
+// Create library and sync in components
+if (!file_exists($work_path . '/library/Zend')) {
+    script_run_command('mkdir -p ' . $work_path . '/library/Zend');
+}
+$components = explode(', ', $ini['package_list']);
+foreach ($components as $component) {
+    $component = str_replace('Zend_', '', $component);
+    if (false === strstr($component, '_')) {
+        $origin = $zf2_path . '/library/Zend/' . $component;
+        $target = $work_path . '/library/Zend/';
+        script_run_command('cp -a ' . $origin . ' ' . $target);
+        continue;
+    }
+
+    $subcomponents = explode('_', $component);
+    $component     = array_pop($subcomponents);
+    $subpath       = implode('/', $subcomponents);
+    $target        = $work_path . '/library/Zend/' . $subpath;
+    if (!file_exists($target)) {
+        script_run_command('mkdir -p ' . $target);
+    }
+    $origin = $zf2_path . '/library/Zend/' . $subpath . '/' . $component;
+    script_run_command('cp -a ' . $origin . ' ' . $target);
+}
 
 // Create API documentation
 script_run_command('mkdir -p ' . $work_path . '/documentation/apidoc/core');
