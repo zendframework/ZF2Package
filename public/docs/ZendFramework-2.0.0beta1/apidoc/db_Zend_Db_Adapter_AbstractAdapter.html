@@ -1,0 +1,2286 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Zend Framework 2.0 API Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" class="content">
+<div class="sub-page-main-header-api-documentation"><h2>API Documentation</h2></div>
+<div class="dotted-line"></div>
+</div>
+<div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">Zend/Db/Adapter/AbstractAdapter.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5CZend%5CDb%5CAdapter%5CAbstractAdapter">\Zend\Db\Adapter\AbstractAdapter</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><div id="file-description">
+<p xmlns:dbx="http://docblox-project.org/xsl/functions" class="short-description">Zend Framework</p>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="long-description"><p>LICENSE</p>
+
+<p>This source file is subject to the new BSD license that is bundled
+with this package in the file LICENSE.txt.
+It is also available through the world-wide-web at this URL:
+http://framework.zend.com/license/new-bsd
+If you did not receive a copy of the license and are unable to
+obtain it through the world-wide-web, please send an email
+to license@zend.com so we can send you a copy immediately.</p>
+</div>
+</div>
+<dl class="file-info">
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Category</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Zend
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Copyright</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Copyright (c) 2005-2011 Zend Technologies USA Inc. (http://www.zend.com)
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">License</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">
+<a href="http://framework.zend.com/license/new-bsd">New BSD License</a>
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Package</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Zend_Db
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Subpackage</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Adapter
+         
+    </dd>
+</dl>
+<a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\Zend\Db\Adapter\AbstractAdapter" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\Zend\Db\Adapter\AbstractAdapter<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Zend\Db\Adapter</small><p class="short-description">Class for connecting to SQL databases and performing common operations.</p>
+<div class="long-description">
+</div>
+<dl class="class-info">
+<dt>Children</dt>
+<dd><a href="db_Zend_Db_Adapter_Oracle.html#%5CZend%5CDb%5CAdapter%5COracle">\Zend\Db\Adapter\Oracle</a></dd>
+<dd><a href="db_Zend_Db_Adapter_Mysqli.html#%5CZend%5CDb%5CAdapter%5CMysqli">\Zend\Db\Adapter\Mysqli</a></dd>
+<dd><a href="db_Zend_Db_Adapter_AbstractPdoAdapter.html#%5CZend%5CDb%5CAdapter%5CAbstractPdoAdapter">\Zend\Db\Adapter\AbstractPdoAdapter</a></dd>
+<dd><a href="db_Zend_Db_Adapter_Sqlsrv.html#%5CZend%5CDb%5CAdapter%5CSqlsrv">\Zend\Db\Adapter\Sqlsrv</a></dd>
+<dd><a href="db_Zend_Db_Adapter_Db2.html#%5CZend%5CDb%5CAdapter%5CDb2">\Zend\Db\Adapter\Db2</a></dd>
+<dt>Category</dt>
+<dd>Zend
+         
+    </dd>
+<dt>Copyright</dt>
+<dd>Copyright (c) 2005-2011 Zend Technologies USA Inc. (http://www.zend.com)
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://framework.zend.com/license/new-bsd">New BSD License</a>
+         
+    </dd>
+<dt>Used_by</dt>
+<dd>
+<a href="db_Zend_Db_Adapter_Oracle.html#%5CZend%5CDb%5CAdapter%5COracle">\Zend\Db\Adapter\Oracle</a>
+         
+    </dd>
+<dt>Used_by</dt>
+<dd>
+<a href="db_Zend_Db_Adapter_Mysqli.html#%5CZend%5CDb%5CAdapter%5CMysqli">\Zend\Db\Adapter\Mysqli</a>
+         
+    </dd>
+<dt>Used_by</dt>
+<dd>
+<a href="db_Zend_Db_Adapter_AbstractPdoAdapter.html#%5CZend%5CDb%5CAdapter%5CAbstractPdoAdapter">\Zend\Db\Adapter\AbstractPdoAdapter</a>
+         
+    </dd>
+<dt>Used_by</dt>
+<dd>
+<a href="db_Zend_Db_Adapter_Sqlsrv.html#%5CZend%5CDb%5CAdapter%5CSqlsrv">\Zend\Db\Adapter\Sqlsrv</a>
+         
+    </dd>
+<dt>Used_by</dt>
+<dd>
+<a href="db_Zend_Db_Adapter_Db2.html#%5CZend%5CDb%5CAdapter%5CDb2">\Zend\Db\Adapter\Db2</a>
+         
+    </dd>
+<dt>Used_by</dt>
+<dd>
+<a href="db_Zend_Db_Table_AbstractTable.html#%5CZend%5CDb%5CTable%5CAbstractTable">\Zend\Db\Table\AbstractTable</a>
+         
+    </dd>
+<dt>Used_by</dt>
+<dd>
+<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a>
+         
+    </dd>
+<dt>Uses</dt>
+<dd>
+<a href="db_Zend_Db_Db.html#%5CZend%5CDb%5CDb">\Zend\Db\Db</a>
+         
+    </dd>
+<dt>Uses</dt>
+<dd>
+<a href="db_Zend_Db_Adapter_Exception.html#%5CZend%5CDb%5CAdapter%5CException">\Zend\Db\Adapter\Exception</a>
+         
+    </dd>
+<dt>Uses</dt>
+<dd>
+<a href="db_Zend_Db_Profiler.html#%5CZend%5CDb%5CProfiler">\Zend\Db\Profiler</a>
+         
+    </dd>
+<dt>Uses</dt>
+<dd>
+<a href="db_Zend_Db_Profiler_Exception.html#%5CZend%5CDb%5CProfiler%5CException">\Zend\Db\Profiler\Exception</a>
+         
+    </dd>
+<dt>Uses</dt>
+<dd>
+<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a>
+         
+    </dd>
+<dt>Uses</dt>
+<dd>\Zend\Loader
+         
+    </dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::$_allowSerialization" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">bool
+                 <span class="highlight">$_allowSerialization</span>= 'true'
+                </code><div class="description">
+<p class="short-description">Weither or not that object can get serialized</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>true</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>bool</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::$_autoQuoteIdentifiers" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">bool
+                 <span class="highlight">$_autoQuoteIdentifiers</span>= 'true'
+                </code><div class="description">
+<p class="short-description">Specifies whether the adapter automatically quotes identifiers.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If true, most SQL generated by Zend_Db classes applies
+identifier quoting automatically.
+If false, developer must quote identifiers themselves
+by calling quoteIdentifier().</p>
+</div>
+<strong>Default value</strong><code>true</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>bool</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::$_autoReconnectOnUnserialize" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">bool
+                 <span class="highlight">$_autoReconnectOnUnserialize</span>= 'false'
+                </code><div class="description">
+<p class="short-description">Weither or not the database should be reconnected
+to that adapter when waking up</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>false</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>bool</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::$_caseFolding" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">integer
+                 <span class="highlight">$_caseFolding</span>= 'Db\Db::CASE_NATURAL'
+                </code><div class="description">
+<p class="short-description">Specifies the case of column names retrieved in queries
+Options
+Zend_Db::CASE_NATURAL (default)
+Zend_Db::CASE_LOWER
+Zend_Db::CASE_UPPER</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>Db\Db::CASE_NATURAL</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>integer</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::$_config" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$_config</span>= 'array()'
+                </code><div class="description">
+<p class="short-description">User-provided configuration</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::$_connection" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">object|resource|null
+                 <span class="highlight">$_connection</span>= 'null'
+                </code><div class="description">
+<p class="short-description">Database connection</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>objectresourcenull</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::$_defaultProfilerClass" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$_defaultProfilerClass</span>= ''\Zend\Db\Profiler''
+                </code><div class="description">
+<p class="short-description">Default class name for the profiler object.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>'\Zend\Db\Profiler'</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::$_defaultStmtClass" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$_defaultStmtClass</span>= ''\Zend\Db\Statement\AbstractStatement''
+                </code><div class="description">
+<p class="short-description">Default class name for a DB statement.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>'\Zend\Db\Statement\AbstractStatement'</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::$_fetchMode" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">integer
+                 <span class="highlight">$_fetchMode</span>= 'Db\Db::FETCH_ASSOC'
+                </code><div class="description">
+<p class="short-description">Fetch mode</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>Db\Db::FETCH_ASSOC</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>integer</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::$_numericDataTypes" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$_numericDataTypes</span>= 'array(
+        Db\Db::INT_TYPE    =&gt; Db\Db::INT_TYPE'
+                </code><div class="description">
+<p class="short-description">Keys are UPPERCASE SQL datatypes or the constants
+Zend_Db::INT_TYPE, Zend_Db::BIGINT_TYPE, or Zend_Db::FLOAT_TYPE.</p>Associative array of datatypes to values 0, 1, or 2.</div>
+<div class="code-tabs">
+<div class="long-description"><p>Values are:
+0 = 32-bit integer
+1 = 64-bit integer
+2 = float or decimal</p>
+</div>
+<strong>Default value</strong><code>array(
+        Db\Db::INT_TYPE    =&gt; Db\Db::INT_TYPE</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::$_profiler" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\Zend\Db\Profiler
+                 <span class="highlight">$_profiler</span>= ''
+                </code><div class="description">
+<p class="short-description">Query profiler object, of type Zend_Db_Profiler
+or a subclass of that.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_Zend_Db_Profiler.html#%5CZend%5CDb%5CProfiler">\Zend\Db\Profiler</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          array|<a href="db_Zend_Config_Config.html#%5CZend%5CConfig%5CConfig">\Zend\Config\Config</a> $config
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Constructor.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>$config is an array of key/value pairs or an instance of Zend_Config
+containing configuration options.  These options are common to most adapters:</p>
+
+<p>dbname         => (string) The name of the database to user
+username       => (string) Connect to the database as this username.
+password       => (string) Password associated with the username.
+host           => (string) What host to connect to, defaults to localhost</p>
+
+<p>Some options are used on a case-by-case basis by adapters:</p>
+
+<p>port           => (string) The port of the database
+persistent     => (boolean) Whether to use a persistent connection or not, defaults to false
+protocol       => (string) The network protocol, defaults to TCPIP
+caseFolding    => (int) style of case-alteration used for identifiers</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$config</th>
+<td>array|<a href="db_Zend_Config_Config.html#%5CZend%5CConfig%5CConfig">\Zend\Config\Config</a>
+</td>
+<td><em><p>An array or instance of \Zend\Config\Config having configuration data</p>
+</em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Adapter_Exception.html#%5CZend%5CDb%5CAdapter%5CException">\Zend\Db\Adapter\Exception</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::__sleep()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__sleep</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">called when object is getting serialized
+This disconnects the DB object that cant be serialized</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Adapter_Exception.html#%5CZend%5CDb%5CAdapter%5CException">\Zend\Db\Adapter\Exception</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::__wakeup()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__wakeup</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">called when object is getting unserialized</p></div>
+<div class="code-tabs"><div class="long-description">
+</div></div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::_beginTransaction()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_beginTransaction</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Begin a transaction.</p>
+</div>
+<div class="code-tabs"><div class="long-description">
+</div></div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::_checkRequiredOptions()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_checkRequiredOptions</span><span class="nb-faded-text">(
+          array $config
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Check for config options that are mandatory.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Throw exceptions if any are missing.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$config</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Adapter_Exception.html#%5CZend%5CDb%5CAdapter%5CException">\Zend\Db\Adapter\Exception</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::_commit()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_commit</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Commit a transaction.</p>
+</div>
+<div class="code-tabs"><div class="long-description">
+</div></div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::_connect()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_connect</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Creates a connection to the database.</p>
+</div>
+<div class="code-tabs"><div class="long-description">
+</div></div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::_quote()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_quote</span><span class="nb-faded-text">(
+          string $value
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Quote a raw string.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$value</th>
+<td>string</td>
+<td><em><p>Raw string</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>Quoted string</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::_quoteIdentifier()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_quoteIdentifier</span><span class="nb-faded-text">(
+          string $value, boolean $auto
+              =
+              false
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Quote an identifier.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$value</th>
+<td>string</td>
+<td><em><p>The identifier or expression.</p></em></td>
+</tr>
+<tr>
+<th>$auto</th>
+<td>boolean</td>
+<td><em><p>If true, heed the AUTO_QUOTE_IDENTIFIERS config option.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The quoted identifier and alias.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::_quoteIdentifierAs()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_quoteIdentifierAs</span><span class="nb-faded-text">(
+          string|array|<a href="db_Zend_Db_Expr.html#%5CZend%5CDb%5CExpr">\Zend\Db\Expr</a> $ident, string $alias
+              =
+              null, boolean $auto
+              =
+              false, string $as
+              =
+              ' AS '
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Quote an identifier and an optional alias.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$ident</th>
+<td>string|array|<a href="db_Zend_Db_Expr.html#%5CZend%5CDb%5CExpr">\Zend\Db\Expr</a>
+</td>
+<td><em><p>The identifier or expression.</p></em></td>
+</tr>
+<tr>
+<th>$alias</th>
+<td>string</td>
+<td><em><p>An optional alias.</p></em></td>
+</tr>
+<tr>
+<th>$auto</th>
+<td>boolean</td>
+<td><em><p>If true, heed the AUTO_QUOTE_IDENTIFIERS config option.</p></em></td>
+</tr>
+<tr>
+<th>$as</th>
+<td>string</td>
+<td><em><p>The string to add between the identifier/expression and the alias.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The quoted identifier and alias.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::_rollBack()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_rollBack</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Roll-back a transaction.</p>
+</div>
+<div class="code-tabs"><div class="long-description">
+</div></div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::_whereExpr()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_whereExpr</span><span class="nb-faded-text">(
+          mixed $where
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Convert an array, string, or Zend_Db_Expr object
+into a string to put in a WHERE clause.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$where</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::beginTransaction()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">beginTransaction</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_Db_Adapter_AbstractAdapter.html#%5CZend%5CDb%5CAdapter%5CAbstractAdapter">\Zend\Db\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Leave autocommit mode and begin a transaction.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Adapter_AbstractAdapter.html#%5CZend%5CDb%5CAdapter%5CAbstractAdapter">\Zend\Db\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::closeConnection()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">closeConnection</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Force the connection to close.</p>
+</div>
+<div class="code-tabs"><div class="long-description">
+</div></div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::commit()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">commit</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_Db_Adapter_AbstractAdapter.html#%5CZend%5CDb%5CAdapter%5CAbstractAdapter">\Zend\Db\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Commit a transaction and return to autocommit mode.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Adapter_AbstractAdapter.html#%5CZend%5CDb%5CAdapter%5CAbstractAdapter">\Zend\Db\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::delete()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">delete</span><span class="nb-faded-text">(
+          mixed $table, mixed $where
+              =
+              ''
+          )
+        </span>
+        :
+          int</code><div class="description"><p class="short_description">Deletes table rows based on a WHERE clause.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$table</th>
+<td>mixed</td>
+<td><em><p>The table to update.</p></em></td>
+</tr>
+<tr>
+<th>$where</th>
+<td>mixed</td>
+<td><em><p>DELETE WHERE clause(s).</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The number of affected rows.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::describeTable()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">describeTable</span><span class="nb-faded-text">(
+          string $tableName, string $schemaName
+              =
+              null
+          )
+        </span>
+        :
+          array</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Returns the column descriptions for a table.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>The return value is an associative array keyed by the column name,
+as returned by the RDBMS.</p>
+
+<p>The value of each array element is an associative array
+with the following keys:</p>
+
+<p>SCHEMA_NAME => string; name of database or schema
+TABLE_NAME  => string;
+COLUMN_NAME => string; column name
+COLUMN_POSITION => number; ordinal position of column in table
+DATA_TYPE   => string; SQL datatype name of column
+DEFAULT     => string; default expression of column, null if none
+NULLABLE    => boolean; true if column can have nulls
+LENGTH      => number; length of CHAR/VARCHAR
+SCALE       => number; scale of NUMERIC/DECIMAL
+PRECISION   => number; precision of NUMERIC/DECIMAL
+UNSIGNED    => boolean; unsigned property of an integer type
+PRIMARY     => boolean; true if column is part of the primary key
+PRIMARY_POSITION => integer; position of column in primary key</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tableName</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$schemaName</th>
+<td>string</td>
+<td><em><p>OPTIONAL</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::fetchAll()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">fetchAll</span><span class="nb-faded-text">(
+          string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a> $sql, mixed $bind
+              =
+              array(), mixed $fetchMode
+              =
+              null
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Fetches all SQL result rows as a sequential array.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Uses the current fetchMode for the adapter.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sql</th>
+<td>string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a>
+</td>
+<td><em><p>An SQL SELECT statement.</p></em></td>
+</tr>
+<tr>
+<th>$bind</th>
+<td>mixed</td>
+<td><em><p>Data to bind into SELECT placeholders.</p></em></td>
+</tr>
+<tr>
+<th>$fetchMode</th>
+<td>mixed</td>
+<td><em><p>Override current fetch mode.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::fetchAssoc()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">fetchAssoc</span><span class="nb-faded-text">(
+          string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a> $sql, mixed $bind
+              =
+              array()
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Fetches all SQL result rows as an associative array.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The first column is the key, the entire row array is the
+value.  You should construct the query to be sure that
+the first column contains unique values, or else
+rows with duplicate values in the first column will
+overwrite previous data.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sql</th>
+<td>string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a>
+</td>
+<td><em><p>An SQL SELECT statement.</p></em></td>
+</tr>
+<tr>
+<th>$bind</th>
+<td>mixed</td>
+<td><em><p>Data to bind into SELECT placeholders.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::fetchCol()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">fetchCol</span><span class="nb-faded-text">(
+          string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a> $sql, mixed $bind
+              =
+              array()
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Fetches the first column of all SQL result rows as an array.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The first column in each row is used as the array key.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sql</th>
+<td>string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a>
+</td>
+<td><em><p>An SQL SELECT statement.</p></em></td>
+</tr>
+<tr>
+<th>$bind</th>
+<td>mixed</td>
+<td><em><p>Data to bind into SELECT placeholders.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::fetchOne()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">fetchOne</span><span class="nb-faded-text">(
+          string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a> $sql, mixed $bind
+              =
+              array()
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Fetches the first column of the first row of the SQL result.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sql</th>
+<td>string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a>
+</td>
+<td><em><p>An SQL SELECT statement.</p></em></td>
+</tr>
+<tr>
+<th>$bind</th>
+<td>mixed</td>
+<td><em><p>Data to bind into SELECT placeholders.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::fetchPairs()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">fetchPairs</span><span class="nb-faded-text">(
+          string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a> $sql, mixed $bind
+              =
+              array()
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Fetches all SQL result rows as an array of key-value pairs.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The first column is the key, the second column is the
+value.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sql</th>
+<td>string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a>
+</td>
+<td><em><p>An SQL SELECT statement.</p></em></td>
+</tr>
+<tr>
+<th>$bind</th>
+<td>mixed</td>
+<td><em><p>Data to bind into SELECT placeholders.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::fetchRow()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">fetchRow</span><span class="nb-faded-text">(
+          string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a> $sql, mixed $bind
+              =
+              array(), mixed $fetchMode
+              =
+              null
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Fetches the first row of the SQL result.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Uses the current fetchMode for the adapter.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sql</th>
+<td>string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a>
+</td>
+<td><em><p>An SQL SELECT statement.</p></em></td>
+</tr>
+<tr>
+<th>$bind</th>
+<td>mixed</td>
+<td><em><p>Data to bind into SELECT placeholders.</p></em></td>
+</tr>
+<tr>
+<th>$fetchMode</th>
+<td>mixed</td>
+<td><em><p>Override current fetch mode.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::foldCase()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">foldCase</span><span class="nb-faded-text">(
+          string $key
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Helper method to change the case of the strings used
+when returning result sets in FETCH_ASSOC and FETCH_BOTH
+modes.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>This is not intended to be used by application code,
+but the method must be public so the Statement class
+can invoke it.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$key</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::getConfig()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getConfig</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Returns the configuration variables in this adapter.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::getConnection()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getConnection</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          object|resource|null</code><div class="description"><p class="short_description">Returns the underlying database connection object or resource.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If not presently connected, this initiates the connection.</p>
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>object|resource|null</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::getFetchMode()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFetchMode</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          int</code><div class="description"><p class="short_description">Get the fetch mode.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::getProfiler()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getProfiler</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_Db_Profiler.html#%5CZend%5CDb%5CProfiler">\Zend\Db\Profiler</a></code><div class="description"><p class="short_description">Returns the profiler for this adapter.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Profiler.html#%5CZend%5CDb%5CProfiler">\Zend\Db\Profiler</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::getQuoteIdentifierSymbol()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getQuoteIdentifierSymbol</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Returns the symbol the adapter uses for delimited identifiers.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::getServerVersion()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getServerVersion</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          string</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Retrieve server version in PHP style</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::getStatementClass()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getStatementClass</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Get the default statement class.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::insert()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">insert</span><span class="nb-faded-text">(
+          mixed $table, array $bind
+          )
+        </span>
+        :
+          int</code><div class="description"><p class="short_description">Inserts a table row with specified data.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$table</th>
+<td>mixed</td>
+<td><em><p>The table to insert data into.</p></em></td>
+</tr>
+<tr>
+<th>$bind</th>
+<td>array</td>
+<td><em><p>Column-value pairs.</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The number of affected rows.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::isConnected()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">isConnected</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          boolean</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Test if a connection is active</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::lastInsertId()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">lastInsertId</span><span class="nb-faded-text">(
+          string $tableName
+              =
+              null, string $primaryKey
+              =
+              null
+          )
+        </span>
+        :
+          string</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Gets the last ID generated automatically by an IDENTITY/AUTOINCREMENT column.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description"><p>As a convention, on RDBMS brands that support sequences
+(e.g. Oracle, PostgreSQL, Db2), this method forms the name of a sequence
+from the arguments and returns the last id generated by that sequence.
+On RDBMS brands that support IDENTITY/AUTOINCREMENT columns, this method
+returns the last value generated for such a column, and the table name
+argument is disregarded.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tableName</th>
+<td>string</td>
+<td><em><p>OPTIONAL Name of table.</p></em></td>
+</tr>
+<tr>
+<th>$primaryKey</th>
+<td>string</td>
+<td><em><p>OPTIONAL Name of primary key column.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::lastSequenceId()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">lastSequenceId</span><span class="nb-faded-text">(
+          string $sequenceName
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Return the most recent value from the specified sequence in the database.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>This is supported only on RDBMS brands that support sequences
+(e.g. Oracle, PostgreSQL, Db2).  Other RDBMS brands return null.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sequenceName</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::limit()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">limit</span><span class="nb-faded-text">(
+          mixed $sql, integer $count, integer $offset
+              =
+              0
+          )
+        </span>
+        :
+          string</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Adds an adapter-specific LIMIT clause to the SELECT statement.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sql</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$count</th>
+<td>integer</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$offset</th>
+<td>integer</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::listTables()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">listTables</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Returns a list of the tables in the database.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::nextSequenceId()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">nextSequenceId</span><span class="nb-faded-text">(
+          string $sequenceName
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Generate a new value from the specified sequence in the database, and return it.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>This is supported only on RDBMS brands that support sequences
+(e.g. Oracle, PostgreSQL, Db2).  Other RDBMS brands return null.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sequenceName</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::prepare()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">prepare</span><span class="nb-faded-text">(
+          string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a> $sql
+          )
+        </span>
+        :
+          <a href="db_Zend_Db_Statement.html#%5CZend%5CDb%5CStatement">\Zend\Db\Statement</a>|\Zend\Db\Adapter\PdoStatement</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Prepare a statement and return a PdoStatement-like object.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sql</th>
+<td>string|<a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a>
+</td>
+<td><em><p>SQL query</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>
+<a href="db_Zend_Db_Statement.html#%5CZend%5CDb%5CStatement">\Zend\Db\Statement</a>|\Zend\Db\Adapter\PdoStatement</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::query()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">query</span><span class="nb-faded-text">(
+          mixed $sql, mixed $bind
+              =
+              array()
+          )
+        </span>
+        :
+          <a href="db_Zend_Db_Statement.html#%5CZend%5CDb%5CStatement">\Zend\Db\Statement</a></code><div class="description"><p class="short_description">Prepares and executes an SQL statement with bound data.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$sql</th>
+<td>mixed</td>
+<td><em><p>The SQL statement with placeholders. May be a string or Zend_Db_Select.</p></em></td>
+</tr>
+<tr>
+<th>$bind</th>
+<td>mixed</td>
+<td><em><p>An array of data to bind to the placeholders.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Statement.html#%5CZend%5CDb%5CStatement">\Zend\Db\Statement</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::quote()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">quote</span><span class="nb-faded-text">(
+          mixed $value, mixed $type
+              =
+              null
+          )
+        </span>
+        :
+          mixed</code><div class="description"><p class="short_description">Safely quotes a value for an SQL statement.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If an array is passed as the value, the array values are quoted
+and then returned as a comma-separated string.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$value</th>
+<td>mixed</td>
+<td><em><p>The value to quote.</p></em></td>
+</tr>
+<tr>
+<th>$type</th>
+<td>mixed</td>
+<td><em><p>OPTIONAL the SQL datatype name, or constant, or null.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td>An SQL-safe quoted value (or string of separated values).</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::quoteColumnAs()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">quoteColumnAs</span><span class="nb-faded-text">(
+          string|array|<a href="db_Zend_Db_Expr.html#%5CZend%5CDb%5CExpr">\Zend\Db\Expr</a> $ident, string $alias, boolean $auto
+              =
+              false
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Quote a column identifier and alias.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$ident</th>
+<td>string|array|<a href="db_Zend_Db_Expr.html#%5CZend%5CDb%5CExpr">\Zend\Db\Expr</a>
+</td>
+<td><em><p>The identifier or expression.</p></em></td>
+</tr>
+<tr>
+<th>$alias</th>
+<td>string</td>
+<td><em><p>An alias for the column.</p></em></td>
+</tr>
+<tr>
+<th>$auto</th>
+<td>boolean</td>
+<td><em><p>If true, heed the AUTO_QUOTE_IDENTIFIERS config option.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The quoted identifier and alias.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::quoteIdentifier()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">quoteIdentifier</span><span class="nb-faded-text">(
+          string|array|<a href="db_Zend_Db_Expr.html#%5CZend%5CDb%5CExpr">\Zend\Db\Expr</a> $ident, boolean $auto
+              =
+              false
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Quotes an identifier.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Accepts a string representing a qualified indentifier. For Example:</p>
+
+<pre><code>$adapter->quoteIdentifier('myschema.mytable')
+</code></pre>
+
+<p>Returns: "myschema"."mytable"</p>
+
+<p>Or, an array of one or more identifiers that may form a qualified identifier:</p>
+
+<pre><code>$adapter->quoteIdentifier(array('myschema','my.table'))
+</code></pre>
+
+<p>Returns: "myschema"."my.table"</p>
+
+<p>The actual quote character surrounding the identifiers may vary depending on
+the adapter.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$ident</th>
+<td>string|array|<a href="db_Zend_Db_Expr.html#%5CZend%5CDb%5CExpr">\Zend\Db\Expr</a>
+</td>
+<td><em><p>The identifier.</p></em></td>
+</tr>
+<tr>
+<th>$auto</th>
+<td>boolean</td>
+<td><em><p>If true, heed the AUTO_QUOTE_IDENTIFIERS config option.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The quoted identifier.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::quoteInto()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">quoteInto</span><span class="nb-faded-text">(
+          string $text, mixed $value, string $type
+              =
+              null, integer $count
+              =
+              null
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Quotes a value and places into a piece of text at a placeholder.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The placeholder is a question-mark; all placeholders will be replaced
+with the quoted value.   For example:</p>
+
+<pre><code>$text = "WHERE date < ?";
+$date = "2005-01-02";
+$safe = $sql->quoteInto($text, $date);
+// $safe = "WHERE date < '2005-01-02'"
+</code></pre>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$text</th>
+<td>string</td>
+<td><em><p>The text with a placeholder.</p></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>mixed</td>
+<td><em><p>The value to quote.</p></em></td>
+</tr>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em><p>OPTIONAL SQL datatype</p></em></td>
+</tr>
+<tr>
+<th>$count</th>
+<td>integer</td>
+<td><em><p>OPTIONAL count of placeholders to replace</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>An SQL-safe quoted value placed into the original text.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::quoteTableAs()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">quoteTableAs</span><span class="nb-faded-text">(
+          string|array|<a href="db_Zend_Db_Expr.html#%5CZend%5CDb%5CExpr">\Zend\Db\Expr</a> $ident, string $alias
+              =
+              null, boolean $auto
+              =
+              false
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Quote a table identifier and alias.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$ident</th>
+<td>string|array|<a href="db_Zend_Db_Expr.html#%5CZend%5CDb%5CExpr">\Zend\Db\Expr</a>
+</td>
+<td><em><p>The identifier or expression.</p></em></td>
+</tr>
+<tr>
+<th>$alias</th>
+<td>string</td>
+<td><em><p>An alias for the table.</p></em></td>
+</tr>
+<tr>
+<th>$auto</th>
+<td>boolean</td>
+<td><em><p>If true, heed the AUTO_QUOTE_IDENTIFIERS config option.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The quoted identifier and alias.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::rollBack()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">rollBack</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_Db_Adapter_AbstractAdapter.html#%5CZend%5CDb%5CAdapter%5CAbstractAdapter">\Zend\Db\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Roll back a transaction and return to autocommit mode.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Adapter_AbstractAdapter.html#%5CZend%5CDb%5CAdapter%5CAbstractAdapter">\Zend\Db\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::select()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">select</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a></code><div class="description"><p class="short_description">Creates and returns a new Zend_Db_Select object for this adapter.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Select.html#%5CZend%5CDb%5CSelect">\Zend\Db\Select</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::setFetchMode()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setFetchMode</span><span class="nb-faded-text">(
+          integer $mode
+          )
+        </span>
+        :
+          void</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Set the fetch mode.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$mode</th>
+<td>integer</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Adapter_Exception.html#%5CZend%5CDb%5CAdapter%5CException">\Zend\Db\Adapter\Exception</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::setProfiler()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setProfiler</span><span class="nb-faded-text">(
+          \Zend\Db\Adapter\Zend_Db_Profiler|<a href="db_Zend_Config_Config.html#%5CZend%5CConfig%5CConfig">\Zend\Config\Config</a>|array|boolean $profiler
+          )
+        </span>
+        :
+          <a href="db_Zend_Db_Adapter_AbstractAdapter.html#%5CZend%5CDb%5CAdapter%5CAbstractAdapter">\Zend\Db\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Set the adapter's profiler object.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>The argument may be a boolean, an associative array, an instance of
+Zend_Db_Profiler, or an instance of Zend_Config.</p>
+
+<p>A boolean argument sets the profiler to enabled if true, or disabled if
+false.  The profiler class is the adapter's default profiler class,
+Zend_Db_Profiler.</p>
+
+<p>An instance of Zend_Db_Profiler sets the adapter's instance to that
+object.  The profiler is enabled and disabled separately.</p>
+
+<p>An associative array argument may contain any of the keys 'enabled',
+'class', and 'instance'. The 'enabled' and 'instance' keys correspond to the
+boolean and object types documented above. The 'class' key is used to name a
+class to use for a custom profiler. The class must be Zend_Db_Profiler or a
+subclass. The class is instantiated with no constructor arguments. The 'class'
+option is ignored when the 'instance' option is supplied.</p>
+
+<p>An object of type Zend_Config may contain the properties 'enabled', 'class', and
+'instance', just as if an associative array had been passed instead.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$profiler</th>
+<td>\Zend\Db\Adapter\Zend_Db_Profiler|<a href="db_Zend_Config_Config.html#%5CZend%5CConfig%5CConfig">\Zend\Config\Config</a>|array|boolean</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Adapter_AbstractAdapter.html#%5CZend%5CDb%5CAdapter%5CAbstractAdapter">\Zend\Db\Adapter\AbstractAdapter</a></td>
+<td>Provides a fluent interface</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Profiler_Exception.html#%5CZend%5CDb%5CProfiler%5CException">\Zend\Db\Profiler\Exception</a></td>
+<td><em>if the object instance or class specified is not Zend_Db_Profiler or an extension of that class.</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::setStatementClass()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setStatementClass</span><span class="nb-faded-text">(
+           $class
+          )
+        </span>
+        :
+          <a href="db_Zend_Db_Adapter_AbstractAdapter.html#%5CZend%5CDb%5CAdapter%5CAbstractAdapter">\Zend\Db\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Set the default statement class.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$class</th>
+<td></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Adapter_AbstractAdapter.html#%5CZend%5CDb%5CAdapter%5CAbstractAdapter">\Zend\Db\Adapter\AbstractAdapter</a></td>
+<td>Fluent interface</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::supportsParameters()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">supportsParameters</span><span class="nb-faded-text">(
+          string $type
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Check if the adapter supports real SQL parameters.</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$type</th>
+<td>string</td>
+<td><em><p>'positional' or 'named'</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Db\Adapter\AbstractAdapter::update()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">update</span><span class="nb-faded-text">(
+          mixed $table, array $bind, mixed $where
+              =
+              ''
+          )
+        </span>
+        :
+          int</code><div class="description"><p class="short_description">Updates table rows with specified data based on a WHERE clause.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$table</th>
+<td>mixed</td>
+<td><em><p>The table to update.</p></em></td>
+</tr>
+<tr>
+<th>$bind</th>
+<td>array</td>
+<td><em><p>Column-value pairs.</p>
+</em></td>
+</tr>
+<tr>
+<th>$where</th>
+<td>mixed</td>
+<td><em><p>UPDATE WHERE clause(s).</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>int</td>
+<td>The number of affected rows.</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.15.1</a>.
+    </small></body></html>

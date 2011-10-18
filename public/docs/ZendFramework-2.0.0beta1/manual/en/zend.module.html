@@ -1,0 +1,635 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Chapter 8. Zend\Module</title>
+<link rel="stylesheet" href="dbstyle.css" type="text/css">
+<meta name="generator" content="DocBook XSL Stylesheets V1.75.2">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="chapter" href="learning.di.html" title="Chapter 3. Learning Dependency Injection">
+<link rel="article" href="ar01.html" title="">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.di.html" title="Chapter 4. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 5. Zend\EventManager">
+<link rel="chapter" href="zend.http.html" title="Chapter 6. Zend_Http">
+<link rel="chapter" href="zend.loader.html" title="Chapter 7. Zend_Loader">
+<link rel="chapter" href="zend.module.html" title="Chapter 8. Zend\Module">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 9. Zend\Mvc">
+<link rel="chapter" href="zend.uri.html" title="Chapter 10. Zend_Uri">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="section" href="zend.module.html#zend.module.intro" title="8.1. Introduction to the Module System">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">Chapter 8. Zend\Module</th></tr>
+<tr>
+<td width="20%" align="left"> </td>
+<th width="60%" align="center">Part III. Zend Framework Reference</th>
+<td width="20%" align="right"> </td>
+</tr>
+</table></div>
+<div class="chapter" title="Chapter 8. Zend\Module">
+<div class="titlepage"><div><div><h2 class="title">
+<a name="zend.module"></a>Chapter 8. Zend\Module</h2></div></div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl>
+<dt><span class="section"><a href="zend.module.html#zend.module.intro">8.1. Introduction to the Module System</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="zend.module.html#zend.module.intro.the-module-class">8.1.1. The Module Class</a></span></dt>
+<dt><span class="section"><a href="zend.module.html#zend.module.intro.the-init.post-event">8.1.2. The "init.post" Event</a></span></dt>
+<dt><span class="section"><a href="zend.module.html#zend.module.intro.module-loading">8.1.3. Module Loading</a></span></dt>
+<dt><span class="section"><a href="zend.module.html#zend.module.intro.non-standard-module-paths">8.1.4. Non-Standard / Explicit Module Paths</a></span></dt>
+<dt><span class="section"><a href="zend.module.html#zend.module.intro.the-autoload-files">8.1.5. The autoload_*.php Files</a></span></dt>
+<dt><span class="section"><a href="zend.module.html#zend.module.intro.packagine-modules-with-phar">8.1.6. Packaging Modules with Phar</a></span></dt>
+<dt><span class="section"><a href="zend.module.html#zend.module.intro.best-practices-for-modules">8.1.7. Best Practices for Modules</a></span></dt>
+</dl></dd>
+</dl>
+</div>
+            
+            
+            <div class="section" title="8.1. Introduction to the Module System">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.module.intro"></a>8.1. Introduction to the Module System</h2></div></div></div>
+    
+
+    <p>
+        Zend Framework 2.0 introduces a new and powerful approach to modules.
+        This new module system is designed with flexibility, simplicity, and
+        re-usability in mind. A module may contain just about anything: PHP
+        code, including MVC functionality; library code; view scripts; and/or
+        or public assets such as images, CSS, and JavaScript. The possibilities
+        are endless.
+    </p>
+
+    <p>
+        The module system in Zend Framework 2 is made of up two main
+        components:
+    </p>
+
+    <div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+            <p>
+                <code class="classname">Zend\Module\Manager</code> is responsible for
+                most module-related tasks such as instantiating modules'
+                <code class="classname">Module</code> objects, merging module
+                configuration, keeping track of loaded modules, etc.
+            </p>
+        </li>
+<li class="listitem">
+            <p>
+                <code class="classname">Zend\Loader\ModuleAutoloader</code> is a
+                specialized autoloader that is responsible for locating and
+                on-demand loading of modules' <code class="classname">Module</code>
+                classes from a variety of sources.
+            </p>
+        </li>
+</ul></div>
+
+    <div class="note" title="Note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top">
+        <p>
+            The name of a module in Zend Framework 2 is simply a <a class="ulink" href="http://php.net/namespaces" target="_top"><acronym class="acronym">PHP</acronym>
+                namespace</a> and must follow all of the same rules.
+        </p>
+    </td></tr>
+</table></div>
+
+    <p>
+        The recommended structure of a typical MVC-oriented module is as
+        follows:
+    </p>
+
+    <div class="literallayout"><p><br>
+module_root/<br>
+    Module.php<br>
+    autoload_classmap.php<br>
+    autoload_function.php<br>
+    autoload_register.php<br>
+    configs/<br>
+        module.config.php<br>
+    public/<br>
+        images/<br>
+        css/<br>
+        js/<br>
+    src/<br>
+        &lt;module_namespace&gt;/<br>
+            &lt;code files&gt;<br>
+    tests/<br>
+        phpunit.xml<br>
+        bootstrap.php<br>
+        &lt;module_namespace&gt;/<br>
+            &lt;test code files&gt;<br>
+    views/<br>
+        &lt;dir-named-after-a-controller/<br>
+            &lt;.phtml files&gt;<br>
+</p></div>
+
+
+    <div class="section" title="8.1.1. The Module Class">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.module.intro.the-module-class"></a>8.1.1. The Module Class</h3></div></div></div>
+        
+
+        <p>
+            The <code class="classname">Module</code> class is single most important
+            part of any Zend Framework 2 module. When initializing a module,
+            <code class="classname">Zend\Module\Manager</code> only cares that a
+            <code class="classname">Module</code> class exists under that module's
+            namespace. 
+        </p>
+
+        <div class="example">
+<a name="zend.module.intro.example.minimal-module"></a><p class="title"><b>Example 8.1. A Minimal Module</b></p>
+<div class="example-contents">
+            
+
+            <p>
+                As an example, provided the module name "MyModule",
+                <code class="classname">Zend\Module\Manager</code> will simply expect
+                the class <code class="classname">MyModule\Module</code> to be
+                available. It is the responsibility of
+                <code class="classname">Zend\Loader\ModuleAutoloader</code> to find and
+                include the <code class="classname">MyModule\Module</code> class if it
+                is not already available. 
+            </p>
+
+            <p>
+                A module named "MyModule" module might start out looking
+                something like this:
+            </p>
+     
+            <div class="literallayout"><p><br>
+MyModule/<br>
+    Module.php<br>
+</p></div>
+
+            <p>
+                Within <code class="filename">Module.php</code>, you define your
+                <code class="classname">MyModule\Module</code> class:
+            </p>
+
+            <pre class="programlisting">
+namespace MyModule;
+
+class Module
+{
+}
+</pre>
+            <p>
+                Though it will not serve any purpose, this "MyModule" module
+                now has everything it needs to be considered a valid module and
+                be loaded by the module system!
+            </p>
+        </div>
+</div>
+<br class="example-break">
+
+        <p>
+            This <code class="classname">Module</code> class serves as the single entry
+            point for <code class="classname">Zend\Module\Manager</code> to detect and
+            interact with a module.  From within this simple, yet powerful
+            class, modules can override or provide additional application
+            configuration, perform initialization tasks such as registering
+            autoloader(s) and event listeners, declare dependencies, and much
+            more.
+        </p>
+
+        <p>
+            Typically, you'll want to take advantage of a couple of special
+            methods in your module's <code class="classname">Module</code> class. The
+            following methods are called by
+            <code class="classname">Zend\Module\Manager</code> on
+            <span class="emphasis"><em>every</em></span> enabled module for
+            <span class="emphasis"><em>every</em></span> application request:
+        </p>
+
+        <div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+                <p>
+                    The <code class="methodname">init()</code> method should be used
+                    for performing <span class="emphasis"><em>lightweight</em></span> tasks such
+                    as registering an autoloader or event listeners.
+                    <code class="classname">Zend\Module\Manager</code> passes itself as
+                    the only parameter to the <code class="methodname">init()</code>
+                    method.
+                </p>
+            </li>
+<li class="listitem">
+                <p>
+                    The <code class="methodname">getConfig()</code> method allows
+                    modules to inject their own configuration into the global
+                    application configuration. The application environment
+                    string will be passed as the only parameter to the
+                    <code class="methodname">getConfig()</code> method, allowing you
+                    to return the appropriate configuration contengent upon the
+                    application environment. The
+                    <code class="methodname">getConfig()</code> method is expected to
+                    always return an instance of
+                    <code class="classname">Zend\Config\Config</code>. All returned
+                    configurations will be merged by
+                    <code class="classname">Zend\Module\Manager</code> and resulting
+                    merged configuration will be utilized by the application.
+                </p>
+            </li>
+</ul></div>
+
+        <div class="example">
+<a name="zend.module.intro.example.typical-module-class"></a><p class="title"><b>Example 8.2. A Typical Module Class</b></p>
+<div class="example-contents">
+            
+
+            <p>
+                The following example shows a more typical usage of the
+                <code class="classname">Module</code> class:
+            </p>
+
+            <pre class="programlisting">
+namespace MyModule;
+
+use Zend\Config\Config,
+    Zend\Loader\AutoloaderFactory,
+    Zend\Module\Manager;
+
+class Module
+{
+    public function init(Manager $moduleManager = null)
+    {
+        $this-&gt;initAutoloader();
+    }
+
+    public function getConfig($env = null)
+    {
+        $config = new Config(include __DIR__ . '/configs/module.config.php');
+        if ($env &amp;&amp; isset($config-&gt;{$env})) {
+            return $config-&gt;{$env};
+        } 
+        return $config; 
+    }
+
+    public function initAutoloader()
+    {
+        AutoloaderFactory::factory(array(
+            'Zend\Loader\ClassMapAutoloader' =&gt; array(
+                __DIR__ . '/autoload_classmap.php',
+            ),
+            'Zend\Loader\StandardAutoloader' =&gt; array(
+                'namespaces' =&gt; array(
+                    __NAMESPACE__ =&gt; __DIR__ . '/src/' . __NAMESPACE__,
+                ),
+            ),
+        ));
+    }
+}
+</pre>
+        </div>
+</div>
+<br class="example-break">    
+
+        <div class="note" title="Note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top">
+            <p>
+                While modules can exist without a Module class, it would not be
+                detected by the module autoloader or manager. An alternative
+                method of utilizing such a module would have to be provided by
+                the developer. For the purposes of this documentation, we will
+                not go into such use-cases.
+            </p>
+        </td></tr>
+</table></div>
+    </div>
+
+    <div class="section" title='8.1.2. The "init.post" Event'>
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.module.intro.the-init.post-event"></a>8.1.2. The "init.post" Event</h3></div></div></div>
+        
+
+        <p>
+            It is not safe for a module to assume that any other modules have
+            already been loaded at the time <code class="methodname">init()</code>
+            method is called. If your module needs to perform some action(s)
+            after all other modules have been loaded, the module manager's
+            "init.post" event makes this easy. 
+        </p>
+
+        <div class="example">
+<a name="zend.module.intro.example.init.post-event"></a><p class="title"><b>Example 8.3. Sample Usage of "init.post" Event</b></p>
+<div class="example-contents">
+            
+
+            <pre class="programlisting">
+use Zend\Module\Manager as ModuleManager;
+
+class Module
+{
+public function init(ModuleManager $moduleManger)
+{
+    $events = $moduleManager-&gt;events();
+    $events-&gt;attach('init.post', array($this, 'postInit'));
+}
+
+public function postInit($e)
+{
+    // This method is called once all modules are loaded.
+    $moduleManager = $e-&gt;getTarget();
+    $loadedModules = $moduleManager-&gt;getLoadedModules();
+    $config        = $moduleManager-&gt;getMergedConfig();
+}
+}
+</pre>
+        </div>
+</div>
+<br class="example-break">
+    </div>
+
+    <div class="section" title="8.1.3. Module Loading">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.module.intro.module-loading"></a>8.1.3. Module Loading</h3></div></div></div>
+        
+
+        <p>
+            Typically, modules will live under a <code class="filename">modules/</code>
+            directory under your application's root directory. To make such a
+            configuration work, we need to configure and register an instance
+            of <code class="classname">Zend\Loader\ModuleAutoloader</code>. The module
+            autoloader takes an array of paths which it should search when
+            trying to load modules.
+        </p>
+
+        <div class="example">
+<a name="zend.module.intro.example.module-loading-single-path"></a><p class="title"><b>Example 8.4. Registering a Single Module Path</b></p>
+<div class="example-contents">
+            
+
+            <p>
+                The following example will search for modules in
+                <code class="filename">/path/to/myzf2project/modules</code>.
+            </p>
+
+            <pre class="programlisting">
+// Assuming we're in /path/to/myzf2project/public/index.php
+$moduleLoader = new \Zend\Loader\ModuleAutoloader(array(
+realpath(__DIR__ . '/../modules')
+));
+$moduleLoader-&gt;register();
+</pre>
+        </div>
+</div>
+<br class="example-break">
+
+        <p>
+            Of course, multiple module paths can be registered as well,
+            allowing multiple applications to share a single copy of a module.
+        </p>
+
+        <div class="example">
+<a name="zend.module.intro.example.module-loading-multiple-paths"></a><p class="title"><b>Example 8.5. Registering Multiple Module Paths</b></p>
+<div class="example-contents">
+            
+
+            <p>
+                In this example, two paths are registered with the module
+                autoloader: an application-local modules directory and a
+                system-wide modules directory.
+            </p>
+
+            <pre class="programlisting">
+// Assuming we're in /path/to/myzf2project/public/index.php
+$moduleLoader = new \Zend\Loader\ModuleAutoloader(array(
+realpath(__DIR__ . '/../modules'),
+'/path/to/shared/modules'
+));
+$moduleLoader-&gt;register();
+</pre>
+        </div>
+</div>
+<br class="example-break">
+
+        <div class="note" title="Note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top">
+            <p>
+                Module paths behave very similar to the PHP include path, and
+                are searched in the order they are defined. If you have modules
+                with the same name in more than one registered module path, the
+                module autoloader will return the first one it finds.
+            </p>
+        </td></tr>
+</table></div>
+    </div>
+
+    <div class="section" title="8.1.4. Non-Standard / Explicit Module Paths">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.module.intro.non-standard-module-paths"></a>8.1.4. Non-Standard / Explicit Module Paths</h3></div></div></div>
+        
+
+        <p>
+            Sometimes you may want to specify exactly where a module is instead
+            of letting <code class="classname">Zend\Loader\ModuleAutoloader</code> try
+            to find it in the registered paths.
+        </p>
+
+        <div class="example">
+<a name="zend.module.intro.example.module-loading-nonstandard-paths"></a><p class="title"><b>Example 8.6. Registering a Non-Standard / Explicit Module Path</b></p>
+<div class="example-contents">
+            
+
+            <p>
+                In this example, the autoloader will first check for
+                <code class="classname">MyModule\Module</code> in
+                <code class="filename">/path/to/mymoduledir/Module.php</code>. If it's
+                not found, then it will fall back to searching any other
+                registered module paths.
+            </p>
+
+            <pre class="programlisting">
+$moduleLoader = new \Zend\Loader\ModuleAutoloader(array(
+realpath(__DIR__ . '/../modules'),
+'MyModule' =&gt; '/path/to/mymoduledir'
+));
+$moduleLoader-&gt;register();
+</pre>
+        </div>
+</div>
+<br class="example-break">
+
+        <p>
+            This same method works if you provide the path to a phar archive.
+        </p>
+    </div>
+
+    <div class="section" title="8.1.5. The autoload_*.php Files">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.module.intro.the-autoload-files"></a>8.1.5. The autoload_*.php Files</h3></div></div></div>
+        
+
+        <p>
+            The three <code class="filename">autoload_*.php</code> files are not
+            required, but recommended. They provide the following:
+        </p>
+
+        <div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+                <p>
+                    <code class="filename">autoload_filemap.php</code> should return an
+                    array classmap of class name/filename pairs (with the
+                    filenames resolved via the <code class="varname">__DIR__</code> magic
+                    constant).
+                </p>
+            </li>
+<li class="listitem">
+                <p>
+                    <code class="filename">autoload_function.php</code> should return a
+                    PHP callback that can be passed to
+                    <code class="methodname">spl_autoload_register()</code>.
+                    Typically, this callback should utilize the map returned by
+                    <code class="filename">autoload_filemap.php</code>.
+                </p>
+            </li>
+<li class="listitem">
+                <p>
+                    <code class="filename">autoload_register.php</code> should register
+                    a PHP callback (typically that returned by
+                    <code class="filename">autoload_function.php</code> with
+                    <code class="methodname">spl_autoload_register()</code>.
+                </p>
+            </li>
+</ul></div>
+
+        <p>
+            The purpose of these three files is to provide reasonable default
+            mechanisms for autoloading the classes contained in the module,
+            thus providing a trivial way to consume the module without
+            requiring <code class="classname">Zend\Module</code> (e.g., for use outside
+            a ZF2 application).
+        </p>
+    </div>
+
+    <div class="section" title="8.1.6. Packaging Modules with Phar">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.module.intro.packagine-modules-with-phar"></a>8.1.6. Packaging Modules with Phar</h3></div></div></div>
+        
+
+        <p>
+            If you prefer, you may easily package your module as a <a class="ulink" href="http://php.net/phar" target="_top">phar archive</a>. Supported
+            phar extensions are: .phar, .phar.gz, .phar.bz2, .phar.tar,
+            .phar.tar.gz, .phar.tar.bz2, .phar.zip, .tar, .tar.gz, .tar.bz2,
+            and .zip. The module autoloader is able to discover modules with
+            these extensions.
+        </p>
+
+        <p>
+            The easiest way to package your module is to simply tar the module
+            directory. You can then replace the <code class="filename">MyModule/</code>
+            directory with <code class="filename">MyModule.tar</code>, and it should
+            still be autoloaded without any additional changes!
+        </p>
+
+        <div class="note" title="Note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top">
+            <p>
+                If possible, avoid using any type of compression (bz2, gz, zip)
+                on your phar archives, as it introduces unnecessary CPU
+                overhead to each request.
+            </p>
+        </td></tr>
+</table></div>
+    </div>
+
+    <div class="section" title="8.1.7. Best Practices for Modules">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.module.intro.best-practices-for-modules"></a>8.1.7. Best Practices for Modules</h3></div></div></div>
+        
+
+        <div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+                <p>
+                    Keep the <code class="methodname">init()</code> method
+                    lightweight. Be conservative with the actions you perform
+                    in the <code class="methodname">init()</code> method of your
+                    <code class="classname">Module</code> class. This method is ran for
+                    <span class="emphasis"><em>every</em></span> page request, and should not
+                    perform anything heavy. As a rule of thumb, registering
+                    autoloaders and event listeners are appropriate tasks to
+                    perform in the <code class="methodname">init()</code> method. Such
+                    lightweight tasks will generally not have a measurable
+                    impact on the performance of your application, even with
+                    many modules enabled. It is considered bad practice to
+                    utilize the <code class="methodname">init()</code> method for
+                    setting up or configuring instances of application
+                    resources such as a database connection, application
+                    logger, or mailer. Tasks such as these are better served
+                    through the new dependency injection capabilities of Zend
+                    Framework 2.
+                </p>
+            </li>
+<li class="listitem">
+                <p>
+                    Do not perform writes within a module. You should
+                    <span class="emphasis"><em>never</em></span> code your module to perform or
+                    expect any writes within the module's directory. Once
+                    installed, the files within a module's directory should
+                    always match the distribution verbatim. Any user-provided
+                    configuration should be performed via overrides in the
+                    Application module. Any other required filesystem writes
+                    should be performed in some writeable path that is outside
+                    of the module's directory. There are two primary advantages
+                    to following this rule: First, any modules which attempt to
+                    write within themselves will not be compatible with phar
+                    packaging. Second, by keeping the module in sync with the
+                    upstream distribution, updates via mechanisms such as Git
+                    will be simple and trouble-free. Of course, the Application
+                    module is a special exception to this rule, as there is
+                    typically no upstream distribution for this module, and
+                    it's unlikely you would want to run this package from
+                    within a phar archive.
+                </p>
+            </li>
+<li class="listitem">
+                <p>
+                    Utilize a vendor prefix for module names.  To avoid module
+                    naming conflicts, you are encouraged to prefix your module
+                    namespace with a vendor prefix. As an example, the
+                    (incomplete) developer tools module distributed by Zend is
+                    named "ZendDeveloperTools" instead of simply
+                    "DeveloperTools".
+                </p>
+            </li>
+</ul></div>
+    </div>
+</div>
+        </div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left"> </td>
+<td width="20%" align="center"><a accesskey="u" href="reference.html">Up</a></td>
+<td width="40%" align="right"> </td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top"> </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> </td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>
