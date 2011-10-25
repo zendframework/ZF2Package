@@ -56,8 +56,16 @@ if (isset($ini['with_phar']) && $ini['with_phar'] == true && ini_get('phar.reado
 
 $library_component_path = str_replace('_', '/', $package_name);
 
-if (!file_exists($zf2_library_path . '/' . $library_component_path)) {
+$is_top_level_class = false;
+if ((!file_exists($zf2_library_path . '/' . $library_component_path))
+    && (!file_exists($zf2_library_path . '/' . $library_component_path . '.php'))
+) {
     script_exit($package_name . ' is not a valid package name, or cannot be found in the ZF2 library');
+}
+if ((!file_exists($zf2_library_path . '/' . $library_component_path))
+    && (file_exists($zf2_library_path . '/' . $library_component_path . '.php'))
+) {
+    $is_top_level_class = true;
 }
 
 // set cwd, just in case it was called from elsewhere
@@ -73,8 +81,13 @@ $output  = script_run_command($command);
 $command = 'rm ' . $package_name . '/src/' . $library_component_path . '/Main.php';
 $output = script_run_command($command);
 
-$command = 'cp -R ' . $zf2_library_path . '/' . $library_component_path . '/* ' 
-    . $package_name . '/src/' . $library_component_path . '/';
+if ($is_top_level_class) {
+    $command = 'cp -a ' . $zf2_library_path . '/' . $library_component_path . '.php '
+             . $package_name . '/src/' . $library_component_path . '.php';
+} else {
+    $command = 'cp -R ' . $zf2_library_path . '/' . $library_component_path . '/* ' 
+             . $package_name . '/src/' . $library_component_path . '/';
+}
 $output = script_run_command($command);
 
 chdir($package_name);
