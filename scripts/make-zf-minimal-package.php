@@ -60,6 +60,13 @@ foreach ($components as $component) {
     $component = str_replace('Zend_', '', $component);
     if (false === strstr($component, '_')) {
         $origin = $zf2_path . '/library/Zend/' . $component;
+        if (!is_dir($origin)) {
+            $origin .= '.php';
+            if (!file_exists($origin)) {
+                echo "UNABLE TO FIND directory or file associated with component '$component'\n";
+                continue;
+            }
+        }
         $target = $work_path . '/library/Zend/';
         script_run_command('cp -a ' . $origin . ' ' . $target);
         continue;
