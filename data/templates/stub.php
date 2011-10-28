@@ -1,17 +1,4 @@
 {PACKAGE_REQUIRE_DEPENDENCIES}
-if (version_compare(phpversion(), '5.3.1', '<')) {
-    if (substr(phpversion(), 0, 5) != '5.3.1') {
-        echo "{PACKAGE_NAME} requires PHP 5.3.1 or newer.\n";
-        exit -1;
-    }
-}
-
-foreach (array('phar', 'spl', 'pcre', 'simplexml') as $ext) {
-    if (!extension_loaded($ext)) {
-        echo 'Extension ', $ext, " is required\n";
-        exit -1;
-    }
-}
 
 try {
     Phar::mapPhar();
