@@ -1,0 +1,211 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Chapter 10. Zend\Module</title>
+<link rel="stylesheet" href="dbstyle.css" type="text/css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="prev" href="zend.mail.file-options.html" title="9.4. Zend\Mail\Transport\FileOptions">
+<link rel="next" href="zend.module.module-manager.html" title="10.2. The Module Manager">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="chapter" href="learning.di.html" title="Chapter 3. Learning Dependency Injection">
+<link rel="article" href="ar01.html" title="">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 4. Zend\Cache">
+<link rel="chapter" href="zend.di.html" title="Chapter 5. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 6. Zend\EventManager">
+<link rel="chapter" href="zend.http.html" title="Chapter 7. Zend_Http">
+<link rel="chapter" href="zend.loader.html" title="Chapter 8. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 9. Zend\Mail">
+<link rel="chapter" href="zend.module.html" title="Chapter 10. Zend\Module">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 11. Zend\Mvc">
+<link rel="chapter" href="zend.uri.html" title="Chapter 12. Zend_Uri">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="section" href="zend.module.html#zend.module.intro" title="10.1. Introduction to the Module System">
+<link rel="section" href="zend.module.module-manager.html" title="10.2. The Module Manager">
+<link rel="section" href="zend.module.module-class.html" title="10.3. The Module Class">
+<link rel="section" href="zend.module.module-autoloader.html" title="10.4. The Module Autoloader">
+<link rel="section" href="zend.module.best-practices.html" title="10.5. Best Practices when Creating Modules">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">Chapter 10. Zend\Module</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.mail.file-options.html">Prev</a> </td>
+<th width="60%" align="center">Part III. Zend Framework Reference</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.module.module-manager.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="chapter" title="Chapter 10. Zend\Module">
+<div class="titlepage"><div><div><h1 class="title">
+<a name="zend.module"></a>Zend\Module</h1></div></div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl>
+<dt><span class="section"><a href="zend.module.html#zend.module.intro">10.1. Introduction to the Module System</a></span></dt>
+<dd><dl><dt><span class="section"><a href="zend.module.html#zend.module.intro.the-autoload-files">10.1.1. The autoload_*.php Files</a></span></dt></dl></dd>
+<dt><span class="section"><a href="zend.module.module-manager.html">10.2. The Module Manager</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="zend.module.module-manager.html#zend.module.module-manager.module-manager-events">10.2.1. Module Manager Events</a></span></dt>
+<dt><span class="section"><a href="zend.module.module-manager.html#zend.module.module-manager.module-manager-listeners">10.2.2. Module Manager Listeners</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="zend.module.module-class.html">10.3. The Module Class</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="zend.module.module-class.html#zend.module.module-class.the-loadModules.post-event">10.3.1. The "loadModules.post" Event</a></span></dt>
+<dt><span class="section"><a href="zend.module.module-class.html#zend.module.module-class.the-mvc-bootstrap-event">10.3.2. The MVC "bootstrap" Event</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="zend.module.module-autoloader.html">10.4. The Module Autoloader</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="zend.module.module-autoloader.html#zend.module.module-autoloader.usage">10.4.1. Module Autoloader Usage</a></span></dt>
+<dt><span class="section"><a href="zend.module.module-autoloader.html#zend.module.module-autoloader.non-standard-module-paths">10.4.2. Non-Standard / Explicit Module Paths</a></span></dt>
+<dt><span class="section"><a href="zend.module.module-autoloader.html#zend.module.module-autoloader.packaging-modules-with-phar">10.4.3. Packaging Modules with Phar</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="zend.module.best-practices.html">10.5. Best Practices when Creating Modules</a></span></dt>
+</dl>
+</div>
+<div class="section" title="10.1. Introduction to the Module System">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.module.intro"></a>10.1. Introduction to the Module System</h2></div></div></div>
+<p>
+        Zend Framework 2.0 introduces a new and powerful approach to modules.  This new module
+        system is designed with flexibility, simplicity, and re-usability in mind. A module may
+        contain just about anything: PHP code, including MVC functionality; library code; view
+        scripts; and/or public assets such as images, CSS, and JavaScript. The possibilities are
+        endless.
+    </p>
+<div class="note" title="Note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>
+            The module system in ZF2 has been designed to be useful as a generic and powerful
+            foundation from which developers and other projects can build their own module or plugin
+            systems.
+        </p>
+<p>
+            For a better understanding of the event-driven concepts behind the ZF2 module system, it
+            may be helpful to read the <a class="link" href="zend.event-manager.html#zend.event-manager.event-manager" title="6.1. The EventManager">EventManager
+                documentation.</a>.
+        </p>
+</td></tr>
+</table></div>
+<p>
+        The module system is made up of the following:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+                <span class="strong"><strong>The Module Autoloader</strong></span> -
+                <code class="classname">Zend\Loader\ModuleAutoloader</code> is a specialized autoloader that
+                is responsible for the locating and loading of modules'
+                <code class="classname">Module</code> classes from a variety of sources.
+            </p></li>
+<li class="listitem"><p>
+                <a class="link" href="zend.module.module-manager.html" title="10.2. The Module Manager"><span class="strong"><strong>The Module
+                        Manager</strong></span></a> - <code class="classname">Zend\Module\Manager</code>
+                simply takes an array of module names and fires a sequence of events for each one,
+                allowing the behavior of the module system to be defined entirely by the listeners
+                which are attached to the module manager.
+            </p></li>
+<li class="listitem"><p>
+                <span class="strong"><strong>Module Manager Listeners</strong></span> - Event listeners can be
+                attached to the module manager's various events. These listeners can do everything
+                from resolving and loading modules to performing complex initialization tasks and
+                introspection into each returned module object.
+            </p></li>
+</ul></div>
+<div class="note" title="Note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+            The name of a module in a typical Zend Framework 2 application is simply a <a class="link" href="http://php.net/namespaces" target="_top"><acronym class="acronym">PHP</acronym> namespace</a> and
+            must follow all of the same rules for naming.
+        </p></td></tr>
+</table></div>
+<p>
+        The recommended structure of a typical MVC-oriented ZF2 module is as follows:
+    </p>
+<div class="literallayout"><p><br>
+module_root/<br>
+    Module.php<br>
+    autoload_classmap.php<br>
+    autoload_function.php<br>
+    autoload_register.php<br>
+    config/<br>
+        module.config.php<br>
+    public/<br>
+        images/<br>
+        css/<br>
+        js/<br>
+    src/<br>
+        &lt;module_namespace&gt;/<br>
+            &lt;code files&gt;<br>
+    tests/<br>
+        phpunit.xml<br>
+        bootstrap.php<br>
+        &lt;module_namespace&gt;/<br>
+            &lt;test code files&gt;<br>
+    views/<br>
+        &lt;dir-named-after-a-controller/<br>
+            &lt;.phtml files&gt;<br>
+</p></div>
+<div class="section" title="10.1.1. The autoload_*.php Files">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.module.intro.the-autoload-files"></a>10.1.1. The autoload_*.php Files</h3></div></div></div>
+<p>
+            The three <code class="filename">autoload_*.php</code> files are not required, but recommended.
+            They provide the following:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+                    <code class="filename">autoload_classmap.php</code> should return an array classmap of
+                    class name/filename pairs (with the filenames resolved via the
+                    <code class="varname">__DIR__</code> magic constant).
+                </p></li>
+<li class="listitem"><p>
+                    <code class="filename">autoload_function.php</code> should return a PHP callback that can
+                    be passed to <code class="methodname">spl_autoload_register()</code>.  Typically, this
+                    callback should utilize the map returned by
+                    <code class="filename">autoload_classmap.php</code>.
+                </p></li>
+<li class="listitem"><p>
+                    <code class="filename">autoload_register.php</code> should register a PHP callback
+                    (typically that returned by <code class="filename">autoload_function.php</code> with
+                    <code class="methodname">spl_autoload_register()</code>.
+                </p></li>
+</ul></div>
+<p>
+            The purpose of these three files is to provide reasonable default mechanisms for
+            autoloading the classes contained in the module, thus providing a trivial way to consume
+            the module without requiring <code class="classname">Zend\Module</code> (e.g., for use outside a
+            ZF2 application).
+        </p>
+</div>
+</div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.mail.file-options.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="reference.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.module.module-manager.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">9.4. Zend\Mail\Transport\FileOptions </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 10.2. The Module Manager</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

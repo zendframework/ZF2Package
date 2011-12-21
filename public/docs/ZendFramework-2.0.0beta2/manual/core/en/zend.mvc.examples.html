@@ -1,0 +1,218 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>11.7. Examples</title>
+<link rel="stylesheet" href="dbstyle.css" type="text/css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.mvc.html" title="Chapter 11. Zend\Mvc">
+<link rel="prev" href="zend.mvc.controller-plugins.html" title="11.6. Controller Plugins">
+<link rel="next" href="zend.uri.html" title="Chapter 12. Zend_Uri">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="chapter" href="learning.di.html" title="Chapter 3. Learning Dependency Injection">
+<link rel="article" href="ar01.html" title="">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 4. Zend\Cache">
+<link rel="chapter" href="zend.di.html" title="Chapter 5. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 6. Zend\EventManager">
+<link rel="chapter" href="zend.http.html" title="Chapter 7. Zend_Http">
+<link rel="chapter" href="zend.loader.html" title="Chapter 8. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 9. Zend\Mail">
+<link rel="chapter" href="zend.module.html" title="Chapter 10. Zend\Module">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 11. Zend\Mvc">
+<link rel="chapter" href="zend.uri.html" title="Chapter 12. Zend_Uri">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="subsection" href="zend.mvc.examples.html#zend.mvc.examples.controllers" title="11.7.1. Controllers">
+<link rel="subsection" href="zend.mvc.examples.html#zend.mvc.examples.bootstrapping" title="11.7.2. Bootstrapping">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">11.7. Examples</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.mvc.controller-plugins.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 11. Zend\Mvc</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.uri.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="11.7. Examples">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.mvc.examples"></a>11.7. Examples</h2></div></div></div>
+<div class="section" title="11.7.1. Controllers">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.mvc.examples.controllers"></a>11.7.1. Controllers</h3></div></div></div>
+<div class="section" title="11.7.1.1. Accessing the Request and Response">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.mvc.examples.controllers.accessing-the-request-and-response"></a>11.7.1.1. Accessing the Request and Response</h4></div></div></div>
+<p>
+        When using <code class="classname">ActionController</code> or
+        <code class="classname">RestfulController</code>, the request and response
+        object are composed directly into the controller as soon as
+        <code class="methodname">dispatch()</code> is called. You may access them in the
+        following ways:
+      </p>
+<pre class="programlisting">
+// Using explicit accessor methods
+$request  = $this-&gt;getRequest();
+$response = $this-&gt;getResponse();
+
+// Using direct property access
+$request  = $this-&gt;request;
+$response = $this-&gt;response;
+</pre>
+<p>
+        Additionally, if your controller implements
+        <code class="classname">InjectApplicationEvent</code> (as both
+        <code class="classname">ActionController</code> and
+        <code class="classname">RestfulController</code> do), you can access these
+        objects from the attached <code class="classname">MvcEvent</code>:
+      </p>
+<pre class="programlisting">
+$event    = $this-&gt;getEvent();
+$request  = $event-&gt;getRequest();
+$response = $event-&gt;getResponse();
+</pre>
+<p>
+        The above can be useful when composing event listeners into your
+        controller.
+      </p>
+</div>
+<div class="section" title="11.7.1.2. Accessing routing parameters">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.mvc.examples.controllers.accessing-routing-parameters"></a>11.7.1.2. Accessing routing parameters</h4></div></div></div>
+<p>
+        The parameters returned when routing completes are wrapped in a
+        <code class="classname">Zend\Mvc\Router\RouteMatch</code> object. This object
+        is detailed in the section on routing.
+      </p>
+<p>
+        Within your controller, if you implement
+        <code class="classname">InjectApplicationEvent</code> (as both
+        <code class="classname">ActionController</code> and
+        <code class="classname">RestfulController</code> do), you can access this
+        object from the attached <code class="classname">MvcEvent</code>:
+      </p>
+<pre class="programlisting">
+$event   = $this-&gt;getEvent();
+$matches = $event-&gt;getRouteMatch();
+</pre>
+<p>
+        Once you have the <code class="classname">RouteMatch</code> object, you can
+        pull parameters from it.
+      </p>
+</div>
+<div class="section" title="11.7.1.3. Returning early">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.mvc.examples.controllers.returning-early"></a>11.7.1.3. Returning early</h4></div></div></div>
+<p>
+        You can effectively short-circuit execution of the application at
+        any point by returning a <code class="classname">Response</code> from your
+        controller or any event. When such a value is discovered, it halts
+        further execution of the event manager, bubbling up to the
+        <code class="classname">Application</code> instance, where it is immediately
+        returned.
+      </p>
+<p>
+        As an example, the <code class="classname">Redirect</code> plugin returns a
+        <code class="classname">Response</code>, which can be returned immediately so
+        as to complete the request as quickly as possible. Other use cases
+        might be for returning JSON or XML results from web service
+        endpoints, returning "401 Forbidden" results, etc.
+      </p>
+</div>
+</div>
+<div class="section" title="11.7.2. Bootstrapping">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.mvc.examples.bootstrapping"></a>11.7.2. Bootstrapping</h3></div></div></div>
+<div class="section" title="11.7.2.1. Registering module-specific listeners">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="registering-module-specific-listeners"></a>11.7.2.1. Registering module-specific listeners</h4></div></div></div>
+<p>
+        Often you may want module-specific listeners. As an example, this
+        would be a simple and effective way to introduce authorization,
+        logging, or caching into your application.
+      </p>
+<p>
+        Each <code class="classname">Module</code> class can have an optional
+        <code class="methodname">init()</code> method. Typically, you'll setup
+        event listeners for you module here. The <code class="methodname">init()</code>
+        method is called for <span class="emphasis"><em>every</em></span> module on
+        <span class="emphasis"><em>every</em></span> page request and should
+        <span class="emphasis"><em>only</em></span> be used for performing
+        <span class="emphasis"><em>lightweight</em></span> tasks such as registering event
+        listeners.
+      </p>
+<p>
+        The base <code class="classname">Bootstrap</code> class shipped with the
+        framework has an <code class="classname">EventManager</code> associated with it,
+        and once the locator and router instances are initialized, it triggers a
+        "bootstrap" event, with "application" and "modules" parameters.
+      </p>
+<p>
+        So, one way to accomplish module-specific listeners is to listen to that
+        event, and register listeners at that time. As an example:
+      </p>
+<pre class="programlisting">
+namespace SomeCustomModule;
+
+use Zend\EventManager\StaticEventManager;
+
+class Module
+{
+    public function init()
+    {
+        // Remember to keep the init() method as lightweight as possible
+        $events = StaticEventManager::getInstance();
+        $events-&gt;attach('bootstrap', 'bootstrap', array($this, 'registerListeners'));
+    }
+
+    public function registerListeners($e)
+    {
+        $application = $e-&gt;getParam('application');
+        $config      = $e-&gt;getParam('config');
+        $view        = $application-&gt;getLocator()-&gt;get('view');
+        $view-&gt;headTitle($config['view']['base_title']);
+
+        $listeners   = new Listeners\ViewListener();
+        $listeners-&gt;setView($view);
+        $application-&gt;events()-&gt;attachAggregate($listeners);
+    }
+}
+</pre>
+<p>
+        The above demonstrates several things. First, it shows registering a
+        callback on the bootstrap's "bootstrap" event (within the
+        <code class="methodname">init()</code> method). Second, it demonstrates that 
+        listener, and how it can be used to register listeners with the
+        application. It grabs the <code class="classname">Application</code> instance,
+        as well as the module manager instance. From the
+        <code class="classname">Application</code>, it is able to grab the attached 
+        locator, and from the <code class="classname">Managar</code>, it grabs
+        configuration. These are then used to retrieve the view, configure some
+        helpers, and then register a listener aggregate with the application
+        event manager.
+      </p>
+</div>
+</div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.mvc.controller-plugins.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.mvc.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.uri.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">11.6. Controller Plugins </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> Chapter 12. Zend_Uri</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>
