@@ -1,0 +1,142 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>11.4. The MvcEvent</title>
+<link rel="stylesheet" href="dbstyle.css" type="text/css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.mvc.html" title="Chapter 11. Zend\Mvc">
+<link rel="prev" href="zend.mvc.routing.html" title="11.3. Routing">
+<link rel="next" href="zend.mvc.controllers.html" title="11.5. Available Controllers">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="chapter" href="learning.di.html" title="Chapter 3. Learning Dependency Injection">
+<link rel="article" href="ar01.html" title="">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 4. Zend\Cache">
+<link rel="chapter" href="zend.di.html" title="Chapter 5. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 6. Zend\EventManager">
+<link rel="chapter" href="zend.http.html" title="Chapter 7. Zend_Http">
+<link rel="chapter" href="zend.loader.html" title="Chapter 8. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 9. Zend\Mail">
+<link rel="chapter" href="zend.module.html" title="Chapter 10. Zend\Module">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 11. Zend\Mvc">
+<link rel="chapter" href="zend.uri.html" title="Chapter 12. Zend_Uri">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">11.4. The MvcEvent</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.mvc.routing.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 11. Zend\Mvc</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.mvc.controllers.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="11.4. The MvcEvent">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.mvc.mvc-event"></a>11.4. The MvcEvent</h2></div></div></div>
+<p>
+    The ZF2 MVC layer incorporates and utilizes a custom
+    <code class="classname">Zend\EventManager\EventDescription</code> type,
+    <code class="classname">Zend\Mvc\MvcEvent</code>. This event is created during
+    <code class="methodname">Zend\Mvc\Application::run()</code>, and is passed
+    directly to all events that method triggers. Additionally, if you
+    mark your controllers with the
+    <code class="classname">Zend\Mvc\InjectApplicationEvent</code> interface, it
+    will be injected into those controllers.
+  </p>
+<p>
+    The <code class="classname">MvcEvent</code> adds accessors and mutators for the
+    following:
+  </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+        <code class="classname">Request</code> object
+      </p></li>
+<li class="listitem"><p>
+        <code class="classname">Response</code> object
+      </p></li>
+<li class="listitem"><p>
+        <code class="classname">Router</code> object
+      </p></li>
+<li class="listitem"><p>
+        <code class="classname">RouteMatch</code> object
+      </p></li>
+<li class="listitem"><p>
+        "Result", usually the result of dispatching a controller
+      </p></li>
+</ul></div>
+<p>
+    The methods it defines are:
+  </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+        <code class="methodname">setRequest($request)</code>
+      </p></li>
+<li class="listitem"><p>
+        <code class="methodname">getRequest()</code>
+      </p></li>
+<li class="listitem"><p>
+        <code class="methodname">setResponse($response)</code>
+      </p></li>
+<li class="listitem"><p>
+        <code class="methodname">getResponse()</code>
+      </p></li>
+<li class="listitem"><p>
+        <code class="methodname">setRouter($router)</code>
+      </p></li>
+<li class="listitem"><p>
+        <code class="methodname">getRouter()</code>
+      </p></li>
+<li class="listitem"><p>
+        <code class="methodname">setRouteMatch($routeMatch)</code>
+      </p></li>
+<li class="listitem"><p>
+        <code class="methodname">getRouteMatch()</code>
+      </p></li>
+<li class="listitem"><p>
+        <code class="methodname">setResult($result)</code>
+      </p></li>
+<li class="listitem"><p>
+        <code class="methodname">getResult()</code>
+      </p></li>
+</ul></div>
+<p>
+    Within <code class="methodname">Application::run()</code>, the event is injected
+    with the Request, Response, and Router immediately. Following the
+    <code class="varname">route</code> event, it will be injected also with the
+    <code class="classname">RouteMatch</code> object encapsulating the results of
+    routing.
+  </p>
+<p>
+    Since this object is passed around throughout the MVC, it is a
+    common location for retrieving the results of routing, the router,
+    and the request and response objects. Additionally, we encourage
+    setting the results of execution in the event, to allow event
+    listeners to introspect them and utilize them within their
+    execution. As an example, the results could be passed into a view
+    renderer.
+  </p>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.mvc.routing.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.mvc.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.mvc.controllers.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">11.3. Routing </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 11.5. Available Controllers</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>10.5. Best Practices when Creating Modules</title>
+<link rel="stylesheet" href="dbstyle.css" type="text/css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.module.html" title="Chapter 10. Zend\Module">
+<link rel="prev" href="zend.module.module-autoloader.html" title="10.4. The Module Autoloader">
+<link rel="next" href="zend.mvc.html" title="Chapter 11. Zend\Mvc">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="chapter" href="learning.di.html" title="Chapter 3. Learning Dependency Injection">
+<link rel="article" href="ar01.html" title="">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 4. Zend\Cache">
+<link rel="chapter" href="zend.di.html" title="Chapter 5. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 6. Zend\EventManager">
+<link rel="chapter" href="zend.http.html" title="Chapter 7. Zend_Http">
+<link rel="chapter" href="zend.loader.html" title="Chapter 8. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 9. Zend\Mail">
+<link rel="chapter" href="zend.module.html" title="Chapter 10. Zend\Module">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 11. Zend\Mvc">
+<link rel="chapter" href="zend.uri.html" title="Chapter 12. Zend_Uri">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">10.5. Best Practices when Creating Modules</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.module.module-autoloader.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 10. Zend\Module</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.mvc.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="10.5. Best Practices when Creating Modules">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.module.best-practices"></a>10.5. Best Practices when Creating Modules</h2></div></div></div>
+<p>
+        When creating a ZF2 module, there are some best practices you should keep in mind.
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+                <span class="strong"><strong>Keep the <code class="methodname">init()</code> method
+                    lightweight.</strong></span> Be conservative with the actions you perform in the
+                <code class="methodname">init()</code> method of your <code class="classname">Module</code> class.
+                This method is run for <span class="emphasis"><em>every</em></span> page request, and should not
+                perform anything heavy. As a rule of thumb, registering event listeners is an
+                appropriate task to perform in the <code class="methodname">init()</code> method. Such
+                lightweight tasks will generally not have a measurable impact on the performance of
+                your application, even with many modules enabled. It is considered bad practice to
+                utilize the <code class="methodname">init()</code> method for setting up or configuring
+                instances of application resources such as a database connection, application
+                logger, or mailer.  Tasks such as these are better served through the dependency
+                injection capabilities of Zend Framework 2.
+            </p></li>
+<li class="listitem">
+<p>
+                <span class="strong"><strong>Do not perform writes within a module.</strong></span> You should
+                <span class="emphasis"><em>never</em></span> code your module to perform or expect any writes within
+                the module's directory. Once installed, the files within a module's directory should
+                always match the distribution verbatim. Any user-provided configuration should be
+                performed via overrides in the Application module or via application-level
+                configuration files. Any other required filesystem writes should be performed in
+                some writeable path that is outside of the module's directory. 
+            </p>
+<p>
+                There are two primary advantages to following this rule. First, any modules which
+                attempt to write within themselves will not be compatible with phar packaging.
+                Second, by keeping the module in sync with the upstream distribution, updates via
+                mechanisms such as Git will be simple and trouble-free. Of course, the Application
+                module is a special exception to this rule, as there is typically no upstream
+                distribution for this module, and it's unlikely you would want to run this package
+                from within a phar archive.
+            </p>
+</li>
+<li class="listitem"><p>
+                <span class="strong"><strong>Utilize a vendor prefix for module names.</strong></span> To
+                avoid module naming conflicts, you are encouraged to prefix your module namespace
+                with a vendor prefix. As an example, the (incomplete) developer tools module
+                distributed by Zend is named "ZendDeveloperTools" instead of simply
+                "DeveloperTools".
+            </p></li>
+</ul></div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.module.module-autoloader.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.module.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.mvc.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">10.4. The Module Autoloader </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> Chapter 11. Zend\Mvc</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

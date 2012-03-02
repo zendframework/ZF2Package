@@ -1,0 +1,282 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>4.2. Zend\Cache\Storage\Plugin</title>
+<link rel="stylesheet" href="dbstyle.css" type="text/css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.cache.html" title="Chapter 4. Zend\Cache">
+<link rel="prev" href="zend.cache.html" title="Chapter 4. Zend\Cache">
+<link rel="next" href="zend.cache.storage.capabilities.html" title="4.3. Zend\Cache\Storage\Capabilities">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="chapter" href="learning.di.html" title="Chapter 3. Learning Dependency Injection">
+<link rel="article" href="ar01.html" title="">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 4. Zend\Cache">
+<link rel="chapter" href="zend.di.html" title="Chapter 5. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 6. Zend\EventManager">
+<link rel="chapter" href="zend.http.html" title="Chapter 7. Zend_Http">
+<link rel="chapter" href="zend.loader.html" title="Chapter 8. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 9. Zend\Mail">
+<link rel="chapter" href="zend.module.html" title="Chapter 10. Zend\Module">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 11. Zend\Mvc">
+<link rel="chapter" href="zend.uri.html" title="Chapter 12. Zend_Uri">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="subsection" href="zend.cache.storage.plugin.html#zend.cache.storage.plugin.intro" title="4.2.1. Overview">
+<link rel="subsection" href="zend.cache.storage.plugin.html#zend.cache.storage.plugin.quick-start" title="4.2.2. Quick Start">
+<link rel="subsection" href="zend.cache.storage.plugin.html#zend.cache.storage.plugin.options" title="4.2.3. Configuration Options">
+<link rel="subsection" href="zend.cache.storage.plugin.html#zend.cache.storage.plugin.methods" title="4.2.4. Available Methods">
+<link rel="subsection" href="zend.cache.storage.plugin.html#zend.cache.storage.plugin.examples" title="4.2.5. TODO: Examples">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">4.2. Zend\Cache\Storage\Plugin</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.cache.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 4. Zend\Cache</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.cache.storage.capabilities.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="4.2. Zend\Cache\Storage\Plugin">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.cache.storage.plugin"></a>4.2. Zend\Cache\Storage\Plugin</h2></div></div></div>
+<div class="section" title="4.2.1. Overview">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.cache.storage.plugin.intro"></a>4.2.1. Overview</h3></div></div></div>
+<p>
+            Cache storage plugins are objects to add missing functionality or to influence behavior
+            of a storage adapter. 
+        </p>
+<p>
+            The plugins listen to events the adapter triggers and can change called method arguments
+            (*.post - events), skipping and directly return a result (using
+            <code class="methodname">stopPropagation</code>), changing the result (with
+            <code class="methodname">setResult</code> of
+            <code class="classname">Zend\Cache\Storage\PostEvent</code>) and catching exceptions (with
+            <code class="classname">Zend\Cache\Storage\ExceptionEvent</code>).
+        </p>
+</div>
+<div class="section" title="4.2.2. Quick Start">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.cache.storage.plugin.quick-start"></a>4.2.2. Quick Start</h3></div></div></div>
+<p>
+            Storage plugins can either be created from
+            <code class="classname">Zend\Cache\StorageFactory</code> with the
+            <code class="methodname">pluginFactory</code>, or by simply instantiating one of the
+            <code class="classname">Zend\Cache\Storage\Plugin\*</code>classes. 
+        </p>
+<p>
+            To make life easier, the <code class="classname">Zend\Cache\StorageFactory</code> comes with the
+            method <code class="methodname">factory</code> to create an adapter and all given plugins at
+            once.
+        </p>
+<pre class="programlisting">
+use Zend\Cache\StorageFactory;
+
+// Via factory:
+$cache = StorageFactory::factory(array(
+    'adapter' =&gt; 'filesystem',
+    'plugins' =&gt; array('serializer'),
+));
+
+// Alternately:
+$cache  = StorageFactory::adapterFactory('filesystem');
+$plugin = StorageFactory::pluginFactory('serializer');
+$cache-&gt;addPlugin($plugin);
+
+// Or manually:
+$cache  = new Zend\Cache\Storage\Adapter\Filesystem();
+$plugin = new Zend\Cache\Storage\Plugin\Serializer();
+$cache-&gt;addPlugin($plugin);
+</pre>
+</div>
+<div class="section" title="4.2.3. Configuration Options">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.cache.storage.plugin.options"></a>4.2.3. Configuration Options</h3></div></div></div>
+<div class="variablelist"><dl>
+<dt>
+<a name="zend.cache.storage.plugin.options.clearing-factor"></a><span class="term">clearing_factor</span>
+</dt>
+<dd>
+<p>
+                        Set the automatic clearing factor. Used by the
+                        <code class="classname">ClearByFactor</code> plugin.
+                    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">setClearingFactor</span>(<span class="methodparam">int $clearingFactor</span>);</code><p>Implements a fluent interface.</p>
+</li>
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">getClearingFactor</span>();</code><p>Returns int</p>
+</li>
+</ul></div>
+</dd>
+<dt>
+<a name="zend.cache.storage.plugin.options.clear-by-namespace"></a><span class="term">clear_by_namespace</span>
+</dt>
+<dd>
+<p>
+                        Flag indicating whether or not to clear by namespace. Used by the
+                        <code class="classname">ClearByFactor</code> plugin.
+                    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">setClearByNamespace</span>(<span class="methodparam">bool $clearByNamespace</span>);</code><p>Implements a fluent interface.</p>
+</li>
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">getClearByNamespace</span>();</code><p>Returns bool</p>
+</li>
+</ul></div>
+</dd>
+<dt>
+<a name="zend.cache.storage.plugin.options.exception-callback"></a><span class="term">exception_callback</span>
+</dt>
+<dd>
+<p>
+                        Set callback to call on intercepted exception. Used by the
+                        <code class="classname">ExceptionHandler</code> plugin.
+                    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">setExceptionCallback</span>(<span class="methodparam">callable $exceptionCallback</span>);</code><p>Implements a fluent interface.</p>
+</li>
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">getExceptionCallback</span>();</code><p>Returns null|callable</p>
+</li>
+</ul></div>
+</dd>
+<dt>
+<a name="zend.cache.storage.plugin.options.optimizing-factor"></a><span class="term">optimizing_factor</span>
+</dt>
+<dd>
+<p>
+                        Set automatic optimizing factor. Used by the
+                        <code class="classname">OptimizeByFactor</code> plugin.
+                    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">setOptimizingFactor</span>(<span class="methodparam">int $optimizingFactor</span>);</code><p>Implements a fluent interface.</p>
+</li>
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">getOptimizingFactor</span>();</code><p>Returns int</p>
+</li>
+</ul></div>
+</dd>
+<dt>
+<a name="zend.cache.storage.plugin.options.serializer"></a><span class="term">serializer</span>
+</dt>
+<dd>
+<p>
+                        Set serializer adapter to use. Used by <code class="classname">Serializer</code>
+                        plugin.
+                    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">setSerializer</span>(<span class="methodparam">string|Zend\Serializer\Adapter $serializer</span>);</code><p>Implements a fluent interface.</p>
+</li>
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">getSerializer</span>();</code><p>Returns Zend\Serializer\Adapter</p>
+</li>
+</ul></div>
+</dd>
+<dt>
+<a name="zend.cache.storage.plugin.options.serializer-options"></a><span class="term">serializer_options</span>
+</dt>
+<dd>
+<p>
+                        Set configuration options for instantiating a serializer adapter. Used by
+                        the <code class="classname">Serializer</code> plugin.
+                    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">setSerializerOptions</span>(<span class="methodparam">array $serializerOptions</span>);</code><p>Implements a fluent interface.</p>
+</li>
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">getSerializerOptions</span>();</code><p>Returns array</p>
+</li>
+</ul></div>
+</dd>
+<dt>
+<a name="zend.cache.storage.plugin.options.throw-exceptions"></a><span class="term">throw_exceptions</span>
+</dt>
+<dd>
+<p>
+                        Set flag indicating we should re-throw exceptions. Used by the
+                        <code class="classname">ExceptionHandler</code> plugin.
+                    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">setThrowExceptions</span>(<span class="methodparam">bool $throwExceptions</span>);</code><p>Implements a fluent interface.</p>
+</li>
+<li class="listitem">
+<code class="methodsynopsis"><span class="methodname">getThrowExceptions</span>();</code><p>Returns bool</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+</div>
+<div class="section" title="4.2.4. Available Methods">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.cache.storage.plugin.methods"></a>4.2.4. Available Methods</h3></div></div></div>
+<div class="variablelist"><dl>
+<dt>
+<a name="zend.cache.storage.plugin.methods.set-options"></a><span class="term">setOptions</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">setOptions</span>(<span class="methodparam">Zend\Cache\Storage\Plugin\PluginOptions $options</span>);</code><p>Set options</p>
+<p>Implements a fluent interface.</p>
+</dd>
+<dt>
+<a name="zend.cache.storage.plugin.methods.get-options"></a><span class="term">getOptions</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">getOptions</span>();</code><p>Get options</p>
+<p>Returns PluginOptions</p>
+</dd>
+<dt>
+<a name="zend.cache.storage.plugin.methods.attach"></a><span class="term">attach</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">attach</span>(<span class="methodparam">EventCollection $events</span>);</code><p>
+                        Defined by <code class="classname">Zend\EventManager\ListenerAggregate</code>,
+                        attach one or more listeners.
+                    </p>
+<p>Returns void</p>
+</dd>
+<dt>
+<a name="zend.cache.storage.plugin.methods.detach"></a><span class="term">detach</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">detach</span>(<span class="methodparam">EventCollection $events</span>);</code><p>
+                        Defined by <code class="classname">Zend\EventManager\ListenerAggregate</code>,
+                        detach all previously attached listeners.
+                    </p>
+<p>Returns void</p>
+</dd>
+</dl></div>
+</div>
+<div class="section" title="4.2.5. TODO: Examples"><div class="titlepage"><div><div><h3 class="title">
+<a name="zend.cache.storage.plugin.examples"></a>4.2.5. TODO: Examples</h3></div></div></div></div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.cache.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.cache.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.cache.storage.capabilities.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">Chapter 4. Zend\Cache </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 4.3. Zend\Cache\Storage\Capabilities</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

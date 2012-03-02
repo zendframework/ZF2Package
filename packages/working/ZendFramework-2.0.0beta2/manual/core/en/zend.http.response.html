@@ -1,0 +1,417 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>7.3. Zend\Http\Response</title>
+<link rel="stylesheet" href="dbstyle.css" type="text/css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.http.html" title="Chapter 7. Zend_Http">
+<link rel="prev" href="zend.http.request.html" title="7.2. Zend\Http\Request">
+<link rel="next" href="zend.http.headers.html" title="7.4. Zend\Http\Headers And The Various Header Classes">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="chapter" href="learning.di.html" title="Chapter 3. Learning Dependency Injection">
+<link rel="article" href="ar01.html" title="">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 4. Zend\Cache">
+<link rel="chapter" href="zend.di.html" title="Chapter 5. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 6. Zend\EventManager">
+<link rel="chapter" href="zend.http.html" title="Chapter 7. Zend_Http">
+<link rel="chapter" href="zend.loader.html" title="Chapter 8. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 9. Zend\Mail">
+<link rel="chapter" href="zend.module.html" title="Chapter 10. Zend\Module">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 11. Zend\Mvc">
+<link rel="chapter" href="zend.uri.html" title="Chapter 12. Zend_Uri">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="subsection" href="zend.http.response.html#zend.http.response.intro" title="7.3.1. Overview">
+<link rel="subsection" href="zend.http.response.html#zend.http.response.quick-start" title="7.3.2. Quick Start">
+<link rel="subsection" href="zend.http.response.html#zend.http.response.options" title="7.3.3. Configuration Options">
+<link rel="subsection" href="zend.http.response.html#zend.http.response.methods" title="7.3.4. Available Methods">
+<link rel="subsection" href="zend.http.response.html#zend.http.response.examples" title="7.3.5. Examples">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">7.3. Zend\Http\Response</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.http.request.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 7. Zend_Http</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.http.headers.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="7.3. Zend\Http\Response">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.http.response"></a>7.3. Zend\Http\Response</h2></div></div></div>
+<div class="section" title="7.3.1. Overview">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.http.response.intro"></a>7.3.1. Overview</h3></div></div></div>
+<p>
+            The <code class="classname">Zend\Http\Response</code> class is responsible for providing a
+            fluent API that allows a developer to interact with all the various parts of an HTTP
+            response.
+        </p>
+<p>
+            A typical HTTP Response looks like this:
+        </p>
+<div class="literallayout"><p><br>
+---------------------------<br>
+| VERSION | CODE | REASON |<br>
+---------------------------<br>
+|        HEADERS          |<br>
+---------------------------<br>
+|         BODY            |<br>
+---------------------------<br>
+        </p></div>
+<p>
+            The first line of the response consists of the HTTP version, status code, and the reason
+            string for the provided status code; this is called the Response Line.  Next is a set of
+            headers; there can be 0 or an unlimited number of headers. The remainder of the response
+            is the response body, which is typically a string of HTML that will render on the
+            client's browser, but which can also be a place for request/response payload data
+            typical of an AJAX request.  More information on the structure and specification of an
+            HTTP response can be found in <a class="link" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec6.html" target="_top">RFC-2616 on the
+                W3.org site</a>.
+        </p>
+</div>
+<div class="section" title="7.3.2. Quick Start">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.http.response.quick-start"></a>7.3.2. Quick Start</h3></div></div></div>
+<p>
+            Response objects can either be created from the provided
+            <code class="methodname">fromString()</code> factory, or, if you wish to have a completely
+            empty object to start with, by simply instantiating the
+            <code class="classname">Zend\Http\Response</code> class.
+        </p>
+<pre class="programlisting">
+use Zend\Http\Response;
+$response = Response::fromString(&lt;&lt;&lt;EOS
+HTTP/1.0 200 OK
+HeaderField1: header-field-value
+HeaderField2: header-field-value2
+
+&lt;html&gt;
+&lt;body&gt;
+    Hello World
+&lt;/body&gt;
+&lt;/html&gt;
+EOS);
+
+// OR
+
+$response = new Request();
+$response-&gt;setStatusCode(Response::STATUS_CODE_200);
+$response-&gt;headers()-&gt;addHeaders(array(
+    'HeaderField1' =&gt; 'header-field-value',
+    'HeaderField2' =&gt; 'header-field-value2',
+);
+$response-&gt;setRawBody(&lt;&lt;&lt;EOS
+&lt;html&gt;
+&lt;body&gt;
+    Hello World
+&lt;/body&gt;
+&lt;/html&gt;
+EOS);
+     </pre>
+</div>
+<div class="section" title="7.3.3. Configuration Options">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.http.response.options"></a>7.3.3. Configuration Options</h3></div></div></div>
+<p>
+            None currently available
+        </p>
+</div>
+<div class="section" title="7.3.4. Available Methods">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.http.response.methods"></a>7.3.4. Available Methods</h3></div></div></div>
+<div class="variablelist"><dl>
+<dt>
+<a name="zend.http.response.methods.from-string"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">Response::fromString</span>(<span class="methodparam">string $string</span>);</code>
+                </span>
+</dt>
+<dd>
+<p>Populate object from string</p>
+<p>Returns <code class="classname">Zend\Http\Response</code></p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.render-status-line"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">renderStatusLine</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Render the status line header</p>
+<p>Returns string</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.set-headers"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">setHeaders</span>(<span class="methodparam">Zend\Http\Headers $headers</span>);</code>
+                </span>
+</dt>
+<dd>
+<p>Set response headers</p>
+<p>Returns <code class="classname">Zend\Http\Response</code></p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.headers"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">headers</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Get response headers</p>
+<p>Returns <code class="classname">Zend\Http\Headers</code></p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.set-version"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">setVersion</span>(<span class="methodparam">string $version</span>);</code>
+                </span>
+</dt>
+<dd><p>Returns <code class="classname">Zend\Http\Response</code></p></dd>
+<dt>
+<a name="zend.http.response.methods.get-version"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">getVersion</span>();</code>
+                </span>
+</dt>
+<dd><p>Returns string</p></dd>
+<dt>
+<a name="zend.http.response.methods.get-status-code"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">getStatusCode</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Retrieve HTTP status code</p>
+<p>Returns int</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.set-reason-phrase"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">setReasonPhrase</span>(<span class="methodparam">string $reasonPhrase</span>);</code>
+                </span>
+</dt>
+<dd><p>Returns <code class="classname">Zend\Http\Response</code></p></dd>
+<dt>
+<a name="zend.http.response.methods.get-reason-phrase"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">getReasonPhrase</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Get HTTP status message</p>
+<p>Returns string</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.set-status-code"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">setStatusCode</span>(<span class="methodparam">numeric $code</span>);</code>
+                </span>
+</dt>
+<dd>
+<p>Set HTTP status code and (optionally) message</p>
+<p>Returns <code class="classname">Zend\Http\Response</code></p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.is-client-error"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">isClientError</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Does the status code indicate a client error?</p>
+<p>Returns bool</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.is-forbidden"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">isForbidden</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Is the request forbidden due to ACLs?</p>
+<p>Returns bool</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.is-informational"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">isInformational</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Is the current status "informational"?</p>
+<p>Returns bool</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.is-not-found"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">isNotFound</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Does the status code indicate the resource is not found?</p>
+<p>Returns bool</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.is-ok"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">isOk</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Do we have a normal, OK response?</p>
+<p>Returns bool</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.is-server-error"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">isServerError</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Does the status code reflect a server error?</p>
+<p>Returns bool</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.is-redirect"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">isRedirect</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Do we have a redirect?</p>
+<p>Returns bool</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.is-success"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">isSuccess</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Was the response successful?</p>
+<p>Returns bool</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.decode-chunked-body"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">decodeChunkedBody</span>(<span class="methodparam">string $body</span>);</code>
+                </span>
+</dt>
+<dd>
+<p>Decode a "chunked" transfer-encoded body and return the decoded text</p>
+<p>Returns string</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.decode-gzip"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">decodeGzip</span>(<span class="methodparam">string $body</span>);</code>
+                </span>
+</dt>
+<dd>
+<p>Decode a gzip encoded message (when Content-encoding = gzip)</p>
+<p>Currently requires PHP with zlib support</p>
+<p>Returns string</p>
+</dd>
+<dt>
+<a name="zend.http.response.methods.decode-deflate"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">decodeDeflate</span>(<span class="methodparam">string $body</span>);</code>
+                </span>
+</dt>
+<dd>
+<p>Decode a zlib deflated message (when Content-encoding = deflate)</p>
+<p>Currently requires PHP with zlib support</p>
+<p>Returns string</p>
+</dd>
+<dt>
+<a name="zend.http.response._parent_.zend.stdlib.message.methods.set-metadata"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">setMetadata</span>(<span class="methodparam">string|int|array|Traversable $spec, mixed $value</span>);</code>
+                </span>
+</dt>
+<dd>
+<p>Set message metadata</p>
+<p>Non-destructive setting of message metadata; always adds to the metadata, never overwrites
+the entire metadata container.</p>
+<p>Returns <code class="classname">Zend\Stdlib\Message</code></p>
+</dd>
+<dt>
+<a name="zend.http.response._parent_.zend.stdlib.message.methods.get-metadata"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">getMetadata</span>(<span class="methodparam">null|string|int $key, null|mixed $default</span>);</code>
+                </span>
+</dt>
+<dd>
+<p>Retrieve all metadata or a single metadatum as specified by key</p>
+<p>Returns mixed</p>
+</dd>
+<dt>
+<a name="zend.http.response._parent_.zend.stdlib.message.methods.set-content"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">setContent</span>(<span class="methodparam">mixed $value</span>);</code>
+                </span>
+</dt>
+<dd>
+<p>Set message content</p>
+<p>Returns <code class="classname">Zend\Stdlib\Message</code></p>
+</dd>
+<dt>
+<a name="zend.http.response._parent_.zend.stdlib.message.methods.get-content"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">getContent</span>();</code>
+                </span>
+</dt>
+<dd>
+<p>Get message content</p>
+<p></p>
+<p>Returns mixed</p>
+</dd>
+<dt>
+<a name="zend.http.response._parent_.zend.stdlib.message.methods.to-string"></a><span class="term">
+                    <code class="methodsynopsis"><span class="methodname">toString</span>();</code>
+                </span>
+</dt>
+<dd><p>Returns string</p></dd>
+</dl></div>
+</div>
+<div class="section" title="7.3.5. Examples">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.http.response.examples"></a>7.3.5. Examples</h3></div></div></div>
+<div class="example">
+<a name="zend.http.response.examples.from-string"></a><p class="title"><b>Example 7.6. Generating a Response object from a string</b></p>
+<div class="example-contents"><pre class="programlisting">
+use Zend\Http\Response;
+$request = Response::fromString(&lt;&lt;&lt;EOS
+HTTP/1.0 200 OK
+HeaderField1: header-field-value
+HeaderField2: header-field-value2
+
+&lt;html&gt;
+&lt;body&gt;
+    Hello World
+&lt;/body&gt;
+&lt;/html&gt;
+EOS);
+</pre></div>
+</div>
+<br class="example-break"><div class="example">
+<a name="zend.http.response.examples.construct-response"></a><p class="title"><b>Example 7.7. Generating a Response object from a string</b></p>
+<div class="example-contents"><pre class="programlisting">
+use Zend\Http\Response;
+$response = new Response();
+$response-&gt;setStatusCode(Response::STATUS_CODE_200);
+$response-&gt;headers()-&gt;addHeaders(array(
+    'HeaderField1' =&gt; 'header-field-value',
+    'HeaderField2' =&gt; 'header-field-value2',
+);
+$response-&gt;setRawBody(&lt;&lt;&lt;EOS
+&lt;html&gt;
+&lt;body&gt;
+    Hello World
+&lt;/body&gt;
+&lt;/html&gt;
+EOS);
+</pre></div>
+</div>
+<br class="example-break">
+</div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.http.request.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.http.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.http.headers.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">7.2. Zend\Http\Request </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 7.4. Zend\Http\Headers And The Various Header Classes</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>
