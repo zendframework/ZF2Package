@@ -1,0 +1,154 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>4. Simplest Usage Case Without Type-hints</title>
+<link rel="stylesheet" href="dbstyle.css" type="text/css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="prev" href="learning.di.simplest-usage-case-2-classes-one-consumes-the-other.html" title="3. Simplest usage case (2 classes, one consumes the other)">
+<link rel="next" href="learning.di.simplest-usage-case-with-compiled-definition.html" title="5. Simplest usage case with Compiled Definition">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.db.html" title="Chapter 5. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 6. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 7. Zend\EventManager">
+<link rel="chapter" href="zend.http.html" title="Chapter 8. Zend_Http">
+<link rel="chapter" href="zend.loader.html" title="Chapter 9. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 10. Zend\Mail">
+<link rel="chapter" href="zend.module.html" title="Chapter 11. Zend\Module">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 12. Zend\Mvc">
+<link rel="chapter" href="zend.uri.html" title="Chapter 13. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 14. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">4. Simplest Usage Case Without Type-hints</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="learning.di.simplest-usage-case-2-classes-one-consumes-the-other.html">Prev</a> </td>
+<th width="60%" align="center">Learning Dependency Injection</th>
+<td width="20%" align="right"> <a accesskey="n" href="learning.di.simplest-usage-case-with-compiled-definition.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="4. Simplest Usage Case Without Type-hints">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="learning.di.simplest-usage-case-without-type-hints"></a>4. Simplest Usage Case Without Type-hints</h2></div></div></div>
+<p>
+    If your code does not have type-hints or you are using 3rd party
+    code that does not have type-hints but does practice dependency
+    injection, you can still use the
+    <code class="literal">DependencyInjector</code>, but you might find you need
+    to describe your dependencies explicitly. To do this, you will need
+    to interact with one of the definitions that is capable of letting a
+    developer describe, with objects, the map between classes. This
+    particular definition is called the
+    <code class="literal">BuilderDefinition</code> and can work with, or in place
+    of, the default <code class="literal">RuntimeDefinition</code>.
+  </p>
+<p>
+    Definitions are a part of the <code class="literal">DependencyInjector</code>
+    that attempt to describe the relationship between classes so that
+    <code class="literal">DependencyInjector::newInstance()</code> and
+    <code class="literal">DependencyInjector::get()</code> can know what the
+    dependencies are that need to be filled for a particular
+    class/object. With no configuration,
+    <code class="literal">DependencyInjector</code> will use the
+    <code class="literal">RuntimeDefinition</code> which uses reflection and the
+    type-hints in your code to determine the dependency map. Without
+    type-hints, it will assume that all dependencies are scalar or
+    required configuration parameters.
+  </p>
+<p>
+    The <code class="literal">BuilderDefinition</code>, which can be used in
+    tandem with the <code class="literal">RuntimeDefinition</code> (technically,
+    it can be used in tandem with any definition by way of the
+    <code class="literal">AggregateDefinition</code>), allows you to
+    programmatically describe the mappings with objects. Let's say for
+    example, our above <code class="literal">A/B/C</code> usage scenario, were
+    altered such that class <code class="literal">B</code> now looks like this:
+  </p>
+<pre class="programlisting">
+namespace My {
+    class B
+    {
+        protected $a;
+        public function setA($a)
+        {
+            $this-&gt;a = $a;
+        }
+    }
+}
+</pre>
+<p>
+    You'll notice the only change is that setA now does not include any
+    type-hinting information.
+  </p>
+<pre class="programlisting">
+use Zend\Di\DependencyInjector,
+    Zend\Di\Definition,
+    Zend\Di\Definition\Builder;
+
+// Describe this class:
+$builder = new Definition\BuilderDefinition;
+$builder-&gt;addClass(($class = new Builder\PhpClass));
+
+$class-&gt;setName('My\B');
+$class-&gt;addInjectableMethod(($im = new Builder\InjectibleMethod));
+
+$im-&gt;setName('setA');
+$im-&gt;addParameter('a', 'My\A');
+
+// Use both our Builder Definition as well as the default 
+// RuntimeDefinition, builder first
+$aDef = new Definition\AggregateDefinition;
+$aDef-&gt;addDefinition($builder);
+$aDef-&gt;addDefinition(new Definition\RuntimeDefinition);
+
+// Now make sure the DependencyInjector understands it
+$di = new DependencyInjector;
+$di-&gt;setDefinition($aDef);
+
+// and finally, create C
+$parameters = array(
+    'username' =&gt; 'MyUsernameValue',
+    'password' =&gt; 'MyHardToGuessPassword%$#',
+);
+
+$c = $di-&gt;get('My\C', $parameters);
+</pre>
+<p>
+    This above usage scenario provides that whatever the code looks
+    like, you can ensure that it works with the dependency injection
+    container. In an ideal world, all of your code would have the proper
+    type hinting and/or would be using a mapping strategy that reduces
+    the amount of bootstrapping work that needs to be done in order to
+    have a full definition that is capable of instantiating all of the
+    objects you might require.
+  </p>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="learning.di.simplest-usage-case-2-classes-one-consumes-the-other.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="learning.di.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="learning.di.simplest-usage-case-with-compiled-definition.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">3. Simplest usage case (2 classes, one consumes the other) </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 5. Simplest usage case with Compiled Definition</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

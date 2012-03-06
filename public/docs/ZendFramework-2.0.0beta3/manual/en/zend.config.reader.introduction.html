@@ -1,0 +1,279 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>4.3. Zend\Config\Reader</title>
+<link rel="stylesheet" href="dbstyle.css" type="text/css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="prev" href="zend.config.theory_of_operation.html" title="4.2. Theory of Operation">
+<link rel="next" href="zend.config.writer.html" title="4.4. Zend\Config\Writer">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.db.html" title="Chapter 5. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 6. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 7. Zend\EventManager">
+<link rel="chapter" href="zend.http.html" title="Chapter 8. Zend_Http">
+<link rel="chapter" href="zend.loader.html" title="Chapter 9. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 10. Zend\Mail">
+<link rel="chapter" href="zend.module.html" title="Chapter 11. Zend\Module">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 12. Zend\Mvc">
+<link rel="chapter" href="zend.uri.html" title="Chapter 13. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 14. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="subsection" href="zend.config.reader.introduction.html#zend.config.reader.ini" title="4.3.1. Zend\Config\Reader\Ini">
+<link rel="subsection" href="zend.config.reader.introduction.html#zend.config.reader.xml" title="4.3.2. Zend\Config\Reader\Xml">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">4.3. Zend\Config\Reader</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.config.theory_of_operation.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 4. Zend_Config</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.config.writer.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="4.3. Zend\Config\Reader">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.config.reader.introduction"></a>4.3. Zend\Config\Reader</h2></div></div></div>
+<p>
+        <code class="classname">Zend\Config\Reader</code> gives you the ability to read a config
+        file. It works with concrete implementations for different file format.
+        The <code class="classname">Zend\Config\Reader</code> is only an interface, that define
+        the two methods <code class="methodname">fromFile()</code> and <code class="methodname">fromString()</code>.
+        The concrete implementations of this interface are:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+                <code class="classname">Zend\Config\Reader\Ini</code>
+            </p></li>
+<li class="listitem"><p>
+                <code class="classname">Zend\Config\Reader\Xml</code>
+            </p></li>
+</ul></div>
+<p>
+        The <code class="methodname">fromFile()</code> and <code class="methodname">fromString()</code> return a PHP array contains the
+        data of the configuration file.
+    </p>
+<div class="section" title="4.3.1. Zend\Config\Reader\Ini">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.config.reader.ini"></a>4.3.1. Zend\Config\Reader\Ini</h3></div></div></div>
+<p>
+            <code class="classname">Zend\Config\Reader\Ini</code> enables developers to store configuration data in a
+            familiar <acronym class="acronym">INI</acronym> format and read them in the application by using an array syntax.
+        </p>
+<p>
+            <code class="classname">Zend\Config\Reader\Ini</code> utilizes the <a class="link" href="http://php.net/parse_ini_file" target="_top"><code class="function">parse_ini_file()</code></a>
+            <acronym class="acronym">PHP</acronym> function. Please review this documentation to be aware of its
+            specific behaviors, which propagate to <code class="classname">Zend\Config\Reader\Ini</code>, such as
+            how the special values of "<code class="constant">TRUE</code>", "<code class="constant">FALSE</code>",
+            "yes", "no", and "<code class="constant">NULL</code>" are handled.
+        </p>
+<div class="note" title="Key Separator"><table border="0" summary="Note: Key Separator">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td>
+<th align="left">Key Separator</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>
+                By default, the key separator character is the period character
+                ("<span class="emphasis"><em>.</em></span>"). This can be changed, however, using the
+                <code class="methodname">setNestSeparator()</code> method. For example:
+            </p>
+<pre class="programlisting">
+$reader = new Zend\Config\Reader\Ini();
+$reader-&gt;setNestSeparator('-');       
+</pre>
+</td></tr>
+</table></div>
+<p>
+            The following example illustrates a basic use of <code class="classname">Zend\Config\Reader\Ini</code> for
+            loading configuration data from an <acronym class="acronym">INI</acronym> file. In this example there
+            are configuration data for both a production system and for a staging system.
+            Suppose we have the following INI configuration file:
+        </p>
+<pre class="programlisting">
+webhost                  = 'www.example.com'
+database.adapter         = 'pdo_mysql'
+database.params.host     = 'db.example.com'
+database.params.username = 'dbuser'
+database.params.password = 'secret'
+database.params.dbname   = 'dbproduction'
+</pre>
+<p>
+            We can use the <code class="classname">Zend\Config\Reader\Ini</code> to read this INI file:
+        </p>
+<pre class="programlisting">
+$reader = new Zend\Config\Reader\Ini();
+$data   = $reader-&gt;fromFile('/path/to/config.ini');
+
+echo $data['webhost']  // prints "www.example.com"
+echo $data['database']['params']['dbname'];  // prints "dbproduction"
+</pre>
+<p>
+            The <code class="classname">Zend\Config\Reader\Ini</code> supports a feature to include the
+            content of a INI file in a specific section of another INI file.
+            For instance, suppose we have an INI file with the database configuration:
+        </p>
+<pre class="programlisting">
+database.adapter         = 'pdo_mysql'
+database.params.host     = 'db.example.com'
+database.params.username = 'dbuser'
+database.params.password = 'secret'
+database.params.dbname   = 'dbproduction'
+</pre>
+<p>
+            We can include this configuration in another INI file, for instance:
+        </p>
+<pre class="programlisting">
+webhost  = 'www.example.com'
+@include = 'database.ini'
+</pre>
+<p>
+            If we read this file using the component <code class="classname">Zend\Config\Reader\Ini</code>
+            we will obtain the same configuration data structure of the previous example.
+        </p>
+<p>
+            The <span class="command"><strong>@include = 'file-to-include.ini'</strong></span> can be used also in
+            a subelement of a value. For instance we can have an INI file like that:
+        </p>
+<pre class="programlisting">
+adapter         = 'pdo_mysql'
+params.host     = 'db.example.com'
+params.username = 'dbuser'
+params.password = 'secret'
+params.dbname   = 'dbproduction'
+</pre>
+<p>
+            And assign the <span class="command"><strong>@include</strong></span> as sublement of the database value:
+        </p>
+<pre class="programlisting">
+webhost           = 'www.example.com'
+database.@include = 'database.ini'
+</pre>
+</div>
+<div class="section" title="4.3.2. Zend\Config\Reader\Xml">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.config.reader.xml"></a>4.3.2. Zend\Config\Reader\Xml</h3></div></div></div>
+<p>
+            <code class="classname">Zend\Config\Reader\Xml</code> enables developers to read configuration data in a
+            familiar <acronym class="acronym">XML</acronym> format and read them in the application by using an array syntax.
+            The root element of the <acronym class="acronym">XML</acronym> file or string is irrelevant and may be named
+            arbitrarily.
+        </p>
+<p>
+            The following example illustrates a basic use of <code class="classname">Zend\Config\Reader\Xml</code> for
+            loading configuration data from an <acronym class="acronym">XML</acronym> file. In this example there
+            are configuration data for both a production system and for a staging system.
+            Suppose we have the following <acronym class="acronym">XML</acronym> configuration file:
+        </p>
+<pre class="programlisting">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;?&gt;
+&lt;config&gt;
+    &lt;webhost&gt;www.example.com&lt;/webhost&gt;
+    &lt;database&gt;
+        &lt;adapter value="pdo_mysql"/&gt;
+        &lt;params&gt;
+            &lt;host value="db.example.com"/&gt;
+            &lt;username value="dbuser"/&gt;
+            &lt;password value="secret"/&gt;
+            &lt;dbname value="dbproduction"/&gt;
+        &lt;/params&gt;
+    &lt;/database&gt;
+&lt;/config&gt;
+</pre>
+<p>
+            We can use the <code class="classname">Zend\Config\Reader\Xml</code> to read this XML file:
+        </p>
+<pre class="programlisting">
+$reader = new Zend\Config\Reader\Xml();
+$data   = $reader-&gt;fromFile('/path/to/config.xml');
+
+echo $data['webhost']  // prints "www.example.com"
+echo $data['database']['params']['dbname'];  // prints "dbproduction"
+</pre>
+<p>
+            <code class="classname">Zend\Config\Reader\Xml</code> utilizes the <a class="link" href="http://php.net/xmlreader" target="_top"><code class="classname">XMLReader</code></a>
+            <acronym class="acronym">PHP</acronym> class. Please review this documentation to be aware of its
+            specific behaviors, which propagate to <code class="classname">Zend\Config\Reader\Xml</code>.
+        </p>
+<p>
+            Using <code class="classname">Zend\Config\Reader\Xml</code> we can include the content of XML files
+            in a specific XML element. This is provided using the standard function <a class="link" href="http://www.w3.org/TR/xinclude/" target="_top">XInclude</a> of XML.
+            To use this function you have to add the namespace <span class="command"><strong>xmlns:xi="http://www.w3.org/2001/XInclude"</strong></span>
+            to the XML file. Suppose we have an XML files that contains only the database configuration:
+        </p>
+<pre class="programlisting">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;config&gt;
+    &lt;database&gt;
+        &lt;adapter&gt;pdo_mysql&lt;/adapter&gt;
+        &lt;params&gt;
+            &lt;host&gt;db.example.com&lt;/host&gt;
+            &lt;username&gt;dbuser&lt;/username&gt;
+            &lt;password&gt;secret&lt;/password&gt;
+            &lt;dbname&gt;dbproduction&lt;/dbname&gt;
+        &lt;/params&gt;
+    &lt;/database&gt;
+&lt;/config&gt;        
+</pre>
+<p>
+            We can include this configuration in another XML file, for instance:
+        </p>
+<pre class="programlisting">
+&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;config xmlns:xi="http://www.w3.org/2001/XInclude"&gt;
+    &lt;webhost&gt;www.example.com&lt;/webhost&gt;
+    &lt;xi:include href="database.xml"/&gt;
+&lt;/config&gt;     
+</pre>
+<p>
+            The syntax to include an XML file in a specific element is <span class="command"><strong>&lt;xi:include href="file-to-include.xml"/&gt;</strong></span>
+        </p>
+</div>
+<div class="note" title="Differences from ZF1"><table border="0" summary="Note: Differences from ZF1">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td>
+<th align="left">Differences from ZF1</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>
+            The <code class="classname">Zend\Config\Reader</code> component no longer supports the following
+            features:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+                    Inheritance of sections.
+                </p></li>
+<li class="listitem"><p>
+                    Reading of specific sections.
+                </p></li>
+</ul></div>
+</td></tr>
+</table></div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.config.theory_of_operation.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.config.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.config.writer.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">4.2. Theory of Operation </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 4.4. Zend\Config\Writer</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

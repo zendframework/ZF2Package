@@ -1,0 +1,155 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Chapter 9. Zend_Loader</title>
+<link rel="stylesheet" href="dbstyle.css" type="text/css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="prev" href="zend.http.headers.html" title="8.4. Zend\Http\Headers And The Various Header Classes">
+<link rel="next" href="zend.loader.autoloader-resource.html" title="9.2. Resource Autoloaders">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.db.html" title="Chapter 5. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 6. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 7. Zend\EventManager">
+<link rel="chapter" href="zend.http.html" title="Chapter 8. Zend_Http">
+<link rel="chapter" href="zend.loader.html" title="Chapter 9. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 10. Zend\Mail">
+<link rel="chapter" href="zend.module.html" title="Chapter 11. Zend\Module">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 12. Zend\Mvc">
+<link rel="chapter" href="zend.uri.html" title="Chapter 13. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 14. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="section" href="zend.loader.html#zend.loader.load" title="9.1. Loading Files and Classes Dynamically">
+<link rel="section" href="zend.loader.autoloader-resource.html" title="9.2. Resource Autoloaders">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">Chapter 9. Zend_Loader</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.http.headers.html">Prev</a> </td>
+<th width="60%" align="center">Part III. Zend Framework Reference</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.loader.autoloader-resource.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="chapter" title="Chapter 9. Zend_Loader">
+<div class="titlepage"><div><div><h1 class="title">
+<a name="zend.loader"></a>Zend_Loader</h1></div></div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl>
+<dt><span class="section"><a href="zend.loader.html#zend.loader.load">9.1. Loading Files and Classes Dynamically</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="zend.loader.html#zend.loader.load.file">9.1.1. Loading Files</a></span></dt>
+<dt><span class="section"><a href="zend.loader.html#zend.loader.load.isreadable">9.1.2. Testing if a File is Readable</a></span></dt>
+</dl></dd>
+<dt><span class="section"><a href="zend.loader.autoloader-resource.html">9.2. Resource Autoloaders</a></span></dt>
+<dd><dl>
+<dt><span class="section"><a href="zend.loader.autoloader-resource.html#zend.loader.autoloader-resource.usage">9.2.1. Resource autoloader usage</a></span></dt>
+<dt><span class="section"><a href="zend.loader.autoloader-resource.html#zend.loader.autoloader-resource.module">9.2.2. The Module Resource Autoloader</a></span></dt>
+<dt><span class="section"><a href="zend.loader.autoloader-resource.html#zend.loader.autoloader-resource.factory">9.2.3. Using Resource Autoloaders as Object Factories</a></span></dt>
+<dt><span class="section"><a href="zend.loader.autoloader-resource.html#zend.loader.autoloader-resource.reference">9.2.4. Resource Autoloader Reference</a></span></dt>
+</dl></dd>
+</dl>
+</div>
+<div class="section" title="9.1. Loading Files and Classes Dynamically">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.loader.load"></a>9.1. Loading Files and Classes Dynamically</h2></div></div></div>
+<p>
+        The <code class="classname">Zend_Loader</code> class includes methods to help you load files
+        dynamically.
+    </p>
+<div class="section" title="9.1.1. Loading Files">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.loader.load.file"></a>9.1.1. Loading Files</h3></div></div></div>
+<p>
+            The static method <code class="methodname">Zend_Loader::loadFile()</code> loads a
+            <acronym class="acronym">PHP</acronym> file. The file loaded may contain any <acronym class="acronym">PHP</acronym>
+            code. The method is a wrapper for the <acronym class="acronym">PHP</acronym> function
+            <a class="link" href="http://php.net/include" target="_top"><code class="methodname">include()</code></a>.
+            This method returns boolean <code class="constant">FALSE</code> on failure, for example
+            if the specified file does not exist.
+        </p>
+<div class="example">
+<a name="zend.loader.load.file.example"></a><p class="title"><b>Example 9.1. Example of the loadFile() Method</b></p>
+<div class="example-contents"><pre class="programlisting">
+Zend_Loader::loadFile($filename, $dirs=null, $once=false);
+</pre></div>
+</div>
+<br class="example-break"><p>
+            The <code class="varname">$filename</code> argument specifies the filename to load,
+            which must not contain any path information.
+            A security check is performed on <code class="varname">$filename</code>.
+            The <code class="varname">$filename</code> may only contain alphanumeric characters,
+            dashes ("-"), underscores ("_"), or periods (".").
+            No such restriction is placed on the <code class="varname">$dirs</code> argument.
+        </p>
+<p>
+            The <code class="varname">$dirs</code> argument specifies which directories to search for the
+            file in. If the value is <code class="constant">NULL</code>, only the include_path
+            is searched; if the value is a string or an array, the directory or directories
+            specified will be searched, followed by the <span class="property">include_path</span>.
+        </p>
+<p>
+            The <code class="varname">$once</code> argument is a boolean. If <code class="constant">TRUE</code>,
+            <code class="methodname">Zend_Loader::loadFile()</code> uses the <acronym class="acronym">PHP</acronym>
+            function <a class="link" href="http://php.net/include" target="_top"><code class="methodname">include_once()</code></a>
+            for loading the file, otherwise the <acronym class="acronym">PHP</acronym> function
+            <a class="link" href="http://php.net/include_once" target="_top"><code class="methodname">include()</code></a>
+            is used.
+        </p>
+</div>
+<div class="section" title="9.1.2. Testing if a File is Readable">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.loader.load.isreadable"></a>9.1.2. Testing if a File is Readable</h3></div></div></div>
+<p>
+            The static method <code class="methodname">Zend_Loader::isReadable($pathname)</code>
+            returns <code class="constant">TRUE</code> if a file at the specified pathname exists
+            and is readable, <code class="constant">FALSE</code> otherwise.
+        </p>
+<div class="example">
+<a name="zend.loader.load.isreadable.example"></a><p class="title"><b>Example 9.2. Example of isReadable() method</b></p>
+<div class="example-contents"><pre class="programlisting">
+if (Zend_Loader::isReadable($filename)) {
+    // do something with $filename
+}
+</pre></div>
+</div>
+<br class="example-break"><p>
+            The <code class="varname">$filename</code> argument specifies the filename to
+            check. This may contain path information.
+            This method is a wrapper for the <acronym class="acronym">PHP</acronym> function
+            <a class="link" href="http://php.net/is_readable" target="_top"><code class="methodname">is_readable()</code></a>.
+            The <acronym class="acronym">PHP</acronym> function does not search the
+            <span class="property">include_path</span>, while
+            <code class="methodname">Zend_Loader::isReadable()</code> does.
+        </p>
+</div>
+</div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.http.headers.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="reference.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.loader.autoloader-resource.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">8.4. Zend\Http\Headers And The Various Header Classes </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 9.2. Resource Autoloaders</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

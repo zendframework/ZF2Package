@@ -1,0 +1,114 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>7. Using Multiple Definitions From Multiple Sources</title>
+<link rel="stylesheet" href="dbstyle.css" type="text/css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.75.2">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="prev" href="learning.di.creating-a-precompiled-definition-for-others-to-use.html" title="6. Creating a precompiled definition for others to use">
+<link rel="next" href="learning.di.generating-service-locators.html" title="8. Generating Service Locators">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.db.html" title="Chapter 5. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 6. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 7. Zend\EventManager">
+<link rel="chapter" href="zend.http.html" title="Chapter 8. Zend_Http">
+<link rel="chapter" href="zend.loader.html" title="Chapter 9. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 10. Zend\Mail">
+<link rel="chapter" href="zend.module.html" title="Chapter 11. Zend\Module">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 12. Zend\Mvc">
+<link rel="chapter" href="zend.uri.html" title="Chapter 13. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 14. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">7. Using Multiple Definitions From Multiple Sources</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="learning.di.creating-a-precompiled-definition-for-others-to-use.html">Prev</a> </td>
+<th width="60%" align="center">Learning Dependency Injection</th>
+<td width="20%" align="right"> <a accesskey="n" href="learning.di.generating-service-locators.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="7. Using Multiple Definitions From Multiple Sources">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="learning.di.using-multiple-definitions-from-multiple-sources"></a>7. Using Multiple Definitions From Multiple Sources</h2></div></div></div>
+<p>
+    In all actuality, you will be using code from multiple places, some
+    Zend Framework code, some other 3rd party code, and of course, your
+    own code that makes up your application. Here is a method for
+    consuming definitions from multiple places:
+  </p>
+<pre class="programlisting">
+use Zend\Di\DependencyInjector,
+    Zend\Di\Definition,
+    Zend\Di\Definition\Builder;
+
+$di = new DependencyInjector;
+$diDefAggregate = new Definition\Aggregate();
+
+// first add in provided Definitions, for example
+$diDefAggregate-&gt;addDefinition(new ThirdParty\Dbal\DiDefinition());
+$diDefAggregate-&gt;addDefinition(new Zend\Controller\DiDefinition());
+
+// for code that does not have TypeHints
+$builder = new Definition\BuilderDefinition();
+$builder-&gt;addClass(($class = Builder\PhpClass));
+$class-&gt;addInjectionMethod(
+    ($injectMethod = new Builder\InjectionMethod())
+);
+$injectMethod-&gt;setName('injectImplementation');
+$injectMethod-&gt;addParameter(
+'implementation', 'Class\For\Specific\Implementation'
+);
+
+// now, your application code
+$compiler = new Definition\Compiler()
+$compiler-&gt;addCodeScannerDirectory(
+    new Zend\Code\Scanner\DirectoryScanner(__DIR__ . '/App/')
+);
+$appDefinition = $compiler-&gt;compile();
+$diDefAggregate-&gt;addDefinition($appDefinition);
+
+// now, pass in properties
+$im = $di-&gt;getInstanceManager();
+
+// this could come from Zend\Config\Config::toArray
+$propertiesFromConfig = array( 
+    'ThirdParty\Dbal\DbAdapter' =&gt; array(
+        'username' =&gt; 'someUsername', 
+        'password' =&gt; 'somePassword'
+    ),
+    'Zend\Controller\Helper\ContentType' =&gt; array(
+        'default' =&gt; 'xhtml5'
+    ),
+);
+$im-&gt;setProperties($propertiesFromConfig);
+</pre>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="learning.di.creating-a-precompiled-definition-for-others-to-use.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="learning.di.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="learning.di.generating-service-locators.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">6. Creating a precompiled definition for others to use </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 8. Generating Service Locators</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>
