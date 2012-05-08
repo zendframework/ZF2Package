@@ -175,7 +175,6 @@ if (isset($dependency_file)) {
         }
     }
 }
-// LDBG($composer);exit;
 
 // write composer file
 $write = '<?php return ' . var_export($composer, true) . '; ?>';
