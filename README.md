@@ -1,17 +1,18 @@
 README
 ======
 
-Building Pyrus packages
------------------------
-
-It's just a couple of steps
+Building Pyrus & Composer packages
+----------------------------------
 
 * First, copy packager.ini.orig to packager.ini.
 * Next, configure:
     * path to the ZF2 root directory
     * path to pyrus script
     * a release version name
-* Then, run:
+
+For Pyrus:
+
+* Run:
 
   `php scripts/make-all-packages.php`
 
@@ -19,7 +20,17 @@ It's just a couple of steps
 
   `php scripts/release-all-packages.php`
 
-That's it. Then add the new files, commit, and push to the 
+For Composer:
+
+* Run:
+
+  `php scripts/make-all-composer-packages.php`
+
+* Finally, run:
+
+  `php scripts/release-all-composer-packages.php`
+
+That's it. Then add the new files & the changed packages.json, commit, and push to the 
 github repository.
  
 Building full/minimal packages
