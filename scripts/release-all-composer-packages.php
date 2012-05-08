@@ -25,10 +25,10 @@ foreach ($list as $dirname) {
     $name = 'zendframework/'.$name;
     echo "\tadding $name" . PHP_EOL;;
 
-    $versions = glob($dirname . '/*.array.php');
+    $versions = glob($dirname . '/*.part.php');
 
     foreach ($versions as $versionFile) {
-        $version = basename($versionFile, '.array.php');
+        $version = basename($versionFile, '.part.php');
         $contents = include $versionFile;
         $repositories['packages'][$name][$version] = $contents;
     }

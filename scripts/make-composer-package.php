@@ -178,7 +178,7 @@ if (isset($dependency_file)) {
 
 // write composer file
 $write = '<?php return ' . var_export($composer, true) . '; ?>';
-$filename = "$release.array.php";
+$filename = "$release.part.php";
 $path = ROOT . '/data/composer/' . $package_name. '/';
 if (!is_dir($path)) {
     mkdir($path, 0777, true);
