@@ -132,9 +132,11 @@ if (array_key_exists('composer_create_zip', $ini)
 
 // Dependencies
 $composer = array();
-$composer['name'] = strtolower(str_replace('_', '/', $package_name));
-$composer['name'] = str_replace('zend', $vendor_name, $composer['name']);
+$composer['name'] = strtolower(str_replace('_', '-', $package_name));
+$composer['name'] = 'zendframework/' . $composer['name'];
 $composer['version'] = $release;
+$composer['license'] = 'BSD-3-Clause';
+$composer['keywords'] = array('zf2', strtolower(str_replace('Zend_', '', $package_name)));
 
 $composer['dist']['url'] = "$composer_url/{$package_file_base_uri}{$package_file_name}";
 $composer['dist']['type'] = "zip";
@@ -159,15 +161,15 @@ if (isset($dependency_file)) {
     if ($package_info) {
         if (isset($package_info['required'])) {
             foreach ($package_info['required'] as $dependency) {
-                $dependency_name = strtolower(str_replace('_', '/', $dependency));
-                $dependency_name = str_replace('zend', 'zendframework', $dependency_name);
+                $dependency_name = strtolower(str_replace('_', '-', $dependency));
+                $dependency_name = 'zendframework/' . $dependency_name;
                 $composer['require'][$dependency_name] = "$release";
             }
         }
         if (isset($package_info['optional'])) {
             foreach ($package_info['optional'] as $dependency) {
-                $dependency_name = strtolower(str_replace('_', '/', $dependency));
-                $dependency_name = str_replace('zend', 'zendframework', $dependency_name);
+                $dependency_name = strtolower(str_replace('_', '-', $dependency));
+                $dependency_name = 'zendframework/' . $dependency_name;
 
                 $suggest = str_replace('_', '\\', $dependency) . ' component';
                 $composer['suggest'][$dependency_name] = $suggest;
