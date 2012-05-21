@@ -21,7 +21,7 @@ $path = ROOT . '/data/composer';
 $list = glob($path.'/Zend*', GLOB_ONLYDIR);
 foreach ($list as $dirname) {
     $name = basename($dirname);
-    $name = strtolower(substr($name, 5));
+    $name = strtolower(str_replace('_', '-', $name));
     $name = 'zendframework/'.$name;
     echo "\tadding $name" . PHP_EOL;;
 
