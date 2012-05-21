@@ -1,7 +1,7 @@
 <?php return array (
   'optional' => 
   array (
-    0 => 'Zend_Config',
-    1 => 'Zend_EventManager',
+    0 => 'Zend_Registry',
+    1 => 'Zend_Locale',
   ),
 );
