@@ -40,7 +40,6 @@ $work_path = ROOT . '/packages/working/' . $package_name;
 if (file_exists($work_path)) {
     script_run_command('rm -Rf ' . $work_path);
 }
-script_run_command('mkdir -p ' . $work_path . '/manual');
 
 // Create library and sync in components
 if (!file_exists($work_path . '/library/Zend')) {
