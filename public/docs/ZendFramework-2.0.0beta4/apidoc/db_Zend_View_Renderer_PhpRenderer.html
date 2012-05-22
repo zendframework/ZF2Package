@@ -1,0 +1,1108 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" class="content">
+<div class="sub-page-main-header-api-documentation"><h2>API Documentation</h2></div>
+<div class="dotted-line"></div>
+</div>
+<div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">Zend/View/Renderer/PhpRenderer.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><div id="file-description">
+<p xmlns:dbx="http://docblox-project.org/xsl/functions" class="short-description">Zend Framework</p>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="long-description"><p>LICENSE</p>
+
+<p>This source file is subject to the new BSD license that is bundled
+with this package in the file LICENSE.txt.
+It is also available through the world-wide-web at this URL:
+http://framework.zend.com/license/new-bsd
+If you did not receive a copy of the license and are unable to
+obtain it through the world-wide-web, please send an email
+to license@zend.com so we can send you a copy immediately.</p>
+</div>
+</div>
+<dl class="file-info">
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Category</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Zend
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Copyright</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">License</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">
+<a href="http://framework.zend.com/license/new-bsd">New BSD License</a>
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Package</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Zend_View
+         
+    </dd>
+</dl>
+<a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\Zend\View\Renderer\PhpRenderer" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\Zend\View\Renderer\PhpRenderer<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Zend\View</small><p class="short-description">Abstract class for Zend_View to help enforce private constructs.</p>
+<div class="long-description"><p>Note: all private variables in this class are prefixed with "__". This is to
+mark them as part of the internal implementation, and thus prevent conflict
+with variables injected into the renderer.</p>
+</div>
+<dl class="class-info">
+<dt>Implements</dt>
+<dd><a href="db_Zend_View_Renderer_RendererInterface.html#%5CZend%5CView%5CRenderer%5CRendererInterface">\Zend\View\Renderer\RendererInterface</a></dd>
+<dd><a href="db_Zend_Loader_Pluggable.html#%5CZend%5CLoader%5CPluggable">\Zend\Loader\Pluggable</a></dd>
+<dd><a href="db_Zend_View_Renderer_TreeRendererInterface.html#%5CZend%5CView%5CRenderer%5CTreeRendererInterface">\Zend\View\Renderer\TreeRendererInterface</a></dd>
+<dt>Category</dt>
+<dd>Zend
+         
+    </dd>
+<dt>Copyright</dt>
+<dd>Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://framework.zend.com/license/new-bsd">New BSD License</a>
+         
+    </dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\Zend\View\Renderer\PhpRenderer::$__content" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">string
+                 <span class="highlight">$__content</span>= ''''
+                </code><div class="description">
+<p class="short-description"></p>Rendered content</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>''</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::$__file" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">string
+                 <span class="highlight">$__file</span>= 'null'
+                </code><div class="description">
+<p class="short-description">Script file name to execute</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::$__filterChain" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">\Zend\Filter\FilterChain
+                 <span class="highlight">$__filterChain</span>= ''
+                </code><div class="description">
+<p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_Zend_Filter_FilterChain.html#%5CZend%5CFilter%5CFilterChain">\Zend\Filter\FilterChain</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::$__helperBroker" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">\Zend\View\HelperBroker
+                 <span class="highlight">$__helperBroker</span>= ''
+                </code><div class="description">
+<p class="short-description">Helper broker</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_Zend_View_HelperBroker.html#%5CZend%5CView%5CHelperBroker">\Zend\View\HelperBroker</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::$__renderTrees" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">bool
+                 <span class="highlight">$__renderTrees</span>= 'false'
+                </code><div class="description">
+<p class="short-description"></p>Whether or not to render trees of view models</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>false</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>bool</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::$__template" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">null|string
+                 <span class="highlight">$__template</span>= 'null'
+                </code><div class="description">
+<p class="short-description">Template being rendered</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>nullstring</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::$__templateResolver" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">\Zend\View\Resolver\ResolverInterface
+                 <span class="highlight">$__templateResolver</span>= ''
+                </code><div class="description">
+<p class="short-description">Template resolver</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_Zend_View_Resolver_ResolverInterface.html#%5CZend%5CView%5CResolver%5CResolverInterface">\Zend\View\Resolver\ResolverInterface</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::$__templates" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">array
+                 <span class="highlight">$__templates</span>= 'array()'
+                </code><div class="description">
+<p class="short-description">Queue of templates to render</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::$__vars" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">\ArrayAccess|array
+                 <span class="highlight">$__vars</span>= ''
+                </code><div class="description">
+<p class="short-description"></p>ArrayAccess or associative array representing available variables</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>\ArrayAccessarray</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::$__varsCache" class="anchor"></a><div class="property private">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_private.png" style="margin-right: 5px" alt="private">array
+                 <span class="highlight">$__varsCache</span>= 'array()'
+                </code><div class="description">
+<p class="short-description"></p>Temporary variable stack; used when variables passed to render()</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\Zend\View\Renderer\PhpRenderer::__call()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__call</span><span class="nb-faded-text">(
+          string $method, array $argv
+          )
+        </span>
+        :
+          mixed</code><div class="description"><p class="short_description">Overloading: proxy to helpers</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Proxies to the attached plugin broker to retrieve, return, and potentially
+execute helpers.</p>
+
+<ul>
+<li>If the helper does not define __invoke, it will be returned</li>
+<li>If the helper does define __invoke, it will be called as a functor</li>
+</ul>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$method</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$argv</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::__clone()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__clone</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></code><div class="description"><p class="short_description">Make sure View variables are cloned when the view is cloned.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          array $config
+              =
+              array()
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Constructor.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$config</th>
+<td>array</td>
+<td><em><p>Configuration key-value pairs.</p>
+</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Todo</dt>
+<dd>handle passing helper broker, options
+         
+    </dd>
+<dt>Todo</dt>
+<dd>handle passing filter chain, options
+         
+    </dd>
+<dt>Todo</dt>
+<dd>handle passing variables object, options
+         
+    </dd>
+<dt>Todo</dt>
+<dd>handle passing resolver object, options
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::__get()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__get</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          mixed</code><div class="description"><p class="short_description">Overloading: proxy to Variables container</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::__isset()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__isset</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Overloading: proxy to Variables container</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::__set()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__set</span><span class="nb-faded-text">(
+          string $name, mixed $value
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Overloading: proxy to Variables container</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$value</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::__unset()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__unset</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Overloading: proxy to Variables container</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::addTemplate()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addTemplate</span><span class="nb-faded-text">(
+          string $template
+          )
+        </span>
+        :
+          <a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></code><div class="description"><p class="short_description">Add a template to the stack</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$template</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::canRenderTrees()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">canRenderTrees</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Can we render trees, or are we configured to do so?</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::get()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">get</span><span class="nb-faded-text">(
+          mixed $key
+          )
+        </span>
+        :
+          mixed</code><div class="description"><p class="short_description">Get a single variable</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$key</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::getBroker()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getBroker</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_View_HelperBroker.html#%5CZend%5CView%5CHelperBroker">\Zend\View\HelperBroker</a></code><div class="description"><p class="short_description">Get plugin broker instance</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_View_HelperBroker.html#%5CZend%5CView%5CHelperBroker">\Zend\View\HelperBroker</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::getEngine()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getEngine</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></code><div class="description"><p class="short_description">Return the template engine object</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Returns the object instance, as it is its own template engine</p>
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::getFilterChain()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFilterChain</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_Filter_FilterChain.html#%5CZend%5CFilter%5CFilterChain">\Zend\Filter\FilterChain</a></code><div class="description"><p class="short_description">Retrieve filter chain for post-filtering script content</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Filter_FilterChain.html#%5CZend%5CFilter%5CFilterChain">\Zend\Filter\FilterChain</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::init()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">init</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Allow custom object initialization when extending Zend_View_Abstract or
+Zend_View</p></div>
+<div class="code-tabs"><div class="long-description"><p>Triggered by {@link __construct() the constructor} as its final action.</p>
+</div></div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::plugin()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">plugin</span><span class="nb-faded-text">(
+           $name, null|array $options
+              =
+              null
+          )
+        </span>
+        :
+          \Zend\View\Renderer\Helper</code><div class="description"><p class="short_description">Get plugin instance</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$options</th>
+<td>null|array</td>
+<td><em><p>Options to pass to plugin constructor (if not already instantiated)</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\Zend\View\Renderer\Helper</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::render()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">render</span><span class="nb-faded-text">(
+          string|<a href="db_Zend_View_Model_ModelInterface.html#%5CZend%5CView%5CModel%5CModelInterface">\Zend\View\Model\ModelInterface</a> $nameOrModel, null|array|\Zend\View\Renderer\Traversable $values
+              =
+              null
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Processes a view script and returns the output.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$nameOrModel</th>
+<td>string|<a href="db_Zend_View_Model_ModelInterface.html#%5CZend%5CView%5CModel%5CModelInterface">\Zend\View\Model\ModelInterface</a>
+</td>
+<td><em><p>Either the template to use, or a ViewModel. The ViewModel must have the template as an option in order to be valid.</p></em></td>
+</tr>
+<tr>
+<th>$values</th>
+<td>null|array|\Zend\View\Renderer\Traversable</td>
+<td><em><p>Values to use when rendering. If none provided, uses those in the composed variables container.</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>The script output.</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_View_Exception_DomainException.html#%5CZend%5CView%5CException%5CDomainException">\Zend\View\Exception\DomainException</a></td>
+<td><em>if a ViewModel is passed, but does not contain a template option.</em></td>
+</tr>
+<tr>
+<td><a href="db_Zend_View_Exception_InvalidArgumentException.html#%5CZend%5CView%5CException%5CInvalidArgumentException">\Zend\View\Exception\InvalidArgumentException</a></td>
+<td><em>if the values passed are not an array or ArrayAccess object</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::resolver()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">resolver</span><span class="nb-faded-text">(
+          null|string $name
+              =
+              null
+          )
+        </span>
+        :
+          string|<a href="db_Zend_View_Resolver_ResolverInterface.html#%5CZend%5CView%5CResolver%5CResolverInterface">\Zend\View\Resolver\ResolverInterface</a></code><div class="description"><p class="short_description">Retrieve template name or template resolver</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>null|string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string|<a href="db_Zend_View_Resolver_ResolverInterface.html#%5CZend%5CView%5CResolver%5CResolverInterface">\Zend\View\Resolver\ResolverInterface</a>
+</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::setBroker()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setBroker</span><span class="nb-faded-text">(
+          string|<a href="db_Zend_View_HelperBroker.html#%5CZend%5CView%5CHelperBroker">\Zend\View\HelperBroker</a> $broker
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Set plugin broker instance</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$broker</th>
+<td>string|<a href="db_Zend_View_HelperBroker.html#%5CZend%5CView%5CHelperBroker">\Zend\View\HelperBroker</a>
+</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_View_Exception_InvalidArgumentException.html#%5CZend%5CView%5CException%5CInvalidArgumentException">\Zend\View\Exception\InvalidArgumentException</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::setCanRenderTrees()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setCanRenderTrees</span><span class="nb-faded-text">(
+          bool $renderTrees
+          )
+        </span>
+        :
+          <a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></code><div class="description"><p class="short_description">Set flag indicating whether or not we should render trees of view models</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>If set to true, the View instance will not attempt to render children
+separately, but instead pass the root view model directly to the PhpRenderer.
+It is then up to the developer to render the children from within the
+view script.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$renderTrees</th>
+<td>bool</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::setFilterChain()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setFilterChain</span><span class="nb-faded-text">(
+          <a href="db_Zend_Filter_FilterChain.html#%5CZend%5CFilter%5CFilterChain">\Zend\Filter\FilterChain</a> $filters
+          )
+        </span>
+        :
+          <a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></code><div class="description"><p class="short_description">Set filter chain</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$filters</th>
+<td><a href="db_Zend_Filter_FilterChain.html#%5CZend%5CFilter%5CFilterChain">\Zend\Filter\FilterChain</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::setResolver()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setResolver</span><span class="nb-faded-text">(
+          <a href="db_Zend_View_Resolver_ResolverInterface.html#%5CZend%5CView%5CResolver%5CResolverInterface">\Zend\View\Resolver\ResolverInterface</a> $resolver
+          )
+        </span>
+        :
+          <a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></code><div class="description"><p class="short_description">Set script resolver</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$resolver</th>
+<td><a href="db_Zend_View_Resolver_ResolverInterface.html#%5CZend%5CView%5CResolver%5CResolverInterface">\Zend\View\Resolver\ResolverInterface</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_View_Exception_InvalidArgumentException.html#%5CZend%5CView%5CException%5CInvalidArgumentException">\Zend\View\Exception\InvalidArgumentException</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::setVars()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setVars</span><span class="nb-faded-text">(
+          array|\ArrayAccess $variables
+          )
+        </span>
+        :
+          <a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></code><div class="description"><p class="short_description">Set variable storage</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>Expects either an array, or an object implementing ArrayAccess.</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$variables</th>
+<td>array|\ArrayAccess</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_View_Renderer_PhpRenderer.html#%5CZend%5CView%5CRenderer%5CPhpRenderer">\Zend\View\Renderer\PhpRenderer</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_View_Exception_InvalidArgumentException.html#%5CZend%5CView%5CException%5CInvalidArgumentException">\Zend\View\Exception\InvalidArgumentException</a></td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\View\Renderer\PhpRenderer::vars()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">vars</span><span class="nb-faded-text">(
+          mixed $key
+              =
+              null
+          )
+        </span>
+        :
+          mixed</code><div class="description"><p class="short_description">Get a single variable, or all variables</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$key</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>mixed</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.15.1</a>.
+    </small></body></html>

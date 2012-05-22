@@ -1,0 +1,208 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>7.2. Zend\Di Quickstart</title>
+<link rel="stylesheet" type="text/css" href="dbstyle.css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.di.html" title="Chapter 7. Zend\Di">
+<link rel="prev" href="zend.di.html" title="Chapter 7. Zend\Di">
+<link rel="next" href="zend.di.definition.html" title="7.3. Zend\Di Definition">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.crypt.html" title="Chapter 5. Zend_Crypt">
+<link rel="chapter" href="zend.db.html" title="Chapter 6. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 7. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 8. Zend\EventManager">
+<link rel="chapter" href="zend.form.html" title="Chapter 9. Zend_Form">
+<link rel="chapter" href="zend.http.html" title="Chapter 10. Zend_Http">
+<link rel="chapter" href="zend.input-filter.html" title="Chapter 11. Zend\InputFilter">
+<link rel="chapter" href="zend.ldap.html" title="Chapter 12. Zend_Ldap">
+<link rel="chapter" href="zend.loader.html" title="Chapter 13. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 14. Zend\Mail">
+<link rel="chapter" href="zend.module-manager.html" title="Chapter 15. Zend\ModuleManager">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 16. Zend\Mvc">
+<link rel="chapter" href="zend.service-manager.html" title="Chapter 17. Zend\ServiceManager">
+<link rel="chapter" href="zend.stdlib.html" title="Chapter 18. Zend\Stdlib">
+<link rel="chapter" href="zend.uri.html" title="Chapter 19. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 20. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">7.2. Zend\Di Quickstart</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.di.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 7. Zend\Di</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.di.definition.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="7.2. Zend\Di Quickstart">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.di.quickstart"></a>7.2. Zend\Di Quickstart</h2></div></div></div>
+<p>
+        This QuickStart is intended to get developers familiar with the concepts
+        of the Zend\Di DiC.  Generally speaking, code is never as simple as it is
+        inside this example, so working knowledge of the other sections of the
+        manual is suggested.
+    </p>
+<p>
+        Assume for a moment, you have the following code as part of your application
+        that you feel is a good candidate for being managed by a DiC, after all,
+        you are already injecting all your dependencies:
+    </p>
+<pre class="programlisting">
+namespace MyLibrary
+{
+    class DbAdapter
+    {
+        protected $username = null;
+        protected $password = null;
+        public function __construct($username, $password)
+        {
+            $this-&gt;username = $username;
+            $this-&gt;password = $password;
+        }
+    }
+}
+
+namespace MyMovieApp
+{
+    class MovieFinder
+    {
+        protected $dbAdapter = null;
+        public function __construct(\MyLibrary\DbAdapter $dbAdapter)
+        {
+            $this-&gt;dbAdapter = $dbAdapter;
+        }
+    }
+
+    class MovieLister
+    {
+        protected $movieFinder = null;
+        public function __construct(MovieFinder $movieFinder)
+        {
+            $this-&gt;movieFinder = $movieFinder;
+        }
+    }
+}
+</pre>
+<p>
+        With the above code, you find yourself writing the following to
+        wire and utilize this code:
+    </p>
+<pre class="programlisting">
+// $config object is assumed
+
+$dbAdapter = new MyLibrary\DbAdapter($config-&gt;username, $config-&gt;password);
+$movieFinder = new MyMovieApp\MovieFinder($dbAdapter);
+$movieLister = new MyMovieApp\MovieLister($movieFinder);
+foreach ($movieLister as $movie) {
+    // iterate and display $movie
+}
+</pre>
+<p>
+        If you are doing this above wiring in each controller or view that
+        wants to list movies, not only can this become repetitive and
+        boring to write, but also unmaintainable if for example you want to
+        swap out one of these dependencies on a wholesale scale.
+    </p>
+<p>
+        Since this example of code already practices good dependency injection,
+        with constructor injection, it is a great candidate for using Zend\Di.
+        The usage is as simple as:
+    </p>
+<pre class="programlisting">
+    // inside a bootstrap somewhere
+    $di = new Zend\Di\Di();
+    $di-&gt;instanceManager()-&gt;setParameters('MyLibrary\DbAdapter', array(
+        'username' =&gt; $config-&gt;username,
+        'password' =&gt; $config-&gt;password
+    ));
+
+    // inside each controller
+    $movieLister = $di-&gt;get('MyMovieApp\MovieLister');
+    foreach ($movieLister as $movie) {
+        // iterate and display $movie
+    }
+</pre>
+<p>
+        In the above example, we are obtaining a default instance of
+        Zend\Di\Di.  By 'default', we mean that Zend\Di\Di is constructed with
+        a DefinitionList seeded with a RuntimeDefinition (uses Reflection) and an
+        empty instance manager and no configuration.
+        Here is the Zend\Di\Di constructor:
+    </p>
+<pre class="programlisting">
+    public function __construct(DefinitionList $definitions = null, InstanceManager $instanceManager = null, Configuration $config = null)
+    {
+        $this-&gt;definitions = ($definitions) ?: new DefinitionList(new Definition\RuntimeDefinition());
+        $this-&gt;instanceManager = ($instanceManager) ?: new InstanceManager();
+
+        if ($config) {
+            $this-&gt;configure($config);
+        }
+    }
+</pre>
+<p>
+        This means that when $di-&gt;get() is called, it will be consulting the
+        RuntimeDefinition, which uses reflection to understand the structure of the code.
+        Once it knows the structure of the code, it can then know how the dependencies
+        fit together and how to go about wiring your objects for you.
+        Zend\Di\Definition\RuntimeDefinition will utilize the names of the parameters in the
+        methods as the class parameter names.  This is how both username and password key
+        are mapped to the first and second parameter, respectively, of the constructor
+        consuming these named parameters.
+    </p>
+<p>
+        If you were to want to pass in the username and password at call time, this is
+        achieved by passing them as the second argument of get():
+    </p>
+<pre class="programlisting">
+    // inside each controller
+    $di = new Zend\Di\Di();
+    $movieLister = $di-&gt;get('MyMovieApp\MovieLister', array(
+        'username' =&gt; $config-&gt;username,
+        'password' =&gt; $config-&gt;password
+    ));
+    foreach ($movieLister as $movie) {
+        // iterate and display $movie
+    }
+</pre>
+<p>
+        It is important to note that when using call time parameters, these parameter
+        names will be applied to any class that accepts a parameter of such name.
+    </p>
+<p>
+        By calling $di-&gt;get(), this instance of MovieLister will be automatically shared.
+        This means subsequent calls to get() will return the same instance as previous
+        calls.  If you wish to have completely new instances of MovieLister, you can
+        utilize $di-&gt;newInstance().
+
+    </p>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.di.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.di.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.di.definition.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">Chapter 7. Zend\Di </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 7.3. Zend\Di Definition</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

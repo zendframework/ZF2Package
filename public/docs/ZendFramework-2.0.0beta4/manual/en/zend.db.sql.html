@@ -1,0 +1,592 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>6.2. Zend\Db\Sql</title>
+<link rel="stylesheet" type="text/css" href="dbstyle.css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.db.html" title="Chapter 6. Zend_Db">
+<link rel="prev" href="zend.db.html" title="Chapter 6. Zend_Db">
+<link rel="next" href="zend.db.tablegateway.html" title="6.3. Zend\Db\TableGateway">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.crypt.html" title="Chapter 5. Zend_Crypt">
+<link rel="chapter" href="zend.db.html" title="Chapter 6. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 7. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 8. Zend\EventManager">
+<link rel="chapter" href="zend.form.html" title="Chapter 9. Zend_Form">
+<link rel="chapter" href="zend.http.html" title="Chapter 10. Zend_Http">
+<link rel="chapter" href="zend.input-filter.html" title="Chapter 11. Zend\InputFilter">
+<link rel="chapter" href="zend.ldap.html" title="Chapter 12. Zend_Ldap">
+<link rel="chapter" href="zend.loader.html" title="Chapter 13. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 14. Zend\Mail">
+<link rel="chapter" href="zend.module-manager.html" title="Chapter 15. Zend\ModuleManager">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 16. Zend\Mvc">
+<link rel="chapter" href="zend.service-manager.html" title="Chapter 17. Zend\ServiceManager">
+<link rel="chapter" href="zend.stdlib.html" title="Chapter 18. Zend\Stdlib">
+<link rel="chapter" href="zend.uri.html" title="Chapter 19. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 20. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="subsection" href="zend.db.sql.html#zend.db.sql.sql" title="6.2.1. Zend\Db\Sql\Sql (Quickstart)">
+<link rel="subsection" href="zend.db.sql.html#zend.db.sql.sql-objects" title="6.2.2. Zend\Db\Sql's Select, Insert, Update and Delete">
+<link rel="subsection" href="zend.db.sql.html#zend.db.sql.select" title="6.2.3. Zend\Db\Sql\Select">
+<link rel="subsection" href="zend.db.sql.html#zend.db.sql.insert" title="6.2.4. Zend\Db\Sql\Insert">
+<link rel="subsection" href="zend.db.sql.html#zend.db.sql.update" title="6.2.5. Zend\Db\Sql\Update">
+<link rel="subsection" href="zend.db.sql.html#zend.db.sql.delete" title="6.2.6. Zend\Db\Sql\Delete">
+<link rel="subsection" href="zend.db.sql.html#zend.db.sql.where" title="6.2.7. Zend\Db\Sql\Where &amp; Zend\Db\Sql\Having">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">6.2. Zend\Db\Sql</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.db.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 6. Zend_Db</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.db.tablegateway.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="6.2. Zend\Db\Sql">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.db.sql"></a>6.2. Zend\Db\Sql</h2></div></div></div>
+<p>
+        Zend\Db\Sql is a SQL abstraction layer for building platform specific
+        SQL queries via a object-oriented API.  The end result of an Zend\Db\Sql
+        object will be to either produce a Statement and Parameter container that
+        represents the target query, or a full string that can be directly executed
+        against the database platform.  To achieve this, there is Zend\Db\Sql
+        objects require a Zend\Db\Adapter\Adapter object in order to produce
+        the desired results.
+    </p>
+<div class="section" title="6.2.1. Zend\Db\Sql\Sql (Quickstart)">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.db.sql.sql"></a>6.2.1. Zend\Db\Sql\Sql (Quickstart)</h3></div></div></div>
+<p>
+            As there are for primary tasks associated with interacting with a database
+            (from the DML, or Data Manipulation Language): selecting, inserting, updating
+            and deleting.  As such, there are four primary objects that developers can
+            interact or buiding queries, Zend\Db\Sql\Select, Insert, Update and Delete.
+        </p>
+<p>
+            Since these four tasks are so closely related, and generally used together
+            within the same application, Zend\Db\Sql\Sql objects help you create them
+            and produce the result you are attempting to achieve.
+        </p>
+<pre class="programlisting">
+use Zend\Db\Sql\Sql;
+$sql = new Sql($adapter);
+$select = $sql-&gt;select(); // @return Zend\Db\Sql\Select
+$insert = $sql-&gt;insert(); // @return Zend\Db\Sql\Insert
+$update = $sql-&gt;update(); // @return Zend\Db\Sql\Update
+$delete = $sql-&gt;delete(); // @return Zend\Db\Sql\Delete
+</pre>
+<p>
+            As a developer, you can now interact with these objects, as described in
+            the sections below, to specialize each query.  Once they have been populated
+            with values, they are ready to either be prepared or executed.
+        </p>
+<p>
+            To prepare (using a Select object):
+        </p>
+<pre class="programlisting">
+use Zend\Db\Sql\Sql;
+$select = new Sql($adapter);
+$select-&gt;from('foo');
+$select-&gt;where(array('id' =&gt; 2));
+
+$statement = $sql-&gt;prepareStatementForSqlObject($select);
+$results = $statement-&gt;execute();
+</pre>
+<p>
+            To execute (using a Select object)
+        </p>
+<pre class="programlisting">
+use Zend\Db\Sql\Sql;
+$select = new Sql($adapter);
+$select-&gt;from('foo');
+$select-&gt;where(array('id' =&gt; 2));
+
+$selectString = $sql-&gt;getSqlStringForSqlObject($select);
+$results = $adapter-&gt;query($selectString, $adapter::QUERY_MODE_EXECUTE);
+</pre>
+<p>
+            Zend\Db\Sql\Sql objects can also be bound to a particular table so that in
+            getting a select, insert, update, or delete object, they are all primarily
+            seeded with the same table when produced.
+        </p>
+<pre class="programlisting">
+use Zend\Db\Sql\Sql;
+$select = new Sql($adapter, 'foo');
+$select-&gt;where(array('id' =&gt; 2)); // $select already has the from('foo') applied
+</pre>
+</div>
+<div class="section" title="6.2.2. Zend\Db\Sql's Select, Insert, Update and Delete">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.db.sql.sql-objects"></a>6.2.2. Zend\Db\Sql's Select, Insert, Update and Delete</h3></div></div></div>
+<p>
+            Each of these objects implement the following (2) interfaces:
+        </p>
+<pre class="programlisting">
+public function prepareStatement(Adapter $adapter, StatementInterface $statement);
+public function getSqlString(PlatformInterface $adapterPlatform = null);
+</pre>
+<p>
+            These are the functions you can call to either produce (a) a prepared statement,
+            or (b) a string to be executed.
+        </p>
+</div>
+<div class="section" title="6.2.3. Zend\Db\Sql\Select">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.db.sql.select"></a>6.2.3. Zend\Db\Sql\Select</h3></div></div></div>
+<p>
+            Zend\Db\Sql\Select is an object who's primary function is to present a unified
+            API for building platform specific SQL SELECT queries.  The object can be
+            instantiated and consumed without Zend\Db\Sql\Sql:
+        </p>
+<pre class="programlisting">
+use Zend\Db\Sql\Select;
+$select = new Select();
+// or, to produce a $select bound to a specific table
+$select = new Select('foo');
+</pre>
+<p>
+            If a table is provided to the Select object, then from() cannot be called later
+            to change the name of the table.
+        </p>
+<p>
+            Once you have a valid Select object, the following API can be used to further
+            specify various select statement parts:
+        </p>
+<pre class="programlisting">
+class Select extends AbstractSql implements SqlInterface, PreparableSqlInterface
+{
+    const JOIN_INNER = 'inner';
+    const JOIN_OUTER = 'outer';
+    const JOIN_LEFT = 'left';
+    const JOIN_RIGHT = 'right';
+    const SQL_STAR = '*';
+    const ORDER_ASCENDING = 'ASC';
+    const ORDER_DESENDING = 'DESC';
+
+    public $where; // @param Where $where
+
+    public function __construct($table = null);
+    public function from($table);
+    public function columns(array $columns, $prefixColumnsWithTable = true);
+    public function join($name, $on, $columns = self::SQL_STAR, $type = self::JOIN_INNER);
+    public function where($predicate, $combination = Predicate\PredicateSet::OP_AND);
+    public function group($group);
+    public function having($predicate, $combination = Predicate\PredicateSet::OP_AND);
+    public function order($order);
+    public function limit($limit);
+    public function offset($offset);
+}
+</pre>
+<p>
+            columns():
+        </p>
+<pre class="programlisting">
+// as array of names
+$select-&gt;columns(array('foo', 'bar'));
+
+// as an associative array with aliases as the keys:
+// produces 'bar' AS 'foo', 'bax' AS 'baz'
+
+$select-&gt;columns(array('foo' =&gt; 'bar', 'baz' =&gt; 'bax'));
+</pre>
+<p>
+            join():
+        </p>
+<pre class="programlisting">
+$select-&gt;join(
+	'foo' // table name,
+	'id = bar.id', // expression to join on (will be quoted by platform object before insertion),
+	array('bar', 'baz'), // (optional) list of columns, same requiremetns as columns() above
+	$select::JOIN_OUTER // (optional), one of inner, outer, left, right also represtned by constants in the API
+);
+</pre>
+<p>
+            where(), having():
+        </p>
+<pre class="programlisting">
+see Where/Having section below
+</pre>
+<p>
+            order():
+        </p>
+<pre class="programlisting">
+$select = new Select;
+$select-&gt;order('id DESC'); // produces 'id' DESC
+
+$select = new Select;
+$select-&gt;order('id DESC')
+	-&gt;order('name ASC, age DESC'); // produces 'id' DESC, 'name' ASC, 'age' DESC
+
+$select = new Select;
+$select-&gt;order(array('name ASC', 'age DESC')); // produces 'name' ASC, 'age' DESC
+</pre>
+<p>
+            limit() and offset():
+        </p>
+<pre class="programlisting">
+$select = new Select;
+$select-&gt;limit(5); // always takes an integer/numeric
+$select-&gt;offset(10); // similarly takes an integer/numeric
+</pre>
+</div>
+<div class="section" title="6.2.4. Zend\Db\Sql\Insert">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.db.sql.insert"></a>6.2.4. Zend\Db\Sql\Insert</h3></div></div></div>
+<p>
+            The Insert API:
+        </p>
+<pre class="programlisting">
+class Insert implements SqlInterface, PreparableSqlInterface
+{
+	const VALUES_MERGE = 'merge';
+	const VALUES_SET   = 'set';
+
+	public function __construct($table = null);
+	public function into($table);
+	public function columns(array $columns);
+	public function values(array $values, $flag = self::VALUES_SET);
+}
+</pre>
+<p>
+            Similarly to Select objects, the table can be set at construction time
+            or via into().
+        </p>
+<p>
+            columns():
+        </p>
+<pre class="programlisting">
+$insert-&gt;columns(array('foo', 'bar')); // set the valid columns
+</pre>
+<p>
+            values():
+        </p>
+<pre class="programlisting">
+// default behavior of values is to set the values
+// succesive calls will not preserve values from previous calls
+$insert-&gt;values(array(
+	'col_1' =&gt; 'value1',
+	'col_2' =&gt; 'value2'
+));
+</pre>
+<pre class="programlisting">
+// merging values with previous calls
+$insert-&gt;values(array('col_2' =&gt; 'value2'), $insert::VALUES);
+</pre>
+</div>
+<div class="section" title="6.2.5. Zend\Db\Sql\Update">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.db.sql.update"></a>6.2.5. Zend\Db\Sql\Update</h3></div></div></div>
+<pre class="programlisting">
+class Update
+{
+    const VALUES_MERGE = 'merge';
+    const VALUES_SET   = 'set';
+
+    public $where; // @param Where $where
+    public function __construct($table = null);
+    public function table($table);
+    public function set(array $values, $flag = self::VALUES_SET);
+    public function where($predicate, $combination = Predicate\PredicateSet::OP_AND);
+}
+</pre>
+<p>
+            set():
+        </p>
+<pre class="programlisting">
+$update-&gt;set(array('foo' =&gt; 'bar', 'baz' =&gt; bax'));
+</pre>
+<p>
+            where():
+        </p>
+<pre class="programlisting">
+See where section below.
+</pre>
+</div>
+<div class="section" title="6.2.6. Zend\Db\Sql\Delete">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.db.sql.delete"></a>6.2.6. Zend\Db\Sql\Delete</h3></div></div></div>
+<pre class="programlisting">
+class Delete
+{
+    public $where; // @param Where $where
+    public function __construct($table = null);
+    public function from($table);
+    public function where($predicate, $combination = Predicate\PredicateSet::OP_AND);
+}
+</pre>
+<p>
+            where():
+        </p>
+<pre class="programlisting">
+See where section below.
+</pre>
+</div>
+<div class="section" title="6.2.7. Zend\Db\Sql\Where &amp; Zend\Db\Sql\Having">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.db.sql.where"></a>6.2.7. Zend\Db\Sql\Where &amp; Zend\Db\Sql\Having</h3></div></div></div>
+<p>
+            In the following, we will talk about Where, Having is implies as being the same API.
+        </p>
+<p>
+            Effectively, Where and Having extend from the same base object, a
+            Predicate (and PredicateSet).  All of the parts that make up a where
+            or having that are and'ed or or'd together are called predicates.  The full
+            set of predicates is called a PredicateSet.  This object set generally contains
+            the values (and identifiers) separate from the fragement they belong to until
+            the last possible moment when the statement is either used to be prepared
+            (parameteritized), or exectued.  In parameterization, the parameters will be
+            replaced with their proper placeholder (a named or positional parameter), and
+            the values stored inside a Adapter\ParameterContainer.  When executed, the values
+            will be interpolated into the fragments they belong to and properly quoted.
+        </p>
+<p>
+            It is important to know that in this API, a distinction is made between what
+            elements are considered identifiers (TYPE_IDENTIFIER) and which of those is
+            a value (TYPE_VALUE).  There is also a special use case type for literal values
+            (TYPE_LITERAL).  These are all exposed via the Zend\Db\Sql\ExpressionInterface
+            interface.
+        </p>
+<p>
+            The Zend\Db\Sql\Where (Predicate/PredicateSet) API:
+        </p>
+<pre class="programlisting">
+// Where &amp; Having:
+class Predicate extends PredicateSet
+{
+	public $and;
+	public $or;
+	public $AND;
+	public $OR;
+	public $NEST;
+	public $UNNSET;
+
+    public function nest();
+    public function setUnnest(Predicate $predicate);
+    public function unnest();
+    public function equalTo($left, $right, $leftType = self::TYPE_IDENTIFIER, $rightType = self::TYPE_VALUE);
+    public function lessThan($left, $right, $leftType = self::TYPE_IDENTIFIER, $rightType = self::TYPE_VALUE);
+    public function greaterThan($left, $right, $leftType = self::TYPE_IDENTIFIER, $rightType = self::TYPE_VALUE);
+    public function lessThanOrEqualTo($left, $right, $leftType = self::TYPE_IDENTIFIER, $rightType = self::TYPE_VALUE);
+    public function greaterThanOrEqualTo($left, $right, $leftType = self::TYPE_IDENTIFIER, $rightType = self::TYPE_VALUE);
+    public function like($identifier, $like);
+    public function literal($literal, $parameter);
+    public function isNull($identifier);
+    public function isNotNull($identifier);
+    public function in($identifier, array $valueSet = array());
+    public function between($identifier, $minValue, $maxValue);
+
+
+   	// Inherited From PredicateSet
+
+    public function addPredicate(PredicateInterface $predicate, $combination = null);
+    public function getPredicates();
+    public function orPredicate(PredicateInterface $predicate);
+    public function andPredicate(PredicateInterface $predicate);
+    public function getExpressionData();
+    public function count();
+
+}
+</pre>
+<p>
+            Each method in the Where API will produce a coresponding Predicate object of a similarly
+            named type, described below, with the full API of the object:
+        </p>
+<p>
+            equalTo(), lessThan(), greaterThan(), lessThanOrEqualTo(), greaterThanOrEqualTo():
+        </p>
+<pre class="programlisting">
+$where-&gt;equalTo('id', 5);
+
+// same as the following workflow
+$where-&gt;addPredicate(
+	new Predicate\Operator($left, Operator::OPERATOR_EQUAL_TO, $right, $leftType, $rightType)
+);
+
+class Operator implements PredicateInterface
+{
+    const OPERATOR_EQUAL_TO                  = '=';
+    const OP_EQ                              = '=';
+    const OPERATOR_NOT_EQUAL_TO              = '!=';
+    const OP_NE                              = '!=';
+    const OPERATOR_LESS_THAN                 = '&lt;';
+    const OP_LT                              = '&lt;';
+    const OPERATOR_LESS_THAN_OR_EQUAL_TO     = '&lt;=';
+    const OP_LTE                             = '&lt;=';
+    const OPERATOR_GREATER_THAN              = '&gt;';
+    const OP_GT                              = '&gt;';
+    const OPERATOR_GREATER_THAN_OR_EQUAL_TO  = '&gt;=';
+    const OP_GTE                             = '&gt;=';
+
+    public function __construct($left = null, $operator = self::OPERATOR_EQUAL_TO, $right = null, $leftType = self::TYPE_IDENTIFIER, $rightType = self::TYPE_VALUE);
+    public function setLeft($left);
+    public function getLeft();
+    public function setLeftType($type);
+    public function getLeftType();
+    public function setOperator($operator);
+    public function getOperator();
+    public function setRight($value);
+    public function getRight();
+    public function setRightType($type);
+    public function getRightType();
+    public function getExpressionData();
+}
+</pre>
+<p>
+            like($identifier, $like):
+        </p>
+<pre class="programlisting">
+$where-&gt;like($identifier, $like):
+
+// same as
+$where-&gt;addPredicate(
+	new Predicate\Like($identifier, $like)
+);
+
+// full API
+
+class Like implements PredicateInterface
+{
+    public function __construct($identifier = null, $like = null);
+    public function setIdentifier($identifier);
+    public function getIdentifier();
+    public function setLike($like);
+    public function getLike();
+}
+</pre>
+<p>
+            literal($literal, $parameter);
+        </p>
+<pre class="programlisting">
+$where-&gt;literal($literal, $parameter);
+
+// same as
+$where-&gt;addPredicate(
+    new Predicate\Expression($literal, $parameter)
+);
+
+// full API
+class Expression implements ExpressionInterface, PredicateInterface
+{
+    const PLACEHOLDER = '?';
+	public function __construct($expression = null, $valueParameter = null /*[, $valueParameter, ... ]*/);
+    public function setExpression($expression);
+    public function getExpression();
+    public function setParameters($parameters);
+    public function getParameters();
+    public function setTypes(array $types);
+    public function getTypes();
+}
+</pre>
+<p>
+            isNull($identifier);
+        </p>
+<pre class="programlisting">
+$where-&gt;isNull($identifier);
+
+// same as
+$where-&gt;addPredicate(
+    new Predicate\IsNull($identifier)
+);
+
+// full API
+class IsNull implements PredicateInterface
+{
+    public function __construct($identifier = null);
+    public function setIdentifier($identifier);
+    public function getIdentifier();
+}
+</pre>
+<p>
+            isNotNull($identifier);
+        </p>
+<pre class="programlisting">
+$where-&gt;isNotNull($identifier);
+
+// same as
+$where-&gt;addPredicate(
+    new Predicate\IsNotNull($identifier)
+);
+
+// full API
+class IsNotNull implements PredicateInterface
+{
+    public function __construct($identifier = null);
+    public function setIdentifier($identifier);
+    public function getIdentifier();
+}
+</pre>
+<p>
+            in($identifier, array $valueSet = array());
+        </p>
+<pre class="programlisting">
+$where-&gt;in($identifier, array $valueSet = array());
+
+// same as
+$where-&gt;addPredicate(
+    new Predicate\In($identifier, $valueSet)
+);
+
+// full API
+class In implements PredicateInterface
+{
+    public function __construct($identifier = null, array $valueSet = array());
+    public function setIdentifier($identifier);
+    public function getIdentifier();
+    public function setValueSet(array $valueSet);
+    public function getValueSet();
+}
+</pre>
+<p>
+            between($identifier, $minValue, $maxValue);
+        </p>
+<pre class="programlisting">
+$where-&gt;between($identifier, $minValue, $maxValue);
+
+// same as
+$where-&gt;addPredicate(
+    new Predicate\Between($identifier, $minValue, $maxValue)
+);
+
+// full API
+class Between implements PredicateInterface
+{
+    public function __construct($identifier = null, $minValue = null, $maxValue = null);
+    public function setIdentifier($identifier);
+    public function getIdentifier();
+    public function setMinValue($minValue);
+    public function getMinValue();
+    public function setMaxValue($maxValue);
+    public function getMaxValue();
+    public function setSpecification($specification);
+}
+</pre>
+</div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.db.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.db.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.db.tablegateway.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">Chapter 6. Zend_Db </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 6.3. Zend\Db\TableGateway</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

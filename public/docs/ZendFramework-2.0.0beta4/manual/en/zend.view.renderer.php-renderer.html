@@ -1,0 +1,490 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>20.2. The PhpRenderer</title>
+<link rel="stylesheet" type="text/css" href="dbstyle.css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.view.html" title="Chapter 20. Zend_View">
+<link rel="prev" href="zend.view.html" title="Chapter 20. Zend_View">
+<link rel="next" href="zend.view.php-renderer.scripts.html" title="20.3. PhpRenderer View Scripts">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.crypt.html" title="Chapter 5. Zend_Crypt">
+<link rel="chapter" href="zend.db.html" title="Chapter 6. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 7. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 8. Zend\EventManager">
+<link rel="chapter" href="zend.form.html" title="Chapter 9. Zend_Form">
+<link rel="chapter" href="zend.http.html" title="Chapter 10. Zend_Http">
+<link rel="chapter" href="zend.input-filter.html" title="Chapter 11. Zend\InputFilter">
+<link rel="chapter" href="zend.ldap.html" title="Chapter 12. Zend_Ldap">
+<link rel="chapter" href="zend.loader.html" title="Chapter 13. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 14. Zend\Mail">
+<link rel="chapter" href="zend.module-manager.html" title="Chapter 15. Zend\ModuleManager">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 16. Zend\Mvc">
+<link rel="chapter" href="zend.service-manager.html" title="Chapter 17. Zend\ServiceManager">
+<link rel="chapter" href="zend.stdlib.html" title="Chapter 18. Zend\Stdlib">
+<link rel="chapter" href="zend.uri.html" title="Chapter 19. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 20. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="subsection" href="zend.view.renderer.php-renderer.html#zend.view.renderer.php-renderer.usage" title="20.2.1. Usage">
+<link rel="subsection" href="zend.view.renderer.php-renderer.html#zend.view.renderer.php-renderer.options" title="20.2.2. Options and Configuration">
+<link rel="subsection" href="zend.view.renderer.php-renderer.html#zend.view.renderer.php-renderer.methods" title="20.2.3. Additional Methods">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">20.2. The PhpRenderer</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.view.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 20. Zend_View</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.view.php-renderer.scripts.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="20.2. The PhpRenderer">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.view.renderer.php-renderer"></a>20.2. The PhpRenderer</h2></div></div></div>
+<p>
+        <code class="classname">Zend\View\Renderer\PhpRenderer</code> "renders" view scripts written in PHP,
+        capturing and returning the output. It composes Variable containers and/or View Models, a
+        plugin broker for <a class="link" href="zend.view.helpers.html" title="20.4. View Helpers">helpers</a>, and optional filtering
+        of the captured output.
+    </p>
+<p>
+        The <code class="classname">PhpRenderer</code> is template system agnostic; you may use
+        <acronym class="acronym">PHP</acronym> as your template language, or create instances of other template
+        systems and manipulate them within your view script. Anything you can do with PHP is
+        available to you.
+    </p>
+<div class="section" title="20.2.1. Usage">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.view.renderer.php-renderer.usage"></a>20.2.1. Usage</h3></div></div></div>
+<p>
+            Basic usage consists of instantiating or otherwise obtaining an instance of the
+            <code class="classname">PhpRenderer</code>, providing it with a resolver which will resolve
+            templates to PHP view scripts, and then calling its <code class="methodname">render()</code>
+            method. 
+        </p>
+<p>
+            Instantiating a renderer is trivial:
+        </p>
+<pre class="programlisting">
+use Zend\View\Renderer\PhpRenderer;
+
+$renderer = new PhpRenderer();
+</pre>
+<p>
+            Zend Framework ships with several types of "resolvers", which are used to resolve a
+            template name to a resource a renderer can consume. The ones we will usually use with
+            the <code class="classname">PhpRenderer</code> are:
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+                    <code class="classname">Zend\View\Resolver\TemplateMapResolver</code>, which simply maps
+                    template names directly to view scripts.
+                </p></li>
+<li class="listitem"><p>
+                    <code class="classname">Zend\View\Resolver\TemplatePathStack</code>, which creates a
+                    LIFO stack of script directories in which to search for a view script. By
+                    default, it appends the suffix ".phtml" to the requested template name, and then
+                    loops through the script directories; if it finds a file matching the requested
+                    template, it returns the full file path.
+                </p></li>
+<li class="listitem"><p>
+                    <code class="classname">Zend\View\Resolver\AggregateResolver</code>, which allows
+                    attaching a FIFO queue of resolvers to consult.
+                </p></li>
+</ul></div>
+<p>
+            We suggest using the <code class="classname">AggregateResolver</code>, as it allows you to
+            create a multi-tiered strategy for resolving template names.
+        </p>
+<p>
+            Programmatically, you would then do something like this:
+        </p>
+<pre class="programlisting">
+use Zend\View\Renderer\PhpRenderer,
+    Zend\View\Resolver;
+
+$renderer = new PhpRenderer();
+
+$resolver = new Resolver\AggregateResolver();
+
+$map = new Resolver\TemplateMapResolver(array(
+    'layout'      =&gt; __DIR__ . '/view/layout.phtml',
+    'index/index' =&gt; __DIR__ . '/view/index/index.phtml',
+));
+$stack = new Resolver\TemplatePathStack(array(
+    __DIR__ . '/view',
+    $someOtherPath,
+));
+
+$resolver-&gt;attach($map)    // this will be consulted first
+         -&gt;attach($stack);
+</pre>
+<p>
+            You can also specify a specific priority value when registering resolvers, with high,
+            positive integers getting higher priority, and low, negative integers getting low
+            priority, when resolving.
+        </p>
+<p>
+            In an MVC application, you can configure this via DI quite easily:
+        </p>
+<pre class="programlisting">
+return array(
+    'di' =&gt; array(
+        'instance' =&gt; array(
+            'Zend\View\Resolver\AggregateResolver' =&gt; array(
+                'injections' =&gt; array(
+                    'Zend\View\Resolver\TemplateMapResolver',
+                    'Zend\View\Resolver\TemplatePathStack',
+                ),
+            ),
+
+            'Zend\View\Resolver\TemplateMapResolver' =&gt; array(
+                'parameters' =&gt; array(
+                    'map'  =&gt; array(
+                        'layout'      =&gt; __DIR__ . '/view/layout.phtml',
+                        'index/index' =&gt; __DIR__ . '/view/index/index.phtml',
+                    ),
+                ),
+            ),
+            'Zend\View\Resolver\TemplatePathStack' =&gt; array(
+                'parameters' =&gt; array(
+                    'paths'  =&gt; array(
+                        'application' =&gt; __DIR__ . '/view',
+                        'elsewhere'   =&gt; $someOtherPath,
+                    ),
+                ),
+            ),
+            'Zend\View\Renderer\PhpRenderer' =&gt; array(
+                'parameters' =&gt; array(
+                    'resolver' =&gt; 'Zend\View\Resolver\AggregateResolver',
+                ),
+            ),
+        ),
+    ),
+);
+</pre>
+<p>
+            Now that we have our <code class="classname">PhpRenderer</code> instance, and it can find
+            templates, let's inject some variables. This can be done in 4 different ways.
+        </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+                    Pass an associative array (or <code class="classname">ArrayAccess</code> instance, or
+                    <code class="classname">Zend\View\Variables</code> instance) of items as the second
+                    argument to <code class="methodname">render()</code>:
+                    <code class="code">$renderer-&gt;render($templateName, array('foo' =&gt; 'bar))</code>
+                </p></li>
+<li class="listitem"><p>
+                    Assign a <code class="classname">Zend\View\Variables</code> instance, associative array,
+                    or <code class="classname">ArrayAccess</code> instance to the
+                    <code class="methodname">setVars()</code> method.
+                </p></li>
+<li class="listitem"><p>
+                    Assign variables as instance properties of the renderer: <code class="code">$renderer-&gt;foo
+                        = 'bar'</code>. This essentially proxies to an instance of
+                    <code class="classname">Variables</code> composed internally in the renderer by default.
+                </p></li>
+<li class="listitem">
+<p>
+                    Create a ViewModel instance, assign variables to that, and pass the ViewModel to
+                    the <code class="methodname">render()</code> method:
+                </p>
+<pre class="programlisting">
+use Zend\View\Model\ViewModel,
+    Zend\View\Renderer\PhpRenderer;
+
+$renderer = new PhpRenderer();
+
+$model    = new ViewModel();
+$model-&gt;setVariable('foo', 'bar');
+// or
+$model = new ViewModel(array('foo' =&gt; 'bar'));
+
+$model-&gt;setTemplate($templateName);
+$renderer-&gt;render($model);
+</pre>
+</li>
+</ul></div>
+<p>
+            Now, let's render something.  As a simple example, let us say you have a list of book
+            data. 
+        </p>
+<pre class="programlisting">
+// use a model to get the data for book authors and titles.
+$data = array(
+    array(
+        'author' =&gt; 'Hernando de Soto',
+        'title' =&gt; 'The Mystery of Capitalism'
+    ),
+    array(
+        'author' =&gt; 'Henry Hazlitt',
+        'title' =&gt; 'Economics in One Lesson'
+    ),
+    array(
+        'author' =&gt; 'Milton Friedman',
+        'title' =&gt; 'Free to Choose'
+    )
+);
+
+// now assign the book data to a renderer instance
+$renderer-&gt;books = $data;
+
+// and render the template "booklist"
+echo $renderer-&gt;render('booklist');
+</pre>
+<p>
+            More often than not, you'll likely be using the MVC layer. As such, you should be
+            thinking in terms of view models. Let's consider the following code from within an
+            action method of a controller.
+        </p>
+<pre class="programlisting">
+namespace Bookstore\Controller;
+
+use Zend\Mvc\Controller\ActionController;
+
+class BookController extends ActionController
+{
+    public function listAction()
+    {
+        // do some work...
+
+        // Assume $data is the list of books from the previous example
+        $model = new ViewModel(array('books' =&gt; $data));
+
+        // Optionally specify a template; if we don't, by default it will be 
+        // auto-determined based on the controller name and this action. In
+        // this example, the template would resolve to "book/list", and thus 
+        // the file "book/list.phtml"; the following overrides that to set 
+        // the template to "booklist", and thus the file "booklist.phtml"
+        // (note the lack of directory preceding the filename).
+        $model-&gt;setTemplate('booklist');
+
+        return $model
+    }
+}
+</pre>
+<p>
+            This will then be rendered as if the following were executed:
+        </p>
+<pre class="programlisting">
+$renderer-&gt;render($model);
+</pre>
+<p>
+            Now we need the associated view script. At this point, we'll assume that the template
+            "booklist" resolves to the file <code class="filename">booklist.phtml</code>.  This is a
+            <acronym class="acronym">PHP</acronym> script like any other, with one exception: it executes inside the
+            scope of the <code class="classname">PhpRenderer</code> instance, which means that references to
+            <code class="varname">$this</code> point to the <code class="classname">PhpRenderer</code> instance
+            properties and methods. Thus, a very basic view script could look like this:
+        </p>
+<pre class="programlisting">
+&lt;?php if ($this-&gt;books): ?&gt;
+
+    &lt;!-- A table of some books. --&gt;
+    &lt;table&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Author&lt;/th&gt;
+            &lt;th&gt;Title&lt;/th&gt;
+        &lt;/tr&gt;
+
+        &lt;?php foreach ($this-&gt;books as $key =&gt; $val): ?&gt;
+        &lt;tr&gt;
+            &lt;td&gt;&lt;?php echo $this-&gt;escape($val['author']) ?&gt;&lt;/td&gt;
+            &lt;td&gt;&lt;?php echo $this-&gt;escape($val['title']) ?&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;?php endforeach; ?&gt;
+
+    &lt;/table&gt;
+
+&lt;?php else: ?&gt;
+
+    &lt;p&gt;There are no books to display.&lt;/p&gt;
+
+&lt;?php endif;?&gt;
+</pre>
+<div class="note" title="Escape Output"><table border="0" summary="Note: Escape Output">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td>
+<th align="left">
+<a name="zend.view.renderer.php-renderer.usage.escape"></a>Escape Output</th>
+</tr>
+<tr><td align="left" valign="top">
+<p>
+                The security mantra is "Filter input, escape output." If you are unsure of the
+                source of a given variable -- which is likely most of the time -- you should escape
+                it.
+            </p>
+<p>
+                In the example above, there are calls to an <code class="methodname">escape()</code>
+                method. The method is actually a <a class="link" href="zend.view.helpers.html" title="20.4. View Helpers">helper</a>,
+                a plugin available via method overloading, but the salient point is: use it to
+                escape your output, and thus help prevent cross-site scripting (XSS) attacks.
+            </p>
+</td></tr>
+</table></div>
+<p>
+            We've now toured the basic usage of the <code class="classname">PhpRenderer</code>. By now you
+            should know how to instantiate the renderer, provide it with a resolver, assign
+            variables and/or create view models, create view scripts, and render view scripts.
+        </p>
+</div>
+<div class="section" title="20.2.2. Options and Configuration">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.view.renderer.php-renderer.options"></a>20.2.2. Options and Configuration</h3></div></div></div>
+<p>
+            <code class="classname">Zend\View\Renderer\PhpRenderer</code> utilizes several collaborators in
+            order to do its work. use the following methods to configure the renderer.
+        </p>
+<div class="variablelist"><dl>
+<dt>
+<a name="zend.view.renderer.php-renderer.options.broker"></a><span class="term">broker</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">setBroker</span>(<span class="methodparam">Zend\View\HelperBroker $broker</span>);</code><p>
+                        Set the broker instance used to load, register, and retrieve <a class="link" href="zend.view.helpers.html" title="20.4. View Helpers">helpers</a>.
+                    </p>
+</dd>
+<dt>
+<a name="zend.view.renderer.php-renderer.options.resolver"></a><span class="term">resolver</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">setResolver</span>(<span class="methodparam">Zend\View\Resolver $resolver</span>);</code><p>
+                        Set the resolver instance.
+                    </p>
+</dd>
+<dt>
+<a name="zend.view.renderer.php-renderer.options.filter-chain"></a><span class="term">filters</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">setFilterChain</span>(<span class="methodparam">Zend\Filter\FilterChain $filters</span>);</code><p>
+                        Set a filter chain to use as an output filter on rendered content.
+                    </p>
+</dd>
+<dt>
+<a name="zend.view.renderer.php-renderer.options.vars"></a><span class="term">vars</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">setVars</span>(<span class="methodparam">array|ArrayAccess|Zend\View\Variables $variables</span>);</code><p>
+                        Set the variables to use when rendering a view script/template.
+                    </p>
+</dd>
+<dt>
+<a name="zend.view.renderer.php-renderer.options.can-render-trees"></a><span class="term">canRenderTrees</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">setCanRenderTrees</span>(<span class="methodparam">bool $canRenderTrees</span>);</code><p>
+                        Set flag indicating whether or not we should render trees of view models. If
+                        set to true, the <code class="classname">Zend\View\View</code> instance will not
+                        attempt to render children separately, but instead pass the root view model
+                        directly to the <code class="classname">PhpRenderer</code>. It is then up to the
+                        developer to render the children from within the view script. This is
+                        typically done using the <code class="classname">RenderChildModel</code> helper:
+                        <code class="code">$this-&gt;renderChildModel('child_name')</code>.
+                    </p>
+</dd>
+</dl></div>
+</div>
+<div class="section" title="20.2.3. Additional Methods">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.view.renderer.php-renderer.methods"></a>20.2.3. Additional Methods</h3></div></div></div>
+<p>
+            Typically, you'll only ever access variables and <a class="link" href="zend.view.helpers.html" title="20.4. View Helpers">helpers</a> within your view scripts or when
+            interacting with the <code class="classname">PhpRenderer</code>. However, there are a few
+            additional methods you may be interested in.
+        </p>
+<div class="variablelist"><dl>
+<dt>
+<a name="zend.view.renderer.php-renderer.methods.render"></a><span class="term">render</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">render</span>(<span class="methodparam">string|Zend\View\Model $nameOrModel, $values = null</span>);</code><p>
+                        Render a template/view model. 
+                    </p>
+<p>
+                        If <code class="varname">$nameOrModel</code> is a string, it is assumed to be a
+                        template name. That template will be resolved using the current resolver,
+                        and then rendered. If <code class="varname">$values</code> is non-null, those values,
+                        and those values only, will be used during rendering, and will replace
+                        whatever variable container previously was in the renderer; however,
+                        the previous variable container will be reset when done. If
+                        <code class="varname">$values</code> is empty, the current variables container (see
+                        <a class="link" href="zend.view.renderer.php-renderer.html#zend.view.renderer.php-renderer.options.vars">setVars()</a>)
+                        will be injected when rendering.
+                    </p>
+<p>
+                        If <code class="varname">$nameOrModel</code> is a <code class="classname">Model</code>
+                        instance, the template name will be retrieved from it and used.
+                        Additionally, if the model contains any variables, these will be used when
+                        rendering; otherwise, the variables container already present, if any, will
+                        be used.
+                    </p>
+</dd>
+<dt>
+<a name="zend.view.renderer.php-renderer.methods.resolver"></a><span class="term">resolver</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">resolver</span>();</code><p>
+                        Retrieves the <code class="classname">Resolver</code> instance.
+                    </p>
+</dd>
+<dt>
+<a name="zend.view.renderer.php-renderer.methods.vars"></a><span class="term">vars</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">vars</span>(<span class="methodparam">string $key = null</span>);</code><p>
+                        Retrieve the variables container, or a single variable from the container..
+                    </p>
+</dd>
+<dt>
+<a name="zend.view.renderer.php-renderer.methods.plugin"></a><span class="term">plugin</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">plugin</span>(<span class="methodparam">string $name, array $options = null</span>);</code><p>
+                        Get a plugin/helper instance. Proxies to the broker's
+                        <code class="methodname">load()</code> method; as such, any
+                        <code class="varname">$options</code> you pass will be passed to the plugin's
+                        constructor if this is the first time the plugin has been retrieved. See the
+                        section on <a class="link" href="zend.view.helpers.html" title="20.4. View Helpers">helpers</a> for more
+                        information.
+                    </p>
+</dd>
+<dt>
+<a name="zend.view.renderer.php-renderer.methods.add-template"></a><span class="term">addTemplate</span>
+</dt>
+<dd>
+<code class="methodsynopsis"><span class="methodname">addTemplate</span>(<span class="methodparam">string $template</span>);</code><p>
+                        Add a template to the stack. When used, the next call to
+                        <code class="methodname">render()</code> will loop through all template added using this
+                        method, rendering them one by one; the output of the last will be returned.
+                    </p>
+</dd>
+</dl></div>
+</div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.view.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.view.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.view.php-renderer.scripts.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">Chapter 20. Zend_View </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 20.3. PhpRenderer View Scripts</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

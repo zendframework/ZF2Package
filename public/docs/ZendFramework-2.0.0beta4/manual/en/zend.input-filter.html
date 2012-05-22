@@ -1,0 +1,251 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Chapter 11. Zend\InputFilter</title>
+<link rel="stylesheet" type="text/css" href="dbstyle.css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="prev" href="zend.http.headers.html" title="10.4. Zend\Http\Headers And The Various Header Classes">
+<link rel="next" href="zend.ldap.html" title="Chapter 12. Zend_Ldap">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.crypt.html" title="Chapter 5. Zend_Crypt">
+<link rel="chapter" href="zend.db.html" title="Chapter 6. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 7. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 8. Zend\EventManager">
+<link rel="chapter" href="zend.form.html" title="Chapter 9. Zend_Form">
+<link rel="chapter" href="zend.http.html" title="Chapter 10. Zend_Http">
+<link rel="chapter" href="zend.input-filter.html" title="Chapter 11. Zend\InputFilter">
+<link rel="chapter" href="zend.ldap.html" title="Chapter 12. Zend_Ldap">
+<link rel="chapter" href="zend.loader.html" title="Chapter 13. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 14. Zend\Mail">
+<link rel="chapter" href="zend.module-manager.html" title="Chapter 15. Zend\ModuleManager">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 16. Zend\Mvc">
+<link rel="chapter" href="zend.service-manager.html" title="Chapter 17. Zend\ServiceManager">
+<link rel="chapter" href="zend.stdlib.html" title="Chapter 18. Zend\Stdlib">
+<link rel="chapter" href="zend.uri.html" title="Chapter 19. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 20. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="section" href="zend.input-filter.html#zend.input-filter.intro" title="11.1. Introduction">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">Chapter 11. Zend\InputFilter</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.http.headers.html">Prev</a> </td>
+<th width="60%" align="center">Part III. Zend Framework Reference</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.ldap.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="chapter" title="Chapter 11. Zend\InputFilter">
+<div class="titlepage"><div><div><h2 class="title">
+<a name="zend.input-filter"></a>Chapter 11. Zend\InputFilter</h2></div></div></div>
+<div class="toc">
+<p><b>Table of Contents</b></p>
+<dl><dt><span class="section"><a href="zend.input-filter.html#zend.input-filter.intro">11.1. Introduction</a></span></dt></dl>
+</div>
+<div class="section" title="11.1. Introduction">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.input-filter.intro"></a>11.1. Introduction</h2></div></div></div>
+<p>
+        The <code class="classname">Zend\InputFilter</code> component can be used to filter and validate
+        generic sets of input data.  For instance, you could use it to filter
+        <code class="varname">$_GET</code> or <code class="varname">$_POST</code>
+        values, CLI arguments, etc.
+    </p>
+<p>
+        To pass input data to the <code class="classname">InputFilter</code>, you can use the
+        <code class="methodname">setData()</code> method.  The data must be specified using an associative
+        array. Below is an example on how to validate the data coming from a form using the
+        <acronym class="acronym">POST</acronym> method.
+    </p>
+<pre class="programlisting">
+use Zend\InputFilter\InputFilter;
+use Zend\InputFilter\Input;
+use Zend\Validator;
+
+$email = new Input('email');
+$email-&gt;getValidatorChain()
+      -&gt;addValidator(new Validator\EmailAddress());
+
+$password = new Input('password');
+$password-&gt;getValidatorChain()
+         -&gt;addValidator(new Validator\StringLength(8));
+
+$inputFilter = new InputFilter();
+$inputFilter-&gt;add($email)
+            -&gt;add($password)
+            -&gt;setData($_POST);
+
+if ($inputFilter-&gt;isValid()) {
+    echo "The form is valid\n";
+} else {
+    echo "The form is not valid\n";
+    foreach ($inputFilter-&gt;getInvalidInput() as $error) {
+        print_r ($error-&gt;getMessages());
+    }
+}
+</pre>
+<p>
+        In this example we validated the email and password values. The email must be a valid address
+        and the password must be composed with at least 8 characters. If the input data are not
+        valid, we report the list of invalid input using the
+        <code class="methodname">getInvalidInput()</code> method.
+    </p>
+<p>
+        You can add one or more validators to each input using the
+        <code class="methodname">addValidator()</code> method for each validator.  It is also possible to
+        specify a "validation group", a subset of the data to be validated; this may be done using
+        the <code class="methodname">setValidationGroup()</code> method. You can specify the list of the
+        input names as an array or as individual parameters.
+    </p>
+<pre class="programlisting">
+// As individual parameters
+$filterInput-&gt;setValidationGroup('email', 'password');
+
+// or as an array of names
+$filterInput-&gt;setValidationGroup(array('email', 'password'));
+</pre>
+<p>
+        You can validate and/or filter the data using the <code class="classname">InputFilter</code>. To
+        filter data, use the <code class="methodname">getFilterChain()</code> method of individual
+        <code class="classname">Input</code> instances, and attach filters to the returned filter chain.
+        Below is an example that uses filtering without validation.
+    </p>
+<pre class="programlisting">
+use Zend\InputFilter\Input;
+use Zend\InputFilter\InputFilter;
+
+$input = new Input('foo');
+$input-&gt;getFilterChain()
+      -&gt;attachByName('stringtrim')
+      -&gt;attachByName('alpha');
+
+$inputfilter = new InputFilter();
+$inputfilter-&gt;add($input, 'foo')
+            -&gt;setData(array(
+                'foo' =&gt; ' Bar3 ';
+            ));
+
+echo "Before:\n";
+echo $inputFilter-&gt;getRawValue('foo') . "\n"; // the output is ' Bar3 '
+echo "After:\n";
+echo $inputFilter-&gt;getValue('foo') . "\n"; // the output is 'Bar'
+</pre>
+<p>
+        The <code class="methodname">getValue()</code> method returns the filtered value of the 'foo'
+        input, while <code class="methodname">getRawValue()</code> returns the original value of the input.
+    </p>
+<p>
+        We provide also <code class="classname">Zend\InputFilter\Factory</code>, to allow initialization of
+        the <code class="classname">InputFilter</code> based on a configuration array (or
+        <code class="classname">Traversable</code> object). Below is an example where we create a password
+        input value with the same constraints proposed before (a string with at least 8 characters):
+    </p>
+<pre class="programlisting">
+use Zend\InputFilter\Factory;
+
+$factory = new Factory();
+$inputFilter = $factory-&gt;createInputFilter(array(
+    'password' =&gt; array(
+        'name'       =&gt; 'password',
+        'required'   =&gt; true,
+        'validators' =&gt; array(
+            array(
+                'name' =&gt; 'not_empty',
+            ),
+            array(
+                'name' =&gt; 'string_length',
+                'options' =&gt; array(
+                    'min' =&gt; 8
+                ),
+            ),
+        ),
+    ),
+));
+
+$inputFilter-&gt;setData($_POST);
+echo $inputFilter-&gt;isValid() ? "Valid form" : "Invalid form";
+</pre>
+<p>
+        The factory may be used to create not only <code class="classname">Input</code> instances, but also
+        nested <code class="classname">InputFilter</code>s, allowing you to create validation and filtering
+        rules for hierarchical data sets.
+    </p>
+<p>
+        Finally, the default <span style="color: red">&lt;class&gt;InputFilter&lt;/class&gt;</span> implementation is backed by a
+        <code class="classname">Factory</code>. This means that when calling <code class="methodname">add()</code>,
+        you can provide a specification that the <code class="classname">Factory</code> would understand,
+        and it will create the appropriate object. You may create either
+        <code class="classname">Input</code> or <code class="classname">InputFilter</code> objects in this fashion.
+    </p>
+<pre class="programlisting">
+use Zend\InputFilter\InputFilter;
+
+$filter = new InputFilter();
+
+// Adding a single input
+$filter-&gt;add(array(
+    'name' =&gt; 'password',
+    'required' =&gt; true,
+    'validators' =&gt; array(
+        array(
+            'name' =&gt; 'not_empty',
+        ),
+        array(
+            'name' =&gt; 'string_length',
+            'options' =&gt; array(
+                'min' =&gt; 8
+            ),
+        ),
+    ),
+));
+
+// Adding an input filter composing a single input to the current filter
+$filter-&gt;add(array(
+    'type' =&gt; 'Zend\Filter\InputFilter',
+    'password' =&gt; array(
+        'name' =&gt; 'password',
+        'required' =&gt; true,
+        'validators' =&gt; array(
+            array(
+                'name' =&gt; 'not_empty',
+            ),
+            array(
+                'name' =&gt; 'string_length',
+                'options' =&gt; array(
+                    'min' =&gt; 8
+                ),
+            ),
+        ),
+    ),
+));
+</pre>
+</div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.http.headers.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="reference.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.ldap.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">10.4. Zend\Http\Headers And The Various Header Classes </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> Chapter 12. Zend_Ldap</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

@@ -1,0 +1,987 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>DocBlox Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" class="content">
+<div class="sub-page-main-header-api-documentation"><h2>API Documentation</h2></div>
+<div class="dotted-line"></div>
+</div>
+<div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">Zend/Authentication/Adapter/DbTable.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><div id="file-description">
+<p xmlns:dbx="http://docblox-project.org/xsl/functions" class="short-description">Zend Framework</p>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="long-description"><p>LICENSE</p>
+
+<p>This source file is subject to the new BSD license that is bundled
+with this package in the file LICENSE.txt.
+It is also available through the world-wide-web at this URL:
+http://framework.zend.com/license/new-bsd
+If you did not receive a copy of the license and are unable to
+obtain it through the world-wide-web, please send an email
+to license@zend.com so we can send you a copy immediately.</p>
+</div>
+</div>
+<dl class="file-info">
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Category</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Zend
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Copyright</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">License</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">
+<a href="http://framework.zend.com/license/new-bsd">New BSD License</a>
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Package</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Zend_Authentication
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Subpackage</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Adapter
+         
+    </dd>
+</dl>
+<a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\Zend\Authentication\Adapter\DbTable" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\Zend\Authentication\Adapter\DbTable<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Zend\Authentication\Adapter</small><p class="short-description"></p>
+<div class="long-description">
+</div>
+<dl class="class-info">
+<dt>Implements</dt>
+<dd><a href="db_Zend_Authentication_Adapter_AdapterInterface.html#%5CZend%5CAuthentication%5CAdapter%5CAdapterInterface">\Zend\Authentication\Adapter\AdapterInterface</a></dd>
+<dt>Category</dt>
+<dd>Zend
+         
+    </dd>
+<dt>Copyright</dt>
+<dd>Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
+         
+    </dd>
+<dt>License</dt>
+<dd>
+<a href="http://framework.zend.com/license/new-bsd">New BSD License</a>
+         
+    </dd>
+</dl>
+<h3>Properties</h3>
+<div>
+<a id="\Zend\Authentication\Adapter\DbTable::$_ambiguityIdentity" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">boolean
+                 <span class="highlight">$_ambiguityIdentity</span>= 'false'
+                </code><div class="description">
+<p class="short-description">$_ambiguityIdentity - Flag to indicate same Identity can be used with
+different credentials. Default is FALSE and need to be set to true to
+allow ambiguity usage.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>false</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>boolean</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::$_authenticateResultInfo" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$_authenticateResultInfo</span>= 'null'
+                </code><div class="description">
+<p class="short-description">$_authenticateResultInfo</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::$_credential" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$_credential</span>= 'null'
+                </code><div class="description">
+<p class="short-description">$_credential - Credential values</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::$_credentialColumn" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$_credentialColumn</span>= 'null'
+                </code><div class="description">
+<p class="short-description">$_credentialColumns - columns to be used as the credentials</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::$_credentialTreatment" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$_credentialTreatment</span>= 'null'
+                </code><div class="description">
+<p class="short-description">$_credentialTreatment - Treatment applied to the credential, such as MD5() or PASSWORD()</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::$_dbSelect" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\Zend\Db\Sql\Select
+                 <span class="highlight">$_dbSelect</span>= 'null'
+                </code><div class="description">
+<p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_Zend_Db_Sql_Select.html#%5CZend%5CDb%5CSql%5CSelect">\Zend\Db\Sql\Select</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::$_identity" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$_identity</span>= 'null'
+                </code><div class="description">
+<p class="short-description">$_identity - Identity value</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::$_identityColumn" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$_identityColumn</span>= 'null'
+                </code><div class="description">
+<p class="short-description">$_identityColumn - the column to use as the identity</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::$_resultRow" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$_resultRow</span>= 'null'
+                </code><div class="description">
+<p class="short-description">$_resultRow - Results of database authentication query</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::$_tableName" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$_tableName</span>= 'null'
+                </code><div class="description">
+<p class="short-description">$_tableName - the table name to check</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::$_zendDb" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\Zend\Db\Adapter\Adapter
+                 <span class="highlight">$_zendDb</span>= 'null'
+                </code><div class="description">
+<p class="short-description">Database Connection</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>null</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_Zend_Db_Adapter_Adapter.html#%5CZend%5CDb%5CAdapter%5CAdapter">\Zend\Db\Adapter\Adapter</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\Zend\Authentication\Adapter\DbTable::__construct()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">__construct</span><span class="nb-faded-text">(
+          <a href="db_Zend_Db_Adapter_Adapter.html#%5CZend%5CDb%5CAdapter%5CAdapter">\Zend\Db\Adapter\Adapter</a> $zendDb, string $tableName
+              =
+              null, string $identityColumn
+              =
+              null, string $credentialColumn
+              =
+              null, string $credentialTreatment
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></code><div class="description"><p class="short_description">__construct() - Sets configuration options</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$zendDb</th>
+<td><a href="db_Zend_Db_Adapter_Adapter.html#%5CZend%5CDb%5CAdapter%5CAdapter">\Zend\Db\Adapter\Adapter</a></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$tableName</th>
+<td>string</td>
+<td><em><p>Optional</p></em></td>
+</tr>
+<tr>
+<th>$identityColumn</th>
+<td>string</td>
+<td><em><p>Optional</p></em></td>
+</tr>
+<tr>
+<th>$credentialColumn</th>
+<td>string</td>
+<td><em><p>Optional</p></em></td>
+</tr>
+<tr>
+<th>$credentialTreatment</th>
+<td>string</td>
+<td><em><p>Optional</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::_authenticateCreateAuthResult()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_authenticateCreateAuthResult</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_Authentication_Result.html#%5CZend%5CAuthentication%5CResult">\Zend\Authentication\Result</a></code><div class="description"><p class="short_description">Creates a Zend\Authentication\Result object from the information that
+has been collected during the authenticate() attempt.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Authentication_Result.html#%5CZend%5CAuthentication%5CResult">\Zend\Authentication\Result</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::_authenticateCreateSelect()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_authenticateCreateSelect</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_Db_Sql_Select.html#%5CZend%5CDb%5CSql%5CSelect">\Zend\Db\Sql\Select</a></code><div class="description"><p class="short_description">_authenticateCreateSelect() - This method creates a Zend\Db\Sql\Select object that
+is completely configured to be queried against the database.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Sql_Select.html#%5CZend%5CDb%5CSql%5CSelect">\Zend\Db\Sql\Select</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::_authenticateQuerySelect()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_authenticateQuerySelect</span><span class="nb-faded-text">(
+          <a href="db_Zend_Db_Sql_Select.html#%5CZend%5CDb%5CSql%5CSelect">\Zend\Db\Sql\Select</a> $dbSelect
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">_authenticateQuerySelect() - This method accepts a Zend\Db\Sql\Select object and
+performs a query against the database with that object.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$dbSelect</th>
+<td><a href="db_Zend_Db_Sql_Select.html#%5CZend%5CDb%5CSql%5CSelect">\Zend\Db\Sql\Select</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\Exception\RuntimeException</td>
+<td><em>when an invalid select object is encountered</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::_authenticateSetup()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_authenticateSetup</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">_authenticateSetup() - This method abstracts the steps involved with
+making sure that this adapter was indeed setup properly with all
+required pieces of information.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\Exception\RuntimeException</td>
+<td><em>in the event that setup was not done properly</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::_authenticateValidateResult()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_authenticateValidateResult</span><span class="nb-faded-text">(
+          array $resultIdentity
+          )
+        </span>
+        :
+          <a href="db_Zend_Authentication_Result.html#%5CZend%5CAuthentication%5CResult">\Zend\Authentication\Result</a></code><div class="description"><p class="short_description">_authenticateValidateResult() - This method attempts to validate that
+the record in the resultset is indeed a record that matched the
+identity provided to this adapter.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$resultIdentity</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Authentication_Result.html#%5CZend%5CAuthentication%5CResult">\Zend\Authentication\Result</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::_authenticateValidateResultSet()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">_authenticateValidateResultSet</span><span class="nb-faded-text">(
+          array $resultIdentities
+          )
+        </span>
+        :
+          boolean|<a href="db_Zend_Authentication_Result.html#%5CZend%5CAuthentication%5CResult">\Zend\Authentication\Result</a></code><div class="description"><p class="short_description">_authenticateValidateResultSet() - This method attempts to make
+certain that only one record was returned in the resultset</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$resultIdentities</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean|<a href="db_Zend_Authentication_Result.html#%5CZend%5CAuthentication%5CResult">\Zend\Authentication\Result</a>
+</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::authenticate()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">authenticate</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_Authentication_Result.html#%5CZend%5CAuthentication%5CResult">\Zend\Authentication\Result</a></code><div class="description"><p class="short_description">This method is called to attempt an authentication. Previous to this
+call, this adapter would have already been configured with all
+necessary information to successfully connect to a database table and
+attempt to find a record matching the provided identity.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Authentication_Result.html#%5CZend%5CAuthentication%5CResult">\Zend\Authentication\Result</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\Exception\RuntimeException</td>
+<td><em>if answering the authentication query is impossible</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::getAmbiguityIdentity()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getAmbiguityIdentity</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">getAmbiguityIdentity() - returns TRUE for usage of multiple identical
+identities with different credentials, FALSE if not used.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::getDbSelect()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getDbSelect</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_Db_Sql_Select.html#%5CZend%5CDb%5CSql%5CSelect">\Zend\Db\Sql\Select</a></code><div class="description"><p class="short_description">getDbSelect() - Return the preauthentication Db Select object for userland select query modification</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Db_Sql_Select.html#%5CZend%5CDb%5CSql%5CSelect">\Zend\Db\Sql\Select</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::getResultRowObject()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getResultRowObject</span><span class="nb-faded-text">(
+          string|array $returnColumns
+              =
+              null, string|array $omitColumns
+              =
+              null
+          )
+        </span>
+        :
+          \Zend\Authentication\Adapter\stdClass|boolean</code><div class="description"><p class="short_description">getResultRowObject() - Returns the result row as a stdClass object</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$returnColumns</th>
+<td>string|array</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$omitColumns</th>
+<td>string|array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>\Zend\Authentication\Adapter\stdClass|boolean</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::setAmbiguityIdentity()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setAmbiguityIdentity</span><span class="nb-faded-text">(
+          int|bool $flag
+          )
+        </span>
+        :
+          <a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></code><div class="description"><p class="short_description">setAmbiguityIdentity() - sets a flag for usage of identical identities
+with unique credentials. It accepts integers (0, 1) or boolean (true,
+false) parameters. Default is false.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$flag</th>
+<td>int|bool</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></td>
+<td>Provides a fluent interface</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::setCredential()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setCredential</span><span class="nb-faded-text">(
+          string $credential
+          )
+        </span>
+        :
+          <a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></code><div class="description"><p class="short_description">setCredential() - set the credential value to be used, optionally can specify a treatment
+to be used, should be supplied in parametrized form, such as 'MD5(?)' or 'PASSWORD(?)'</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$credential</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></td>
+<td>Provides a fluent interface</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::setCredentialColumn()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setCredentialColumn</span><span class="nb-faded-text">(
+          string $credentialColumn
+          )
+        </span>
+        :
+          <a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></code><div class="description"><p class="short_description">setCredentialColumn() - set the column name to be used as the credential column</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$credentialColumn</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></td>
+<td>Provides a fluent interface</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::setCredentialTreatment()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setCredentialTreatment</span><span class="nb-faded-text">(
+          string $treatment
+          )
+        </span>
+        :
+          <a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></code><div class="description"><p class="short_description">setCredentialTreatment() - allows the developer to pass a parametrized string that is
+used to transform or treat the input credential data.</p></div>
+<div class="code-tabs">
+<div class="long-description"><p>In many cases, passwords and other sensitive data are encrypted, hashed, encoded,
+obscured, or otherwise treated through some function or algorithm. By specifying a
+parametrized treatment string with this method, a developer may apply arbitrary SQL
+upon input credential data.</p>
+
+<p>Examples:</p>
+
+<p>'PASSWORD(?)'
+ 'MD5(?)'</p>
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$treatment</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></td>
+<td>Provides a fluent interface</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::setIdentity()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setIdentity</span><span class="nb-faded-text">(
+          string $value
+          )
+        </span>
+        :
+          <a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></code><div class="description"><p class="short_description">setIdentity() - set the value to be used as the identity</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$value</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></td>
+<td>Provides a fluent interface</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::setIdentityColumn()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setIdentityColumn</span><span class="nb-faded-text">(
+          string $identityColumn
+          )
+        </span>
+        :
+          <a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></code><div class="description"><p class="short_description">setIdentityColumn() - set the column name to be used as the identity column</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$identityColumn</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></td>
+<td>Provides a fluent interface</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\Authentication\Adapter\DbTable::setTableName()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setTableName</span><span class="nb-faded-text">(
+          string $tableName
+          )
+        </span>
+        :
+          <a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></code><div class="description"><p class="short_description">setTableName() - set the table name to be used in the select query</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$tableName</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Authentication_Adapter_DbTable.html#%5CZend%5CAuthentication%5CAdapter%5CDbTable">\Zend\Authentication\Adapter\DbTable</a></td>
+<td>Provides a fluent interface</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.15.1</a>.
+    </small></body></html>

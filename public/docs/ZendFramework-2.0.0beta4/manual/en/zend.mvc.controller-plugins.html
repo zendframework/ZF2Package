@@ -1,0 +1,344 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>16.7. Controller Plugins</title>
+<link rel="stylesheet" type="text/css" href="dbstyle.css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.mvc.html" title="Chapter 16. Zend\Mvc">
+<link rel="prev" href="zend.mvc.controllers.html" title="16.6. Available Controllers">
+<link rel="next" href="zend.mvc.examples.html" title="16.8. Examples">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.crypt.html" title="Chapter 5. Zend_Crypt">
+<link rel="chapter" href="zend.db.html" title="Chapter 6. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 7. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 8. Zend\EventManager">
+<link rel="chapter" href="zend.form.html" title="Chapter 9. Zend_Form">
+<link rel="chapter" href="zend.http.html" title="Chapter 10. Zend_Http">
+<link rel="chapter" href="zend.input-filter.html" title="Chapter 11. Zend\InputFilter">
+<link rel="chapter" href="zend.ldap.html" title="Chapter 12. Zend_Ldap">
+<link rel="chapter" href="zend.loader.html" title="Chapter 13. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 14. Zend\Mail">
+<link rel="chapter" href="zend.module-manager.html" title="Chapter 15. Zend\ModuleManager">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 16. Zend\Mvc">
+<link rel="chapter" href="zend.service-manager.html" title="Chapter 17. Zend\ServiceManager">
+<link rel="chapter" href="zend.stdlib.html" title="Chapter 18. Zend\Stdlib">
+<link rel="chapter" href="zend.uri.html" title="Chapter 19. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 20. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="subsection" href="zend.mvc.controller-plugins.html#zend.mvc.controller-plugins.flashmessenger" title="16.7.1. The FlashMessenger">
+<link rel="subsection" href="zend.mvc.controller-plugins.html#zend.mvc.controller-plugins.forward" title="16.7.2. The Forward Plugin">
+<link rel="subsection" href="zend.mvc.controller-plugins.html#zend.mvc.controller-plugins.redirect" title="16.7.3. The Redirect Plugin">
+<link rel="subsection" href="zend.mvc.controller-plugins.html#zend.mvc.controller-plugins.url" title="16.7.4. The Url Plugin">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">16.7. Controller Plugins</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.mvc.controllers.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 16. Zend\Mvc</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.mvc.examples.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="16.7. Controller Plugins">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.mvc.controller-plugins"></a>16.7. Controller Plugins</h2></div></div></div>
+<p>
+    When using the <code class="classname">ActionController</code> or
+    <code class="classname">RestfulController</code>, or if you compose the
+    <code class="classname">Zend\Mvc\Controller\PluginBroker</code> in your custom
+    controllers, you have access to a number of pre-built plugins.
+    Additionally, you can register your own custom plugins with the
+    broker, just as you would with
+    <code class="classname">Zend\Loader\PluginBroker</code>.
+  </p>
+<p>
+    The built-in plugins are:
+  </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+        <code class="classname">Zend\Mvc\Controller\Plugin\FlashMessenger</code>
+      </p></li>
+<li class="listitem"><p>
+        <code class="classname">Zend\Mvc\Controller\Plugin\Forward</code>
+      </p></li>
+<li class="listitem"><p>
+        <code class="classname">Zend\Mvc\Controller\Plugin\Redirect</code>
+      </p></li>
+<li class="listitem"><p>
+        <code class="classname">Zend\Mvc\Controller\Plugin\Url</code>
+      </p></li>
+</ul></div>
+<p>
+    If your controller implements the
+    <code class="classname">Zend\Loader\Pluggable</code> interface, you can access
+    these using their shortname via the <code class="methodname">plugin()</code>
+    method:
+  </p>
+<pre class="programlisting">
+$plugin = $this-&gt;plugin('url');
+</pre>
+<p>
+    For an extra layer of convenience, both
+    <code class="classname">ActionController</code> and
+    <code class="classname">RestfulController</code> have
+    <code class="methodname">__call()</code> implementations that allow you to
+    retrieve plugins via method calls:
+  </p>
+<pre class="programlisting">
+$plugin = $this-&gt;url();
+</pre>
+<div class="section" title="16.7.1. The FlashMessenger">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.mvc.controller-plugins.flashmessenger"></a>16.7.1. The FlashMessenger</h3></div></div></div>
+<p>
+      The <code class="classname">FlashMessenger</code> is a plugin designed to
+      create and retrieve self-expiring, session-based messages. It
+      exposes a number of methods:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+          <code class="methodname">setSessionManager()</code> allows you to specify an
+          alternate session manager, if desired.
+        </p></li>
+<li class="listitem"><p>
+          <code class="methodname">getSessionManager()</code> allows you to retrieve the
+          session manager registered.
+        </p></li>
+<li class="listitem"><p>
+          <code class="methodname">getContainer()</code> returns the
+          <code class="classname">Zend\Session\Container</code> instance in which the
+          flass messages are stored.
+        </p></li>
+<li class="listitem"><p>
+          <code class="methodname">setNamespace()</code> allows you to specify a specific
+          namespace in the container in which to store or from which to
+          retrieve flash messages.
+        </p></li>
+<li class="listitem"><p>
+          <code class="methodname">getNamespace()</code> retrieves the name of the flash
+          message namespace.
+        </p></li>
+<li class="listitem"><p>
+          <code class="methodname">addMessage()</code> allows you to add a message to the
+          current namespace of the session container.
+        </p></li>
+<li class="listitem"><p>
+          <code class="methodname">hasMessages()</code> lets you determine if there are
+          any flash messages from the current namespace in the session
+          container.
+        </p></li>
+<li class="listitem"><p>
+          <code class="methodname">getMessages()</code> retrieves the flash messages from
+          the current namespace of the session container.
+        </p></li>
+<li class="listitem"><p>
+          <code class="methodname">clearMessages()</code> clears all flash messages in
+          current namespace of the session container.
+        </p></li>
+<li class="listitem"><p>
+          <code class="methodname">hasCurrentMessages()</code> indicates whether any
+          messages were added during the current request.
+        </p></li>
+<li class="listitem"><p>
+          <code class="methodname">getCurrentMessages()</code> retrieves any messages
+          added during the current request.
+        </p></li>
+<li class="listitem"><p>
+          <code class="methodname">clearCurrentMessages()</code> removes any messages
+          added during the current request.
+        </p></li>
+</ul></div>
+<p>
+      Additionally, the <code class="classname">FlashMessenger</code> implements both
+      <code class="classname">IteratorAggregate</code> and
+      <code class="classname">Countable</code>, allowing you to iterate over and
+      count the flash messages in the current namespace within the
+      session container.
+    </p>
+<div class="section" title="16.7.1.1. Examples">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.mvc.controller-plugins.examples"></a>16.7.1.1. Examples</h4></div></div></div>
+<pre class="programlisting">
+public function processAction()
+{
+    // ... do some work ...
+    $this-&gt;flashMessenger()-&gt;addMessage('You are now logged in.');
+    return $this-&gt;redirect()-&gt;toRoute('user-success');
+}
+
+public function successAction()
+{
+    $return = array('success' =&gt; true);
+    $flashMessenger = $this-&gt;flashMessenger();
+    if ($flashMessenger-&gt;hasMessages()) {
+        $return['messages'] = $flashMessenger-&gt;getMessages();
+    }
+    return $return;
+}
+</pre>
+</div>
+</div>
+<div class="section" title="16.7.2. The Forward Plugin">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.mvc.controller-plugins.forward"></a>16.7.2. The Forward Plugin</h3></div></div></div>
+<p>
+      Occasionally, you may want to dispatch additional controllers from
+      within the matched controller -- for instance, you might use this
+      approach to build up "widgetized" content. The
+      <code class="classname">Forward</code> plugin helps enable this.
+    </p>
+<p>
+      For the <code class="classname">Forward</code> plugin to work, the controller
+      calling it must be <code class="classname">ServiceManagerAware</code>; otherwise, the
+      plugin will be unable to retrieve a configured and injected
+      instance of the requested controller.
+    </p>
+<p>
+      The plugin exposes a single method, <code class="methodname">dispatch()</code>,
+      which takes two arguments:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+          <code class="varname">$name</code>, the name of the controller to invoke.  This
+          may be either the fully qualified class name, or an alias defined and
+          recognized by the <code class="classname">ServiceManager</code> instance
+          attached to the invoking controller.
+        </p></li>
+<li class="listitem"><p>
+          <code class="varname">$params</code> is an optional array of parameters with
+          which to see a <code class="classname">RouteMatch</code> object for purposes of
+          this specific request.
+        </p></li>
+</ul></div>
+<p>
+      <code class="classname">Forward</code> returns the results of dispatching the
+      requested controller; it is up to the developer to determine what,
+      if anything, to do with those results. One recommendation is to
+      aggregate them in any return value from the invoking controller.
+    </p>
+<p>
+      As an example:
+    </p>
+<pre class="programlisting">
+$foo = $this-&gt;forward()-&gt;dispatch('foo', array('action' =&gt; 'process'));
+return array(
+    'somekey' =&gt; $somevalue,
+    'foo'     =&gt; $foo,
+);
+</pre>
+</div>
+<div class="section" title="16.7.3. The Redirect Plugin">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.mvc.controller-plugins.redirect"></a>16.7.3. The Redirect Plugin</h3></div></div></div>
+<p>
+      Redirections are quite common operations within applications. If
+      done manually, you will need to do the following steps:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+          Assemble a url using the router
+        </p></li>
+<li class="listitem"><p>
+          Create and inject a "Location" header into the
+          <code class="classname">Response</code> object, pointing to the assembled URL
+        </p></li>
+<li class="listitem"><p>
+          Set the status code of the <code class="classname">Response</code> object to
+          one of the 3xx HTTP statuses.
+        </p></li>
+</ul></div>
+<p>
+      The <code class="classname">Redirect</code> plugin does this work for you. It
+      offers two methods:
+    </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+          <code class="methodname">toRoute($route, array $params = array(), array $options = array())</code>:
+          Redirects to a named route, using the provided
+          <code class="varname">$params</code> and <code class="varname">$options</code> to
+          assembled the URL.
+        </p></li>
+<li class="listitem"><p>
+          <code class="methodname">toUrl($url)</code>: Simply redirects to the given URL.
+        </p></li>
+</ul></div>
+<p>
+      In each case, the <code class="classname">Response</code> object is returned.
+      If you return this immediately, you can effectively short-circuit
+      execution of the request.
+    </p>
+<p>
+      One note: this plugin requires that the controller invoking it
+      implements <code class="classname">InjectApplicationEvent</code>, and thus has
+      an <code class="classname">MvcEvent</code> composed, as it retrieves the router
+      from the event object.
+    </p>
+<p>
+      As an example:
+    </p>
+<pre class="programlisting">
+return $this-&gt;redirect()-&gt;toRoute('login-success');
+</pre>
+</div>
+<div class="section" title="16.7.4. The Url Plugin">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.mvc.controller-plugins.url"></a>16.7.4. The Url Plugin</h3></div></div></div>
+<p>
+      Often you may want to generate URLs from route definitions within
+      your controllers -- in order to seed the view, generate headers,
+      etc. While the <code class="classname">MvcEvent</code> object composes the
+      router, doing so manually would require this workflow:
+    </p>
+<pre class="programlisting">
+$router = $this-&gt;getEvent()-&gt;getRouter();
+$url    = $router-&gt;assemble($params, array('name' =&gt; 'route-name'));
+</pre>
+<p>
+      The <code class="classname">Url</code> helper makes this slightly more
+      convenient:
+    </p>
+<pre class="programlisting">
+$url = $this-&gt;url()-&gt;fromRoute('route-name', $params);
+</pre>
+<p>
+      The <code class="methodname">fromRoute()</code> method is the only public method
+      defined, and has the following signature:
+    </p>
+<pre class="programlisting">
+public function fromRoute($route, array $params = array(), array $options = array())
+</pre>
+<p>
+      One note: this plugin requires that the controller invoking it
+      implements <code class="classname">InjectApplicationEvent</code>, and thus has
+      an <code class="classname">MvcEvent</code> composed, as it retrieves the router
+      from the event object.
+    </p>
+</div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.mvc.controllers.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.mvc.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.mvc.examples.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">16.6. Available Controllers </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 16.8. Examples</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

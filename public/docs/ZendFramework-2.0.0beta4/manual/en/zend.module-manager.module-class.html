@@ -1,0 +1,236 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>15.3. The Module Class</title>
+<link rel="stylesheet" type="text/css" href="dbstyle.css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.module-manager.html" title="Chapter 15. Zend\ModuleManager">
+<link rel="prev" href="zend.module-manager.module-manager.html" title="15.2. The Module Manager">
+<link rel="next" href="zend.module-manager.module-autoloader.html" title="15.4. The Module Autoloader">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.crypt.html" title="Chapter 5. Zend_Crypt">
+<link rel="chapter" href="zend.db.html" title="Chapter 6. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 7. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 8. Zend\EventManager">
+<link rel="chapter" href="zend.form.html" title="Chapter 9. Zend_Form">
+<link rel="chapter" href="zend.http.html" title="Chapter 10. Zend_Http">
+<link rel="chapter" href="zend.input-filter.html" title="Chapter 11. Zend\InputFilter">
+<link rel="chapter" href="zend.ldap.html" title="Chapter 12. Zend_Ldap">
+<link rel="chapter" href="zend.loader.html" title="Chapter 13. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 14. Zend\Mail">
+<link rel="chapter" href="zend.module-manager.html" title="Chapter 15. Zend\ModuleManager">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 16. Zend\Mvc">
+<link rel="chapter" href="zend.service-manager.html" title="Chapter 17. Zend\ServiceManager">
+<link rel="chapter" href="zend.stdlib.html" title="Chapter 18. Zend\Stdlib">
+<link rel="chapter" href="zend.uri.html" title="Chapter 19. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 20. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="subsection" href="zend.module-manager.module-class.html#zend.module-manager.module-class.the-loadModules.post-event" title='15.3.1. The "loadModules.post" Event'>
+<link rel="subsection" href="zend.module-manager.module-class.html#zend.module-manager.module-class.the-mvc-bootstrap-event" title='15.3.2. The MVC "bootstrap" Event'>
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">15.3. The Module Class</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.module-manager.module-manager.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 15. Zend\ModuleManager</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.module-manager.module-autoloader.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="15.3. The Module Class">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.module-manager.module-class"></a>15.3. The Module Class</h2></div></div></div>
+<p>
+        By default, ZF2 module system simply expects each module name to be able to be resolved to
+        an object instance. The default module resolver,
+        <code class="classname">Zend\ModuleManager\Listener\ModuleResolverListener</code>, simply
+        instantiates an instance of <code class="classname">{moduleName}\Module</code> for each enabled
+        module.
+    </p>
+<div class="example">
+<a name="zend.module-manager.module-class.example.minimal-module"></a><p class="title"><b>Example 15.1. A Minimal Module</b></p>
+<div class="example-contents">
+<p>
+            As an example, provided the module name "MyModule",
+            <code class="classname">Zend\ModuleManager\Listener\ModuleResolverListener</code> will simply expect
+            the class <code class="classname">MyModule\Module</code> to be available. It relies on a
+            registered autoloader, (typically <code class="classname"><a class="classname" href="zend.module-manager.module-autoloader" target="_top">Zend\Loader\ModuleAutoloader</a></code>)
+            to find and include the <code class="classname">MyModule\Module</code> class if it is not
+            already available. 
+        </p>
+<p>
+            A module named "MyModule" module might start out looking something like this:
+        </p>
+<div class="literallayout"><p><br>
+MyModule/<br>
+    Module.php<br>
+</p></div>
+<p>
+            Within <code class="filename">Module.php</code>, you define your
+            <code class="classname">MyModule\Module</code> class:
+        </p>
+<pre class="programlisting">
+namespace MyModule;
+
+class Module
+{
+}
+</pre>
+<p>
+            Though it will not serve any purpose at this point, this "MyModule" module now has
+            everything it needs to be considered a valid module and be loaded by the module system!
+        </p>
+</div>
+</div>
+<br class="example-break"><p>
+        This <code class="classname">Module</code> class serves as the single entry point for module manager
+        listeners to interact with a module.  From within this simple, yet powerful class, modules
+        can override or provide additional application configuration, perform initialization tasks
+        such as registering autoloader(s) and event listeners, declaring dependencies, and much
+        more.
+    </p>
+<div class="example">
+<a name="zend.module-manager.module-class.example.typical-module-class"></a><p class="title"><b>Example 15.2. A Typical Module Class</b></p>
+<div class="example-contents">
+<p>
+            The following example shows a more typical usage of the <code class="classname">Module</code>
+            class:
+        </p>
+<pre class="programlisting">
+namespace MyModule;
+
+class Module
+{
+    public function getAutoloaderConfig()
+    {
+        return array(
+            'Zend\Loader\ClassMapAutoloader' =&gt; array(
+                __DIR__ . '/autoload_classmap.php',
+            ),
+            'Zend\Loader\StandardAutoloader' =&gt; array(
+                'namespaces' =&gt; array(
+                    __NAMESPACE__ =&gt; __DIR__ . '/src/' . __NAMESPACE__,
+                ),
+            ),
+        );
+    }
+
+    public function getConfig()
+    {
+        return include __DIR__ . '/config/module.config.php';
+    }
+}
+</pre>
+</div>
+</div>
+<br class="example-break"><p>
+        For a list of the provided module manager listeners and the interfaces and methods that
+        <code class="classname">Module</code> classes may implement in order to interact with the module
+        manager and application, see the <a class="link" href="zend.module-manager.module-manager.html#zend.module-manager.module-manager.module-manager-listeners" title="15.2.2. Module Manager Listeners">module manager listeners
+            documentation</a> and the <a class="link" href="zend.module-manager.module-manager.html#zend.module-manager.module-manager.module-manager-events" title="15.2.1. Module Manager Events">module mananger events
+            documentation</a>.
+    </p>
+<div class="section" title='15.3.1. The "loadModules.post" Event'>
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.module-manager.module-class.the-loadModules.post-event"></a>15.3.1. The "loadModules.post" Event</h3></div></div></div>
+<p>
+            It is not safe for a module to assume that any other modules have already been loaded at
+            the time <code class="methodname">init()</code> method is called. If your module needs to
+            perform any actions after all other modules have been loaded, the module manager's
+            "loadModules.post" event makes this easy. 
+        </p>
+<div class="note" title="Note"><table border="0" summary="Note">
+<tr>
+<td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="images/note.png"></td>
+<th align="left">Note</th>
+</tr>
+<tr><td align="left" valign="top"><p>
+                For more information on methods like <code class="methodname">init()</code> and
+                <code class="methodname">getConfig()</code>, refer to the <a class="link" href="zend.module-manager.module-manager.html#zend.module-manager.module-manager.module-manager-listeners" title="15.2.2. Module Manager Listeners">module manager
+                    listeners documentation</a>.
+            </p></td></tr>
+</table></div>
+<div class="example">
+<a name="zend.module-manager.module-class.example.loadModules.post-event"></a><p class="title"><b>Example 15.3. Sample Usage of "loadModules.post" Event</b></p>
+<div class="example-contents"><pre class="programlisting">
+use Zend\EventManager\EventInterface as Event;
+use Zend\ModuleManager\ModuleManager;
+
+class Module
+{
+    public function init(ModuleManager $moduleManger)
+    {
+        // Remember to keep the init() method as lightweight as possible
+        $events = $moduleManager-&gt;events();
+        $events-&gt;attach('loadModules.post', array($this, 'modulesLoaded'));
+    }
+
+    public function modulesLoaded(Event $e)
+    {
+        // This method is called once all modules are loaded.
+        $moduleManager = $e-&gt;getTarget();
+        $loadedModules = $moduleManager-&gt;getLoadedModules();
+        $config        = $moduleManager-&gt;getConfig();
+    }
+}
+</pre></div>
+</div>
+<br class="example-break">
+</div>
+<div class="section" title='15.3.2. The MVC "bootstrap" Event'>
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.module-manager.module-class.the-mvc-bootstrap-event"></a>15.3.2. The MVC "bootstrap" Event</h3></div></div></div>
+<p>
+            If you are writing an MVC-oriented module for ZF2, you may need access to additional
+            parts of the application in your <code class="classname">Module</code> class such as the
+            instance of <code class="classname">Zend\Mvc\Application</code> or its registered service
+            manager instance. For this, you may utilize the MVC "bootstrap" event. The bootstrap
+            event is triggered after the "loadModule.post" event, once
+            <code class="code">$application-&gt;bootstrap()</code> is called.
+        </p>
+<div class="example">
+<a name="zend.module-manager.module-class.example.mvc-bootstrap-event"></a><p class="title"><b>Example 15.4. Sample Usage of the MVC "bootstrap" Event</b></p>
+<div class="example-contents"><pre class="programlisting">
+use Zend\EventManager\EventInterface as Event;
+
+class Module
+{
+    public function onBootstrap(Event $e)
+    {
+        // This method is called once the MVC bootstrapping is complete
+        $application = $e-&gt;getApplication();
+        $services    = $application-&gt;getServiceManager();
+    }
+}
+</pre></div>
+</div>
+<br class="example-break">
+</div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.module-manager.module-manager.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.module-manager.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.module-manager.module-autoloader.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">15.2. The Module Manager </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 15.4. The Module Autoloader</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

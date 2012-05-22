@@ -1,0 +1,179 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>6.3. Zend\Db\TableGateway</title>
+<link rel="stylesheet" type="text/css" href="dbstyle.css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.db.html" title="Chapter 6. Zend_Db">
+<link rel="prev" href="zend.db.sql.html" title="6.2. Zend\Db\Sql">
+<link rel="next" href="zend.di.html" title="Chapter 7. Zend\Di">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.crypt.html" title="Chapter 5. Zend_Crypt">
+<link rel="chapter" href="zend.db.html" title="Chapter 6. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 7. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 8. Zend\EventManager">
+<link rel="chapter" href="zend.form.html" title="Chapter 9. Zend_Form">
+<link rel="chapter" href="zend.http.html" title="Chapter 10. Zend_Http">
+<link rel="chapter" href="zend.input-filter.html" title="Chapter 11. Zend\InputFilter">
+<link rel="chapter" href="zend.ldap.html" title="Chapter 12. Zend_Ldap">
+<link rel="chapter" href="zend.loader.html" title="Chapter 13. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 14. Zend\Mail">
+<link rel="chapter" href="zend.module-manager.html" title="Chapter 15. Zend\ModuleManager">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 16. Zend\Mvc">
+<link rel="chapter" href="zend.service-manager.html" title="Chapter 17. Zend\ServiceManager">
+<link rel="chapter" href="zend.stdlib.html" title="Chapter 18. Zend\Stdlib">
+<link rel="chapter" href="zend.uri.html" title="Chapter 19. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 20. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="subsection" href="zend.db.tablegateway.html#zend.db.tablegateway.by-example" title="6.3.1. Examples">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">6.3. Zend\Db\TableGateway</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.db.sql.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 6. Zend_Db</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.di.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="6.3. Zend\Db\TableGateway">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.db.tablegateway"></a>6.3. Zend\Db\TableGateway</h2></div></div></div>
+<p>
+        The Table Gateway object is intended to provide an object
+        that represents a table in a database, and the methods of
+        this object mirror the most common operations on a database
+        table.  In code, the interface for such an object looks like this:
+    </p>
+<pre class="programlisting">
+interface Zend\Db\TableGateway\TableGatewayInterface
+{
+    public function getTableName();
+    public function select($where = null);
+    public function insert($set);
+    public function update($set, $where = null);
+    public function delete($where);
+}
+</pre>
+<div class="section" title="6.3.1. Examples">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.db.tablegateway.by-example"></a>6.3.1. Examples</h3></div></div></div>
+<p>
+            Here are a few examples of TableGateway usage
+        </p>
+<div class="section" title="6.3.1.1. Selecting Rows">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.db.tablegateway.by-example.select"></a>6.3.1.1. Selecting Rows</h4></div></div></div>
+<pre class="programlisting">
+$artistTable = new Zend\Db\TableGateway\TableGateway('artist', $adapter);
+$rowset = $artistTable-&gt;select(array('id' =&gt; 2));
+$row = $rowset-&gt;current();
+
+$name = $row['name'];
+$name2 = $row-&gt;name;
+</pre>
+</div>
+<div class="section" title="6.3.1.2. Inserting Rows">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.db.tablegateway.by-example.insert"></a>6.3.1.2. Inserting Rows</h4></div></div></div>
+<pre class="programlisting">
+$artistTable = new Zend\Db\TableGateway\TableGateway('artist', $adapter);
+$result = $artistTable-&gt;insert(array(
+    'name' =&gt; 'New Artist',
+    'history' =&gt; 'This is the history'
+));
+
+// $result is rows affected by the insert
+
+$lastId = $artistTable-&gt;getLastInsertId();
+</pre>
+</div>
+<div class="section" title="6.3.1.3. Updating Rows">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.db.tablegateway.by-example.update"></a>6.3.1.3. Updating Rows</h4></div></div></div>
+<pre class="programlisting">
+$artistTable = new Zend\Db\TableGateway\TableGateway('artist', $adapter);
+$result = $artistTable-&gt;update(array('name' =&gt; 'New Artist'), array('id' =&gt; 2));
+
+$name = $row['name'];
+</pre>
+</div>
+<div class="section" title="6.3.1.4. Deleting Rows">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.db.tablegateway.by-example.delete"></a>6.3.1.4. Deleting Rows</h4></div></div></div>
+<pre class="programlisting">
+$artistTable = new Zend\Db\TableGateway\TableGateway('artist', $adapter);
+$result = $artistTable-&gt;delete(array('id' =&gt; 2));
+</pre>
+</div>
+<div class="section" title="6.3.1.5. Using a Fluent Where With Select">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.db.tablegateway.by-example.select-with-where"></a>6.3.1.5. Using a Fluent Where With Select</h4></div></div></div>
+<pre class="programlisting">
+$artistTable = new TableGateway('artist', $adapter);
+$where = $select-&gt;where;
+$where-&gt;like('name', 'Bar%');
+$rowset = $artistTable-&gt;select($where);
+$row = $rowset-&gt;current();
+</pre>
+</div>
+<div class="section" title="6.3.1.6. Using a Closure With Select">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.db.tablegateway.by-example.select-with-closure"></a>6.3.1.6. Using a Closure With Select</h4></div></div></div>
+<pre class="programlisting">
+$artistTable = new TableGateway('artist', $adapter);
+$rowset = $artistTable-&gt;select(function (Select $select) {
+    $select-&gt;where-&gt;like('name', 'Bar%');
+});
+$row = $rowset-&gt;current();
+</pre>
+</div>
+<div class="section" title="6.3.1.7. Row Gateway Integration">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.db.tablegateway.by-example.row-gateway"></a>6.3.1.7. Row Gateway Integration</h4></div></div></div>
+<pre class="programlisting">
+$artistTable = new Zend\Db\TableGateway\TableGateway('artist', $adapter);
+$artistTable-&gt;setSelectResultPrototype(
+    new Zend\Db\ResultSet\ResultSet(new Zend\Db\RowGateway\RowGateway($artistTable, 'id'))
+);
+
+// find and update
+$rowset = $artistTable-&gt;select(array('id' =&gt; 2));
+$row = $rowset-&gt;current();
+$row['name'] = 'New Artist'; // array notation
+$affected = $row-&gt;save();
+
+// check
+$rowset = $artistTable-&gt;select(array('id' =&gt; 2));
+$row = $rowset-&gt;current();
+</pre>
+</div>
+</div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.db.sql.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.db.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.di.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">6.2. Zend\Db\Sql </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> Chapter 7. Zend\Di</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

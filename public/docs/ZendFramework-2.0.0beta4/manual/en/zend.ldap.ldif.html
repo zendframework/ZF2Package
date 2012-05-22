@@ -1,0 +1,190 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>12.7. Serializing LDAP data to and from LDIF</title>
+<link rel="stylesheet" type="text/css" href="dbstyle.css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.ldap.html" title="Chapter 12. Zend_Ldap">
+<link rel="prev" href="zend.ldap.server.html" title="12.6. Getting information from the LDAP server">
+<link rel="next" href="zend.loader.html" title="Chapter 13. Zend_Loader">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.crypt.html" title="Chapter 5. Zend_Crypt">
+<link rel="chapter" href="zend.db.html" title="Chapter 6. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 7. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 8. Zend\EventManager">
+<link rel="chapter" href="zend.form.html" title="Chapter 9. Zend_Form">
+<link rel="chapter" href="zend.http.html" title="Chapter 10. Zend_Http">
+<link rel="chapter" href="zend.input-filter.html" title="Chapter 11. Zend\InputFilter">
+<link rel="chapter" href="zend.ldap.html" title="Chapter 12. Zend_Ldap">
+<link rel="chapter" href="zend.loader.html" title="Chapter 13. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 14. Zend\Mail">
+<link rel="chapter" href="zend.module-manager.html" title="Chapter 15. Zend\ModuleManager">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 16. Zend\Mvc">
+<link rel="chapter" href="zend.service-manager.html" title="Chapter 17. Zend\ServiceManager">
+<link rel="chapter" href="zend.stdlib.html" title="Chapter 18. Zend\Stdlib">
+<link rel="chapter" href="zend.uri.html" title="Chapter 19. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 20. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="subsection" href="zend.ldap.ldif.html#zend.ldap.ldif.encode" title="12.7.1. Serialize a LDAP entry to LDIF">
+<link rel="subsection" href="zend.ldap.ldif.html#zend.ldap.ldif.decode" title="12.7.2. Deserialize a LDIF string into a LDAP entry">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">12.7. Serializing LDAP data to and from LDIF</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.ldap.server.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 12. Zend_Ldap</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.loader.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="12.7. Serializing LDAP data to and from LDIF">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.ldap.ldif"></a>12.7. Serializing LDAP data to and from LDIF</h2></div></div></div>
+<div class="section" title="12.7.1. Serialize a LDAP entry to LDIF">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.ldap.ldif.encode"></a>12.7.1. Serialize a LDAP entry to LDIF</h3></div></div></div>
+<pre class="programlisting">
+$data = array(
+    'dn'                         =&gt; 'uid=rogasawara,ou=営業部,o=Airius',
+    'objectclass'                =&gt; array('top',
+                                          'person',
+                                          'organizationalPerson',
+                                          'inetOrgPerson'),
+    'uid'                        =&gt; array('rogasawara'),
+    'mail'                       =&gt; array('rogasawara@airius.co.jp'),
+    'givenname;lang-ja'          =&gt; array('ロドニー'),
+    'sn;lang-ja'                 =&gt; array('小笠原'),
+    'cn;lang-ja'                 =&gt; array('小笠原 ロドニー'),
+    'title;lang-ja'              =&gt; array('営業部 部長'),
+    'preferredlanguage'          =&gt; array('ja'),
+    'givenname'                  =&gt; array('ロドニー'),
+    'sn'                         =&gt; array('小笠原'),
+    'cn'                         =&gt; array('小笠原 ロドニー'),
+    'title'                      =&gt; array('営業部 部長'),
+    'givenname;lang-ja;phonetic' =&gt; array('ろどにー'),
+    'sn;lang-ja;phonetic'        =&gt; array('おがさわら'),
+    'cn;lang-ja;phonetic'        =&gt; array('おがさわら ろどにー'),
+    'title;lang-ja;phonetic'     =&gt; array('えいぎょうぶ ぶちょう'),
+    'givenname;lang-en'          =&gt; array('Rodney'),
+    'sn;lang-en'                 =&gt; array('Ogasawara'),
+    'cn;lang-en'                 =&gt; array('Rodney Ogasawara'),
+    'title;lang-en'              =&gt; array('Sales, Director'),
+);
+$ldif = Zend\Ldap\Ldif\Encoder::encode($data, array('sort' =&gt; false,
+                                                    'version' =&gt; null));
+/*
+$ldif contains:
+dn:: dWlkPXJvZ2FzYXdhcmEsb3U95Za25qWt6YOoLG89QWlyaXVz
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+uid: rogasawara
+mail: rogasawara@airius.co.jp
+givenname;lang-ja:: 44Ot44OJ44OL44O8
+sn;lang-ja:: 5bCP56yg5Y6f
+cn;lang-ja:: 5bCP56yg5Y6fIOODreODieODi+ODvA==
+title;lang-ja:: 5Za25qWt6YOoIOmDqOmVtw==
+preferredlanguage: ja
+givenname:: 44Ot44OJ44OL44O8
+sn:: 5bCP56yg5Y6f
+cn:: 5bCP56yg5Y6fIOODreODieODi+ODvA==
+title:: 5Za25qWt6YOoIOmDqOmVtw==
+givenname;lang-ja;phonetic:: 44KN44Gp44Gr44O8
+sn;lang-ja;phonetic:: 44GK44GM44GV44KP44KJ
+cn;lang-ja;phonetic:: 44GK44GM44GV44KP44KJIOOCjeOBqeOBq+ODvA==
+title;lang-ja;phonetic:: 44GI44GE44GO44KH44GG44G2IOOBtuOBoeOCh+OBhg==
+givenname;lang-en: Rodney
+sn;lang-en: Ogasawara
+cn;lang-en: Rodney Ogasawara
+title;lang-en: Sales, Director
+*/
+</pre>
+</div>
+<div class="section" title="12.7.2. Deserialize a LDIF string into a LDAP entry">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.ldap.ldif.decode"></a>12.7.2. Deserialize a LDIF string into a LDAP entry</h3></div></div></div>
+<pre class="programlisting">
+$ldif = "dn:: dWlkPXJvZ2FzYXdhcmEsb3U95Za25qWt6YOoLG89QWlyaXVz
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+uid: rogasawara
+mail: rogasawara@airius.co.jp
+givenname;lang-ja:: 44Ot44OJ44OL44O8
+sn;lang-ja:: 5bCP56yg5Y6f
+cn;lang-ja:: 5bCP56yg5Y6fIOODreODieODi+ODvA==
+title;lang-ja:: 5Za25qWt6YOoIOmDqOmVtw==
+preferredlanguage: ja
+givenname:: 44Ot44OJ44OL44O8
+sn:: 5bCP56yg5Y6f
+cn:: 5bCP56yg5Y6fIOODreODieODi+ODvA==
+title:: 5Za25qWt6YOoIOmDqOmVtw==
+givenname;lang-ja;phonetic:: 44KN44Gp44Gr44O8
+sn;lang-ja;phonetic:: 44GK44GM44GV44KP44KJ
+cn;lang-ja;phonetic:: 44GK44GM44GV44KP44KJIOOCjeOBqeOBq+ODvA==
+title;lang-ja;phonetic:: 44GI44GE44GO44KH44GG44G2IOOBtuOBoeOCh+OBhg==
+givenname;lang-en: Rodney
+sn;lang-en: Ogasawara
+cn;lang-en: Rodney Ogasawara
+title;lang-en: Sales, Director";
+$data = Zend\Ldap\Ldif\Encoder::decode($ldif);
+/*
+$data = array(
+    'dn'                         =&gt; 'uid=rogasawara,ou=営業部,o=Airius',
+    'objectclass'                =&gt; array('top',
+                                          'person',
+                                          'organizationalPerson',
+                                          'inetOrgPerson'),
+    'uid'                        =&gt; array('rogasawara'),
+    'mail'                       =&gt; array('rogasawara@airius.co.jp'),
+    'givenname;lang-ja'          =&gt; array('ロドニー'),
+    'sn;lang-ja'                 =&gt; array('小笠原'),
+    'cn;lang-ja'                 =&gt; array('小笠原 ロドニー'),
+    'title;lang-ja'              =&gt; array('営業部 部長'),
+    'preferredlanguage'          =&gt; array('ja'),
+    'givenname'                  =&gt; array('ロドニー'),
+    'sn'                         =&gt; array('小笠原'),
+    'cn'                         =&gt; array('小笠原 ロドニー'),
+    'title'                      =&gt; array('営業部 部長'),
+    'givenname;lang-ja;phonetic' =&gt; array('ろどにー'),
+    'sn;lang-ja;phonetic'        =&gt; array('おがさわら'),
+    'cn;lang-ja;phonetic'        =&gt; array('おがさわら ろどにー'),
+    'title;lang-ja;phonetic'     =&gt; array('えいぎょうぶ ぶちょう'),
+    'givenname;lang-en'          =&gt; array('Rodney'),
+    'sn;lang-en'                 =&gt; array('Ogasawara'),
+    'cn;lang-en'                 =&gt; array('Rodney Ogasawara'),
+    'title;lang-en'              =&gt; array('Sales, Director'),
+);
+*/
+</pre>
+</div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.ldap.server.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.ldap.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.loader.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">12.6. Getting information from the LDAP server </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> Chapter 13. Zend_Loader</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>

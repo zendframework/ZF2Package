@@ -1,0 +1,557 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>16.4. Routing</title>
+<link rel="stylesheet" type="text/css" href="dbstyle.css">
+<meta name="generator" content="DocBook XSL-NS Stylesheets V1.76.1">
+<link rel="home" href="index.html" title="Programmer's Reference Guide">
+<link rel="up" href="zend.mvc.html" title="Chapter 16. Zend\Mvc">
+<link rel="prev" href="zend.mvc.services.html" title="16.3. Default Services">
+<link rel="next" href="zend.mvc.mvc-event.html" title="16.5. The MvcEvent">
+<link rel="part" href="introduction.html" title="Part I. Introduction to Zend Framework">
+<link rel="chapter" href="introduction.overview.html" title="Chapter 1. Overview">
+<link rel="chapter" href="introduction.installation.html" title="Chapter 2. Installation">
+<link rel="part" href="learning.html" title="Part II. Learning Zend Framework">
+<link rel="article" href="learning.di.html" title="Learning Dependency Injection">
+<link rel="part" href="reference.html" title="Part III. Zend Framework Reference">
+<link rel="chapter" href="zend.cache.html" title="Chapter 3. Zend\Cache">
+<link rel="chapter" href="zend.config.html" title="Chapter 4. Zend_Config">
+<link rel="chapter" href="zend.crypt.html" title="Chapter 5. Zend_Crypt">
+<link rel="chapter" href="zend.db.html" title="Chapter 6. Zend_Db">
+<link rel="chapter" href="zend.di.html" title="Chapter 7. Zend\Di">
+<link rel="chapter" href="zend.event-manager.html" title="Chapter 8. Zend\EventManager">
+<link rel="chapter" href="zend.form.html" title="Chapter 9. Zend_Form">
+<link rel="chapter" href="zend.http.html" title="Chapter 10. Zend_Http">
+<link rel="chapter" href="zend.input-filter.html" title="Chapter 11. Zend\InputFilter">
+<link rel="chapter" href="zend.ldap.html" title="Chapter 12. Zend_Ldap">
+<link rel="chapter" href="zend.loader.html" title="Chapter 13. Zend_Loader">
+<link rel="chapter" href="zend.mail.html" title="Chapter 14. Zend\Mail">
+<link rel="chapter" href="zend.module-manager.html" title="Chapter 15. Zend\ModuleManager">
+<link rel="chapter" href="zend.mvc.html" title="Chapter 16. Zend\Mvc">
+<link rel="chapter" href="zend.service-manager.html" title="Chapter 17. Zend\ServiceManager">
+<link rel="chapter" href="zend.stdlib.html" title="Chapter 18. Zend\Stdlib">
+<link rel="chapter" href="zend.uri.html" title="Chapter 19. Zend_Uri">
+<link rel="chapter" href="zend.view.html" title="Chapter 20. Zend_View">
+<link rel="appendix" href="copyrights.html" title="Appendix A. Copyright Information">
+<link rel="subsection" href="zend.mvc.routing.html#zend.mvc.routing.router-types" title="16.4.1. Router Types">
+<link rel="subsection" href="zend.mvc.routing.html#zend.mvc.routing.route-types" title="16.4.2. Route Types">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<div class="navheader"><table width="100%" summary="Navigation header">
+<tr><th colspan="3" align="center">16.4. Routing</th></tr>
+<tr>
+<td width="20%" align="left">
+<a accesskey="p" href="zend.mvc.services.html">Prev</a> </td>
+<th width="60%" align="center">Chapter 16. Zend\Mvc</th>
+<td width="20%" align="right"> <a accesskey="n" href="zend.mvc.mvc-event.html">Next</a>
+</td>
+</tr>
+</table></div>
+<div class="section" title="16.4. Routing">
+<div class="titlepage"><div><div><h2 class="title" style="clear: both">
+<a name="zend.mvc.routing"></a>16.4. Routing</h2></div></div></div>
+<p>
+    Routing is the act of matching a request to a given controller.
+  </p>
+<p>
+    Typically, routing will examine the request URI, and attempt to
+    match the URI path segment against provided constraints. If the
+    constraints match, a set of "matches" are returned, one
+    of which should be the controller name to execute. Routing can
+    utilize other portions of the request URI or environment as well --
+    for example, the host or scheme, query parametes, headers, request
+    method, and more.
+  </p>
+<p>
+    Routing has been written from the ground up for Zend Framework 2.0.
+    Execution is quite similar, but the internal workings are more
+    consistent, performant, and often simpler.
+  </p>
+<p>
+    The base unit of routing is a <code class="classname">Route</code>:
+  </p>
+<pre class="programlisting">
+namespace Zend\Mvc\Router;
+
+use zend\Stdlib\RequestInterface as Request;
+
+interface Route
+{
+    public static function factory(array $options = array());
+    public function match(Request $request);
+    public function assemble(array $params = array(), array $options = array());
+}
+</pre>
+<p>
+    A <code class="classname">Route</code> accepts a <code class="classname">Request</code>,
+    and determines if it matches. If so, it returns a
+    <code class="classname">RouteMatch</code> object:
+  </p>
+<pre class="programlisting">
+namespace Zend\Mvc\Router;
+
+class RouteMatch
+{
+    public function __construct(array $params);
+    public function setParam($name, $value);
+    public function merge(RouteMatch $match);
+    public function getParam($name, $default = null);
+    public function getRoute();
+}
+</pre>
+<p>
+    Typically, when a <code class="classname">Route</code> matches, it will define
+    one or more parameters. These are passed into the
+    <code class="classname">RouteMatch</code>, and objects may query the
+    <code class="classname">RouteMatch</code> for their values.
+  </p>
+<pre class="programlisting">
+$id = $routeMatch-&gt;getParam('id', false);
+if (!$id) {
+    throw new Exception('Required identifier is missing!');
+}
+$entity = $resource-&gt;get($id);
+</pre>
+<p>
+    Usually you will have multiple routes you wish to test against. In
+    order to facilitate this, you will use a route aggregate, usually
+    implementing <code class="classname">RouteStack</code>:
+  </p>
+<pre class="programlisting">
+namespace Zend\Mvc\Router;
+
+interface RouteStack extends Route
+{
+    public function addRoute($name, $route, $priority = null);
+    public function addRoutes(array $routes);
+    public function removeRoute($name);
+}
+</pre>
+<p>
+    Typically, routes should be queried in a LIFO order, and hence the
+    reason behind the name <code class="classname">RouteStack</code>. Zend
+    Framework provides two implementations of this interface,
+    <code class="classname">SimpleRouteStack</code> and
+    <code class="classname">TreeRouteStack</code>. In each, you register routes
+    either one at a time using <code class="methodname">addRoute()</code>, or in
+    bulk using <code class="methodname">addRoutes()</code>.
+  </p>
+<pre class="programlisting">
+// One at a time:
+$route = Literal::factory(array(
+    'route' =&gt; '/foo',
+    'defaults' =&gt; array(
+        'controller' =&gt; 'foo-index',
+        'action'     =&gt; 'index',
+    ),
+));
+$router-&gt;addRoute('foo', $route);
+
+$router-&gt;addRoutes(array(
+    // using already instantiated routes:
+    'foo' =&gt; $route,
+
+    // providing configuration to allow lazy-loading routes:
+    'bar' =&gt; array(
+        'type' =&gt; 'literal',
+        'options' =&gt; array(
+            'route' =&gt; '/bar',
+            'defaults' =&gt; array(
+                'controller' =&gt; 'bar-index',
+                'action'     =&gt; 'index',
+            ),
+        ),
+    ),
+));
+</pre>
+<div class="section" title="16.4.1. Router Types">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.mvc.routing.router-types"></a>16.4.1. Router Types</h3></div></div></div>
+<p>
+      Two routers are provided, the <code class="classname">SimpleRouteStack</code>
+      and <code class="classname">TreeRouteStack</code>. Each works with the above
+      interface, but utilize slightly different options and execution
+      paths.
+    </p>
+<div class="section" title="16.4.1.1. SimpleRouteStack">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.mvc.routing.router-types.simple-route-stack"></a>16.4.1.1. SimpleRouteStack</h4></div></div></div>
+<p>
+        This router simply takes individual routes that provide their full
+        matching logic in one go, and loops through them in LIFO order
+        until a match is found. As such, routes that will match most often
+        should be registered last, and least common routes first.
+        Additionally, you will need to ensure that routes that potentially
+        overlap are registered such that the most specific match will match
+        first (i.e., register later). Alternatively, you can set priorities by
+        giving the priority as third parameter to the
+        <code class="methodname">addRoute()</code> method, specifying the priority
+        in the route specifications or setting the priority property within
+        a route instance before adding it to the route stack.
+      </p>
+</div>
+<div class="section" title="16.4.1.2. TreeRouteStack">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.mvc.routing.router-types.tree-route-stack"></a>16.4.1.2. TreeRouteStack</h4></div></div></div>
+<p>
+        <code class="classname">Zend\Mvc\Router\Http\TreeRouteStack</code> provides the
+        ability to register trees of routes, and will use a B-tree
+        algorithm to match routes. As such, you register a single route
+        with many children.
+      </p>
+<p>
+        A <code class="classname">TreeRouteStack</code> will consist of the following
+        configuration:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+            A base "route", which describes the base match needed,
+            the root of the tree.
+          </p></li>
+<li class="listitem"><p>
+            An optional "route_broker", which is a configured
+            <code class="classname">Zend\Mvc\Router\RouteBroker</code> that can lazy-load
+            routes.
+          </p></li>
+<li class="listitem"><p>
+            The option "may_terminate", which hints to the router
+            that no other segments will follow it.
+          </p></li>
+<li class="listitem"><p>
+            An optional "child_routes" array, which contains
+            additional routes that stem from the base "route" (i.e.,
+            build from it). Each child route can itself be a
+            <code class="classname">TreeRouteStack</code> if desired; in fact, the
+            <code class="classname">Part</code> route works exactly this way.
+          </p></li>
+</ul></div>
+<p>
+        When a route matches against a <code class="classname">TreeRouteStack</code>,
+        the matched parameters from each segment of the tree will be
+        returned.
+      </p>
+<p>
+        A <code class="classname">TreeRouteStack</code> can be your sole route for your
+        application, or describe particular path segments of the
+        application.
+      </p>
+<p>
+        An example of a <code class="classname">TreeRouteStack</code> is provided in
+        the documentation of the <code class="classname">Part</code> route.
+      </p>
+</div>
+</div>
+<div class="section" title="16.4.2. Route Types">
+<div class="titlepage"><div><div><h3 class="title">
+<a name="zend.mvc.routing.route-types"></a>16.4.2. Route Types</h3></div></div></div>
+<p>
+      Zend Framework 2.0 ships with the following route types.
+    </p>
+<div class="section" title="16.4.2.1. Zend\Mvc\Router\Http\Hostname">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.mvc.routing.route-types.hostname"></a>16.4.2.1. Zend\Mvc\Router\Http\Hostname</h4></div></div></div>
+<p>
+        The <code class="classname">Hostname</code> route attempts to match the
+        hostname registered in the request against specific criteria.
+        Typically, this will be in one of the following forms:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+            "subdomain.domain.tld"
+          </p></li>
+<li class="listitem"><p>
+            ":subdomain.domain.tld"
+          </p></li>
+</ul></div>
+<p>
+        In the above, the second route would return a "subdomain"
+        key as part of the route match.
+      </p>
+<p>
+        For any given hostname segment, you may also provide a constraint.
+        As an example, if the "subdomain" segment needed to match
+        only if it started with "fw" and contained exactly 2
+        digits following, the following route would be needed:
+      </p>
+<pre class="programlisting">
+$route = Hostname::factory(array(
+    'route' =&gt; ':subdomain.domain.tld',
+    'constraints' =&gt; array(
+        'subdomain' =&gt; 'fw\d{2}'
+    ),
+));
+</pre>
+<p>
+        In the above example, only a "subdomain" key will be
+        returned in the <code class="classname">RouteMatch</code>. If you wanted to
+        also provide other information based on matching, or a default
+        value to return for the subdomain, you need to also provide
+        defaults.
+      </p>
+<pre class="programlisting">
+$route = Hostname::factory(array(
+    'route' =&gt; ':subdomain.domain.tld',
+    'constraints' =&gt; array(
+        'subdomain' =&gt; 'fw\d{2}'
+    ),
+    'defaults' =&gt; array(
+        'type' =&gt; 'json',
+    ),
+));
+</pre>
+<p>
+        When matched, the above will return two keys in the
+        <code class="classname">RouteMatch</code>, "subdomain" and
+        "type".
+      </p>
+</div>
+<div class="section" title="16.4.2.2. Zend\Mvc\Router\Http\Literal">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.mvc.routing.route-types.literal"></a>16.4.2.2. Zend\Mvc\Router\Http\Literal</h4></div></div></div>
+<p>
+        The <code class="classname">Literal</code> route is for doing exact matching of
+        the URI path. Configuration therefore is solely the path you want
+        to match, and the "defaults", or parameters you want
+        returned on a match.
+      </p>
+<pre class="programlisting">
+$route = Literal::factory(array(
+    'route' =&gt; '/foo',
+    'defaults' =&gt; array(
+        'controller' =&gt; 'foo-index',
+    ),
+));
+</pre>
+<p>
+        The above route would match a path "/foo", and return the
+        key "controller" in the <code class="classname">RouteMatch</code>,
+        with the value "foo-index".
+      </p>
+</div>
+<div class="section" title="16.4.2.3. Zend\Mvc\Router\Http\Part">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.mvc.routing.route-types.part"></a>16.4.2.3. Zend\Mvc\Router\Http\Part</h4></div></div></div>
+<p>
+        A <code class="classname">Part</code> route allows crafting a tree of possible
+        routes based on segments of the URI path. It actually extends the
+        <code class="classname">TreeRouteStack</code>.
+      </p>
+<p>
+        <code class="classname">Part</code> routes are difficult to describe, so we'll
+        simply provide a sample one here.
+      </p>
+<pre class="programlisting">
+$route = Part::factory(array(
+    'route' =&gt; array(
+        'type'    =&gt; 'literal',
+        'options' =&gt; array(
+            'route'    =&gt; '/',
+            'defaults' =&gt; array(
+                'controller' =&gt; 'ItsHomePage',
+            ),
+        )
+    ),
+    'may_terminate' =&gt; true,
+    'route_broker'  =&gt; $routeBroker,
+    'child_routes'  =&gt; array(
+        'blog' =&gt; array(
+            'type'    =&gt; 'literal',
+            'options' =&gt; array(
+                'route'    =&gt; 'blog',
+                'defaults' =&gt; array(
+                    'controller' =&gt; 'ItsBlog',
+                ),
+            ),
+            'may_terminate' =&gt; true,
+            'child_routes'  =&gt; array(
+                'rss' =&gt; array(
+                    'type'    =&gt; 'literal',
+                    'options' =&gt; array(
+                        'route'    =&gt; '/rss',
+                        'defaults' =&gt; array(
+                            'controller' =&gt; 'ItsRssBlog',
+                        ),
+                    ),
+                    'child_routes'  =&gt; array(
+                        'sub' =&gt; array(
+                            'type'    =&gt; 'literal',
+                            'options' =&gt; array(
+                                'route'    =&gt; '/sub',
+                                'defaults' =&gt; array(
+                                    'action' =&gt; 'ItsSubRss',
+                                ),
+                            )
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        'forum' =&gt; array(
+            'type'    =&gt; 'literal',
+            'options' =&gt; array(
+                'route'    =&gt; 'forum',
+                'defaults' =&gt; array(
+                    'controller' =&gt; 'ItsForum',
+                ),
+            ),
+        ),
+    ),
+));
+</pre>
+<p>
+        The above would match the following:
+      </p>
+<div class="itemizedlist"><ul class="itemizedlist" type="disc">
+<li class="listitem"><p>
+            "/" would load the "ItsHomePage" controller
+          </p></li>
+<li class="listitem"><p>
+            "/blog" would load the "ItsBlog" controller
+          </p></li>
+<li class="listitem"><p>
+            "/blog/rss" would load the "ItsRssBlog"
+            controller
+          </p></li>
+<li class="listitem"><p>
+            "/blog/rss/sub" would load the "ItsSubRss"
+            controller
+          </p></li>
+<li class="listitem"><p>
+            "/forum" would load the "ItsForum" controller
+          </p></li>
+</ul></div>
+<p>
+        You may use any route type as a child route of a
+        <code class="classname">Part</code> route.
+      </p>
+</div>
+<div class="section" title="16.4.2.4. Zend\Mvc\Router\Http\Regex">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.mvc.routing.route-types.regex"></a>16.4.2.4. Zend\Mvc\Router\Http\Regex</h4></div></div></div>
+<p>
+        A <code class="classname">Regex</code> route utilizes a regular expression to
+        match against the URI path. Any valid regular expession is allowed;
+        our recommendation is to use named captures for any values you want
+        to return in the <code class="classname">RouteMatch</code>.
+      </p>
+<p>
+        Since regular expression routes are often complex, you must specify
+        a "spec" or specification to use when assembling URLs
+        from regex routes. The spec is simply a string; replacements are
+        identified using "%keyname%" within the string, with the
+        keys coming from either the captured values or named parameters
+        passed to the <code class="methodname">assemble()</code> method.
+      </p>
+<p>
+        Just like other routes, the <code class="classname">Regex</code> route can
+        accept "defaults", parameters to include in the
+        <code class="classname">RouteMatch</code> when succesfully matched.
+      </p>
+<pre class="programlisting">
+$route = Regex::factory(array(
+    'regex' =&gt; '/blog/(?&lt;id&gt;[a-zA-Z0-9_-]+)(\.(?&lt;format&gt;(json|html|xml|rss)))?',
+    'defaults' =&gt; array(
+        'controller' =&gt; 'blog-entry',
+        'format'     =&gt; 'html',
+    ),
+    'spec' =&gt; '/blog/%id%.%format%',
+));
+</pre>
+<p>
+        The above would match
+        "/blog/001-some-blog_slug-here.html", and return three
+        items in the <code class="classname">RouteMatch</code>, an "id", the
+        "controller", and the "format". When assembling
+        a URL from this route, the "id" and "format"
+        values would be used to fill the specification.
+      </p>
+</div>
+<div class="section" title="16.4.2.5. Zend\Mvc\Router\Http\Scheme">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.mvc.routing.route-types.scheme"></a>16.4.2.5. Zend\Mvc\Router\Http\Scheme</h4></div></div></div>
+<p>
+        The <code class="classname">Scheme</code> route matches the URI scheme only,
+        and must be an exact match. As such, this route, like the
+        <code class="classname">Literal</code> route, simply takes what you want to
+        match and the "defaults", parameters to return on a
+        match.
+      </p>
+<pre class="programlisting">
+$route = Scheme::factory(array(
+    'scheme' =&gt; 'https',
+    'defaults' =&gt; array(
+        'https' =&gt; true,
+    ),
+));
+</pre>
+<p>
+        The above route would match the "https" scheme, and
+        return the key "https" in the
+        <code class="classname">RouteMatch</code> with a boolean
+        <code class="varname">true</code> value.
+      </p>
+</div>
+<div class="section" title="16.4.2.6. Zend\Mvc\Router\Http\Segment">
+<div class="titlepage"><div><div><h4 class="title">
+<a name="zend.mvc.routing.route-types.segment"></a>16.4.2.6. Zend\Mvc\Router\Http\Segment</h4></div></div></div>
+<p>
+        A <code class="classname">Segment</code> route allows matching any segment of a
+        URI path. Segments are denoted using a colon, followed by
+        alphanumeric characters; if a segment is optional, it should be
+        surrounded by brackets. As an example, "/:foo[/:bar]"
+        would match a "/" followed by text and assign it to the
+        key "foo"; if any additional "/" characters are
+        found, any text following the last one will be assigned to the key
+        "bar".
+      </p>
+<p>
+        The separation between literal and named segments can be anything.
+        For example, the above could be done as "/:foo{-}[-:bar] as well. The
+        {-} after the :foo parameter indicates a set of one or more delimiters,
+        after which matching of the parameter itself ends.
+      </p>
+<p>
+        Each segment may have constraints associated with it. Each
+        constraint should simply be a regular expression expressing the
+        conditions under which that segment should match.
+      </p>
+<p>
+        Also, as you can in other routes, you may provide defaults to use;
+        these are particularly useful when using optional segments.
+      </p>
+<p>
+        As a complex example:
+      </p>
+<pre class="programlisting">
+$route = Segment::factory(array(
+    'route' =&gt; '/:controller[/:action]',
+    'constraints' =&gt; array(
+        'controller' =&gt; '[a-zA-Z][a-zA-Z0-9_-]+',
+        'action'     =&gt; '[a-zA-Z][a-zA-Z0-9_-]+',
+    ),
+    'defaults' =&gt; array(
+        'controller' =&gt; 'application-index',
+        'action'     =&gt; 'index',
+    ),
+));
+</pre>
+</div>
+</div>
+</div>
+<div class="navfooter"><table width="100%" summary="Navigation footer">
+<tr>
+<td width="40%" align="left">
+<a accesskey="p" href="zend.mvc.services.html">Prev</a> </td>
+<td width="20%" align="center"><a accesskey="u" href="zend.mvc.html">Up</a></td>
+<td width="40%" align="right"> <a accesskey="n" href="zend.mvc.mvc-event.html">Next</a>
+</td>
+</tr>
+<tr>
+<td width="40%" align="left" valign="top">16.3. Default Services </td>
+<td width="20%" align="center"><a accesskey="h" href="index.html">Home</a></td>
+<td width="40%" align="right" valign="top"> 16.5. The MvcEvent</td>
+</tr>
+</table></div>
+<div class="revinfo"></div>
+</body>
+</html>
