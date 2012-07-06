@@ -131,33 +131,26 @@ if (array_key_exists('composer_create_zip', $ini)
 }
 
 // Dependencies
-$composer = array();
-$composer['name'] = strtolower(str_replace('_', '-', $package_name));
-$composer['name'] = 'zendframework/' . $composer['name'];
-$composer['version'] = $release;
-$composer['license'] = 'BSD-3-Clause';
-$composer['keywords'] = array('zf2', strtolower(str_replace('Zend_', '', $package_name)));
+$library_component_path = str_replace('_', '/', $package_name);
+if (file_exists($zf2_library_path . '/' . $library_component_path . '/composer.json')) {
+    $content  = file_get_contents($zf2_library_path . '/' . $library_component_path . '/composer.json');
+    $composer = json_decode($content, true);
+} else {
+    $composer = array();
+    $composer['name'] = strtolower(str_replace('_', '-', $package_name));
+    $composer['name'] = 'zendframework/' . $composer['name'];
+    $composer['license'] = 'BSD-3-Clause';
+    $composer['keywords'] = array('zf2', strtolower(str_replace('Zend_', '', $package_name)));
+    $composer['autoload']['psr-0'][str_replace('_', '\\', $package_name)] = $autoload;
+    $composer['require']['php'] = ">=5.3.3";
 
-$composer['dist']['url'] = "$composer_url/{$package_file_base_uri}{$package_file_name}";
-$composer['dist']['type'] = "zip";
+    if (file_exists(ROOT . '/data/dependencies/' . $package_name . '.php')) {
+        $dependency_file = ROOT . '/data/dependencies/' . $package_name . '.php';
+    } elseif (file_exists(ROOT . '/data/dependencies/' . $package_name . '-scanned.php')) {
+        $dependency_file = ROOT . '/data/dependencies/' . $package_name . '-scanned.php';
+        $package_info = include $dependency_file;
+    }
 
-$composer['autoload']['psr-0'][str_replace('_', '\\', $package_name)] = $autoload;
-
-$composer['require']['php'] = ">=5.3.3";
-
-$file_replacements = array();
-$file_replacements['{PACKAGE_NAME}'] = $package_name;
-$file_replacements['{PACKAGE_RELEASE}'] = $release;
-$file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] = null;
-
-if (file_exists(ROOT . '/data/dependencies/' . $package_name . '.php')) {
-    $dependency_file = ROOT . '/data/dependencies/' . $package_name . '.php';
-} elseif (file_exists(ROOT . '/data/dependencies/' . $package_name . '-scanned.php')) {
-    $dependency_file = ROOT . '/data/dependencies/' . $package_name . '-scanned.php';
-}
-
-if (isset($dependency_file)) {
-    $package_info = include $dependency_file;
     if ($package_info) {
         if (isset($package_info['required'])) {
             foreach ($package_info['required'] as $dependency) {
@@ -177,6 +170,12 @@ if (isset($dependency_file)) {
         }
     }
 }
+
+$composer['version'] = $release;
+
+$composer['dist']['url'] = "$composer_url/{$package_file_base_uri}{$package_file_name}";
+$composer['dist']['type'] = "zip";
+
 
 // write composer file
 $write = '<?php return ' . var_export($composer, true) . '; ?>';
