@@ -37,13 +37,15 @@ script_run_command('mkdir -p ' . $work_path);
 
 // Copy files to working directory
 $paths = array(
-    'README.txt',
-    'README-GIT.txt',
-    'README-DEV.txt',
-    'INSTALL.txt',
+    'README.md',
+    'README-GIT.md',
+    'README-DEV.md',
+    'INSTALL.md',
     'LICENSE.txt',
-    'bin/',
-    'resources/',
+    'composer.json',
+    'bin',
+    'resources',
+    'vendor',
 );
 foreach ($paths as $file)  {
     $origin_path = $zf2_path  . '/' . $file;
