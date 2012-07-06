@@ -151,7 +151,7 @@ if (file_exists($zf2_library_path . '/' . $library_component_path . '/composer.j
         $package_info = include $dependency_file;
     }
 
-    if ($package_info) {
+    if (isset($package_info) && $package_info) {
         if (isset($package_info['required'])) {
             foreach ($package_info['required'] as $dependency) {
                 $dependency_name = strtolower(str_replace('_', '-', $dependency));
