@@ -115,17 +115,25 @@ if (file_exists($zf2_library_path . '/' . $library_component_path . '/composer.j
     $composer = json_decode($content, true);
     $package_info = array();
     foreach($composer['require'] as $dep => $version) {
-        list($vendor, $name) = split($dep, '/');
+        $vendor = $name = $dep;
+        if (strpos($dep, '/')) {
+            list($vendor, $name) = explode('/', $dep, 2);
+        }
         if ($vendor == $ini['vendor_name']) {
             $name = ucwords(str_replace('-', ' ', $name));
             $package_info['required'] = str_replace(' ', '_', $name);
         }
     }
-    foreach($composer['suggest'] as $dep => $version) {
-        list($vendor, $name) = split($dep, '/');
-        if ($vendor == $ini['vendor_name']) {
-            $name = ucwords(str_replace('-', ' ', $name));
-            $package_info['optional'] = str_replace(' ', '_', $name);
+    if (isset($composer['suggest'])) {
+        foreach($composer['suggest'] as $dep => $version) {
+            $vendor = $name = $dep;
+            if (strpos($dep, '/')) {
+                list($vendor, $name) = explode('/', $dep, 2);
+            }
+            if ($vendor == $ini['vendor_name']) {
+                $name = ucwords(str_replace('-', ' ', $name));
+                $package_info['optional'] = str_replace(' ', '_', $name);
+            }
         }
     }
 } elseif (file_exists(ROOT . '/data/dependencies/' . $package_name . '.php')) {
@@ -139,6 +147,9 @@ if (file_exists($zf2_library_path . '/' . $library_component_path . '/composer.j
 if (isset($package_info)) {
     $packagexmlsetup_content = '<?php' . PHP_EOL;
     if (isset($package_info['required'])) {
+        if (is_string($package_info['required'])) {
+            $package_info['required'] = array($package_info['required']);
+        }
         foreach ($package_info['required'] as $dependency) {
             $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] .= 'require_once \'' . $dependency . '-' . trim($release) . '.phar\';' . "\n";
             $file_replacements['{PACKAGE_DEPENDENCY}'] = trim($dependency);
@@ -146,6 +157,9 @@ if (isset($package_info)) {
         }
     }
     if (isset($package_info['optional'])) {
+        if (is_string($package_info['optional'])) {
+            $package_info['optional'] = array($package_info['optional']);
+        }
         foreach ($package_info['optional'] as $dependency) {
             $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] .= 'require_once \'' . $dependency . '-' . trim($release) . '.phar\';' . "\n";
             $file_replacements['{PACKAGE_DEPENDENCY}'] = trim($dependency);
