@@ -15,33 +15,16 @@ For Pyrus:
 * Run:
 
   `php scripts/make-all-packages.php`
+  `php scripts/make-all-external-packages.php`
+  `php scripts/release-all-packages.php`
 
 For Composer:
 
 * Run:
 
   `php scripts/make-all-composer-packages.php`
-
-For External Packages:
-
-* Run:
-
   `php scripts/make-all-external-composer-packages.php`
-
-* Finally, run:
-
-  `php scripts/make-all-external-packages.php`
-
-Releasing:
-
-* Finally, run:
-
-  `php scripts/release-all-packages.php`
-
-* Finally, run:
-
   `php scripts/release-all-composer-packages.php`
-
 
 That's it. Then add the new files & the changed packages.json, commit, and push to the 
 github repository.
