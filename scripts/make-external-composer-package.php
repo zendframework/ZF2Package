@@ -82,7 +82,7 @@ if (array_key_exists('composer_create_zip', $ini)
 
     $path = $package_name . '/src/' . $package_name;
     script_run_command('mkdir -p ' . $path);
-    $command = 'cp -R ' . $ext_component_library_path . '/' . $package_name . '/* ' 
+    $command = 'cp -R ' . $ext_component_library_path . '/' . (preg_match('/^ZendService/', $package_name) ? 'ZendService' : $package_name) . '/* ' 
              . $path . '/';
     $output = script_run_command($command);
 
