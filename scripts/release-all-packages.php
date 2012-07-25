@@ -9,14 +9,19 @@ if (!file_exists(__DIR__ . '/../data/packager.ini')) {
 // load the ini
 $ini = parse_ini_file(__DIR__ . '/../data/packager.ini');
 
-$package_list = $ini['package_list'];
+$package_list  = $ini['package_list'];
+$external_list = $ini['external_component_list'];
 
-$packages = explode(',', $package_list);
+$package_list  = explode(',', $package_list);
+$external_list = explode(',', $external_list);
+
+$packages = array_merge($package_list, $external_list);
 
 foreach ($packages as $package) {
+    $package    = trim($package);
     $return_val = 0;
-    $php = '/usr/bin/env php';
-    $command = $php . ' ' . __DIR__ . '/release-package.php ' . $package;
+    $php        = '/usr/bin/env php';
+    $command    = $php . ' ' . __DIR__ . '/release-package.php ' . $package;
     echo 'Running: ' . $command . PHP_EOL;
     passthru($command, $return_val);
     if ($return_val === -1) {
