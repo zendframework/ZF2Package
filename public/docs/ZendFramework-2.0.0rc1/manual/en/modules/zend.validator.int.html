@@ -1,0 +1,154 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Int &mdash; Zend Framework 2 2.0.0beta5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0beta5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0beta5 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="int">
+<span id="zend-validator-set-int"></span><h1>Int<a class="headerlink" href="#int" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Validator\Int</span></tt> validates if a given value is an integer. Also localized integer values are recognised and
+can be validated.</p>
+<div class="section" id="supported-options-for-zend-validator-int">
+<span id="zend-validator-set-int-options"></span><h2>Supported options for Zend\Validator\Int<a class="headerlink" href="#supported-options-for-zend-validator-int" title="Permalink to this headline">¶</a></h2>
+<p>The following options are supported for <tt class="docutils literal"><span class="pre">Zend\Validator\Int</span></tt>:</p>
+<ul class="simple">
+<li><strong>locale</strong>: Sets the locale which will be used to validate localized integers.</li>
+</ul>
+</div>
+<div class="section" id="simple-integer-validation">
+<span id="zend-validator-set-int-basic"></span><h2>Simple integer validation<a class="headerlink" href="#simple-integer-validation" title="Permalink to this headline">¶</a></h2>
+<p>The simplest way to validate an integer is by using the system settings. When no option is used, the environment
+locale is used for validation:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\Int</span><span class="p">();</span>
+
+<span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="mi">1234</span><span class="p">);</span>   <span class="c1">// returns true</span>
+<span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="mf">1234.5</span><span class="p">);</span> <span class="c1">// returns false</span>
+<span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="s1">&#39;1,234&#39;</span><span class="p">);</span> <span class="c1">// returns true</span>
+</pre></div>
+</td></tr></table></div>
+<p>In the above example we expected that our environment is set to &#8220;en&#8221; as locale. As you can see in the third example
+also grouping is recognised.</p>
+</div>
+<div class="section" id="localized-integer-validation">
+<span id="zend-validator-set-int-localized"></span><h2>Localized integer validation<a class="headerlink" href="#localized-integer-validation" title="Permalink to this headline">¶</a></h2>
+<p>Often it&#8217;s useful to be able to validate also localized values. Integer values are often written different in other
+countries. For example using english you can write &#8220;1234&#8221; or &#8220;1,234&#8221;. Both are integer values but the grouping is
+optional. In german for example you may write &#8220;1.234&#8221; and in french &#8220;1 234&#8221;.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Validator\Int</span></tt> is able to validate such notations. But it is limited to the locale you set. This means that
+it not simply strips off the separator, it validates if the correct separator is used. See the following code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\Int</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;locale&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;de&#39;</span><span class="p">));</span>
+
+<span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="mi">1234</span><span class="p">);</span> <span class="c1">// returns true</span>
+<span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="s2">&quot;1,234&quot;</span><span class="p">);</span> <span class="c1">// returns false</span>
+<span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="s2">&quot;1.234&quot;</span><span class="p">);</span> <span class="c1">// returns true</span>
+</pre></div>
+</td></tr></table></div>
+<p>As you can see, by using a locale, your input is validated localized. Using the english notation you get a
+<tt class="docutils literal"><span class="pre">FALSE</span></tt> when the locale forces a different notation.</p>
+<p>The locale can also be set afterwards by using <tt class="docutils literal"><span class="pre">setLocale()</span></tt> and retrieved by using <tt class="docutils literal"><span class="pre">getLocale()</span></tt>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Int</a><ul>
+<li><a class="reference internal" href="#supported-options-for-zend-validator-int">Supported options for Zend\Validator\Int</a></li>
+<li><a class="reference internal" href="#simple-integer-validation">Simple integer validation</a></li>
+<li><a class="reference internal" href="#localized-integer-validation">Localized integer validation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.validator.int.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1396 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\View Quick Start &mdash; Zend Framework 2 2.0.0beta5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0beta5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0beta5 documentation" href="../index.html" />
+    <link rel="next" title="The PhpRenderer" href="zend.view.renderer.php.renderer.html" />
+    <link rel="prev" title="Validation Messages" href="zend.validator.messages.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.view.renderer.php.renderer.html" title="The PhpRenderer"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.validator.messages.html" title="Validation Messages"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-view-quick-start">
+<span id="id1"></span><h1>Zend\View Quick Start<a class="headerlink" href="#zend-view-quick-start" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-view-quick-start-intro"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\View</span></tt> provides the &#8220;View&#8221; layer of Zend Framework&#8217;s MVC system. It is a multi-tiered system allowing a
+variety of mechanisms for extension, substitution, and more.</p>
+<p>The components of the view layer are as follows:</p>
+<ul class="simple">
+<li><strong>Variables containers</strong>, which hold variables and callbacks that you wish to represent in the view. Often-times,
+a Variables container will also provide mechanisms for context-specific escaping of variables and more.</li>
+<li><strong>View Models</strong>, which hold Variables containers, specify the template to use, if any, and optionally provide
+rendering options (more on that below). View Models may be nested in order to represent complex structures.</li>
+<li><strong>Renderers</strong>, which take View Models and provide a representation of them to return. Zend Framework ships three
+renderers by default: a &#8220;PHP&#8221; renderer which utilizes PHP templates in order to generate markup; a JSON renderer;
+and a Feed renderer, capable of generating RSS and Atom feeds.</li>
+<li><strong>Resolvers</strong>, which resolve a template name to a resource a Renderer may consume. As an example, a resolver may
+take the name &#8220;blog/entry&#8221; and resolve it to a PHP view script.</li>
+<li><strong>The View</strong>, which consists of strategies that map the current Request to a Renderer, and strategies for
+injecting the Response with the result of rendering.</li>
+<li><strong>Renderer and Response Strategies</strong>. Renderer Strategies listen to the &#8220;renderer&#8221; event of the View, and decide
+which Renderer should be selected, based on the Request or other criteria. Response strategies are used to inject
+the Response object with the results of rendering &#8211; which may also include taking actions such as setting
+Content-Type headers.</li>
+</ul>
+<p>Additionally, Zend Framework provides integration with the MVC via a number of event listeners in the
+<tt class="docutils literal"><span class="pre">Zend\Mvc\View</span></tt> namespace.</p>
+</div>
+<div class="section" id="usage">
+<span id="zend-view-quick-start-usage"></span><h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>This manual section is designed to show you typical usage patterns of the view layer when using it within the Zend
+Framework MVC. The assumptions are that you are using <em class="xref std std-ref">Dependency Injection</em>, and that you are using
+the default <em class="xref std std-ref">default MVC view strategies</em>.</p>
+<p class="rubric" id="zend-view-quick-start-usage-config">Configuration</p>
+<p>The default configuration for the framework will typically work out-of-the-box. However, you will still need to
+select resolver strategies and configure them, as well as potentially indicate alternate template names for things
+like the site layout, 404 (not found) pages, and error pages. The code snippets below can be added to your
+configuration to accomplish this. We recommend adding it to a site-specific module, such as the &#8220;Application&#8221;
+module from the framework&#8217;s &#8220;ZendSkeletonApplication&#8221;, or to one of your autoloaded configurations within the
+<tt class="docutils literal"><span class="pre">config/autoload/</span></tt> directory.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;di&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;instance&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="c1">// The above lines will likely already be present; it&#39;s the following</span>
+        <span class="c1">// definitions that you will want to ensure are present within the DI</span>
+        <span class="c1">// instance configuration.</span>
+
+            <span class="c1">// Setup the View layer</span>
+            <span class="c1">// This sets up an &quot;AggregateResolver&quot;, which allows you to have</span>
+            <span class="c1">// multiple template resolution strategies. We recommend using the</span>
+            <span class="c1">// TemplateMapResolver as the primary solution, with the</span>
+            <span class="c1">// TemplatePathStack as a backup.</span>
+            <span class="s1">&#39;Zend\View\Resolver\AggregateResolver&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;injections&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;Zend\View\Resolver\TemplateMapResolver&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Zend\View\Resolver\TemplatePathStack&#39;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+
+            <span class="c1">// The TemplateMapResolver allows you to directly map template names</span>
+            <span class="c1">// to specific templates. The following map would provide locations</span>
+            <span class="c1">// for a &quot;home&quot; template, as well as for the &quot;site/layout&quot;,</span>
+            <span class="c1">// &quot;site/error&quot;, and &quot;site/404&quot; templates, resolving them to view</span>
+            <span class="c1">// scripts in this module.</span>
+            <span class="s1">&#39;Zend\View\Resolver\TemplateMapResolver&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;parameters&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;map&#39;</span>  <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;home&#39;</span>        <span class="o">=&gt;</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../view/home.phtml&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;site/layout&#39;</span> <span class="o">=&gt;</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../view/site/layout.phtml&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;site/error&#39;</span>  <span class="o">=&gt;</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../view/site/error.phtml&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;site/404&#39;</span>    <span class="o">=&gt;</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../view/site/404.phtml&#39;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+
+            <span class="c1">// The TemplatePathStack takes an array of directories. Directories</span>
+            <span class="c1">// are then searched in LIFO order (it&#39;s a stack) for the requested</span>
+            <span class="c1">// view script. This is a nice solution for rapid application</span>
+            <span class="c1">// development, but potentially introduces performance expense in</span>
+            <span class="c1">// production due to the number of stat calls necessary.</span>
+            <span class="c1">//</span>
+            <span class="c1">// The following maps adds an entry pointing to the view directory</span>
+            <span class="c1">// of the current module. Make sure your keys differ between modules</span>
+            <span class="c1">// to ensure that they are not overwritten!</span>
+            <span class="s1">&#39;Zend\View\Resolver\TemplatePathStack&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;parameters&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;paths&#39;</span>  <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;application&#39;</span> <span class="o">=&gt;</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../view&#39;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+
+            <span class="c1">// We&#39;ll now define the PhpRenderer, and inject it with the</span>
+            <span class="c1">// AggregateResolver we defined earlier. By default, the MVC layer</span>
+            <span class="c1">// registers a rendering strategy that uses the PhpRenderer.</span>
+            <span class="s1">&#39;Zend\View\Renderer\PhpRenderer&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;parameters&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;resolver&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\View\Resolver\AggregateResolver&#39;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+
+            <span class="c1">// By default, the MVC&#39;s default rendering strategy uses the</span>
+            <span class="c1">// template name &quot;layout&quot; for the site layout. Let&#39;s tell it to use</span>
+            <span class="c1">// &quot;site/layout&quot; (which we mapped via the TemplateMapResolver,</span>
+            <span class="c1">// above).</span>
+            <span class="s1">&#39;Zend\Mvc\View\DefaultRenderingStrategy&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;parameters&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;layoutTemplate&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;site/layout&#39;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+
+            <span class="c1">// By default, the MVC registers an &quot;exception strategy&quot;, which is</span>
+            <span class="c1">// triggered when a requested action raises an exception; it creates</span>
+            <span class="c1">// a custom view model that wraps the exception, and selects a</span>
+            <span class="c1">// template. This template is &quot;error&quot; by default; let&#39;s change it to</span>
+            <span class="c1">// &quot;site/error&quot; (which we mapped via the TemplateMapResolver,</span>
+            <span class="c1">// above).</span>
+            <span class="c1">//</span>
+            <span class="c1">// Additionally, we&#39;ll tell it that we want to display an exception</span>
+            <span class="c1">// stack trace; you&#39;ll likely want to disable this by default.</span>
+            <span class="s1">&#39;Zend\Mvc\View\ExceptionStrategy&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;parameters&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;displayExceptions&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                    <span class="s1">&#39;exceptionTemplate&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;site/error&#39;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+
+            <span class="c1">// Another strategy the MVC registers by default is a &quot;route not</span>
+            <span class="c1">// found&quot; strategy. Basically, this gets triggered if (a) no route</span>
+            <span class="c1">// matches the current request, (b) the controller specified in the</span>
+            <span class="c1">// route match cannot be found in the locator, (c) the controller</span>
+            <span class="c1">// specified in the route match does not implement the DispatchableInterface</span>
+            <span class="c1">// interface, or (d) if a response from a controller sets the</span>
+            <span class="c1">// response status to 404.</span>
+            <span class="c1">//</span>
+            <span class="c1">// The default template used in such situations is &quot;error&quot;, just</span>
+            <span class="c1">// like the exception strategy. Let&#39;s tell it to use the &quot;site/404&quot;</span>
+            <span class="c1">// template, (which we mapped via the TemplateMapResolver, above).</span>
+            <span class="c1">//</span>
+            <span class="c1">// You can opt in to inject the reason for a 404 situation; see the</span>
+            <span class="c1">// various Application::ERROR_* constants for a list of values.</span>
+            <span class="c1">// Additionally, a number of 404 situations derive from exceptions</span>
+            <span class="c1">// raised during routing or dispatching. You can opt-in to display</span>
+            <span class="c1">// these.</span>
+            <span class="s1">&#39;Zend\Mvc\View\RouteNotFoundStrategy&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;parameters&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;displayExceptions&#39;</span>     <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                    <span class="s1">&#39;displayNotFoundReason&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                    <span class="s1">&#39;notFoundTemplate&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;site/404&#39;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-quick-start-usage-controllers">Controllers and View Models</p>
+<p><tt class="docutils literal"><span class="pre">Zend\View\View</span></tt> consumes <tt class="docutils literal"><span class="pre">ViewModels</span></tt>, passing them to the selected renderer. Where do you create these,
+though?</p>
+<p>The most explicit way is to create them in your controllers and return them.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Foo\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Mvc\Controller\AbstractActionController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Model\ViewModel</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">BarController</span> <span class="k">extends</span> <span class="nx">AbstractActionController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">doSomethingAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$view</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;message&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Hello world&#39;</span><span class="p">,</span>
+        <span class="p">));</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">setTemplate</span><span class="p">(</span><span class="s1">&#39;bar/do-something&#39;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nv">$view</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This sets a &#8220;message&#8221; variable in the view model, and sets the template name &#8220;bar/do-something&#8221;. The view model is
+then returned.</p>
+<p>Considering that in most cases, you&#8217;ll likely have a template name based on the controller and action, and simply
+be passing some variables, could this be made simpler? Definitely.</p>
+<p>The MVC registers a couple of listeners for controllers to automate this. The first will look to see if you
+returned an associative array from your controller; if so, it will create a view model and inject this associative
+array as the view variables container; this view model then replaces the MVC event&#8217;s result. It will also look to
+see if you returned nothing or null; if so, it will create a view model without any variables attached; this view
+model also replaces the MVC event&#8217;s result.</p>
+<p>The second listener checks to see if the MVC event result is a view model, and, if so, if it has a template
+associated with it. If not, it will inspect the controller matched during routing, and, if available, it&#8217;s &#8220;action&#8221;
+parameter in order to create a template name. This will be &#8220;controller/action&#8221;, with the controller and action
+normalized to lowercase, dash-separated words.</p>
+<p>As an example, the controller <tt class="docutils literal"><span class="pre">Bar\Controller\BazBatController</span></tt>, with action &#8220;doSomethingCrazy&#8221;, would be mapped
+to the template <tt class="docutils literal"><span class="pre">baz-bat/do-something-crazy</span></tt>.</p>
+<p>In practice, that means our previous example could be re-written as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Foo\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Mvc\Controller\AbstractActionController</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">BarController</span> <span class="k">extends</span> <span class="nx">AbstractActionController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">doSomethingCrazyAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;message&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Hello world&#39;</span><span class="p">,</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above method will likely work for a majority of use cases. When you need to specify a different template,
+explicitly create and return a view model, and specify the template manually.</p>
+<p>The other use case you may have for explicit view models is if you wish to <strong>nest</strong> view models. Use cases include
+if you want to render templates to include within the main view you return.</p>
+<p>As an example, you may want the view from the action to be one primary section that includes both an &#8220;article&#8221; and
+a couple of sidebars; one of the sidebars may include content from multiple views as well.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Content\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Mvc\Controller\AbstractActionController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Model\ViewModel</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">ArticleController</span> <span class="k">extends</span> <span class="nx">AbstractActionController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">viewAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// get the article from the persistence layer, etc...</span>
+
+        <span class="nv">$view</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">();</span>
+
+        <span class="nv">$articleView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;article&#39;</span> <span class="o">=&gt;</span> <span class="nv">$article</span><span class="p">));</span>
+        <span class="nv">$articleView</span><span class="o">-&gt;</span><span class="na">setTemplate</span><span class="p">(</span><span class="s1">&#39;content/article&#39;</span><span class="p">);</span>
+
+        <span class="nv">$primarySidebarView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">();</span>
+        <span class="nv">$primarySidebarView</span><span class="o">-&gt;</span><span class="na">setTemplate</span><span class="p">(</span><span class="s1">&#39;content/main-sidebar&#39;</span><span class="p">);</span>
+
+        <span class="nv">$secondarySidebarView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">();</span>
+        <span class="nv">$secondarySidebarView</span><span class="o">-&gt;</span><span class="na">setTemplate</span><span class="p">(</span><span class="s1">&#39;content/secondary-sidebar&#39;</span><span class="p">);</span>
+
+        <span class="nv">$sidebarBlockView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">();</span>
+        <span class="nv">$sidebarBlockView</span><span class="o">-&gt;</span><span class="na">setTemplate</span><span class="p">(</span><span class="s1">&#39;content/block&#39;</span><span class="p">);</span>
+
+        <span class="nv">$secondarySidebarView</span><span class="o">-&gt;</span><span class="na">addChild</span><span class="p">(</span><span class="nv">$sidebarBlockView</span><span class="p">,</span> <span class="s1">&#39;block&#39;</span><span class="p">);</span>
+
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">addChild</span><span class="p">(</span><span class="nv">$articleView</span><span class="p">,</span> <span class="s1">&#39;article&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">addChild</span><span class="p">(</span><span class="nv">$primarySidebarView</span><span class="p">,</span> <span class="s1">&#39;sidebar_primary&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">addChild</span><span class="p">(</span><span class="nv">$secondarySidebarView</span><span class="p">,</span> <span class="s1">&#39;sidebar_secondary&#39;</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$view</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above will create and return a view model specifying the template &#8220;content/article&#8221;. When the view is rendered,
+it will render three child views, the <tt class="docutils literal"><span class="pre">$articleView</span></tt>, <tt class="docutils literal"><span class="pre">$primarySidebarView</span></tt>, and <tt class="docutils literal"><span class="pre">$secondarySidebarView</span></tt>;
+these will be captured to the <tt class="docutils literal"><span class="pre">$view</span></tt>&#8216;s &#8220;article&#8221;, &#8220;sidebar_primary&#8221;, and &#8220;sidebar_secondary&#8221; variables,
+respectively, so that when it renders, you may include that content. Additionally, the <tt class="docutils literal"><span class="pre">$secondarySidebarView</span></tt>
+will include an additional view model, <tt class="docutils literal"><span class="pre">$sidebarBlockView</span></tt>, which will be captured to its &#8220;block&#8221; view variable.</p>
+<p>To better visualize this, let&#8217;s look at what the final content might look like, with comments detailing where each
+nested view model is injected.</p>
+<p>Here are the templates:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="c1">// &quot;article/view&quot; template ?&gt;</span>
+<span class="o">&lt;</span><span class="nx">div</span> <span class="nx">class</span><span class="o">=</span><span class="s2">&quot;sixteen columns content&quot;</span><span class="o">&gt;</span>
+    <span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">article</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">    </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">sidebar_primary</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">    </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">sidebar_secondary</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/div&gt;</span>
+
+<span class="cp">&lt;?php</span> <span class="c1">// &quot;content/article&quot; template ?&gt;</span>
+    <span class="o">&lt;!--</span> <span class="k">This</span> <span class="nx">is</span> <span class="nx">from</span> <span class="nx">the</span> <span class="nv">$articleView</span> <span class="nx">view</span> <span class="nx">model</span><span class="p">,</span> <span class="k">and</span> <span class="nx">the</span> <span class="s2">&quot;content/article&quot;</span>
+         <span class="nx">template</span> <span class="o">--&gt;</span>
+    <span class="o">&lt;</span><span class="nx">article</span> <span class="nx">class</span><span class="o">=</span><span class="s2">&quot;twelve columns&quot;</span><span class="o">&gt;</span>
+        <span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escapeHtml</span><span class="p">(</span><span class="s1">&#39;article&#39;</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    &lt;/article&gt;</span>
+
+<span class="cp">&lt;?php</span> <span class="c1">// &quot;content/main-sidebar template ?&gt;</span>
+    <span class="o">&lt;!--</span> <span class="k">This</span> <span class="nx">is</span> <span class="nx">from</span> <span class="nx">the</span> <span class="nv">$primarySidebarView</span> <span class="nx">view</span> <span class="nx">model</span><span class="p">,</span> <span class="k">and</span> <span class="nx">the</span>
+         <span class="s2">&quot;content/main-sidebar template --&gt;</span>
+<span class="s2">    &lt;div class=&quot;</span><span class="nx">two</span> <span class="nx">columns</span> <span class="nx">sidebar</span><span class="s2">&quot;&gt;</span>
+<span class="s2">        sidebar content...</span>
+<span class="s2">    &lt;/div&gt;</span>
+
+<span class="s2">&lt;?php // &quot;</span><span class="nx">content</span><span class="o">/</span><span class="nx">secondary</span><span class="o">-</span><span class="nx">sidebar</span> <span class="nx">template</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    &lt;!-- This is from the $secondarySidebarView view model, and the</span>
+<span class="x">         &quot;content/secondary-sidebar template --&gt;</span>
+<span class="x">    &lt;div class=&quot;two columns sidebar&quot;&gt;</span>
+<span class="x">        </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">block</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    &lt;/div&gt;</span>
+
+<span class="cp">&lt;?php</span> <span class="c1">// &quot;content/block template ?&gt;</span>
+        <span class="o">&lt;!--</span> <span class="k">This</span> <span class="nx">is</span> <span class="nx">from</span> <span class="nx">the</span> <span class="nv">$sidebarBlockView</span> <span class="nx">view</span> <span class="nx">model</span><span class="p">,</span> <span class="k">and</span> <span class="nx">the</span>
+            <span class="s2">&quot;content/block template --&gt;</span>
+<span class="s2">        &lt;div class=&quot;</span><span class="nx">block</span><span class="s2">&quot;&gt;</span>
+<span class="s2">            block content...</span>
+<span class="s2">        &lt;/div&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>And here is the aggregate, generated content:</p>
+<div class="highlight-html"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">&lt;!-- This is from the $view view model, and the &quot;article/view&quot; template --&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;sixteen columns content&quot;</span><span class="nt">&gt;</span>
+    <span class="c">&lt;!-- This is from the $articleView view model, and the &quot;content/article&quot;</span>
+<span class="c">         template --&gt;</span>
+    <span class="nt">&lt;article</span> <span class="na">class=</span><span class="s">&quot;twelve columns&quot;</span><span class="nt">&gt;</span>
+        Lorem ipsum ....
+    <span class="nt">&lt;/article&gt;</span>
+
+    <span class="c">&lt;!-- This is from the $primarySidebarView view model, and the</span>
+<span class="c">         &quot;content/main-sidebar template --&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;two columns sidebar&quot;</span><span class="nt">&gt;</span>
+        sidebar content...
+    <span class="nt">&lt;/div&gt;</span>
+
+    <span class="c">&lt;!-- This is from the $secondarySidebarView view model, and the</span>
+<span class="c">         &quot;content/secondary-sidebar template --&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;two columns sidebar&quot;</span><span class="nt">&gt;</span>
+        <span class="c">&lt;!-- This is from the $sidebarBlockView view model, and the</span>
+<span class="c">            &quot;content/block template --&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;block&quot;</span><span class="nt">&gt;</span>
+            block content...
+        <span class="nt">&lt;/div&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>As you can see, you can achieve very complex markup using nested views, while simultaneously keeping the details of
+rendering isolated from the request/reponse lifecycle of the controller.</p>
+<p class="rubric" id="zend-view-quick-start-usage-layouts">Dealing with Layouts</p>
+<p>Most sites enforce a cohesive look-and-feel, which we typically call the site &#8220;layout&#8221;. The site layout includes
+the default stylesheets and JavaScript necessary, if any, as well as the basic markup structure into which all site
+content will be injected.</p>
+<p>Within Zend Framework, layouts are handled via nesting of view models (see the <a class="reference internal" href="#zend-view-quick-start-usage-controllers"><em>previous example</em></a> for examples of view model nesting). The MVC event composes a View Model
+which acts as the &#8220;root&#8221; for nested view models, as such, it should contain the skeleton, or layout, template for
+the site (configuration refers to this as the &#8220;layoutTemplate&#8221;). All other content is then rendered and captured to
+view variables ov this root view model.</p>
+<p>The default rendering strategy sets the layout template as &#8220;layout&#8221;. To change this, you can add some configuration
+for the Dependency Injector.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;di&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;instance&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="c1">// The above lines will likely already be present; it&#39;s the following</span>
+        <span class="c1">// definitions that you will want to ensure are present within the DI</span>
+        <span class="c1">// instance configuration.</span>
+
+            <span class="c1">// By default, the MVC&#39;s default rendering strategy uses the</span>
+            <span class="c1">// template name &quot;layout&quot; for the site layout. Let&#39;s tell it to use</span>
+            <span class="c1">// &quot;site/layout&quot; (which we mapped via the TemplateMapResolver,</span>
+            <span class="c1">// above).</span>
+            <span class="s1">&#39;Zend\Mvc\View\DefaultRenderingStrategy&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;parameters&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;baseTemplate&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;site/layout&#39;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>A listener on the controllers, <tt class="docutils literal"><span class="pre">Zend\Mvc\View\InjectViewModelListener</span></tt>, will take a view model returned from a
+controller and inject it as a child of the root (layout) view model. By default, view models will capture to the
+&#8220;content&#8221; variable of the root view model. This means you can do the following in your layout view script.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;</span><span class="nx">html</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="nx">head</span><span class="o">&gt;</span>
+        <span class="o">&lt;</span><span class="nx">title</span><span class="o">&gt;&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headTitle</span><span class="p">()</span> <span class="cp">?&gt;</span><span class="x">&lt;/title&gt;</span>
+<span class="x">    &lt;/head&gt;</span>
+<span class="x">    &lt;body&gt;</span>
+<span class="x">        </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">content</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    &lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you want to specify a different view variable to which to capture, explicitly create a view model in your
+controller, and set it&#8217;s &#8220;capture to&#8221; value.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Foo\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Mvc\Controller\AbstractActionController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Model\ViewModel</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">BarController</span> <span class="k">extends</span> <span class="nx">AbstractActionController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">doSomethingAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$view</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;message&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Hello world&#39;</span><span class="p">,</span>
+        <span class="p">));</span>
+
+        <span class="c1">// Capture to the layout view&#39;s &quot;article&quot; variable</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">setCaptureTo</span><span class="p">(</span><span class="s1">&#39;article&#39;</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$view</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>There will be times you don&#8217;t want to render a layout. For example, you might be answering an API call which
+expects JSON or an XML payload, or you might be answering an XHR request that expects a partial HTML payload. The
+simplest way to do this is to explicitly create and return a view model from your controller, and mark it as
+&#8220;terminal&#8221;, which will hint to the MVC listener that normally injects the returned view model into the layout view
+model to instead replace the layout view model.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Foo\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Mvc\Controller\AbstractActionController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Model\ViewModel</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">BarController</span> <span class="k">extends</span> <span class="nx">AbstractActionController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">doSomethingAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$view</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;message&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Hello world&#39;</span><span class="p">,</span>
+        <span class="p">));</span>
+
+        <span class="c1">// Disable layouts; use this view model in the MVC event instead</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">setTerminal</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="nv">$view</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p><a class="reference internal" href="#zend-view-quick-start-usage-controllers"><em>When discussing controllers and view models</em></a>, we detailed a nested
+view model which contained an article and sidebars. Sometimes, you may want to provide additional view models to
+the layout, instead of nesting in the returned layout. This may be done by using the &#8220;layout&#8221; controller plugin,
+which returns the root view model; you can then call the same <tt class="docutils literal"><span class="pre">addChild()</span></tt> method on it as we did in that
+previous example.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Content\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Mvc\Controller\AbstractActionController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Model\ViewModel</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">ArticleController</span> <span class="k">extends</span> <span class="nx">AbstractActionController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">viewAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// get the article from the persistence layer, etc...</span>
+
+        <span class="c1">// Get the &quot;layout&quot; view model and inject a sidebar</span>
+        <span class="nv">$layout</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">layout</span><span class="p">();</span>
+        <span class="nv">$sidebarView</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">();</span>
+        <span class="nv">$sidebarView</span><span class="o">-&gt;</span><span class="na">setTemplate</span><span class="p">(</span><span class="s1">&#39;content/sidebar&#39;</span><span class="p">);</span>
+        <span class="nv">$layout</span><span class="o">-&gt;</span><span class="na">addChild</span><span class="p">(</span><span class="nv">$sidebarView</span><span class="p">,</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">);</span>
+
+        <span class="c1">// Create and return a view model for the retrieved article</span>
+        <span class="nv">$view</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;article&#39;</span> <span class="o">=&gt;</span> <span class="nv">$article</span><span class="p">));</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">setTemplate</span><span class="p">(</span><span class="s1">&#39;content/article&#39;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nv">$view</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>You could also use this technique to select a different layout, by simply calling the <tt class="docutils literal"><span class="pre">setTemplate()</span></tt> method of
+the layout view model.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Content\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Mvc\Controller\AbstractActionController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Model\ViewModel</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">ArticleController</span> <span class="k">extends</span> <span class="nx">AbstractActionController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">viewAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// get the article from the persistence layer, etc...</span>
+
+        <span class="c1">// Get the &quot;layout&quot; view model and set an alternate template</span>
+        <span class="nv">$layout</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">layout</span><span class="p">();</span>
+        <span class="nv">$layout</span><span class="o">-&gt;</span><span class="na">setTemplate</span><span class="p">(</span><span class="s1">&#39;article/layout&#39;</span><span class="p">);</span>
+
+        <span class="c1">// Create and return a view model for the retrieved article</span>
+        <span class="nv">$view</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;article&#39;</span> <span class="o">=&gt;</span> <span class="nv">$article</span><span class="p">));</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">setTemplate</span><span class="p">(</span><span class="s1">&#39;content/article&#39;</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nv">$view</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Sometimes, you may want to access the layout from within your actual view scripts when using the <tt class="docutils literal"><span class="pre">PhpRenderer</span></tt>.
+Reasons might include wanting to change the layout template, or wanting to access or inject layout view variables.
+Similar to controllers, you can use the &#8220;layout&#8221; view plugin/helper. If you provide a string argument to it, you
+will change the template; if you provide no arguments the root layout view model is returned.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Change the layout:</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">layout</span><span class="p">(</span><span class="s1">&#39;alternate/layout&#39;</span><span class="p">);</span> <span class="c1">// OR</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">layout</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setTemplate</span><span class="p">(</span><span class="s1">&#39;alternate/layout&#39;</span><span class="p">);</span>
+
+<span class="c1">// Access a layout variable.</span>
+<span class="c1">// Since access to the base view model is relatively easy, it becomes a</span>
+<span class="c1">// reasonable place to store things such as API keys, which other view scripts</span>
+<span class="c1">// may need.</span>
+<span class="nv">$layout</span>       <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">layout</span><span class="p">();</span>
+<span class="nv">$disqusApiKey</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$layout</span><span class="o">-&gt;</span><span class="na">disqusApiKey</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$disqusApiKey</span> <span class="o">=</span> <span class="nv">$layout</span><span class="o">-&gt;</span><span class="na">disqusApiKey</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Set a layout variable</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">layout</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">footer</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">&#39;article/footer&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Commonly, you may want to alter the layout based on the module currently selected.</p>
+<p>Another frequently requested feature is the ability to change a layout based on the current <strong>module</strong>. This
+requires (a) detecting if the controller matched in routing belongs to this module, and then (b) changing the
+template of the view model.</p>
+<p>The place to do these actions is in a listener. It should listen either to the &#8220;route&#8221; event at low (negative)
+priority, or on the &#8220;dispatch&#8221; event, at any priority. Typically, you will register this during the bootstrap
+event.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Content</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Module</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">onBootstrap</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Register a dispatch event</span>
+        <span class="nv">$app</span> <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;application&#39;</span><span class="p">);</span>
+        <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;dispatch&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;setLayout&#39;</span><span class="p">),</span> <span class="o">-</span><span class="mi">100</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setLayout</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$matches</span>    <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getRouteMatch</span><span class="p">();</span>
+        <span class="nv">$controller</span> <span class="o">=</span> <span class="nv">$matches</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;controller&#39;</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">!==</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$controller</span><span class="p">,</span> <span class="nx">__NAMESPACE__</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+            <span class="c1">// not a controller from this module</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Set the layout template</span>
+        <span class="nv">$viewModel</span> <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getViewModel</span><span class="p">();</span>
+        <span class="nv">$viewModel</span><span class="o">-&gt;</span><span class="na">setTemplate</span><span class="p">(</span><span class="s1">&#39;content/layout&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-quick-start-usage-strategies">Creating and Registering Alternate Rendering and Response Strategies</p>
+<p><tt class="docutils literal"><span class="pre">Zend\View\View</span></tt> does very little. Its workflow is essentially to martial a <tt class="docutils literal"><span class="pre">ViewEvent</span></tt>, and then trigger two
+events, &#8220;renderer&#8221; and &#8220;response&#8221;. You can attach &#8220;strategies&#8221; to these events, using the methods
+<tt class="docutils literal"><span class="pre">addRendererStrategy()</span></tt> and <tt class="docutils literal"><span class="pre">addResponseStrategy()</span></tt>, respectively. A &#8220;renderer strategy&#8221; investigates the
+Request object (or any other criteria) in order to select a renderer (or fail to select one). A &#8220;response strategy&#8221;
+determines how to populate the Response based on the result of rendering.</p>
+<p>Zend Framework ships with three rendering/response strategies that you can use within your application.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\View\Strategy\PhpRendererStrategy</span></tt>. This strategy is a &#8220;catch-all&#8221; in that it will always return the
+<tt class="docutils literal"><span class="pre">Zend\View\Renderer\PhpRenderer</span></tt>, and populate the Response body with the results of rendering.</li>
+<li><tt class="docutils literal"><span class="pre">Zend\View\Strategy\JsonStrategy</span></tt>. This strategy inspects the Accept HTTP header, if present, and determines if
+the client has indicated it accepts an &#8220;application/json&#8221; response. If so, it will return the
+<tt class="docutils literal"><span class="pre">Zend\View\Renderer\JsonRenderer</span></tt>, and populate the Response body with the JSON value returned, as well as set
+a Content-Type header with a value of &#8220;application/json&#8221;.</li>
+<li><tt class="docutils literal"><span class="pre">Zend\View\Strategy\FeedStrategy</span></tt>. This strategy inspects the Accept HTTP header, if present, and determines if
+the client has indicated it accepts either an &#8220;application/rss+xml&#8221; or &#8220;application/atom+xml&#8221; response. If so, it
+will return the <tt class="docutils literal"><span class="pre">Zend\View\Renderer\FeedRenderer</span></tt>, setting the feed type to either &#8220;rss&#8221; or &#8220;atom&#8221;, based on
+what was matched. Its Response strategy will populate the Response body with the generated feed, as well as set a
+Content-Type header with the appropriate value based on feed type.</li>
+</ul>
+<p>By default, only the <tt class="docutils literal"><span class="pre">PhpRendererStrategy</span></tt> is registered, meaning you will need to register the other strategies
+yourself if you want to use them. Additionally, it means that you will likely want to register these at higher
+priority to ensure they match before the <tt class="docutils literal"><span class="pre">PhpRendererStrategy</span></tt>. As an example, let&#8217;s register the
+<tt class="docutils literal"><span class="pre">JsonStrategy</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Application</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Module</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">onBootstrap</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Register a &quot;render&quot; event, at high priority (so it executes prior</span>
+        <span class="c1">// to the view attempting to render)</span>
+        <span class="nv">$app</span> <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;application&#39;</span><span class="p">);</span>
+        <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;render&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;registerJsonStrategy&#39;</span><span class="p">),</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerJsonStrategy</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$app</span>          <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getTarget</span><span class="p">();</span>
+        <span class="nv">$locator</span>      <span class="o">=</span> <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">getServiceManager</span><span class="p">();</span>
+        <span class="nv">$view</span>         <span class="o">=</span> <span class="nv">$locator</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;Zend\View\View&#39;</span><span class="p">);</span>
+        <span class="nv">$jsonStrategy</span> <span class="o">=</span> <span class="nv">$locator</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;Zend\View\Strategy\JsonStrategy&#39;</span><span class="p">);</span>
+
+        <span class="c1">// Attach strategy, which is a listener aggregate, at high priority</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="nv">$jsonStrategy</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above will register the <tt class="docutils literal"><span class="pre">JsonStrategy</span></tt> with the &#8220;render&#8221; event, such that it executes prior to the
+<tt class="docutils literal"><span class="pre">PhpRendererStrategy</span></tt>, and thus ensure that a JSON payload is created when requested.</p>
+<p>What if you want this to happen only in specific modules, or specific controllers? One way is similar to the last
+example in the <a class="reference internal" href="#zend-view-quick-start-usage-layouts"><em>previous section on layouts</em></a>, where we detailed changing
+the layout for a specific module.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Content</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Module</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">onBootstrap</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// Register a render event</span>
+        <span class="nv">$app</span> <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;application&#39;</span><span class="p">);</span>
+        <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;render&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;registerJsonStrategy&#39;</span><span class="p">),</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">registerJsonStrategy</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$matches</span>    <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getRouteMatch</span><span class="p">();</span>
+        <span class="nv">$controller</span> <span class="o">=</span> <span class="nv">$matches</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;controller&#39;</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">!==</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$controller</span><span class="p">,</span> <span class="nx">__NAMESPACE__</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="p">{</span>
+            <span class="c1">// not a controller from this module</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Potentially, you could be even more selective at this point, and test</span>
+        <span class="c1">// for specific controller classes, and even specific actions or request</span>
+        <span class="c1">// methods.</span>
+
+        <span class="c1">// Set the JSON strategy when controllers from this module are selected</span>
+        <span class="nv">$app</span>          <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getTarget</span><span class="p">();</span>
+        <span class="nv">$locator</span>      <span class="o">=</span> <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">getServiceManager</span><span class="p">();</span>
+        <span class="nv">$view</span>         <span class="o">=</span> <span class="nv">$locator</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;Zend\View\View&#39;</span><span class="p">);</span>
+        <span class="nv">$jsonStrategy</span> <span class="o">=</span> <span class="nv">$locator</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;Zend\View\Strategy\JsonStrategy&#39;</span><span class="p">);</span>
+
+        <span class="c1">// Attach strategy, which is a listener aggregate, at high priority</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="nv">$jsonStrategy</span><span class="p">,</span> <span class="mi">100</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>While the above examples detail using the JSON strategy, the same could be done for the <tt class="docutils literal"><span class="pre">FeedStrategy</span></tt>.</p>
+<p>What if you want to use a custom renderer? or if your app might allow a combination of JSON, Atom feeds, and HTML?
+At this point, you&#8217;ll need to create your own custom strategies. Below is an example that more appropriately loops
+through the HTTP Accept header, and selects the appropriate renderer based on what is matched first.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Content\View</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\EventManager\EventCollection</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\EventManager\ListenerAggregate</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Feed\Writer\Feed</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Renderer\FeedRenderer</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Renderer\JsonRenderer</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Renderer\PhpRenderer</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AcceptStrategy</span> <span class="k">implements</span> <span class="nx">ListenerAggregate</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$feedRenderer</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$jsonRenderer</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$listeners</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+    <span class="k">protected</span> <span class="nv">$phpRenderer</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span>
+        <span class="nx">PhpRenderer</span> <span class="nv">$phpRenderer</span><span class="p">,</span>
+        <span class="nx">JsonRenderer</span> <span class="nv">$jsonRenderer</span><span class="p">,</span>
+        <span class="nx">FeedRenderer</span> <span class="nv">$feedRenderer</span>
+    <span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">phpRenderer</span>  <span class="o">=</span> <span class="nv">$phpRenderer</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">jsonRenderer</span> <span class="o">=</span> <span class="nv">$jsonRenderer</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">feedRenderer</span> <span class="o">=</span> <span class="nv">$feedRenderer</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">attach</span><span class="p">(</span><span class="nx">EventCollection</span> <span class="nv">$events</span><span class="p">,</span> <span class="nv">$priority</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">null</span> <span class="o">===</span> <span class="nv">$priority</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">listeners</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;renderer&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;selectRenderer&#39;</span><span class="p">));</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">listeners</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;response&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;injectResponse&#39;</span><span class="p">));</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">listeners</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;renderer&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;selectRenderer&#39;</span><span class="p">),</span> <span class="nv">$priority</span><span class="p">);</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">listeners</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;response&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;injectResponse&#39;</span><span class="p">),</span> <span class="nv">$priority</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">detach</span><span class="p">(</span><span class="nx">EventCollection</span> <span class="nv">$events</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">listeners</span> <span class="k">as</span> <span class="nv">$index</span> <span class="o">=&gt;</span> <span class="nv">$listener</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$events</span><span class="o">-&gt;</span><span class="na">detach</span><span class="p">(</span><span class="nv">$listener</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nb">unset</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">listeners</span><span class="p">[</span><span class="nv">$index</span><span class="p">]);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">selectRenderer</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$request</span> <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+        <span class="nv">$headers</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getHeaders</span><span class="p">();</span>
+
+        <span class="c1">// No Accept header? return PhpRenderer</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$headers</span><span class="o">-&gt;</span><span class="na">has</span><span class="p">(</span><span class="s1">&#39;accept&#39;</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">phpRenderer</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nv">$accept</span> <span class="o">=</span> <span class="nv">$headers</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;accept&#39;</span><span class="p">);</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$accept</span><span class="o">-&gt;</span><span class="na">getPrioritized</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$mediaType</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">===</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$mediaType</span><span class="p">,</span> <span class="s1">&#39;application/json&#39;</span><span class="p">))</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">jsonRenderer</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">===</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$mediaType</span><span class="p">,</span> <span class="s1">&#39;application/rss+xml&#39;</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">feedRenderer</span><span class="o">-&gt;</span><span class="na">setFeedType</span><span class="p">(</span><span class="s1">&#39;rss&#39;</span><span class="p">);</span>
+                <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">feedRenderer</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">===</span> <span class="nb">strpos</span><span class="p">(</span><span class="nv">$mediaType</span><span class="p">,</span> <span class="s1">&#39;application/atom+xml&#39;</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">feedRenderer</span><span class="o">-&gt;</span><span class="na">setFeedType</span><span class="p">(</span><span class="s1">&#39;atom&#39;</span><span class="p">);</span>
+                <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">feedRenderer</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Nothing matched; return PhpRenderer. Technically, we should probably</span>
+        <span class="c1">// return an HTTP 415 Unsupported response.</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">phpRenderer</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">injectResponse</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$renderer</span> <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getRenderer</span><span class="p">();</span>
+        <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getResponse</span><span class="p">();</span>
+        <span class="nv">$result</span>   <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getResult</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$renderer</span> <span class="o">===</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">jsonRenderer</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// JSON Renderer; set content-type header</span>
+            <span class="nv">$headers</span> <span class="o">=</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getHeaders</span><span class="p">();</span>
+            <span class="nv">$headers</span><span class="o">-&gt;</span><span class="na">addHeaderLine</span><span class="p">(</span><span class="s1">&#39;content-type&#39;</span><span class="p">,</span> <span class="s1">&#39;application/json&#39;</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$renderer</span> <span class="o">===</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">feedRenderer</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Feed Renderer; set content-type header, and export the feed if</span>
+            <span class="c1">// necessary</span>
+            <span class="nv">$feedType</span>  <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">feedRenderer</span><span class="o">-&gt;</span><span class="na">getFeedType</span><span class="p">();</span>
+            <span class="nv">$headers</span>   <span class="o">=</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getHeaders</span><span class="p">();</span>
+            <span class="nv">$mediatype</span> <span class="o">=</span> <span class="s1">&#39;application/&#39;</span>
+                       <span class="o">.</span> <span class="p">((</span><span class="s1">&#39;rss&#39;</span> <span class="o">==</span> <span class="nv">$feedType</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39;rss&#39;</span> <span class="o">:</span> <span class="s1">&#39;atom&#39;</span><span class="p">)</span>
+                       <span class="o">.</span> <span class="s1">&#39;+xml&#39;</span><span class="p">;</span>
+            <span class="nv">$headers</span><span class="o">-&gt;</span><span class="na">addHeaderLine</span><span class="p">(</span><span class="s1">&#39;content-type&#39;</span><span class="p">,</span> <span class="nv">$mediatype</span><span class="p">);</span>
+
+            <span class="c1">// If the $result is a feed, export it</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$result</span> <span class="nx">instanceof</span> <span class="nx">Feed</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="na">export</span><span class="p">(</span><span class="nv">$feedType</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$renderer</span> <span class="o">!==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">phpRenderer</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Not a renderer we support, therefor not our strategy. Return</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Inject the content</span>
+        <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">setContent</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This strategy would be registered just as we demonstrated registering the <tt class="docutils literal"><span class="pre">JsonStrategy</span></tt> earlier. You would also
+need to define DI configuration to ensure the various renderers are injected when you retrieve the strategy from
+the application&#8217;s locator instance.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\View Quick Start</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.validator.messages.html"
+                        title="previous chapter">Validation Messages</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.view.renderer.php.renderer.html"
+                        title="next chapter">The PhpRenderer</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.view.quick.start.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.view.renderer.php.renderer.html" title="The PhpRenderer"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.validator.messages.html" title="Validation Messages"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

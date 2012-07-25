@@ -1,0 +1,416 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend Framework 1.10 &mdash; Zend Framework 2 2.0.0beta5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0beta5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0beta5 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-framework-1-10">
+<span id="migration-110"></span><h1>Zend Framework 1.10<a class="headerlink" href="#zend-framework-1-10" title="Permalink to this headline">¶</a></h1>
+<p>When upgrading from a previous release to Zend Framework 1.10 or higher you should note the following migration
+notes.</p>
+<div class="section" id="zend-controller-front">
+<span id="migration-110-zend-controller-front"></span><h2>Zend_Controller_Front<a class="headerlink" href="#zend-controller-front" title="Permalink to this headline">¶</a></h2>
+<p>A wrong behaviour was fixed, when there was no module route and no route matched the given request. Previously, the
+router returned an unmodified request object, so the front controller just displayed the default controller and
+action. Since Zend Framework 1.10, the router will correctly as noted in the router interface, throw an exception
+if no route matches. The error plugin will then catch that exception and forward to the error controller. You can
+then test for that specific error with the constant <tt class="docutils literal"><span class="pre">Zend_Controller_Plugin_ErrorHandler::EXCEPTION_NO_ROUTE</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">/**</span>
+<span class="sd"> * Before 1.10</span>
+<span class="sd"> */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">errorAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$errors</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_getParam</span><span class="p">(</span><span class="s1">&#39;error_handler&#39;</span><span class="p">);</span>
+
+        <span class="k">switch</span> <span class="p">(</span><span class="nv">$errors</span><span class="o">-&gt;</span><span class="na">type</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="nx">Zend_Controller_Plugin_ErrorHandler</span><span class="o">::</span><span class="na">EXCEPTION_NO_CONTROLLER</span><span class="o">:</span>
+            <span class="k">case</span> <span class="nx">Zend_Controller_Plugin_ErrorHandler</span><span class="o">::</span><span class="na">EXCEPTION_NO_ACTION</span><span class="o">:</span>
+    <span class="c1">// ...</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * With 1.10</span>
+<span class="sd"> */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">errorAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$errors</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_getParam</span><span class="p">(</span><span class="s1">&#39;error_handler&#39;</span><span class="p">);</span>
+
+        <span class="k">switch</span> <span class="p">(</span><span class="nv">$errors</span><span class="o">-&gt;</span><span class="na">type</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="nx">Zend_Controller_Plugin_ErrorHandler</span><span class="o">::</span><span class="na">EXCEPTION_NO_ROUTE</span><span class="o">:</span>
+            <span class="k">case</span> <span class="nx">Zend_Controller_Plugin_ErrorHandler</span><span class="o">::</span><span class="na">EXCEPTION_NO_CONTROLLER</span><span class="o">:</span>
+            <span class="k">case</span> <span class="nx">Zend_Controller_Plugin_ErrorHandler</span><span class="o">::</span><span class="na">EXCEPTION_NO_ACTION</span><span class="o">:</span>
+    <span class="c1">// ...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="zend-feed-reader">
+<span id="migration-110-zend-feed-reader"></span><h2>Zend_Feed_Reader<a class="headerlink" href="#zend-feed-reader" title="Permalink to this headline">¶</a></h2>
+<p>With the introduction of Zend Framework 1.10, <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt>&#8216;s handling of retrieving Authors and
+Contributors was changed, introducing a break in backwards compatibility. This change was an effort to harmonise
+the treatment of such data across the RSS and Atom classes of the component and enable the return of Author and
+Contributor data in more accessible, usable and detailed form. It also rectifies an error in that it was assumed
+any author element referred to a name. In RSS this is incorrect as an author element is actually only required to
+provide an email address. In addition, the original implementation applied its RSS limits to Atom feeds
+significantly reducing the usefulness of the parser with that format.</p>
+<p>The change means that methods like <tt class="docutils literal"><span class="pre">getAuthors()</span></tt> and <tt class="docutils literal"><span class="pre">getContributors</span></tt> no longer return a simple array of
+strings parsed from the relevant RSS and Atom elements. Instead, the return value is an <tt class="docutils literal"><span class="pre">ArrayObject</span></tt> subclass
+called <tt class="docutils literal"><span class="pre">Zend_Feed_Reader_Collection_Author</span></tt> which simulates an iterable multidimensional array of Authors. Each
+member of this object will be a simple array with three potential keys (as the source data permits). These include:
+name, email and uri.</p>
+<p>The original behaviour of such methods would have returned a simple array of strings, each string attempting to
+present a single name, but in reality this was unreliable since there is no rule governing the format of RSS Author
+strings.</p>
+<p>The simplest method of simulating the original behaviour of these methods is to use the
+<tt class="docutils literal"><span class="pre">Zend_Feed_Reader_Collection_Author</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">getValues()</span></tt> which also returns a simple array of strings representing
+the &#8220;most relevant data&#8221;, for authors presumed to be their name. Each value in the resulting array is derived from
+the &#8220;name&#8221; value attached to each Author (if present). In most cases this simple change is easy to apply as
+demonstrated below.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">/**</span>
+<span class="sd"> * Before 1.10</span>
+<span class="sd"> */</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://example.com/feed&#39;</span><span class="p">);</span>
+<span class="nv">$authors</span> <span class="o">=</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getAuthors</span><span class="p">();</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * With 1.10</span>
+<span class="sd"> */</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://example.com/feed&#39;</span><span class="p">);</span>
+<span class="nv">$authors</span> <span class="o">=</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getAuthors</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getValues</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="zend-file-transfer">
+<span id="migration-110-zend-file-transfer"></span><h2>Zend_File_Transfer<a class="headerlink" href="#zend-file-transfer" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="security-change">
+<span id="migration-110-zend-file-transfer-files"></span><h3>Security change<a class="headerlink" href="#security-change" title="Permalink to this headline">¶</a></h3>
+<p>For security reasons <tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> does no longer store the original mimetype and filesize which is given
+from the requesting client into its internal storage. Instead the real values will be detected at initiation.</p>
+<p>Additionally the original values within <tt class="docutils literal"><span class="pre">$_FILES</span></tt> will be overridden within the real values at initiation. This
+makes also <tt class="docutils literal"><span class="pre">$_FILES</span></tt> secure.</p>
+<p>When you are in need of the original values you can either store them before initiating <tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> or
+use the <tt class="docutils literal"><span class="pre">disableInfos</span></tt> option at initiation. Note that this option is useless when its given after initiation.</p>
+</div>
+<div class="section" id="count-validation">
+<span id="migration-110-zend-file-transfer-count"></span><h3>Count validation<a class="headerlink" href="#count-validation" title="Permalink to this headline">¶</a></h3>
+<p>Before release 1.10 the <tt class="docutils literal"><span class="pre">MimeType</span></tt> validator used a wrong naming. For consistency the following constants have
+been changed:</p>
+<table border="1" class="docutils" id="migration-110-zend-file-transfer-count-table">
+<caption>Changed Validation Messages</caption>
+<colgroup>
+<col width="10%" />
+<col width="10%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Old</th>
+<th class="head">New</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>TOO_MUCH</td>
+<td>TOO_MANY</td>
+<td>Too many files, maximum &#8216;%max%&#8217; are allowed but &#8216;%count%&#8217; are given</td>
+</tr>
+<tr class="row-odd"><td>TOO_LESS</td>
+<td>TOO_FEW</td>
+<td>Too few files, minimum &#8216;%min%&#8217; are expected but &#8216;%count%&#8217; are given</td>
+</tr>
+</tbody>
+</table>
+<p>When you are translating these messages within your code then use the new constants. As benefit you don&#8217;t need to
+translate the original string anymore to get a correct spelling.</p>
+</div>
+</div>
+<div class="section" id="zend-filter-htmlentities">
+<span id="migration-110-zend-filter-html-entities"></span><h2>Zend_Filter_HtmlEntities<a class="headerlink" href="#zend-filter-htmlentities" title="Permalink to this headline">¶</a></h2>
+<p>In order to default to a more secure character encoding, <tt class="docutils literal"><span class="pre">Zend_Filter_HtmlEntities</span></tt> now defaults to <em>UTF-8</em>
+instead of <em>ISO-8859-1</em>.</p>
+<p>Additionally, because the actual mechanism is dealing with character encodings and not character sets, two new
+methods have been added, <tt class="docutils literal"><span class="pre">setEncoding()</span></tt> and <tt class="docutils literal"><span class="pre">getEncoding()</span></tt>. The previous methods <tt class="docutils literal"><span class="pre">setCharSet()</span></tt> and
+<tt class="docutils literal"><span class="pre">setCharSet()</span></tt> are now deprecated and proxy to the new methods. Finally, instead of using the protected members
+directly within the <tt class="docutils literal"><span class="pre">filter()</span></tt> method, these members are retrieved by their explicit accessors. If you were
+extending the filter in the past, please check your code and unit tests to ensure everything still continues to
+work.</p>
+</div>
+<div class="section" id="zend-filter-striptags">
+<span id="migration-110-zend-filter-strip-tags"></span><h2>Zend_Filter_StripTags<a class="headerlink" href="#zend-filter-striptags" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Filter_StripTags</span></tt> contains a flag, <tt class="docutils literal"><span class="pre">commentsAllowed</span></tt>, that, in previous versions, allowed you to
+optionally whitelist <em>HTML</em> comments in <em>HTML</em> text filtered by the class. However, this opens code enabling the
+flag to <em>XSS</em> attacks, particularly in Internet Explorer (which allows specifying conditional functionality via
+<em>HTML</em> comments). Starting in version 1.9.7 (and backported to versions 1.8.5 and 1.7.9), the <tt class="docutils literal"><span class="pre">commentsAllowed</span></tt>
+flag no longer has any meaning, and all <em>HTML</em> comments, including those containing other <em>HTML</em> tags or nested
+commments, will be stripped from the final output of the filter.</p>
+</div>
+<div class="section" id="zend-translator">
+<span id="migration-110-zend-translator"></span><h2>Zend_Translator<a class="headerlink" href="#zend-translator" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="xliff-adapter">
+<span id="migration-110-zend-translator-xliff"></span><h3>Xliff adapter<a class="headerlink" href="#xliff-adapter" title="Permalink to this headline">¶</a></h3>
+<p>In past the Xliff adapter used the source string as message Id. According to the Xliff standard the trans-unit Id
+should be used. This behaviour was corrected with Zend Framework 1.10. Now the trans-unit Id is used as message Id
+per default.</p>
+<p>But you can still get the incorrect and old behaviour by setting the <tt class="docutils literal"><span class="pre">useId</span></tt> option to <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$trans</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Translator</span><span class="p">(</span>
+    <span class="s1">&#39;xliff&#39;</span><span class="p">,</span> <span class="s1">&#39;/path/to/source&#39;</span><span class="p">,</span> <span class="nv">$locale</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;useId&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="zend-validate">
+<span id="migration-110-zend-validate"></span><h2>Zend_Validate<a class="headerlink" href="#zend-validate" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="self-written-validators">
+<span id="migration-110-zend-validate-selfwritten"></span><h3>Self written validators<a class="headerlink" href="#self-written-validators" title="Permalink to this headline">¶</a></h3>
+<p>When setting returning a error from within a self written validator you have to call the <tt class="docutils literal"><span class="pre">_error()</span></tt> method.
+Before Zend Framework 1.10 you were able to call this method without giving a parameter. It used then the first
+found message template.</p>
+<p>This behaviour is problematic when you have validators with more than one different message to be returned. Also
+when you extend an existing validator you can get unexpected results. This could lead to the problem that your user
+get not the message you expected.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">My_Validator</span> <span class="k">extends</span> <span class="nx">Zend_Validate_Abstract</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nx">isValid</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="o">...</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_error</span><span class="p">();</span> <span class="c1">// unexpected results between different OS</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>To prevent this problem the <tt class="docutils literal"><span class="pre">_error()</span></tt> method is no longer allowed to be called without giving a parameter.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">My_Validator</span> <span class="k">extends</span> <span class="nx">Zend_Validate_Abstract</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nx">isValid</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="o">...</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_error</span><span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="na">MY_ERROR</span><span class="p">);</span> <span class="c1">// defined error, no unexpected results</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="simplification-in-date-validator">
+<span id="migration-110-zend-validate-datevalidator"></span><h3>Simplification in date validator<a class="headerlink" href="#simplification-in-date-validator" title="Permalink to this headline">¶</a></h3>
+<p>Before Zend Framework 1.10 2 identical messages were thrown within the date validator. These were
+<tt class="docutils literal"><span class="pre">NOT_YYYY_MM_DD</span></tt> and <tt class="docutils literal"><span class="pre">FALSEFORMAT</span></tt>. As of Zend Framework 1.10 only the <tt class="docutils literal"><span class="pre">FALSEFORMAT</span></tt> message will be returned
+when the given date does not match the set format.</p>
+</div>
+<div class="section" id="fixes-in-alpha-alnum-and-barcode-validator">
+<span id="migration-110-zend-validate-barcodevalidator"></span><h3>Fixes in Alpha, Alnum and Barcode validator<a class="headerlink" href="#fixes-in-alpha-alnum-and-barcode-validator" title="Permalink to this headline">¶</a></h3>
+<p>Before Zend Framework 1.10 the messages within the 2 barcode adapters, the Alpha and the Alnum validator were
+identical. This introduced problems when using custom messages, translations or multiple instances of these
+validators.</p>
+<p>As with Zend Framework 1.10 the values of the constants were changed to be unique. When you used the constants as
+proposed in the manual there is no change for you. But when you used the content of the constants in your code then
+you will have to change them. The following table shows you the changed values:</p>
+<table border="1" class="docutils" id="migration-110-zend-validate-barcodevalidator-table">
+<caption>Available Validation Messages</caption>
+<colgroup>
+<col width="29%" />
+<col width="31%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Validator</th>
+<th class="head">Constant</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Alnum</td>
+<td>STRING_EMPTY</td>
+<td>alnumStringEmpty</td>
+</tr>
+<tr class="row-odd"><td>Alpha</td>
+<td>STRING_EMPTY</td>
+<td>alphaStringEmpty</td>
+</tr>
+<tr class="row-even"><td>Barcode_Ean13</td>
+<td>INVALID</td>
+<td>ean13Invalid</td>
+</tr>
+<tr class="row-odd"><td>Barcode_Ean13</td>
+<td>INVALID_LENGTH</td>
+<td>ean13InvalidLength</td>
+</tr>
+<tr class="row-even"><td>Barcode_UpcA</td>
+<td>INVALID</td>
+<td>upcaInvalid</td>
+</tr>
+<tr class="row-odd"><td>Barcode_UpcA</td>
+<td>INVALID_LENGTH</td>
+<td>upcaInvalidLength</td>
+</tr>
+<tr class="row-even"><td>Digits</td>
+<td>STRING_EMPTY</td>
+<td>digitsStringEmpty</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend Framework 1.10</a><ul>
+<li><a class="reference internal" href="#zend-controller-front">Zend_Controller_Front</a></li>
+<li><a class="reference internal" href="#zend-feed-reader">Zend_Feed_Reader</a></li>
+<li><a class="reference internal" href="#zend-file-transfer">Zend_File_Transfer</a><ul>
+<li><a class="reference internal" href="#security-change">Security change</a></li>
+<li><a class="reference internal" href="#count-validation">Count validation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zend-filter-htmlentities">Zend_Filter_HtmlEntities</a></li>
+<li><a class="reference internal" href="#zend-filter-striptags">Zend_Filter_StripTags</a></li>
+<li><a class="reference internal" href="#zend-translator">Zend_Translator</a><ul>
+<li><a class="reference internal" href="#xliff-adapter">Xliff adapter</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zend-validate">Zend_Validate</a><ul>
+<li><a class="reference internal" href="#self-written-validators">Self written validators</a></li>
+<li><a class="reference internal" href="#simplification-in-date-validator">Simplification in date validator</a></li>
+<li><a class="reference internal" href="#fixes-in-alpha-alnum-and-barcode-validator">Fixes in Alpha, Alnum and Barcode validator</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/ref/migration.110.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

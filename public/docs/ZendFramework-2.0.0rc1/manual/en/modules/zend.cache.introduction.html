@@ -1,0 +1,270 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Zend Framework 2 2.0.0beta5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0beta5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0beta5 documentation" href="../index.html" />
+    <link rel="next" title="Zend_Cache Frontends" href="zend.cache.frontends.html" />
+    <link rel="prev" title="The Theory of Caching" href="zend.cache.theory.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.cache.frontends.html" title="Zend_Cache Frontends"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.cache.theory.html" title="The Theory of Caching"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<span id="zend-cache-introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend_Cache</span></tt> provides a generic way to cache any data.</p>
+<p>Caching in Zend Framework is operated by frontends while cache records are stored through backend adapters
+(<strong>File</strong>, <strong>Sqlite</strong>, <strong>Memcache</strong>...) through a flexible system of IDs and tags. Using those, it is easy to
+delete specific types of records afterwards (for example: &#8220;delete all cache records marked with a given tag&#8221;).</p>
+<p>The core of the module (<tt class="docutils literal"><span class="pre">Zend_Cache_Core</span></tt>) is generic, flexible and configurable. Yet, for your specific needs
+there are cache frontends that extend <tt class="docutils literal"><span class="pre">Zend_Cache_Core</span></tt> for convenience: <strong>Output</strong>, <strong>File</strong>, <strong>Function</strong> and
+<strong>Class</strong>.</p>
+<p class="rubric" id="zend-cache-introduction-example-1">Getting a Frontend with Zend_Cache::factory()</p>
+<p><tt class="docutils literal"><span class="pre">Zend_Cache::factory()</span></tt> instantiates correct objects and ties them together. In this first example, we will use
+<strong>Core</strong> frontend together with <strong>File</strong> backend.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$frontendOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;lifetime&#39;</span> <span class="o">=&gt;</span> <span class="mi">7200</span><span class="p">,</span> <span class="c1">// cache lifetime of 2 hours</span>
+   <span class="s1">&#39;automatic_serialization&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+<span class="p">);</span>
+
+<span class="nv">$backendOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;cache_dir&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;./tmp/&#39;</span> <span class="c1">// Directory where to put the cache files</span>
+<span class="p">);</span>
+
+<span class="c1">// getting a Zend_Cache_Core object</span>
+<span class="nv">$cache</span> <span class="o">=</span> <span class="nx">Zend_Cache</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;Core&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;File&#39;</span><span class="p">,</span>
+                             <span class="nv">$frontendOptions</span><span class="p">,</span>
+                             <span class="nv">$backendOptions</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Frontends and Backends Consisting of Multiple Words</strong></p>
+<p class="last">Some frontends and backends are named using multiple words, such as &#8216;ZendPlatform&#8217;. When specifying them to the
+factory, separate them using a word separator, such as a space (&#8216; &#8216;), hyphen (&#8216;-&#8216;), or period (&#8216;.&#8217;).</p>
+</div>
+<p class="rubric" id="zend-cache-introduction-example-2">Caching a Database Query Result</p>
+<p>Now that we have a frontend, we can cache any type of data (we turned on serialization). for example, we can cache
+a result from a very expensive database query. After it is cached, there is no need to even connect to the
+database; records are fetched from cache and unserialized.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// $cache initialized in previous example</span>
+
+<span class="c1">// see if a cache already exists:</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nv">$result</span> <span class="o">=</span> <span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="s1">&#39;myresult&#39;</span><span class="p">))</span> <span class="p">{</span>
+
+    <span class="c1">// cache miss; connect to the database</span>
+
+    <span class="nv">$db</span> <span class="o">=</span> <span class="nx">Zend_Db</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="p">);</span>
+
+    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$db</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">(</span><span class="s1">&#39;SELECT * FROM huge_table&#39;</span><span class="p">);</span>
+
+    <span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">(</span><span class="nv">$result</span><span class="p">,</span> <span class="s1">&#39;myresult&#39;</span><span class="p">);</span>
+
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+
+    <span class="c1">// cache hit! shout so that we know</span>
+    <span class="k">echo</span> <span class="s2">&quot;This one is from cache!</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+
+<span class="p">}</span>
+
+<span class="nb">print_r</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-cache-introduction-example-3">Caching Output with Zend_Cache Output Frontend</p>
+<p>We &#8216;mark up&#8217; sections in which we want to cache output by adding some conditional logic, encapsulating the section
+within <tt class="docutils literal"><span class="pre">start()</span></tt> and <tt class="docutils literal"><span class="pre">end()</span></tt> methods (this resembles the first example and is the core strategy for caching).</p>
+<p>Inside, output your data as usual - all output will be cached when execution hits the <tt class="docutils literal"><span class="pre">end()</span></tt> method. On the next
+run, the whole section will be skipped in favor of fetching data from cache (as long as the cache record is valid).</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$frontendOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;lifetime&#39;</span> <span class="o">=&gt;</span> <span class="mi">30</span><span class="p">,</span>                   <span class="c1">// cache lifetime of 30 seconds</span>
+   <span class="s1">&#39;automatic_serialization&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span>  <span class="c1">// this is the default anyways</span>
+<span class="p">);</span>
+
+<span class="nv">$backendOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;cache_dir&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;./tmp/&#39;</span><span class="p">);</span>
+
+<span class="nv">$cache</span> <span class="o">=</span> <span class="nx">Zend_Cache</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;Output&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;File&#39;</span><span class="p">,</span>
+                             <span class="nv">$frontendOptions</span><span class="p">,</span>
+                             <span class="nv">$backendOptions</span><span class="p">);</span>
+
+<span class="c1">// we pass a unique identifier to the start() method</span>
+<span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">start</span><span class="p">(</span><span class="s1">&#39;mypage&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="c1">// output as usual:</span>
+
+    <span class="k">echo</span> <span class="s1">&#39;Hello world! &#39;</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="s1">&#39;This is cached (&#39;</span><span class="o">.</span><span class="nb">time</span><span class="p">()</span><span class="o">.</span><span class="s1">&#39;) &#39;</span><span class="p">;</span>
+
+    <span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">end</span><span class="p">();</span> <span class="c1">// the output is saved and sent to the browser</span>
+<span class="p">}</span>
+
+<span class="k">echo</span> <span class="s1">&#39;This is never cached (&#39;</span><span class="o">.</span><span class="nb">time</span><span class="p">()</span><span class="o">.</span><span class="s1">&#39;).&#39;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Notice that we output the result of <tt class="docutils literal"><span class="pre">time()</span></tt> twice; this is something dynamic for demonstration purposes. Try
+running this and then refreshing several times; you will notice that the first number doesn&#8217;t change while second
+changes as time passes. That is because the first number was output in the cached section and is saved among other
+output. After half a minute (we&#8217;ve set lifetime to 30 seconds) the numbers should match again because the cache
+record expired &#8211; only to be cached again. You should try this in your browser or console.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When using <tt class="docutils literal"><span class="pre">Zend_Cache</span></tt>, pay attention to the important cache identifier (passed to <tt class="docutils literal"><span class="pre">save()</span></tt> and
+<tt class="docutils literal"><span class="pre">start()</span></tt>). It must be unique for every resource you cache, otherwise unrelated cache records may wipe each
+other or, even worse, be displayed in place of the other.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.cache.theory.html"
+                        title="previous chapter">The Theory of Caching</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.cache.frontends.html"
+                        title="next chapter">Zend_Cache Frontends</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.cache.introduction.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.cache.frontends.html" title="Zend_Cache Frontends"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.cache.theory.html" title="The Theory of Caching"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

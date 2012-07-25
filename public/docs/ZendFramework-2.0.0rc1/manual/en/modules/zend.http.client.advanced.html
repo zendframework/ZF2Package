@@ -1,0 +1,540 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend_Http_Client - Advanced Usage &mdash; Zend Framework 2 2.0.0beta5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0beta5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0beta5 documentation" href="../index.html" />
+    <link rel="next" title="Translating" href="zend.i18n.translating.html" />
+    <link rel="prev" title="Zend_Http_Client - Connection Adapters" href="zend.http.client.adapters.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.i18n.translating.html" title="Translating"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.http.client.adapters.html" title="Zend_Http_Client - Connection Adapters"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-http-client-advanced-usage">
+<span id="zend-http-client-advanced"></span><h1>Zend_Http_Client - Advanced Usage<a class="headerlink" href="#zend-http-client-advanced-usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="http-redirections">
+<span id="zend-http-client-redirections"></span><h2>HTTP Redirections<a class="headerlink" href="#http-redirections" title="Permalink to this headline">¶</a></h2>
+<p>By default, <tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> automatically handles <em>HTTP</em> redirections, and will follow up to 5 redirections.
+This can be changed by setting the &#8216;maxredirects&#8217; configuration parameter.</p>
+<p>According to the <em>HTTP</em>/1.1 RFC, <em>HTTP</em> 301 and 302 responses should be treated by the client by resending the same
+request to the specified location - using the same request method. However, most clients to not implement this and
+always use a <tt class="docutils literal"><span class="pre">GET</span></tt> request when redirecting. By default, <tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> does the same - when redirecting on
+a 301 or 302 response, all <tt class="docutils literal"><span class="pre">GET</span></tt> and POST parameters are reset, and a <tt class="docutils literal"><span class="pre">GET</span></tt> request is sent to the new
+location. This behavior can be changed by setting the &#8216;strictredirects&#8217; configuration parameter to boolean
+<tt class="docutils literal"><span class="pre">TRUE</span></tt>:</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-client-redirections-example-1">Forcing RFC 2616 Strict Redirections on 301 and 302 Responses</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Strict Redirections</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setConfig</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;strictredirects&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">));</span>
+
+<span class="c1">// Non-strict Redirections</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setConfig</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;strictredirects&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+<p>You can always get the number of redirections done after sending a request using the getRedirectionsCount() method.</p>
+</div>
+<div class="section" id="adding-cookies-and-using-cookie-persistence">
+<span id="zend-http-client-cookies"></span><h2>Adding Cookies and Using Cookie Persistence<a class="headerlink" href="#adding-cookies-and-using-cookie-persistence" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> provides an easy interface for adding cookies to your request, so that no direct header
+modification is required. This is done using the setCookie() method. This method can be used in several ways:</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-client-cookies-example-1">Setting Cookies Using setCookie()</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Easy and simple: by providing a cookie name and cookie value</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setCookie</span><span class="p">(</span><span class="s1">&#39;flavor&#39;</span><span class="p">,</span> <span class="s1">&#39;chocolate chips&#39;</span><span class="p">);</span>
+
+<span class="c1">// By directly providing a raw cookie string (name=value)</span>
+<span class="c1">// Note that the value must be already URL encoded</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setCookie</span><span class="p">(</span><span class="s1">&#39;flavor=chocolate%20chips&#39;</span><span class="p">);</span>
+
+<span class="c1">// By providing a Zend_Http_Cookie object</span>
+<span class="nv">$cookie</span> <span class="o">=</span> <span class="nx">Zend_Http_Cookie</span><span class="o">::</span><span class="na">fromString</span><span class="p">(</span><span class="s1">&#39;flavor=chocolate%20chips&#39;</span><span class="p">);</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setCookie</span><span class="p">(</span><span class="nv">$cookie</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+<p>For more information about <tt class="docutils literal"><span class="pre">Zend_Http_Cookie</span></tt> objects, see <a class="reference internal" href="zend.http.cookie.handling.html#zend-http-cookies"><em>this section</em></a>.</p>
+<p><tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> also provides the means for cookie stickiness - that is having the client internally store all
+sent and received cookies, and resend them automatically on subsequent requests. This is useful, for example when
+you need to log in to a remote site first and receive and authentication or session ID cookie before sending
+further requests.</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-client-cookies-example-2">Enabling Cookie Stickiness</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// To turn cookie stickiness on, set a Cookie Jar</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setCookieJar</span><span class="p">();</span>
+
+<span class="c1">// First request: log in and start a session</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://example.com/login.php&#39;</span><span class="p">);</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setParameterPost</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;h4x0r&#39;</span><span class="p">);</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setParameterPost</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;1337&#39;</span><span class="p">);</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">);</span>
+
+<span class="c1">// The Cookie Jar automatically stores the cookies set</span>
+<span class="c1">// in the response, like a session ID cookie.</span>
+
+<span class="c1">// Now we can send our next request - the stored cookies</span>
+<span class="c1">// will be automatically sent.</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://example.com/read_member_news.php&#39;</span><span class="p">);</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+<p>For more information about the <tt class="docutils literal"><span class="pre">Zend_Http_CookieJar</span></tt> class, see <a class="reference internal" href="zend.http.cookie.handling.html#zend-http-cookies-cookiejar"><em>this section</em></a>.</p>
+</div>
+<div class="section" id="setting-custom-request-headers">
+<span id="zend-http-client-custom-headers"></span><h2>Setting Custom Request Headers<a class="headerlink" href="#setting-custom-request-headers" title="Permalink to this headline">¶</a></h2>
+<p>Setting custom headers can be done by using the setHeaders() method. This method is quite diverse and can be used
+in several ways, as the following example shows:</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-client-custom-headers-example-1">Setting A Single Custom Request Header</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Setting a single header, overwriting any previous value</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setHeaders</span><span class="p">(</span><span class="s1">&#39;Host&#39;</span><span class="p">,</span> <span class="s1">&#39;www.example.com&#39;</span><span class="p">);</span>
+
+<span class="c1">// Another way of doing the exact same thing</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setHeaders</span><span class="p">(</span><span class="s1">&#39;Host: www.example.com&#39;</span><span class="p">);</span>
+
+<span class="c1">// Setting several values for the same header</span>
+<span class="c1">// (useful mostly for Cookie headers):</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setHeaders</span><span class="p">(</span><span class="s1">&#39;Cookie&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;PHPSESSID=1234567890abcdef1234567890abcdef&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;language=he&#39;</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+<p>setHeader() can also be easily used to set multiple headers in one call, by providing an array of headers as a
+single parameter:</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-client-custom-headers-example-2">Setting Multiple Custom Request Headers</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Setting multiple headers, overwriting any previous value</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setHeaders</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;Host&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;www.example.com&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Accept-encoding&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;gzip,deflate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;X-Powered-By&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend Framework&#39;</span><span class="p">));</span>
+
+<span class="c1">// The array can also contain full array strings:</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setHeaders</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;Host: www.example.com&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Accept-encoding: gzip,deflate&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;X-Powered-By: Zend Framework&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+</div>
+<div class="section" id="file-uploads">
+<span id="zend-http-client-file-uploads"></span><h2>File Uploads<a class="headerlink" href="#file-uploads" title="Permalink to this headline">¶</a></h2>
+<p>You can upload files through <em>HTTP</em> using the setFileUpload method. This method takes a file name as the first
+parameter, a form name as the second parameter, and data as a third optional parameter. If the third data parameter
+is <tt class="docutils literal"><span class="pre">NULL</span></tt>, the first file name parameter is considered to be a real file on disk, and <tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> will
+try to read this file and upload it. If the data parameter is not <tt class="docutils literal"><span class="pre">NULL</span></tt>, the first file name parameter will be
+sent as the file name, but no actual file needs to exist on the disk. The second form name parameter is always
+required, and is equivalent to the &#8220;name&#8221; attribute of an &gt;input&lt; tag, if the file was to be uploaded through an
+<em>HTML</em> form. A fourth optional parameter provides the file&#8217;s content-type. If not specified, and
+<tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> reads the file from the disk, the mime_content_type function will be used to guess the file&#8217;s
+content type, if it is available. In any case, the default MIME type will be application/octet-stream.</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-client-file-uploads-example-1">Using setFileUpload to Upload Files</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Uploading arbitrary data as a file</span>
+<span class="nv">$text</span> <span class="o">=</span> <span class="s1">&#39;this is some plain text&#39;</span><span class="p">;</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setFileUpload</span><span class="p">(</span><span class="s1">&#39;some_text.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;upload&#39;</span><span class="p">,</span> <span class="nv">$text</span><span class="p">,</span> <span class="s1">&#39;text/plain&#39;</span><span class="p">);</span>
+
+<span class="c1">// Uploading an existing file</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setFileUpload</span><span class="p">(</span><span class="s1">&#39;/tmp/Backup.tar.gz&#39;</span><span class="p">,</span> <span class="s1">&#39;bufile&#39;</span><span class="p">);</span>
+
+<span class="c1">// Send the files</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+<p>In the first example, the $text variable is uploaded and will be available as $_FILES[&#8216;upload&#8217;] on the server side.
+In the second example, the existing file /tmp/Backup.tar.gz is uploaded to the server and will be available as
+$_FILES[&#8216;bufile&#8217;]. The content type will be guesses automatically if possible - and if not, the content type will
+be set to &#8216;application/octet-stream&#8217;.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Uploading files</strong></p>
+<p class="last">When uploading files, the <em>HTTP</em> request content-type is automatically set to multipart/form-data. Keep in mind
+that you must send a POST or PUT request in order to upload files. Most servers will ignore the requests body on
+other request methods.</p>
+</div>
+</div>
+<div class="section" id="sending-raw-post-data">
+<span id="zend-http-client-raw-post-data"></span><h2>Sending Raw POST Data<a class="headerlink" href="#sending-raw-post-data" title="Permalink to this headline">¶</a></h2>
+<p>You can use a <tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> to send raw POST data using the setRawData() method. This method takes two
+parameters: the first is the data to send in the request body. The second optional parameter is the content-type of
+the data. While this parameter is optional, you should usually set it before sending the request - either using
+setRawData(), or with another method: setEncType().</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-client-raw-post-data-example-1">Sending Raw POST Data</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$xml</span> <span class="o">=</span> <span class="s1">&#39;&lt;book&gt;&#39;</span> <span class="o">.</span>
+       <span class="s1">&#39;  &lt;title&gt;Islands in the Stream&lt;/title&gt;&#39;</span> <span class="o">.</span>
+       <span class="s1">&#39;  &lt;author&gt;Ernest Hemingway&lt;/author&gt;&#39;</span> <span class="o">.</span>
+       <span class="s1">&#39;  &lt;year&gt;1970&lt;/year&gt;&#39;</span> <span class="o">.</span>
+       <span class="s1">&#39;&lt;/book&gt;&#39;</span><span class="p">;</span>
+
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setRawData</span><span class="p">(</span><span class="nv">$xml</span><span class="p">,</span> <span class="s1">&#39;text/xml&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">);</span>
+
+<span class="c1">// Another way to do the same thing:</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setRawData</span><span class="p">(</span><span class="nv">$xml</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setEncType</span><span class="p">(</span><span class="s1">&#39;text/xml&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+<p>The data should be available on the server side through <em>PHP</em>&#8216;s $HTTP_RAW_POST_DATA variable or through the
+php://input stream.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Using raw POST data</strong></p>
+<p class="last">Setting raw POST data for a request will override any POST parameters or file uploads. You should not try to use
+both on the same request. Keep in mind that most servers will ignore the request body unless you send a POST
+request.</p>
+</div>
+</div>
+<div class="section" id="http-authentication">
+<span id="zend-http-client-http-authentication"></span><h2>HTTP Authentication<a class="headerlink" href="#http-authentication" title="Permalink to this headline">¶</a></h2>
+<p>Currently, <tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> only supports basic <em>HTTP</em> authentication. This feature is utilized using the
+<tt class="docutils literal"><span class="pre">setAuth()</span></tt> method, or by specifying a username and a password in the URI. The <tt class="docutils literal"><span class="pre">setAuth()</span></tt> method takes 3
+parameters: The user name, the password and an optional authentication type parameter. As mentioned, currently only
+basic authentication is supported (digest authentication support is planned).</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-client-http-authentication-example-1">Setting HTTP Authentication User and Password</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Using basic authentication</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setAuth</span><span class="p">(</span><span class="s1">&#39;shahar&#39;</span><span class="p">,</span> <span class="s1">&#39;myPassword!&#39;</span><span class="p">,</span> <span class="nx">Zend_Http_Client</span><span class="o">::</span><span class="na">AUTH_BASIC</span><span class="p">);</span>
+
+<span class="c1">// Since basic auth is default, you can just do this:</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setAuth</span><span class="p">(</span><span class="s1">&#39;shahar&#39;</span><span class="p">,</span> <span class="s1">&#39;myPassword!&#39;</span><span class="p">);</span>
+
+<span class="c1">// You can also specify username and password in the URI</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://christer:secret@example.com&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+</div>
+<div class="section" id="sending-multiple-requests-with-the-same-client">
+<span id="zend-http-client-multiple-requests"></span><h2>Sending Multiple Requests With the Same Client<a class="headerlink" href="#sending-multiple-requests-with-the-same-client" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> was also designed specifically to handle several consecutive requests with the same object.
+This is useful in cases where a script requires data to be fetched from several places, or when accessing a
+specific <em>HTTP</em> resource requires logging in and obtaining a session cookie, for example.</p>
+<p>When performing several requests to the same host, it is highly recommended to enable the &#8216;keepalive&#8217; configuration
+flag. This way, if the server supports keep-alive connections, the connection to the server will only be closed
+once all requests are done and the Client object is destroyed. This prevents the overhead of opening and closing
+<em>TCP</em> connections to the server.</p>
+<p>When you perform several requests with the same client, but want to make sure all the request-specific parameters
+are cleared, you should use the resetParameters() method. This ensures that <tt class="docutils literal"><span class="pre">GET</span></tt> and POST parameters, request
+body and request-specific headers are reset and are not reused in the next request.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Resetting parameters</strong></p>
+<p>Note that non-request specific headers are not reset by default when the <tt class="docutils literal"><span class="pre">resetParameters()</span></tt> method is used.
+Only the &#8216;Content-length&#8217; and &#8216;Content-type&#8217; headers are reset. This allows you to set-and-forget headers like
+&#8216;Accept-language&#8217; and &#8216;Accept-encoding&#8217;</p>
+<p class="last">To clean all headers and other data except for URI and method, use <tt class="docutils literal"><span class="pre">resetParameters(true)</span></tt>.</p>
+</div>
+<p>Another feature designed specifically for consecutive requests is the Cookie Jar object. Cookie Jars allow you to
+automatically save cookies set by the server in the first request, and send them on consecutive requests
+transparently. This allows, for example, going through an authentication request before sending the actual data
+fetching request.</p>
+<p>If your application requires one authentication request per user, and consecutive requests might be performed in
+more than one script in your application, it might be a good idea to store the Cookie Jar object in the user&#8217;s
+session. This way, you will only need to authenticate the user once every session.</p>
+<p class="rubric" id="zend-http-client-multiple-requests-example-1">Performing consecutive requests with one client</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// First, instantiate the client</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Http_Client</span><span class="p">(</span><span class="s1">&#39;http://www.example.com/fetchdata.php&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;keepalive&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+<span class="p">));</span>
+
+<span class="c1">// Do we have the cookies stored in our session?</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;cookiejar&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+    <span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;cookiejar&#39;</span><span class="p">]</span> <span class="nx">instanceof</span> <span class="nx">Zend_Http_CookieJar</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setCookieJar</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;cookiejar&#39;</span><span class="p">]);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// If we don&#39;t, authenticate and store cookies</span>
+    <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setCookieJar</span><span class="p">();</span>
+    <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://www.example.com/login.php&#39;</span><span class="p">);</span>
+    <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setParameterPost</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;user&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;shahar&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pass&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;somesecret&#39;</span>
+    <span class="p">));</span>
+    <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">(</span><span class="nx">Zend_Http_Client</span><span class="o">::</span><span class="na">POST</span><span class="p">);</span>
+
+    <span class="c1">// Now, clear parameters and set the URI to the original one</span>
+    <span class="c1">// (note that the cookies that were set by the server are now</span>
+    <span class="c1">// stored in the jar)</span>
+    <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">resetParameters</span><span class="p">();</span>
+    <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://www.example.com/fetchdata.php&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">(</span><span class="nx">Zend_Http_Client</span><span class="o">::</span><span class="na">GET</span><span class="p">);</span>
+
+<span class="c1">// Store cookies in session, for next page</span>
+<span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;cookiejar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">getCookieJar</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="data-streaming">
+<span id="zend-http-client-streaming"></span><h2>Data Streaming<a class="headerlink" href="#data-streaming" title="Permalink to this headline">¶</a></h2>
+<p>By default, <tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> accepts and returns data as <em>PHP</em> strings. However, in many cases there are big
+files to be sent or received, thus keeping them in memory might be unnecessary or too expensive. For these cases,
+<tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> supports reading data from files (and in general, <em>PHP</em> streams) and writing data to files
+(streams).</p>
+<p>In order to use stream to pass data to <tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt>, use <tt class="docutils literal"><span class="pre">setRawData()</span></tt> method with data argument being
+stream resource (e.g., result of <tt class="docutils literal"><span class="pre">fopen()</span></tt>).</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-client-streaming-example-1">Sending file to HTTP server with streaming</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$fp</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="s2">&quot;mybigfile.zip&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">);</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setRawData</span><span class="p">(</span><span class="nv">$fp</span><span class="p">,</span> <span class="s1">&#39;application/zip&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">(</span><span class="s1">&#39;PUT&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+<p>Only PUT requests currently support sending streams to <em>HTTP</em> server.</p>
+<p>In order to receive data from the server as stream, use <tt class="docutils literal"><span class="pre">setStream()</span></tt>. Optional argument specifies the filename
+where the data will be stored. If the argument is just <tt class="docutils literal"><span class="pre">TRUE</span></tt> (default), temporary file will be used and will be
+deleted once response object is destroyed. Setting argument to <tt class="docutils literal"><span class="pre">FALSE</span></tt> disables the streaming functionality.</p>
+<p>When using streaming, <tt class="docutils literal"><span class="pre">request()</span></tt> method will return object of class <tt class="docutils literal"><span class="pre">Zend_Http_Client_Response_Stream</span></tt>, which
+has two useful methods: <tt class="docutils literal"><span class="pre">getStreamName()</span></tt> will return the name of the file where the response is stored, and
+<tt class="docutils literal"><span class="pre">getStream()</span></tt> will return stream from which the response could be read.</p>
+<p>You can either write the response to pre-defined file, or use temporary file for storing it and send it out or
+write it to another file using regular stream functions.</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-client-streaming-example-2">Receiving file from HTTP server with streaming</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setStream</span><span class="p">();</span> <span class="c1">// will use temp file</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">(</span><span class="s1">&#39;GET&#39;</span><span class="p">);</span>
+<span class="c1">// copy file</span>
+<span class="nb">copy</span><span class="p">(</span><span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getStreamName</span><span class="p">(),</span> <span class="s2">&quot;my/downloads/file&quot;</span><span class="p">);</span>
+<span class="c1">// use stream</span>
+<span class="nv">$fp</span> <span class="o">=</span> <span class="nb">fopen</span><span class="p">(</span><span class="s2">&quot;my/downloads/file2&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">);</span>
+<span class="nb">stream_copy_to_stream</span><span class="p">(</span><span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getStream</span><span class="p">(),</span> <span class="nv">$fp</span><span class="p">);</span>
+<span class="c1">// Also can write to known file</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setStream</span><span class="p">(</span><span class="s2">&quot;my/downloads/myfile)-&gt;request(&#39;GET&#39;);</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend_Http_Client - Advanced Usage</a><ul>
+<li><a class="reference internal" href="#http-redirections">HTTP Redirections</a></li>
+<li><a class="reference internal" href="#adding-cookies-and-using-cookie-persistence">Adding Cookies and Using Cookie Persistence</a></li>
+<li><a class="reference internal" href="#setting-custom-request-headers">Setting Custom Request Headers</a></li>
+<li><a class="reference internal" href="#file-uploads">File Uploads</a></li>
+<li><a class="reference internal" href="#sending-raw-post-data">Sending Raw POST Data</a></li>
+<li><a class="reference internal" href="#http-authentication">HTTP Authentication</a></li>
+<li><a class="reference internal" href="#sending-multiple-requests-with-the-same-client">Sending Multiple Requests With the Same Client</a></li>
+<li><a class="reference internal" href="#data-streaming">Data Streaming</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.http.client.adapters.html"
+                        title="previous chapter">Zend_Http_Client - Connection Adapters</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.i18n.translating.html"
+                        title="next chapter">Translating</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.http.client.advanced.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.i18n.translating.html" title="Translating"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.http.client.adapters.html" title="Zend_Http_Client - Connection Adapters"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

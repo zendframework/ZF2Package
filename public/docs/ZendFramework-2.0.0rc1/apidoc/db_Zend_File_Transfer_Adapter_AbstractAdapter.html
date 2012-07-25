@@ -1,0 +1,2438 @@
+<html xmlns="http://www.w3.org/1999/xhtml"><head><title>Zend Framework 2.0 API Documentation</title><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta><link rel="stylesheet" href="css/jquery-ui.css" type="text/css"></link><link rel="stylesheet" href="css/docblox/jquery-ui-1.8.16.custom.css" type="text/css"></link><link rel="stylesheet" href="css/jquery.treeview.css" type="text/css"></link><link rel="stylesheet" href="css/theme.css" type="text/css"></link><script type="text/javascript" src="js/jquery-1.4.2.min.js"></script><script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script><script type="text/javascript" src="js/jquery.cookie.js"></script><script type="text/javascript" src="js/jquery.treeview.js"></script><script type="text/javascript">
+            $(document).ready(function() {
+                $(".filetree").treeview({
+                    collapsed: true,
+                    persist: "cookie"
+                });
+
+                $("#accordion").accordion({
+                    collapsible: true,
+                    autoHeight:  false,
+                    fillSpace:   true
+                });
+
+                $(".tabs").tabs();
+            });
+        </script></head><body><div xmlns="" class="content">
+<div class="sub-page-main-header-api-documentation"><h2>API Documentation</h2></div>
+<div class="dotted-line"></div>
+</div>
+<div xmlns="" id="content">
+<script xmlns:dbx="http://docblox-project.org/xsl/functions">
+
+      function filterElements()
+      {
+        inherited = !$('#show-inherited').hasClass('deselected');
+        public    = !$('#show-public').hasClass('deselected');
+        protected = !$('#show-protected').hasClass('deselected');
+        private   = !$('#show-private').hasClass('deselected');
+
+        $('div.public').each(function(index, val) {
+            $(val).toggle(public && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.protected').each(function(index, val) {
+            $(val).toggle(protected && !($(val).hasClass('inherited_from') && !inherited));
+        });
+        $('div.private').each(function(index, val) {
+            $(val).toggle(private && !($(val).hasClass('inherited_from') && !inherited));
+        });
+      }
+
+      $(document).ready(function() {
+        $('a.gripper').click(function() {
+            $(this).nextAll('div.code-tabs').slideToggle();
+            $(this).children('img').toggle();
+            return false;
+        });
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').css('cursor', 'pointer');
+
+        $('div.method code span.highlight,div.function code span.highlight,div.constant code span.highlight,div.property code span.highlight').click(function() {
+            $(this).parent().nextAll('div.code-tabs').slideToggle();
+            $(this).parent().prevAll('a.gripper').children('img').toggle();
+            return false;
+        });
+
+        $('div.code-tabs').hide();
+        $('a.gripper').show();
+        $('div.code-tabs:empty').prevAll('a.gripper').html('');
+
+        $('#show-public, #show-protected, #show-private, #show-inherited')
+            .css('cursor', 'pointer')
+            .click(function(){
+                $(this).toggleClass('deselected');
+                if ($(this).hasClass('deselected')) {
+                  $(this).fadeTo('fast', '0.4');
+                } else {
+                  $(this).fadeTo('fast', '1.0');
+                }
+                filterElements();
+                return false;
+            });
+        $('#show-protected, #show-private').click();
+
+        // add the sliding behaviour to the file navigation and show it
+        // it is initially hidden for non-JS users.
+        $("#file-nav-box").show().hover(function() {
+            $("#file-nav-container").slideDown(400);
+        }, function() {
+            $("#file-nav-container").slideUp(400);
+        });
+      });
+
+      
+    </script><h1 xmlns:dbx="http://docblox-project.org/xsl/functions" class="file">Zend/File/Transfer/Adapter/AbstractAdapter.php</h1>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" id="file-nav-box">
+<div id="file-nav-options">
+              Show:
+              <img src="images/icons/visibility_public.png" id="show-public"><img src="images/icons/visibility_protected.png" id="show-protected"><img src="images/icons/visibility_private.png" id="show-private"><span class="attribute" id="show-inherited">inherited</span>
+</div>
+<div id="file-nav-container">
+<ul id="file-nav"><li>
+<a href="#classes"><img src="images/icons/class.png" height="14">
+                          Classes
+                      </a><ul><li><a href="#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></li></ul>
+</li></ul>
+<div style="clear: left;"></div>
+</div>
+<div id="file-nav-tab">
+              Table of Contents
+          </div>
+</div>
+<a xmlns:dbx="http://docblox-project.org/xsl/functions" name="top" class="anchor"></a><div id="file-description">
+<p xmlns:dbx="http://docblox-project.org/xsl/functions" class="short-description">Zend Framework (http://framework.zend.com/)</p>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="long-description">
+</div>
+</div>
+<dl class="file-info">
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Copyright</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Copyright (c) 2005-2012 Zend Technologies USA Inc. (http://www.zend.com)
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">License</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">
+<a href="http://framework.zend.com/license/new-bsd">New BSD License</a>
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Link</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">
+<a href="http://github.com/zendframework/zf2">for the canonical source repository</a>
+         
+    </dd>
+<dt xmlns:dbx="http://docblox-project.org/xsl/functions">Package</dt>
+<dd xmlns:dbx="http://docblox-project.org/xsl/functions">Zend_File
+         
+    </dd>
+</dl>
+<a name="classes" class="anchor"></a><a xmlns:dbx="http://docblox-project.org/xsl/functions" id="\Zend\File\Transfer\Adapter\AbstractAdapter" class="anchor"></a><h2 xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">\Zend\File\Transfer\Adapter\AbstractAdapter<div class="to-top"><a href="#top">jump to top</a></div>
+</h2>
+<div xmlns:dbx="http://docblox-project.org/xsl/functions" class="class">
+<small class="package"><b>Package: </b>Zend\File\Transfer</small><p class="short-description">Abstract class for file transfers (Downloads and Uploads)</p>
+<div class="long-description"><p>This class needs a full rewrite. It re-implements functionality present in
+Zend\Filter\Input and/or Zend\Form\Element, and in a way that's inconsistent
+with either one. Additionally, plugin loader usage is now deprecated -- but
+modifying that should be done in tandem with a rewrite to utilize validator
+and filter chains instead.</p>
+</div>
+<dl class="class-info">
+<dt>Implements</dt>
+<dd><a href="db_Zend_I18n_Translator_TranslatorAwareInterface.html#%5CZend%5CI18n%5CTranslator%5CTranslatorAwareInterface">\Zend\I18n\Translator\TranslatorAwareInterface</a></dd>
+<dt>Children</dt>
+<dd><a href="db_Zend_File_Transfer_Adapter_Http.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CHttp">\Zend\File\Transfer\Adapter\Http</a></dd>
+<dt>Category</dt>
+<dd>Zend
+         
+    </dd>
+<dt>Todo</dt>
+<dd>Rewrite
+         
+    </dd>
+</dl>
+<h3>Constants</h3>
+<div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::FILTER" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">FILTER</span>
+                = 'FILTER'</code><div class="description"></div>
+<div class="code-tabs"><dl class="constant-info"></dl></div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::VALIDATOR" class="anchor"></a><div class="constant publicC">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/constant.png" alt="Constant"> 
+                <span class="highlight">VALIDATOR</span>
+                = 'VALIDATOR'</code><div class="description"></div>
+<div class="code-tabs"><dl class="constant-info"></dl></div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Properties</h3>
+<div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$break" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$break</span>= 'array()'
+                </code><div class="description">
+<p class="short-description">Internal list of breaks</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$files" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$files</span>= 'array()'
+                </code><div class="description">
+<p class="short-description">Internal list of files
+This array looks like this:
+    array(form =&gt; array( - Form is the name within the form or, if not set the filename
+        name,            - Original name of this file
+        type,            - Mime type of this file
+        size,            - Filesize in bytes
+        tmp_name,        - Internally temporary filename for uploaded files
+        error,           - Error which has occured
+        destination,     - New destination for this file
+        validators,      - Set validator names for this file
+        files            - Set file names for this file
+    ))</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$filterManager" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\Zend\File\Transfer\Adapter\FilterPluginManager
+                 <span class="highlight">$filterManager</span>= ''
+                </code><div class="description">
+<p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_Zend_File_Transfer_Adapter_FilterPluginManager.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CFilterPluginManager">\Zend\File\Transfer\Adapter\FilterPluginManager</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$filters" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$filters</span>= 'array()'
+                </code><div class="description">
+<p class="short-description">Internal list of filters</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$loaders" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$loaders</span>= 'array()'
+                </code><div class="description">
+<p class="short-description">Plugin loaders for filter and validation chains</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$messages" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$messages</span>= 'array()'
+                </code><div class="description">
+<p class="short-description">Internal list of messages</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$options" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">
+                 <span class="highlight">$options</span>= 'array(
+        'ignoreNoFile'  =&gt; false'
+                </code><div class="description"><p class="short-description">Available options for file transfers</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array(
+        'ignoreNoFile'  =&gt; false</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$tmpDir" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$tmpDir</span>= ''
+                </code><div class="description">
+<p class="short-description">TMP directory</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$translator" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\Zend\I18n\Translator\Translator
+                 <span class="highlight">$translator</span>= ''
+                </code><div class="description">
+<p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_Zend_I18n_Translator_Translator.html#%5CZend%5CI18n%5CTranslator%5CTranslator">\Zend\I18n\Translator\Translator</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$translatorEnabled" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">bool
+                 <span class="highlight">$translatorEnabled</span>= 'true'
+                </code><div class="description">
+<p class="short-description">Is translation enabled?</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>true</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>bool</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$translatorTextDomain" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">string
+                 <span class="highlight">$translatorTextDomain</span>= ''default''
+                </code><div class="description">
+<p class="short-description">Translator text domain (optional)</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>'default'</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>string</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$validatorManager" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">\Zend\File\Transfer\Adapter\ValidatorPluginManager
+                 <span class="highlight">$validatorManager</span>= ''
+                </code><div class="description">
+<p class="short-description"></p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd><a href="db_Zend_File_Transfer_Adapter_ValidatorPluginManager.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CValidatorPluginManager">\Zend\File\Transfer\Adapter\ValidatorPluginManager</a></dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::$validators" class="anchor"></a><div class="property protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/property.png" alt="Property"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected">array
+                 <span class="highlight">$validators</span>= 'array()'
+                </code><div class="description">
+<p class="short-description">Internal list of validators</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Default value</strong><code>array()</code><strong>Details</strong><dl class="property-info">
+<dt>Type</dt>
+<dd>array</dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+<h3>Methods</h3>
+<div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::addFilter()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addFilter</span><span class="nb-faded-text">(
+          string|<a href="db_Zend_Filter_FilterInterface.html#%5CZend%5CFilter%5CFilterInterface">\Zend\Filter\FilterInterface</a> $filter, string|array $options
+              =
+              null, string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Adds a new filter for this class</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$filter</th>
+<td>string|<a href="db_Zend_Filter_FilterInterface.html#%5CZend%5CFilter%5CFilterInterface">\Zend\Filter\FilterInterface</a>
+</td>
+<td><em><p>Type of filter to add</p></em></td>
+</tr>
+<tr>
+<th>$options</th>
+<td>string|array</td>
+<td><em><p>Options to set for the filter</p></em></td>
+</tr>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>Files to limit this filter to</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Exception_InvalidArgumentException.html#%5CZend%5CFile%5CTransfer%5CException%5CInvalidArgumentException">\Zend\File\Transfer\Exception\InvalidArgumentException</a></td>
+<td><em>for invalid type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::addFilters()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addFilters</span><span class="nb-faded-text">(
+          array $filters, string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Add Multiple filters at once</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$filters</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::addValidator()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addValidator</span><span class="nb-faded-text">(
+          string|<a href="db_Zend_Validator_ValidatorInterface.html#%5CZend%5CValidator%5CValidatorInterface">\Zend\Validator\ValidatorInterface</a> $validator, boolean $breakChainOnFailure
+              =
+              false, string|array $options
+              =
+              null, string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Adds a new validator for this class</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$validator</th>
+<td>string|<a href="db_Zend_Validator_ValidatorInterface.html#%5CZend%5CValidator%5CValidatorInterface">\Zend\Validator\ValidatorInterface</a>
+</td>
+<td><em><p>Type of validator to add</p></em></td>
+</tr>
+<tr>
+<th>$breakChainOnFailure</th>
+<td>boolean</td>
+<td><em><p>If the validation chain should stop an failure</p></em></td>
+</tr>
+<tr>
+<th>$options</th>
+<td>string|array</td>
+<td><em><p>Options to set for the validator</p></em></td>
+</tr>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>Files to limit this validator to</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Exception_InvalidArgumentException.html#%5CZend%5CFile%5CTransfer%5CException%5CInvalidArgumentException">\Zend\File\Transfer\Exception\InvalidArgumentException</a></td>
+<td><em>for invalid type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::addValidators()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">addValidators</span><span class="nb-faded-text">(
+          array $validators, string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Add Multiple validators at once</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$validators</th>
+<td>array</td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Exception_InvalidArgumentException.html#%5CZend%5CFile%5CTransfer%5CException%5CInvalidArgumentException">\Zend\File\Transfer\Exception\InvalidArgumentException</a></td>
+<td><em>for invalid type</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::clearFilters()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">clearFilters</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Remove all filters</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::clearValidators()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">clearValidators</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Remove all validators</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::detectFileSize()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">detectFileSize</span><span class="nb-faded-text">(
+          array $value
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Internal method to detect the size of a file</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$value</th>
+<td>array</td>
+<td><em><p>File infos</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>Filesize of given file</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::detectMimeType()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">detectMimeType</span><span class="nb-faded-text">(
+          array $value
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Internal method to detect the mime type of a file</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$value</th>
+<td>array</td>
+<td><em><p>File infos</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td>Mimetype of given file</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::filter()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">filter</span><span class="nb-faded-text">(
+          string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Internal function to filter all given files</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>(Optional) Files to check</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td>False on error</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getDestination()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getDestination</span><span class="nb-faded-text">(
+          null|string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          null|string|array</code><div class="description"><p class="short_description">Retrieve destination directory value</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>null|string|array</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>null|string|array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getErrors()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getErrors</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Retrieve error codes</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getFileInfo()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFileInfo</span><span class="nb-faded-text">(
+          string $file
+              =
+              null
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Retrieve additional internal file informations for files</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$file</th>
+<td>string</td>
+<td><em><p>(Optional) File to get informations for</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getFileName()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFileName</span><span class="nb-faded-text">(
+           $file
+              =
+              null, boolean $path
+              =
+              true
+          )
+        </span>
+        :
+          string|array</code><div class="description"><p class="short_description">Retrieves the filename of transferred files.</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$file</th>
+<td></td>
+<td><em></em></td>
+</tr>
+<tr>
+<th>$path</th>
+<td>boolean</td>
+<td><em><p>(Optional) Should the path also be returned ?</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string|array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getFileSize()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFileSize</span><span class="nb-faded-text">(
+          string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          string|array</code><div class="description"><p class="short_description">Returns the real filesize of the file</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>Files to get the filesize from</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string|array</td>
+<td>Filesize</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Exception_InvalidArgumentException.html#%5CZend%5CFile%5CTransfer%5CException%5CInvalidArgumentException">\Zend\File\Transfer\Exception\InvalidArgumentException</a></td>
+<td><em>When the file does not exist</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getFiles()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getFiles</span><span class="nb-faded-text">(
+          string|array $files, boolean $names
+              =
+              false, boolean $noexception
+              =
+              false
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Returns found files based on internal file array and given files</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>(Optional) Files to return</p>
+</em></td>
+</tr>
+<tr>
+<th>$names</th>
+<td>boolean</td>
+<td><em><p>(Optional) Returns only names on true, else complete info</p>
+</em></td>
+</tr>
+<tr>
+<th>$noexception</th>
+<td>boolean</td>
+<td><em><p>(Optional) Allows throwing an exception, otherwise returns an empty array</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>Found files</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Exception_RuntimeException.html#%5CZend%5CFile%5CTransfer%5CException%5CRuntimeException">\Zend\File\Transfer\Exception\RuntimeException</a></td>
+<td><em>On false filename</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getFilter()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFilter</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          <a href="db_Zend_Filter_FilterInterface.html#%5CZend%5CFilter%5CFilterInterface">\Zend\Filter\FilterInterface</a>|null</code><div class="description"><p class="short_description">Retrieve individual filter</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>
+<a href="db_Zend_Filter_FilterInterface.html#%5CZend%5CFilter%5CFilterInterface">\Zend\Filter\FilterInterface</a>|null</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getFilterIdentifier()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getFilterIdentifier</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Retrieve internal identifier for a named filter</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getFilterManager()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFilterManager</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_FilterPluginManager.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CFilterPluginManager">\Zend\File\Transfer\Adapter\FilterPluginManager</a></code><div class="description"><p class="short_description">Get the filter plugin manager instance</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_FilterPluginManager.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CFilterPluginManager">\Zend\File\Transfer\Adapter\FilterPluginManager</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getFilters()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getFilters</span><span class="nb-faded-text">(
+          string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Returns all set filters</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>(Optional) Returns the filter for this files</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>List of set filters</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Exception_RuntimeException.html#%5CZend%5CFile%5CTransfer%5CException%5CRuntimeException">\Zend\File\Transfer\Exception\RuntimeException</a></td>
+<td><em>When file not found</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getHash()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getHash</span><span class="nb-faded-text">(
+          string $hash
+              =
+              'crc32', string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          string|array</code><div class="description"><p class="short_description">Returns the hash for a given file</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$hash</th>
+<td>string</td>
+<td><em><p>Hash algorithm to use</p></em></td>
+</tr>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>Files to return the hash for</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string|array</td>
+<td>Hashstring</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Exception_InvalidArgumentException.html#%5CZend%5CFile%5CTransfer%5CException%5CInvalidArgumentException">\Zend\File\Transfer\Exception\InvalidArgumentException</a></td>
+<td><em>On unknown hash algorithm</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getMessages()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getMessages</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Returns found validation messages</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getMimeType()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getMimeType</span><span class="nb-faded-text">(
+          string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          string|array</code><div class="description"><p class="short_description">Returns the real mimetype of the file
+Uses fileinfo, when not available mime_magic and as last fallback a manual given mimetype</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>Files to get the mimetype from</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string|array</td>
+<td>MimeType</td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Exception_InvalidArgumentException.html#%5CZend%5CFile%5CTransfer%5CException%5CInvalidArgumentException">\Zend\File\Transfer\Exception\InvalidArgumentException</a></td>
+<td><em>When the file does not exist</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getOptions()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getOptions</span><span class="nb-faded-text">(
+          array $files
+              =
+              null
+          )
+        </span>
+        :
+          array</code><div class="description"><p class="short_description">Returns set options for adapters or files</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>array</td>
+<td><em><p>(Optional) Files to return the options for</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>array</td>
+<td>Options for given files</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getTmpDir()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getTmpDir</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Determine system TMP directory and detect if we have read access</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Exception_RuntimeException.html#%5CZend%5CFile%5CTransfer%5CException%5CRuntimeException">\Zend\File\Transfer\Exception\RuntimeException</a></td>
+<td><em>if unable to determine directory</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getTranslator()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getTranslator</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_I18n_Translator_Translator.html#%5CZend%5CI18n%5CTranslator%5CTranslator">\Zend\I18n\Translator\Translator</a>|null</code><div class="description"><p class="short_description">Retrieve localization translator object</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>
+<a href="db_Zend_I18n_Translator_Translator.html#%5CZend%5CI18n%5CTranslator%5CTranslator">\Zend\I18n\Translator\Translator</a>|null</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getTranslatorTextDomain()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getTranslatorTextDomain</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Return the translation text domain</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getValidator()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getValidator</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          <a href="db_Zend_Validator_ValidatorInterface.html#%5CZend%5CValidator%5CValidatorInterface">\Zend\Validator\ValidatorInterface</a>|null</code><div class="description"><p class="short_description">Retrieve individual validator</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>
+<a href="db_Zend_Validator_ValidatorInterface.html#%5CZend%5CValidator%5CValidatorInterface">\Zend\Validator\ValidatorInterface</a>|null</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getValidatorIdentifier()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">getValidatorIdentifier</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          string</code><div class="description"><p class="short_description">Retrieve internal identifier for a named validator</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getValidatorManager()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getValidatorManager</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_ValidatorPluginManager.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CValidatorPluginManager">\Zend\File\Transfer\Adapter\ValidatorPluginManager</a></code><div class="description"><p class="short_description">Get the validator plugin manager instance</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_ValidatorPluginManager.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CValidatorPluginManager">\Zend\File\Transfer\Adapter\ValidatorPluginManager</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::getValidators()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">getValidators</span><span class="nb-faded-text">(
+          string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          null|array</code><div class="description"><p class="short_description">Returns all set validators</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>(Optional) Returns the validator for this files</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>null|array</td>
+<td>List of set validators</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::hasErrors()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">hasErrors</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Are there errors registered?</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::hasFilter()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">hasFilter</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Determine if a given filter has already been registered</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::hasTranslator()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">hasTranslator</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Checks if the helper has a translator</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::hasValidator()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">hasValidator</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Determine if a given validator has already been registered</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::isFiltered()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">isFiltered</span><span class="nb-faded-text">(
+          array|string|null $files
+              =
+              null
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Has the file been filtered ?</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>array|string|null</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::isPathWriteable()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">isPathWriteable</span><span class="nb-faded-text">(
+          string $path
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Tries to detect if we can read and write to the given path</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$path</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::isReceived()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">isReceived</span><span class="nb-faded-text">(
+          array|string|null $files
+              =
+              null
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Is file received?</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>array|string|null</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::isSent()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">isSent</span><span class="nb-faded-text">(
+          array|string|null $files
+              =
+              null
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Is file sent?</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>array|string|null</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::isTranslatorEnabled()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">isTranslatorEnabled</span><span class="nb-faded-text">(
+          
+          )
+        </span>
+        :
+          bool</code><div class="description"><p class="short_description">Is translation enabled?</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::isUploaded()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">isUploaded</span><span class="nb-faded-text">(
+          array|string|null $files
+              =
+              null
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Has a file been uploaded ?</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>array|string|null</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::isValid()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">isValid</span><span class="nb-faded-text">(
+          string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          boolean</code><div class="description"><p class="short_description">Checks if the files are valid</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>(Optional) Files to check</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>boolean</td>
+<td>True if all checks are valid</td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::receive()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">receive</span><span class="nb-faded-text">(
+          mixed $options
+              =
+              null
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Receive file</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$options</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::removeFilter()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">removeFilter</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Remove an individual filter</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::removeValidator()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">removeValidator</span><span class="nb-faded-text">(
+          string $name
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Remove an individual validator</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$name</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::send()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">send</span><span class="nb-faded-text">(
+          mixed $options
+              =
+              null
+          )
+        </span>
+        :
+          bool</code><div class="description">
+<span class="attribute">abstract</span><p class="short_description">Send file</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$options</th>
+<td>mixed</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>bool</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::setDestination()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setDestination</span><span class="nb-faded-text">(
+          string $destination, string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Sets a new destination for the given files</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$destination</th>
+<td>string</td>
+<td><em><p>New destination directory</p></em></td>
+</tr>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>Files to set the new destination for</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+<strong>Throws</strong><table class="argument-info">
+<thead><tr>
+<th>Exception</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Exception_InvalidArgumentException.html#%5CZend%5CFile%5CTransfer%5CException%5CInvalidArgumentException">\Zend\File\Transfer\Exception\InvalidArgumentException</a></td>
+<td><em>when the given destination is not a directory or does not exist</em></td>
+</tr>
+</table>
+<strong>Details</strong><dl class="function-info">
+<dt>Deprecated</dt>
+<dd>Will be changed to be a filter!!!
+         
+    </dd>
+</dl>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::setFilterManager()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setFilterManager</span><span class="nb-faded-text">(
+          <a href="db_Zend_File_Transfer_Adapter_FilterPluginManager.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CFilterPluginManager">\Zend\File\Transfer\Adapter\FilterPluginManager</a> $filterManager
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Set the filter plugin manager instance</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$filterManager</th>
+<td><a href="db_Zend_File_Transfer_Adapter_FilterPluginManager.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CFilterPluginManager">\Zend\File\Transfer\Adapter\FilterPluginManager</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::setFilters()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setFilters</span><span class="nb-faded-text">(
+          array $filters, string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_Zend_Filter_AbstractFilter.html#%5CZend%5CFilter%5CAbstractFilter">\Zend\Filter\AbstractFilter</a></code><div class="description"><p class="short_description">Sets a filter for the class, erasing all previous set</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$filters</th>
+<td>array</td>
+<td><em><p>Filter to set</p></em></td>
+</tr>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>Files to limit this filter to</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_Filter_AbstractFilter.html#%5CZend%5CFilter%5CAbstractFilter">\Zend\Filter\AbstractFilter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::setOptions()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setOptions</span><span class="nb-faded-text">(
+          array $options
+              =
+              array(), array $files
+              =
+              null
+          )
+        </span>
+        :
+          void</code><div class="description"><p class="short_description">Sets Options for adapters</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$options</th>
+<td>array</td>
+<td><em><p>Options to set</p></em></td>
+</tr>
+<tr>
+<th>$files</th>
+<td>array</td>
+<td><em><p>(Optional) Files to set the options for</p>
+</em></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::setTranslator()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setTranslator</span><span class="nb-faded-text">(
+          <a href="db_Zend_I18n_Translator_Translator.html#%5CZend%5CI18n%5CTranslator%5CTranslator">\Zend\I18n\Translator\Translator</a> $translator
+              =
+              null, string $textDomain
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Sets translator to use in helper</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$translator</th>
+<td><a href="db_Zend_I18n_Translator_Translator.html#%5CZend%5CI18n%5CTranslator%5CTranslator">\Zend\I18n\Translator\Translator</a></td>
+<td><em><p>[optional] translator. Default is null, which sets no translator.</p>
+</em></td>
+</tr>
+<tr>
+<th>$textDomain</th>
+<td>string</td>
+<td><em><p>[optional] text domain Default is null, which skips setTranslatorTextDomain</p>
+</em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::setTranslatorEnabled()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setTranslatorEnabled</span><span class="nb-faded-text">(
+          bool $flag
+              =
+              true
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Indicate whether or not translation should be enabled</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$flag</th>
+<td>bool</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::setTranslatorTextDomain()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setTranslatorTextDomain</span><span class="nb-faded-text">(
+          string $textDomain
+              =
+              'default'
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Set translation text domain</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$textDomain</th>
+<td>string</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::setValidatorManager()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setValidatorManager</span><span class="nb-faded-text">(
+          <a href="db_Zend_File_Transfer_Adapter_ValidatorPluginManager.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CValidatorPluginManager">\Zend\File\Transfer\Adapter\ValidatorPluginManager</a> $validatorManager
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Set the validator plugin manager instance</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$validatorManager</th>
+<td><a href="db_Zend_File_Transfer_Adapter_ValidatorPluginManager.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CValidatorPluginManager">\Zend\File\Transfer\Adapter\ValidatorPluginManager</a></td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::setValidators()" class="anchor"></a><div class="method public">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_public.png" style="margin-right: 5px" alt="public"><span class="highlight">setValidators</span><span class="nb-faded-text">(
+          array $validators, string|array $files
+              =
+              null
+          )
+        </span>
+        :
+          <a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></code><div class="description"><p class="short_description">Sets a validator for the class, erasing all previous set</p></div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$validators</th>
+<td>array</td>
+<td><em><p>Validators to set</p></em></td>
+</tr>
+<tr>
+<th>$files</th>
+<td>string|array</td>
+<td><em><p>Files to limit this validator to</p></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td><a href="db_Zend_File_Transfer_Adapter_AbstractAdapter.html#%5CZend%5CFile%5CTransfer%5CAdapter%5CAbstractAdapter">\Zend\File\Transfer\Adapter\AbstractAdapter</a></td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+<a id="\Zend\File\Transfer\Adapter\AbstractAdapter::toByteString()" class="anchor"></a><div class="method protected">
+<a href="#" class="gripper"><img src="images/icons/arrow_right.png"><img src="images/icons/arrow_down.png" style="display: none;"></a><code><img src="images/icons/method.png" alt="method"><img src="images/icons/visibility_protected.png" style="margin-right: 5px" alt="protected"><span class="highlight">toByteString</span><span class="nb-faded-text">(
+          integer $size
+          )
+        </span>
+        :
+          string</code><div class="description">
+<span class="attribute">static</span><p class="short_description">Returns the formatted size</p>
+</div>
+<div class="code-tabs">
+<div class="long-description">
+</div>
+<strong>Parameters</strong><table class="argument-info">
+<thead><tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<th>$size</th>
+<td>integer</td>
+<td><em></em></td>
+</tr>
+</table>
+<strong>Returns</strong><table class="argument-info">
+<thead><tr>
+<th>Type</th>
+<th>Description</th>
+</tr></thead>
+<tr>
+<td>string</td>
+<td></td>
+</tr>
+</table>
+</div>
+<div class="clear"></div>
+</div>
+</div>
+</div>
+</div>
+<small xmlns="" class="footer">Documentation was generated by <a href="http://docblox-project.org">DocBlox 0.15.1</a>.
+    </small></body></html>

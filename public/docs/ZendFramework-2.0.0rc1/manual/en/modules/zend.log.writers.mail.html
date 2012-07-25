@@ -1,0 +1,150 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Writing to Email &mdash; Zend Framework 2 2.0.0beta5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0beta5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0beta5 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="writing-to-email">
+<span id="zend-log-writers-mail"></span><h1>Writing to Email<a class="headerlink" href="#writing-to-email" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Log\Writer\Mail</span></tt> writes log entries in an email message by using <tt class="docutils literal"><span class="pre">Zend\Mail</span></tt>. The
+<tt class="docutils literal"><span class="pre">Zend\Log\Writer\Mail</span></tt> constructor takes a <tt class="docutils literal"><span class="pre">Zend\Mail\Message</span></tt> object to compose the message, and an optional
+<tt class="docutils literal"><span class="pre">Zend\Mail\Transport</span></tt> object to send the email (the default transport is <tt class="docutils literal"><span class="pre">Zend\Mail\Transport\Sendmail</span></tt>).</p>
+<p>The primary use case for <tt class="docutils literal"><span class="pre">Zend\Log\Writer\Mail</span></tt> is notifying developers, systems administrators, or any concerned
+parties of errors that might be occurring with <em>PHP</em>-based scripts. <tt class="docutils literal"><span class="pre">Zend\Log\Writer\Mail</span></tt> was born out of the
+idea that if something is broken, a human being needs to be alerted of it immediately so they can take corrective
+action.</p>
+<p>Basic usage is outlined below:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Message</span><span class="p">();</span>
+<span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">setFrom</span><span class="p">(</span><span class="s1">&#39;errors@example.org&#39;</span><span class="p">)</span>
+     <span class="o">-&gt;</span><span class="na">addTo</span><span class="p">(</span><span class="s1">&#39;project_developers@example.org&#39;</span><span class="p">);</span>
+
+<span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Writer\Mail</span><span class="p">(</span><span class="nv">$mail</span><span class="p">);</span>
+
+<span class="c1">// Set subject text for use; summary of number of errors is appended to the</span>
+<span class="c1">// subject line before sending the message.</span>
+<span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">setSubjectPrependText</span><span class="p">(</span><span class="s1">&#39;Errors with script foo.php&#39;</span><span class="p">);</span>
+
+<span class="c1">// Only email warning level entries and higher.</span>
+<span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="nx">Zend\Log\Logger</span><span class="o">::</span><span class="na">WARN</span><span class="p">);</span>
+
+<span class="nv">$log</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Logger</span><span class="p">();</span>
+<span class="nv">$log</span><span class="o">-&gt;</span><span class="na">addWriter</span><span class="p">(</span><span class="nv">$writer</span><span class="p">);</span>
+
+<span class="c1">// Something bad happened!</span>
+<span class="nv">$log</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="s1">&#39;unable to connect to database&#39;</span><span class="p">);</span>
+
+<span class="c1">// On writer shutdown, send() is triggered to send an email with</span>
+<span class="c1">// all log entries at or above the Zend\Log\Logger filter level.</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">Zend\Log\Writer\Mail</span></tt> will render the email body as plain text.</p>
+<p>One email is sent containing all log entries at or above the filter level. For example, if warning-level entries an
+up are to be emailed, and two warnings and five errors occur, the resulting email will contain a total of seven log
+entries.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.log.writers.mail.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

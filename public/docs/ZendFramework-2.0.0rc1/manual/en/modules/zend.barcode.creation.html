@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Barcode creation using Zend\Barcode\Barcode class &mdash; Zend Framework 2 2.0.0beta5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0beta5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0beta5 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Barcode\Barcode Objects" href="zend.barcode.objects.html" />
+    <link rel="prev" title="Introduction" href="zend.barcode.intro.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.barcode.objects.html" title="Zend\Barcode\Barcode Objects"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.barcode.intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="barcode-creation-using-zend-barcode-barcode-class">
+<span id="zend-barcode-creation"></span><h1>Barcode creation using Zend\Barcode\Barcode class<a class="headerlink" href="#barcode-creation-using-zend-barcode-barcode-class" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="using-zend-barcode-barcode-factory">
+<span id="zend-barcode-creation-configuration"></span><h2>Using Zend\Barcode\Barcode::factory<a class="headerlink" href="#using-zend-barcode-barcode-factory" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Barcode</span></tt> uses a factory method to create an instance of a renderer that extends
+<tt class="docutils literal"><span class="pre">Zend\Barcode\Renderer\AbstractRenderer</span></tt>. The factory method accepts five arguments.</p>
+<p>. The name of the barcode format (e.g., &#8220;code39&#8221;) or a <a class="reference external" href="php.net/traversable">Traversable</a> object (required)</p>
+<p>. The name of the renderer (e.g., &#8220;image&#8221;) (required)</p>
+<p>. Options to pass to the barcode object (an array or a <a class="reference external" href="php.net/traversable">Traversable</a> object) (optional)</p>
+<p>. Options to pass to the renderer object (an array or a <a class="reference external" href="php.net/traversable">Traversable</a> object) (optional)</p>
+<dl class="docutils">
+<dt>. Boolean to indicate whether or not to automatically render errors. If an exception occurs, the provided barcode</dt>
+<dd>object will be replaced with an Error representation (optional default <tt class="docutils literal"><span class="pre">TRUE</span></tt>)</dd>
+</dl>
+<p class="rubric" id="zend-barcode-creation-configuration-example-1">Getting a Renderer with Zend\Barcode\Barcode::factory()</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Barcode\Barcode::factory()</span></tt> instantiates barcode objects and renderers and ties them together. In this
+first example, we will use the <strong>Code39</strong> barcode type together with the <strong>Image</strong> renderer.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Barcode</span><span class="p">;</span>
+
+<span class="c1">// Only the text to draw is required</span>
+<span class="nv">$barcodeOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;text&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ZEND-FRAMEWORK&#39;</span><span class="p">);</span>
+
+<span class="c1">// No required options</span>
+<span class="nv">$rendererOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="nv">$renderer</span> <span class="o">=</span> <span class="nx">Barcode</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span>
+    <span class="s1">&#39;code39&#39;</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="nv">$barcodeOptions</span><span class="p">,</span> <span class="nv">$rendererOptions</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-barcode-creation-configuration-example-2">Using Zend\Barcode\Barcode::factory() with Zend\Config\Config objects</p>
+<p>You may pass a <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object to the factory in order to create the necessary objects. The following
+example is functionally equivalent to the previous.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Config</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Barcode</span><span class="p">;</span>
+
+<span class="c1">// Using only one Zend\Config\Config object</span>
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Config</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;barcode&#39;</span>        <span class="o">=&gt;</span> <span class="s1">&#39;code39&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;barcodeParams&#39;</span>  <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;text&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ZEND-FRAMEWORK&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;renderer&#39;</span>       <span class="o">=&gt;</span> <span class="s1">&#39;image&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;rendererParams&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;imageType&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;gif&#39;</span><span class="p">),</span>
+<span class="p">));</span>
+
+<span class="nv">$renderer</span> <span class="o">=</span> <span class="nx">Barcode</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="drawing-a-barcode">
+<span id="zend-barcode-creation-drawing"></span><h2>Drawing a barcode<a class="headerlink" href="#drawing-a-barcode" title="Permalink to this headline">¶</a></h2>
+<p>When you <strong>draw</strong> the barcode, you retrieve the resource in which the barcode is drawn. To draw a barcode, you can
+call the <tt class="docutils literal"><span class="pre">draw()</span></tt> of the renderer, or simply use the proxy method provided by <tt class="docutils literal"><span class="pre">Zend\Barcode\Barcode</span></tt>.</p>
+<p class="rubric" id="zend-barcode-creation-drawing-example-1">Drawing a barcode with the renderer object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Barcode</span><span class="p">;</span>
+
+<span class="c1">// Only the text to draw is required</span>
+<span class="nv">$barcodeOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;text&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ZEND-FRAMEWORK&#39;</span><span class="p">);</span>
+
+<span class="c1">// No required options</span>
+<span class="nv">$rendererOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+<span class="c1">// Draw the barcode in a new image,</span>
+<span class="nv">$imageResource</span> <span class="o">=</span> <span class="nx">Barcode</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span>
+    <span class="s1">&#39;code39&#39;</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="nv">$barcodeOptions</span><span class="p">,</span> <span class="nv">$rendererOptions</span>
+<span class="p">)</span><span class="o">-&gt;</span><span class="na">draw</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-barcode-creation-drawing-example-2">Drawing a barcode with Zend\Barcode\Barcode::draw()</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Barcode</span><span class="p">;</span>
+
+<span class="c1">// Only the text to draw is required</span>
+<span class="nv">$barcodeOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;text&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ZEND-FRAMEWORK&#39;</span><span class="p">);</span>
+
+<span class="c1">// No required options</span>
+<span class="nv">$rendererOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+<span class="c1">// Draw the barcode in a new image,</span>
+<span class="nv">$imageResource</span> <span class="o">=</span> <span class="nx">Barcode</span><span class="o">::</span><span class="na">draw</span><span class="p">(</span>
+    <span class="s1">&#39;code39&#39;</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="nv">$barcodeOptions</span><span class="p">,</span> <span class="nv">$rendererOptions</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="renderering-a-barcode">
+<span id="zend-barcode-creation-renderering"></span><h2>Renderering a barcode<a class="headerlink" href="#renderering-a-barcode" title="Permalink to this headline">¶</a></h2>
+<p>When you render a barcode, you draw the barcode, you send the headers and you send the resource (e.g. to a
+browser). To render a barcode, you can call the <tt class="docutils literal"><span class="pre">render()</span></tt> method of the renderer or simply use the proxy method
+provided by <tt class="docutils literal"><span class="pre">Zend\Barcode\Barcode</span></tt>.</p>
+<p class="rubric" id="zend-barcode-creation-renderering-example-1">Renderering a barcode with the renderer object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Barcode</span><span class="p">;</span>
+
+<span class="c1">// Only the text to draw is required</span>
+<span class="nv">$barcodeOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;text&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ZEND-FRAMEWORK&#39;</span><span class="p">);</span>
+
+<span class="c1">// No required options</span>
+<span class="nv">$rendererOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+<span class="c1">// Draw the barcode in a new image,</span>
+<span class="c1">// send the headers and the image</span>
+<span class="nx">Barcode</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span>
+    <span class="s1">&#39;code39&#39;</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="nv">$barcodeOptions</span><span class="p">,</span> <span class="nv">$rendererOptions</span>
+<span class="p">)</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will generate this barcode:</p>
+<img alt="../_images/zend.barcode.introduction.example-1.png" class="align-center" src="../_images/zend.barcode.introduction.example-1.png" style="width: 275px;" />
+<p class="rubric" id="zend-barcode-creation-renderering-example-2">Renderering a barcode with Zend\Barcode\Barcode::render()</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Barcode</span><span class="p">;</span>
+
+<span class="c1">// Only the text to draw is required</span>
+<span class="nv">$barcodeOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;text&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ZEND-FRAMEWORK&#39;</span><span class="p">);</span>
+
+<span class="c1">// No required options</span>
+<span class="nv">$rendererOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+<span class="c1">// Draw the barcode in a new image,</span>
+<span class="c1">// send the headers and the image</span>
+<span class="nx">Barcode</span><span class="o">::</span><span class="na">render</span><span class="p">(</span>
+    <span class="s1">&#39;code39&#39;</span><span class="p">,</span> <span class="s1">&#39;image&#39;</span><span class="p">,</span> <span class="nv">$barcodeOptions</span><span class="p">,</span> <span class="nv">$rendererOptions</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will generate the same barcode as the previous example.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Barcode creation using Zend\Barcode\Barcode class</a><ul>
+<li><a class="reference internal" href="#using-zend-barcode-barcode-factory">Using Zend\Barcode\Barcode::factory</a></li>
+<li><a class="reference internal" href="#drawing-a-barcode">Drawing a barcode</a></li>
+<li><a class="reference internal" href="#renderering-a-barcode">Renderering a barcode</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.barcode.intro.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.barcode.objects.html"
+                        title="next chapter">Zend\Barcode\Barcode Objects</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.barcode.creation.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.barcode.objects.html" title="Zend\Barcode\Barcode Objects"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.barcode.intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

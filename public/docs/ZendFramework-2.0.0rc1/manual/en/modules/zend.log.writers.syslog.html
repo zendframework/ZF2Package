@@ -1,0 +1,132 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Writing to the System Log &mdash; Zend Framework 2 2.0.0beta5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0beta5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0beta5 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="writing-to-the-system-log">
+<span id="zend-log-writers-syslog"></span><h1>Writing to the System Log<a class="headerlink" href="#writing-to-the-system-log" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Log\Writer\Syslog</span></tt> writes log entries to the system log (syslog). Internally, it proxies to <em>PHP</em>&#8216;s
+<tt class="docutils literal"><span class="pre">openlog()</span></tt>, <tt class="docutils literal"><span class="pre">closelog()</span></tt>, and <tt class="docutils literal"><span class="pre">syslog()</span></tt> functions.</p>
+<p>One useful case for <tt class="docutils literal"><span class="pre">Zend\Log\Writer\Syslog</span></tt> is for aggregating logs from clustered machines via the system log
+functionality. Many systems allow remote logging of system events, which allows system administrators to monitor a
+cluster of machines from a single log file.</p>
+<p>By default, all syslog messages generated are prefixed with the string &#8220;Zend_Log&#8221;. You may specify a different
+&#8220;application&#8221; name by which to identify such log messages by either passing the application name to the constructor
+or the application accessor:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// At instantiation, pass the &quot;application&quot; key in the options:</span>
+<span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Writer\Syslog</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;application&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;FooBar&#39;</span><span class="p">));</span>
+
+<span class="c1">// Any other time:</span>
+<span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">setApplicationName</span><span class="p">(</span><span class="s1">&#39;BarBaz&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The system log also allows you to identify the &#8220;facility,&#8221; or application type, logging the message; many system
+loggers will actually generate different log files per facility, which again aids administrators monitoring server
+activity.</p>
+<p>You may specify the log facility either in the constructor or via an accessor. It should be one of the
+<tt class="docutils literal"><span class="pre">openlog()</span></tt> constants defined on the <a class="reference external" href="http://php.net/openlog">openlog() manual page</a>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// At instantiation, pass the &quot;facility&quot; key in the options:</span>
+<span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Writer\Syslog</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;facility&#39;</span> <span class="o">=&gt;</span> <span class="nx">LOG_AUTH</span><span class="p">));</span>
+
+<span class="c1">// Any other time:</span>
+<span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">setFacility</span><span class="p">(</span><span class="nx">LOG_USER</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>When logging, you may continue to use the default <tt class="docutils literal"><span class="pre">Zend\Log\Logger</span></tt> priority constants; internally, they are
+mapped to the appropriate <tt class="docutils literal"><span class="pre">syslog()</span></tt> priority constants.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.log.writers.syslog.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

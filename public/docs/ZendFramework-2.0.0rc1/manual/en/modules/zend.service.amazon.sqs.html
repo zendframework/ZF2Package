@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend_Service_Amazon_Sqs &mdash; Zend Framework 2 2.0.0beta5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0beta5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0beta5 documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-service-amazon-sqs">
+<span id="id1"></span><h1>Zend_Service_Amazon_Sqs<a class="headerlink" href="#zend-service-amazon-sqs" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-service-amazon-sqs-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://aws.amazon.com/sqs/">Amazon Simple Queue Service (Amazon SQS)</a> offers a reliable, highly scalable, hosted queue for storing messages
+as they travel between computers. By using Amazon SQS, developers can simply move data between distributed
+components of their applications that perform different tasks, without losing messages or requiring each component
+to be always available. Amazon SQS makes it easy to build an automated workflow, working in close conjunction with
+the Amazon Elastic Compute Cloud (Amazon EC2) and the other <em>AWS</em> infrastructure web services.</p>
+<p>Amazon SQS works by exposing Amazon&#8217;s web-scale messaging infrastructure as a web service. Any computer on the
+Internet can add or read messages without any installed software or special firewall configurations. Components of
+applications using Amazon SQS can run independently, and do not need to be on the same network, developed with the
+same technologies, or running at the same time.</p>
+</div>
+<div class="section" id="registering-with-amazon-sqs">
+<span id="zend-service-amazon-sqs-registering"></span><h2>Registering with Amazon SQS<a class="headerlink" href="#registering-with-amazon-sqs" title="Permalink to this headline">¶</a></h2>
+<p>Before you can get started with <tt class="docutils literal"><span class="pre">Zend_Service_Amazon_Sqs</span></tt>, you must first register for an account. Please see the
+<a class="reference external" href="http://aws.amazon.com/sqs/faqs/">SQS FAQ</a> page on the Amazon website for more information.</p>
+<p>After registering, you will receive an application key and a secret key. You will need both to access the SQS
+service.</p>
+</div>
+<div class="section" id="api-documentation">
+<span id="zend-service-amazon-sqs-apidocumentation"></span><h2>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend_Service_Amazon_Sqs</span></tt> class provides the <em>PHP</em> wrapper to the Amazon SQS REST interface. Please consult
+the <a class="reference external" href="http://developer.amazonwebservices.com/connect/kbcategory.jspa?categoryID=31">Amazon SQS documentation</a> for detailed description of the service. You will need to be familiar with basic
+concepts in order to use this service.</p>
+</div>
+<div class="section" id="features">
+<span id="zend-service-amazon-sqs-features"></span><h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Service_Amazon_Sqs</span></tt> provides the following functionality:</p>
+<ul class="simple">
+<li>A single point for configuring your amazon.sqs authentication credentials that can be used across the amazon.sqs
+namespaces.</li>
+<li>A proxy object that is more convenient to use than an <em>HTTP</em> client alone, mostly removing the need to manually
+construct <em>HTTP</em> POST requests to access the REST service.</li>
+<li>A response wrapper that parses each response body and throws an exception if an error occurred, alleviating the
+need to repeatedly check the success of many commands.</li>
+<li>Additional convenience methods for some of the more common operations.</li>
+</ul>
+</div>
+<div class="section" id="getting-started">
+<span id="zend-service-amazon-sqs-storing-your-first"></span><h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>Once you have registered with Amazon SQS, you&#8217;re ready to create your queue and store some messages on SQS. Each
+queue can contain unlimited amount of messages, identified by name.</p>
+<p>The following example demonstrates creating a queue, storing and retrieving messages.</p>
+<p class="rubric" id="zend-service-amazon-sqs-storing-your-first-example">Zend_Service_Amazon_Sqs Usage Example</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$sqs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Sqs</span><span class="p">(</span><span class="nv">$my_aws_key</span><span class="p">,</span> <span class="nv">$my_aws_secret_key</span><span class="p">);</span>
+
+<span class="nv">$queue_url</span> <span class="o">=</span> <span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">);</span>
+
+<span class="nv">$message</span> <span class="o">=</span> <span class="s1">&#39;this is a test&#39;</span><span class="p">;</span>
+<span class="nv">$message_id</span> <span class="o">=</span> <span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="nv">$queue_url</span><span class="p">,</span> <span class="nv">$message</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">receive</span><span class="p">(</span><span class="nv">$queue_url</span><span class="p">)</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$message</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span><span class="o">.</span><span class="s1">&#39;&lt;br/&gt;&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Since the <tt class="docutils literal"><span class="pre">Zend_Service_Amazon_Sqs</span></tt> service requires authentication, you should pass your credentials (AWS key
+and secret key) to the constructor. If you only use one account, you can set default credentials for the service:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Zend_Service_Amazon_Sqs</span><span class="o">::</span><span class="na">setKeys</span><span class="p">(</span><span class="nv">$my_aws_key</span><span class="p">,</span> <span class="nv">$my_aws_secret_key</span><span class="p">);</span>
+<span class="nv">$sqs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Sqs</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="queue-operations">
+<span id="zend-service-amazon-sqs-queues"></span><h2>Queue operations<a class="headerlink" href="#queue-operations" title="Permalink to this headline">¶</a></h2>
+<p>All messages SQS are stored in queues. A queue has to be created before any message operations. Queue names must be
+unique under your access key and secret key.</p>
+<p>Queue names can contain lowercase letters, digits, periods (.), underscores (_), and dashes (-). No other symbols
+allowed. Queue names can be a maximum of 80 characters.</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">create()</span></tt> creates a new queue.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">delete()</span></tt> removes all messages in the queue.</p>
+<p class="rubric" id="zend-service-amazon-sqs-queues-removalexample">Zend_Service_Amazon_Sqs Queue Removal Example</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$sqs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Sqs</span><span class="p">(</span><span class="nv">$my_aws_key</span><span class="p">,</span> <span class="nv">$my_aws_secret_key</span><span class="p">);</span>
+<span class="nv">$queue_url</span> <span class="o">=</span> <span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="s1">&#39;test_1&#39;</span><span class="p">);</span>
+<span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">(</span><span class="nv">$queue_url</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">count()</span></tt> gets the approximate number of messages in the queue.</p>
+<p class="rubric" id="zend-service-amazon-sqs-queues-countexample">Zend_Service_Amazon_Sqs Queue Count Example</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$sqs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Sqs</span><span class="p">(</span><span class="nv">$my_aws_key</span><span class="p">,</span> <span class="nv">$my_aws_secret_key</span><span class="p">);</span>
+<span class="nv">$queue_url</span> <span class="o">=</span> <span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="s1">&#39;test_1&#39;</span><span class="p">);</span>
+<span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="nv">$queue_url</span><span class="p">,</span> <span class="s1">&#39;this is a test&#39;</span><span class="p">);</span>
+<span class="nv">$count</span> <span class="o">=</span> <span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">count</span><span class="p">(</span><span class="nv">$queue_url</span><span class="p">);</span> <span class="c1">// Returns &#39;1&#39;</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">getQueues()</span></tt> returns the list of the names of all queues belonging to the user.</p>
+<p class="rubric" id="zend-service-amazon-sqs-queues-listexample">Zend_Service_Amazon_Sqs Queue Listing Example</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$sqs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Sqs</span><span class="p">(</span><span class="nv">$my_aws_key</span><span class="p">,</span> <span class="nv">$my_aws_secret_key</span><span class="p">);</span>
+<span class="nv">$list</span> <span class="o">=</span> <span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">getQueues</span><span class="p">();</span>
+<span class="k">foreach</span><span class="p">(</span><span class="nv">$list</span> <span class="k">as</span> <span class="nv">$queue</span><span class="p">)</span> <span class="p">{</span>
+   <span class="k">echo</span> <span class="s2">&quot;I have queue </span><span class="si">$queue</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+</div>
+<div class="section" id="message-operations">
+<span id="zend-service-amazon-sqs-messages"></span><h2>Message operations<a class="headerlink" href="#message-operations" title="Permalink to this headline">¶</a></h2>
+<p>After a queue is created, simple messages can be sent into the queue then received at a later point in time.
+Messages can be up to 8KB in length. If longer messages are needed please see <a class="reference external" href="http://framework.zend.com/manual/en/zend.service.amazon.s3.html">S3</a>. There is no limit to the
+number of messages a queue can contain.</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">sent($queue_url,</span> <span class="pre">$message)</span></tt> send the <tt class="docutils literal"><span class="pre">$message</span></tt> to the <tt class="docutils literal"><span class="pre">$queue_url</span></tt> SQS queue <em>URL</em>.</p>
+<p class="rubric" id="zend-service-amazon-sqs-messages-sendexample">Zend_Service_Amazon_Sqs Message Send Example</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$sqs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Sqs</span><span class="p">(</span><span class="nv">$my_aws_key</span><span class="p">,</span> <span class="nv">$my_aws_secret_key</span><span class="p">);</span>
+<span class="nv">$queue_url</span> <span class="o">=</span> <span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="s1">&#39;test_queue&#39;</span><span class="p">);</span>
+<span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="nv">$queue_url</span><span class="p">,</span> <span class="s1">&#39;this is a test message&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">receive($queue_url)</span></tt> retrieves messages from the queue.</p>
+<p class="rubric" id="zend-service-amazon-sqs-messages-receiveexample">Zend_Service_Amazon_Sqs Message Receive Example</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$sqs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Sqs</span><span class="p">(</span><span class="nv">$my_aws_key</span><span class="p">,</span> <span class="nv">$my_aws_secret_key</span><span class="p">);</span>
+<span class="nv">$queue_url</span> <span class="o">=</span> <span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="s1">&#39;test_queue&#39;</span><span class="p">);</span>
+<span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="nv">$queue_url</span><span class="p">,</span> <span class="s1">&#39;this is a test message&#39;</span><span class="p">);</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">receive</span><span class="p">(</span><span class="nv">$queue_url</span><span class="p">)</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;got message &quot;</span><span class="o">.</span><span class="nv">$message</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span><span class="o">.</span><span class="s1">&#39;&lt;br/&gt;&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">deleteMessage($queue_url,</span> <span class="pre">$handle)</span></tt> deletes a message from a queue. A message must first be received using the
+<tt class="docutils literal"><span class="pre">receive()</span></tt> method before it can be deleted.</p>
+<p class="rubric" id="zend-service-amazon-sqs-messages-deleteexample">Zend_Service_Amazon_Sqs Message Delete Example</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$sqs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Sqs</span><span class="p">(</span><span class="nv">$my_aws_key</span><span class="p">,</span> <span class="nv">$my_aws_secret_key</span><span class="p">);</span>
+<span class="nv">$queue_url</span> <span class="o">=</span> <span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="s1">&#39;test_queue&#39;</span><span class="p">);</span>
+<span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="nv">$queue_url</span><span class="p">,</span> <span class="s1">&#39;this is a test message&#39;</span><span class="p">);</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">receive</span><span class="p">(</span><span class="nv">$queue_url</span><span class="p">)</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;got message &quot;</span><span class="o">.</span><span class="nv">$message</span><span class="p">[</span><span class="s1">&#39;body&#39;</span><span class="p">]</span><span class="o">.</span><span class="s1">&#39;&lt;br/&gt;&#39;</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$sqs</span><span class="o">-&gt;</span><span class="na">deleteMessage</span><span class="p">(</span><span class="nv">$queue_url</span><span class="p">,</span> <span class="nv">$message</span><span class="p">[</span><span class="s1">&#39;handle&#39;</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;Message deleted&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;Message not deleted&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend_Service_Amazon_Sqs</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#registering-with-amazon-sqs">Registering with Amazon SQS</a></li>
+<li><a class="reference internal" href="#api-documentation">API Documentation</a></li>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#queue-operations">Queue operations</a></li>
+<li><a class="reference internal" href="#message-operations">Message operations</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.service.amazon.sqs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0beta5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
