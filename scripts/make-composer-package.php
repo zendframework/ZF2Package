@@ -23,7 +23,7 @@ function script_exit($reason) {
 if (!isset($_SERVER['argv'][1]) || !preg_match('#\w+_\w+#', $_SERVER['argv'][1])) {
     script_exit(__FILE__ . ' expects a package name as the only argument');
 } else {
-    $package_name = $_SERVER['argv'][1];
+    $package_name = trim($_SERVER['argv'][1]);
 }
 
 // did you copy config.ini.orig to the proper place?
@@ -61,20 +61,20 @@ $vendor_name = $ini['vendor_name'];
 
 // MAKE A ZIP FILE?
 if (array_key_exists('composer_create_zip', $ini)
-    && (bool)$ini['composer_create_zip']) {
+    && (bool)$ini['composer_create_zip']
+) {
 
     // check for zip
     if (!file_exists($ini['zip_path'])) {
         script_exit('The path to zip does not look correct.');
     }
-    $zip_path = $ini['zip_path'];
 
-    $zf2_path = rtrim($ini['zf2_path'], '\\/');
-    $zf2_library_path = $zf2_path . '/library';
-
+    $zip_path               = $ini['zip_path'];
+    $zf2_path               = rtrim($ini['zf2_path'], '\\/');
+    $zf2_library_path       = $zf2_path . '/library';
     $library_component_path = str_replace('_', '/', $package_name);
+    $is_top_level_class     = false;
 
-    $is_top_level_class = false;
     if ((!file_exists($zf2_library_path . '/' . $library_component_path))
         && (!file_exists($zf2_library_path . '/' . $library_component_path . '.php'))
     ) {
@@ -135,6 +135,9 @@ $library_component_path = str_replace('_', '/', $package_name);
 if (file_exists($zf2_library_path . '/' . $library_component_path . '/composer.json')) {
     $content  = file_get_contents($zf2_library_path . '/' . $library_component_path . '/composer.json');
     $composer = json_decode($content, true);
+    if (isset($composer['target-dir'])) {
+        unset($composer['target-dir']);
+    }
 } else {
     $composer = array();
     $composer['name'] = strtolower(str_replace('_', '-', $package_name));

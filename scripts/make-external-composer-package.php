@@ -23,7 +23,7 @@ if (!function_exists('script_exit')) {
 if (!isset($_SERVER['argv'][1]) || !preg_match('#\w+#', $_SERVER['argv'][1])) {
     script_exit(__FILE__ . ' expects a package name as the only argument');
 } else {
-    $package_name = $_SERVER['argv'][1];
+    $package_name = trim($_SERVER['argv'][1]);
 }
 
 // did you copy config.ini.orig to the proper place?
@@ -62,15 +62,15 @@ $vendor_name = $ini['vendor_name'];
 
 // MAKE A ZIP FILE?
 if (array_key_exists('composer_create_zip', $ini)
-    && (bool)$ini['composer_create_zip']) {
-
+    && (bool) $ini['composer_create_zip']
+) {
     // check for zip
     if (!file_exists($ini['zip_path'])) {
         script_exit('The path to zip does not look correct.');
     }
     $zip_path = $ini['zip_path'];
 
-    $ext_component_path = rtrim($ini['external_components_path'], '\\/') . '/' . $package_name;
+    $ext_component_path         = rtrim($ini['external_components_path'], '\\/') . '/' . $package_name;
     $ext_component_library_path = $ext_component_path . '/library';
 
     // set cwd, just in case it was called from elsewhere
@@ -80,16 +80,16 @@ if (array_key_exists('composer_create_zip', $ini)
         script_run_command('rm -Rf ' . ROOT . '/packages/working/' . $package_name);
     }
 
-    $path = $package_name . '/src/' . $package_name;
+    $srcPathSegment = preg_match('/^ZendService/', $package_name) ? 'ZendService' : $package_name;
+    $path           = $package_name . '/src/' . $srcPathSegment;
     script_run_command('mkdir -p ' . $path);
-    $command = 'cp -R ' . $ext_component_library_path . '/' . (preg_match('/^ZendService/', $package_name) ? 'ZendService' : $package_name) . '/* ' 
+    $command = 'cp -R ' . $ext_component_library_path . '/' . $srcPathSegment . '/* ' 
              . $path . '/';
     $output = script_run_command($command);
 
     // LICENSE file
-    $command = 'cp -a ' . $ext_component_path . '/LICENSE.txt '
-                 . $package_name . '/src/';
-    $output = script_run_command($command);
+    $command = 'cp -a ' . $ext_component_path . '/LICENSE.txt ' . $package_name . '/src/';
+    $output  = script_run_command($command);
 
     // write zip file
     chdir($package_name . '/src');
@@ -116,6 +116,9 @@ $library_component_path = str_replace('_', '/', $package_name);
 if (file_exists($ext_component_path . '/composer.json')) {
     $content  = file_get_contents($ext_component_path . '/composer.json');
     $composer = json_decode($content, true);
+    if (isset($composer['target-dir'])) {
+        unset($composer['target-dir']);
+    }
 } else {
     $composer = array();
     $composer['name'] = strtolower(str_replace('_', '-', $package_name));
