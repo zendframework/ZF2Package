@@ -28,8 +28,13 @@ foreach ($list as $dirname) {
     $versions = glob($dirname . '/*.part.php');
 
     foreach ($versions as $versionFile) {
-        $version = basename($versionFile, '.part.php');
+        $version  = basename($versionFile, '.part.php');
         $contents = include $versionFile;
+
+        if (isset($contents['name'])) {
+            $name = $contents['name'];
+        }
+
         $repositories['packages'][$name][$version] = $contents;
     }
 }
