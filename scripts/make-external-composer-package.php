@@ -81,10 +81,10 @@ if (array_key_exists('composer_create_zip', $ini)
     }
 
     $srcPathSegment = preg_match('/^ZendService/', $package_name) ? 'ZendService' : $package_name;
-    $path           = $package_name . '/src/' . $srcPathSegment;
+    $path           = $package_name . '/src/library/' . $srcPathSegment;
     script_run_command('mkdir -p ' . $path);
-    $command = 'cp -R ' . $ext_component_library_path . '/' . $srcPathSegment . '/* ' 
-             . $path . '/';
+    $command = 'cp -R ' . $ext_component_library_path . '/' . $srcPathSegment . '/* '
+             . $path;
     $output = script_run_command($command);
 
     // LICENSE file
