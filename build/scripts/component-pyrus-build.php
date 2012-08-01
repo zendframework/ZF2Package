@@ -107,7 +107,7 @@ if (isset($package_info)) {
         foreach ($package_info['required'] as $dependency) {
             $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] .= 'require_once \'' . $dependency . '-' . trim($package_release) . '.phar\';' . "\n";
             $file_replacements['{PACKAGE_DEPENDENCY}'] = trim($dependency);
-            $packagexmlsetup_content .= apply_replacements(file_get_contents(ROOT . '/data/templates/packagexmlsetup-required.php'), $file_replacements);
+            $packagexmlsetup_content .= apply_replacements(file_get_contents(ROOT . '/build/scripts/pyrus-templates/packagexmlsetup-required.php'), $file_replacements);
         }
     }
     if (isset($package_info['optional'])) {
@@ -117,7 +117,7 @@ if (isset($package_info)) {
         foreach ($package_info['optional'] as $dependency) {
             $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] .= 'require_once \'' . $dependency . '-' . trim($package_release) . '.phar\';' . "\n";
             $file_replacements['{PACKAGE_DEPENDENCY}'] = trim($dependency);
-            $packagexmlsetup_content .= apply_replacements(file_get_contents(ROOT . '/data/templates/packagexmlsetup-optional.php'), $file_replacements);
+            $packagexmlsetup_content .= apply_replacements(file_get_contents(ROOT . '/build/scripts/pyrus-templates/packagexmlsetup-optional.php'), $file_replacements);
         }
     }
     echo 'Writing: packagexmlsetup.php' . PHP_EOL;
@@ -125,11 +125,9 @@ if (isset($package_info)) {
 }
 
 echo 'Writing: stub.php' . PHP_EOL;
-file_put_contents('stub.php', '<?php' . "\n" . trim(apply_replacements(file_get_contents(ROOT . '/data/templates/stub.php'), $file_replacements)));
+file_put_contents('stub.php', '<?php' . "\n" . trim(apply_replacements(file_get_contents(ROOT . '/build/scripts/pyrus-templates/stub.php'), $file_replacements)));
 
 script_run_command($pyrus_path . ' make');
-//script_run_command($pyrus_path . ' package -g');
-//script_run_command($pyrus_path . ' package -z');
 script_run_command($pyrus_path . ' package -p');
 
 script_run_command('rm -Rf ' . ROOT . '/packages/component-pyrus/' . $package_name . '-' . $package_release . '.*');
