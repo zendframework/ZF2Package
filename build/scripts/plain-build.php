@@ -14,7 +14,7 @@ list($package_name, $package_release) = preg_split('#-#', $package_name_full);
 
 chdir(ROOT . '/packages/plain');
 
-script_run_command('rm -Rf ' . ROOT . '/packages/plain/' . $package_name . '*');
+script_run_command('rm -Rf ' . ROOT . '/packages/plain/' . $package_name_full . '/');
 
 mkdir(ROOT . '/packages/plain/' . $package_name_full);
 
@@ -56,3 +56,12 @@ if (isset($composer_content['target-dir'])) {
 $zip->addFromString('composer.json', json_encode($composer_content));
 $zip->close();
 
+// Build tgz file
+unlink(ROOT . '/packages/plain/composer.json');
+script_run_command('unzip -q ' . ROOT . '/packages/plain/' . $package_name_full . '.zip -d ' . ROOT . '/packages/plain/');
+script_run_command('tar czf ' . ROOT . '/packages/plain/' . $package_name_full . '.tgz '
+    . '-C ' . ROOT . '/packages/plain '
+    . $package_name_full
+);
+
+script_run_command('rm -Rf ' . ROOT . '/packages/plain/' . $package_name_full . '/');
