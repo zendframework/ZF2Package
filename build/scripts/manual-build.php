@@ -12,15 +12,14 @@ $package_filter = (isset($_SERVER['argv'][3])) ? trim($_SERVER['argv'][3], '/') 
 
 list($package_name, $package_release) = preg_split('#-#', $package_name_full);
 
-chdir($package_source);
-
 script_run_command('rm -Rf ' . ROOT . '/packages/manual/' . $package_name_full . '/');
 mkdir(ROOT . '/packages/manual/' . $package_name_full);
-script_run_command('cp -R docs/ ' . ROOT . '/packages/manual/' . $package_name_full . '/');
-chdir(ROOT . '/packages/manual/' . $package_name_full . '/');
+script_run_command('cp -R ' .  $package_source . '/docs/ ' . ROOT . '/packages/manual/' . $package_name_full . '/');
+
+chdir(ROOT . '/packages/manual/' . $package_name_full . '/docs');
 script_run_command('make html');
 
-chdir(ROOT . '/packages/manual/' . $package_name_full . '/_build/html/');
+chdir(ROOT . '/packages/manual/' . $package_name_full . '/docs/_build/html/');
 script_run_command('zip -rq ' . ROOT . '/packages/manual/' . $package_name_full . '.zip .');
 script_run_command('tar -cf ' . ROOT . '/packages/manual/' . $package_name_full . '.tar .');
 chdir(ROOT . '/packages/manual/');
