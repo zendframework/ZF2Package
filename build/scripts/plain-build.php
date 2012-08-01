@@ -1,106 +1,58 @@
-#!/usr/bin/env php -dphar.readonly=0
+#!/usr/bin/env php
 <?php
-
-define('ROOT', realpath(__DIR__ . '/../'));
 
 include 'functions.php';
 
-$package_name = 'ZendFramework';
+define('ROOT', realpath(__DIR__ . '/../../'));
 
-// did you copy config.ini.orig to the proper place?
-if (!file_exists(ROOT . '/data/packager.ini')) {
-    script_exit('packager.ini is required');
-}
+// get information from CLI
+$package_name_full = $_SERVER['argv'][1];
+$package_source = $_SERVER['argv'][2];
+$package_filter = (isset($_SERVER['argv'][3])) ? trim($_SERVER['argv'][3], '/') : '*';
 
-// load the ini
-$ini = parse_ini_file(ROOT . '/data/packager.ini');
+list($package_name, $package_release) = preg_split('#-#', $package_name_full);
 
-// Do we have a zf2_path?
-if (!file_exists($ini['zf2_path'] . '/library')) {
-    script_exit('The path to the ZF2 repo does not look correct.');
-}
+chdir(ROOT . '/packages/plain');
 
-$zf2_path = rtrim($ini['zf2_path'], '\\/');
+script_run_command('rm -Rf ' . ROOT . '/packages/plain/' . $package_name . '*');
 
-// Do we have a release version?
-if (!isset($ini['release'])) {
-    script_exit('The proper release is required.');
-}
+mkdir(ROOT . '/packages/plain/' . $package_name_full);
 
-$release       = $ini['release'];
-$package_name .= '-' . $release;
+chdir($package_source);
+script_run_command('tar -cf - ' . $package_filter . ' | tar -C ' . ROOT . '/packages/plain/' . $package_name_full . ' -xf -');
+chdir(ROOT . '/packages/plain/');
 
-// Create working directory
-$work_path = ROOT . '/packages/working/' . $package_name;
-if (file_exists($work_path)) {
-    script_run_command('rm -Rf ' . $work_path);
-}
-script_run_command('mkdir -p ' . $work_path);
+script_run_command('zip -rq ' . ROOT . '/packages/plain/' . $package_name_full . '.zip ./' . $package_name_full);
+script_run_command('rm -Rf ' . ROOT . '/packages/plain/' . $package_name_full . '/');
 
-// Copy files to working directory
-$paths = array(
-    'README.md',
-    'README-GIT.md',
-    'README-DEV.md',
-    'INSTALL.md',
-    'LICENSE.txt',
-    'composer.json',
-    'bin',
-    'demos',
-    'resources',
-    'tests',
-    'vendor',
-);
-foreach ($paths as $file)  {
-    $origin_path = $zf2_path  . '/' . $file;
-    $copy_path   = $work_path . '/' . $file;
-    script_run_command('cp -a ' . $origin_path . ' ' . $copy_path);
-}
+// modify package's composer.json
 
-// Create library and sync in components
-if (!file_exists($work_path . '/library/Zend')) {
-    script_run_command('mkdir -p ' . $work_path . '/library/Zend');
-}
-$components = explode(', ', $ini['package_list']);
-foreach ($components as $component) {
-    $component = str_replace('Zend_', '', $component);
-    if (false === strstr($component, '_')) {
-        $origin = $zf2_path . '/library/Zend/' . $component;
-        if (!is_dir($origin)) {
-            $origin .= '.php';
-            if (!file_exists($origin)) {
-                echo "UNABLE TO FIND directory or file associated with component '$component'\n";
-                continue;
-            }
-        }
-        $target = $work_path . '/library/Zend/';
-        script_run_command('cp -a ' . $origin . ' ' . $target);
-        continue;
+$zip = new ZipArchive();
+$zip->open(ROOT . '/packages/plain/' . $package_name_full . '.zip');
+$composer_index_in_root = $zip->locateName('composer.json');
+if ($composer_index_in_root !== false) {
+    $fp = $zip->getStream($zip->getNameIndex($composer_index_in_root));
+    $composer_content = json_decode(stream_get_contents($fp), true);
+} else {
+    $composer_index_anywhere = $zip->locateName('composer.json', ZIPARCHIVE::FL_NODIR);
+    if ($composer_index_anywhere) {
+        $fp = $zip->getStream($zip->getNameIndex($composer_index_anywhere));
+        $composer_content = json_decode(stream_get_contents($fp), true);
+    } else {
+        var_dump($composer_index_anywhere);
+        echo 'A composer.json was not found in ' . $package_name_full . '.zip';
+        exit -1;
     }
-
-    $subcomponents = explode('_', $component);
-    $component     = array_pop($subcomponents);
-    $subpath       = implode('/', $subcomponents);
-    $target        = $work_path . '/library/Zend/' . $subpath;
-    if (!file_exists($target)) {
-        script_run_command('mkdir -p ' . $target);
-    }
-    $origin = $zf2_path . '/library/Zend/' . $subpath . '/' . $component;
-    script_run_command('cp -a ' . $origin . ' ' . $target);
 }
 
-// Create archives
-chdir(ROOT . '/packages/working');
-script_run_command('zip -r '  . $package_name . '.zip ' . $package_name);
-script_run_command('tar czf ' . $package_name . '.tgz ' . $package_name);
+$composer_content['version'] = $package_release;
+$composer_content['dist']['url'] = "http://packages.zendframework.com/composer/{$package_name_full}.zip";
+$composer_content['dist']['type'] = "zip";
 
-// Create release directory
-$release_dir = ROOT . '/public/releases/' . $package_name;
-if (!file_exists($release_dir)) {
-    script_run_command('mkdir -p ' . $release_dir);
+if (isset($composer_content['target-dir'])) {
+    unset($composer_content['target-dir']);
 }
 
-// Move packages to release directory
-foreach (array('zip', 'tgz') as $type) {
-    script_run_command('mv ' . $package_name . '.' . $type . ' ' . $release_dir . '/');
-}
+$zip->addFromString('composer.json', json_encode($composer_content));
+$zip->close();
+

@@ -65,7 +65,7 @@ foreach ($components as $component_info) {
 foreach ($components as $component_info) {
 
     if (in_array('MANUAL', $component_info[3])) {
-        echo 'Building Documentation package for' . $component_info[0] . ' ... ' . PHP_EOL;
+        echo 'Building Documentation package for ' . $component_info[0] . ' ... ' . PHP_EOL;
         $command =
             $php . ' -dphar.readonly=0 '
                 . __DIR__ . '/scripts/manual-build.php '
@@ -82,13 +82,31 @@ foreach ($components as $component_info) {
 foreach ($components as $component_info) {
 
     if (isset($component_info[3]['APIDOC'])) {
-        echo 'Building Apidoc package for' . $component_info[0] . ' ... ' . PHP_EOL;
+        echo 'Building Apidoc package for ' . $component_info[0] . ' ... ' . PHP_EOL;
         $command =
             $php . ' -dphar.readonly=0 '
                 . __DIR__ . '/scripts/apidoc-build.php '
                 . $component_info[0] . '-' . $component_info[2] . ' '
                 . ROOT . '/packages/working/' . $component_info[1] . ' '
                 . escapeshellarg($component_info[3]['APIDOC']);
+        script_run_command($command);
+    }
+
+    // reset path
+    chdir(ROOT . '/packages/working/');
+}
+
+// build API docs
+foreach ($components as $component_info) {
+
+    if (isset($component_info[3]['PLAIN'])) {
+        echo 'Building Plain package for ' . $component_info[0] . ' ... ' . PHP_EOL;
+        $command =
+            $php . ' -dphar.readonly=0 '
+                . __DIR__ . '/scripts/plain-build.php '
+                . $component_info[0] . '-' . $component_info[2] . ' '
+                . ROOT . '/packages/working/' . $component_info[1] . ' '
+                . escapeshellarg($component_info[3]['PLAIN']);
         script_run_command($command);
     }
 
