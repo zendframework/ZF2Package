@@ -1,16 +1,15 @@
 #!/usr/bin/env php -dphar.readonly=0
 <?php
 
-define('ROOT', realpath(__DIR__ . '/../../'));
+include 'functions.php';
 
-$pyrus_path = __DIR__ . '/pyrus.phar';
-$files = glob(ROOT . '/packages/component-pyrus/*');
+define('ROOT', realpath(__DIR__ . '/../../'));
 
 chdir(ROOT . '/public');
 
-var_dump($files);
+$php = $_SERVER["_"];
 
-//foreach ($files as $file) {
-//    script_run_command($pyrus_path . ' scs-release ' . $file);
-//}
-
+$di = new DirectoryIterator(ROOT . '/packages/component-pyrus/'); // change this to actual public directory
+foreach ($di as $file) {
+    script_run_command($php . ' ' . ROOT . '/build/scripts/pyrus.phar scs-release ' . $file->getPathname());
+}

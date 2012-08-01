@@ -128,8 +128,8 @@ echo 'Writing: stub.php' . PHP_EOL;
 file_put_contents('stub.php', '<?php' . "\n" . trim(apply_replacements(file_get_contents(ROOT . '/data/templates/stub.php'), $file_replacements)));
 
 script_run_command($pyrus_path . ' make');
-script_run_command($pyrus_path . ' package -g');
-script_run_command($pyrus_path . ' package -z');
+//script_run_command($pyrus_path . ' package -g');
+//script_run_command($pyrus_path . ' package -z');
 script_run_command($pyrus_path . ' package -p');
 
 script_run_command('rm -Rf ' . ROOT . '/packages/component-pyrus/' . $package_name . '-' . $package_release . '.*');

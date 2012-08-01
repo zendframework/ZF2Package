@@ -74,8 +74,6 @@ foreach ($components as $component_info) {
         script_run_command($command);
     }
 
-
-
     // reset path
     chdir(ROOT . '/packages/working/');
 }
@@ -83,8 +81,15 @@ foreach ($components as $component_info) {
 // build API docs
 foreach ($components as $component_info) {
 
-    if (in_array('APIDOC', $component_info[3])) {
-        echo 'Building Apidoc package for' . $component_info[0] . ' ... ' . PHP_EOL;        
+    if (isset($component_info[3]['APIDOC'])) {
+        echo 'Building Apidoc package for' . $component_info[0] . ' ... ' . PHP_EOL;
+        $command =
+            $php . ' -dphar.readonly=0 '
+                . __DIR__ . '/scripts/apidoc-build.php '
+                . $component_info[0] . '-' . $component_info[2] . ' '
+                . ROOT . '/packages/working/' . $component_info[1] . ' '
+                . escapeshellarg($component_info[3]['APIDOC']);
+        script_run_command($command);
     }
 
     // reset path
