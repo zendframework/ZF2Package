@@ -34,3 +34,23 @@ function glob_recursive($pattern, $flags = 0) {
     }
     return $files;
 }
+
+function create_composer_json_stub($filename)
+{
+    $composer = array();
+
+    list($package_name, $package_release) = preg_split('#-#', pathinfo($filename)['filename'], 2);
+
+    $composer['name'] = strtolower(str_replace('_', '-', $package_name));
+    $composer['name'] = 'zendframework/' . $composer['name'];
+    $composer['license'] = 'BSD-3-Clause';
+    $composer['keywords'] = array('zf2', strtolower(str_replace('Zend_', '', $package_name)));
+    $composer['autoload']['psr-0'][str_replace('_', '\\', $package_name)] = '';
+    $composer['require']['php'] = ">=5.3.3";
+
+    $composer['version'] = $package_release;
+    $composer['dist']['url'] = "http://packages.zendframework.com/composer/{$package_name}.zip";
+    $composer['dist']['type'] = "zip";
+
+    return $composer;
+}
