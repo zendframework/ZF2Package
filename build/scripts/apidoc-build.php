@@ -32,3 +32,7 @@ chdir(ROOT . '/packages/apidoc/');
 script_run_command('php -dmemory_limit=-1 ' . ROOT . '/build/scripts/phpDocumentor.phar -c ' . ROOT . '/packages/apidoc/' . $package_name_full . '.xml');
 
 script_run_command('zip -rq ' . ROOT . '/packages/apidoc/' . $package_name_full . '-apidoc.zip ' . $package_name_full);
+script_run_command('tar czf ' . ROOT . '/packages/apidoc/' . $package_name_full . '-apidoc.tgz '
+    . '-C ' . ROOT . '/packages/plain '
+    . $package_name_full
+);
