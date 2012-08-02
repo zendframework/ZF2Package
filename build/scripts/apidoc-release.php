@@ -19,5 +19,8 @@ script_run_command('mv ' . $apidoc_release_tmp . '/ZendFramework-' . $release . 
 
 $apidoc_packages    = ROOT . '/packages/apidoc/ZendFramework-' . $release . '-apidoc.*';
 $apidoc_release_dir = ROOT . '/public/releases/ZendFramework-' . $release . '/';
+if (!is_dir($apidoc_release_dir)) {
+    mkdir($apidoc_release_dir, 0777, true);
+}
 script_run_command('cp -a ' . $apidoc_packages . ' ' . $apidoc_release_dir);
 

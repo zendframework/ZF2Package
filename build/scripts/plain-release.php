@@ -12,5 +12,7 @@ if (!$release) {
 
 $package_glob = ROOT . '/packages/plain/ZendFramework-*' . $release . '.*';
 $release_dir  = ROOT . '/public/releases/ZendFramework-' . $release . '';
-mkdir($release_dir, 0777, true);
+if (!is_dir($release_dir)) {
+    mkdir($release_dir, 0777, true);
+}
 script_run_command('cp -a ' . $package_glob . ' ' . $release_dir);

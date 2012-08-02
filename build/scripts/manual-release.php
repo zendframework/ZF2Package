@@ -17,4 +17,7 @@ script_run_command('unzip ' . $manual_package . ' -d ' . $manual_release_dir);
 
 $manual_packages    = ROOT . '/packages/manual/ZendFramework-' . $release . '-manual-en.*';
 $manual_release_dir = ROOT . '/public/releases/ZendFramework-' . $release . '/';
+if (!is_dir($manual_release_dir)) {
+    mkdir($manual_release_dir, 0777, true);
+}
 script_run_command('cp -a ' . $manual_packages . ' ' . $manual_release_dir);
