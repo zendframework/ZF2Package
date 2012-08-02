@@ -39,10 +39,7 @@ function create_composer_json_stub($filename)
 {
     $composer = array();
 
-    $matches = array();
-    preg_match('/^(?P<package_name>[^-]+)-(?P<package_release>\d+\.\d+\.\d+-?(?:alpha|a|beta|b|rc|pl|p|dev|d)(?:\d+)?)$/s', pathinfo($filename)['filename'], $matches);
-    $package_name    = isset($matches['package_name'])    ? $matches['package_name']    : false;
-    $package_release = isset($matches['package_release']) ? $matches['package_release'] : false;
+    list($package_name, $package_release) = preg_split('#-#', pathinfo($filename)['filename'], 2);
 
     if (!$package_name || !$package_release) {
         script_exit('Unable to determine either package name or package release from filename "' . $filename . '"');

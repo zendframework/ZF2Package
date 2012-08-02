@@ -37,15 +37,16 @@ foreach ($di as $file) {
 }
 
 $packages = array();
-foreach ($composers as $composer) {
+foreach ($composers as $filename => $composer) {
     if (!isset($packages[$composer['name']])) {
         $packages[$composer['name']] = array();
     }
     if (!isset($composer['version'])) {
-        echo "Missing composer version for package " . $composer['name'] . "; skipping\n";
-        continue;
+        list($filename_name, $filename_version) = preg_split('#-#', pathinfo($filename)['filename'], 2);
+        $composer['version'] = $filename_version;
     }
     $packages[$composer['name']][$composer['version']] = $composer;
 }
+
 file_put_contents(ROOT . '/public/packages.json', json_encode($packages, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
 
