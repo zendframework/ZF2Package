@@ -1,0 +1,263 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend_Search_Lucene Introduction &mdash; Zend Framework 2 2.0.0rc1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc1 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-search-lucene-introduction">
+<span id="learning-lucene-intro"></span><h1>Zend_Search_Lucene Introduction<a class="headerlink" href="#zend-search-lucene-introduction" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">Zend_Search_Lucene</span></tt> component is intended to provide a ready-for-use full-text search solution. It doesn&#8217;t
+require any <em>PHP</em> extensions <a class="footnote-reference" href="#id3" id="id1">[1]</a> or additional software to be installed, and can be used immediately after Zend
+Framework installation.</p>
+<p><tt class="docutils literal"><span class="pre">Zend_Search_Lucene</span></tt> is a pure <em>PHP</em> port of the popular open source full-text search engine known as Apache
+Lucene. See <a class="reference external" href="http://lucene.apache.org">http://lucene.apache.org/</a> for the details.</p>
+<p>Information must be indexed to be available for searching. <tt class="docutils literal"><span class="pre">Zend_Search_Lucene</span></tt> and Java Lucene use a document
+concept known as an &#8220;atomic indexing item.&#8221;</p>
+<p>Each document is a set of fields: &lt;name, value&gt; pairs where name and value are <em>UTF-8</em> strings <a class="footnote-reference" href="#id4" id="id2">[2]</a>. Any subset of
+the document fields may be marked as &#8220;indexed&#8221; to include field data in the text indexing process.</p>
+<p>Field values may or may not be tokenized while indexing. If a field is not tokenized, then the field value is
+stored as one term; otherwise, the current analyzer is used for tokenization.</p>
+<p>Several analyzers are provided within the <tt class="docutils literal"><span class="pre">Zend_Search_Lucene</span></tt> package. The default analyzer works with <em>ASCII</em>
+text (since the <em>UTF-8</em> analyzer needs the <strong>mbstring</strong> extension to be turned on). It is case insensitive, and it
+skips numbers. Use other analyzers or create your own analyzer if you need to change this behavior.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Using analyzers during indexing and searching</strong></p>
+<p class="last">Important note! Search queries are also tokenized using the &#8220;current analyzer&#8221;, so the same analyzer must be set
+as the default during both the indexing and searching process. This will guarantee that source and searched text
+will be transformed into terms in the same way.</p>
+</div>
+<p>Field values are optionally stored within an index. This allows the original field data to be retrieved from the
+index while searching. This is the only way to associate search results with the original data (internal document
+IDs may be changed after index optimization or auto-optimization).</p>
+<p>The thing that should be remembered is that a Lucene index is not a database. It doesn&#8217;t provide index backup
+mechanisms except backup of the file system directory. It doesn&#8217;t provide transactional mechanisms though
+concurrent index update as well as concurrent update and read are supported. It doesn&#8217;t compare with databases in
+data retrieving speed.</p>
+<p>So it&#8217;s good idea:</p>
+<ul class="simple">
+<li><strong>Not</strong> to use Lucene index as a storage since it may dramatically decrease search hit retrieving performance.
+Store only unique document identifiers (doc paths, <em>URL</em>s, database unique IDs) and associated data within an
+index. E.g. title, annotation, category, language info, avatar. (Note: a field may be included in indexing, but
+not stored, or stored, but not indexed).</li>
+<li>To write functionality that can rebuild an index completely if it&#8217;s corrupted for any reason.</li>
+</ul>
+<p>Individual documents in the index may have completely different sets of fields. The same fields in different
+documents don&#8217;t need to have the same attributes. E.g. a field may be indexed for one document and skipped from
+indexing for another. The same applies for storing, tokenizing, or treating field value as a binary string.</p>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Though some <em>UTF-8</em> processing functionality requires the <strong>mbstring</strong> extension to be turned on</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Binary strings are also allowed to be used as field values</td></tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/tutorials/lucene.intro.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/lucene.intro.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/lucene.intro.rst">
+                Zend_Search_Lucene Introduction
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

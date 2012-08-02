@@ -1,0 +1,449 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Controller Plugins &mdash; Zend Framework 2 2.0.0rc1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc1 documentation" href="../index.html" />
+    <link rel="next" title="Examples" href="zend.mvc.examples.html" />
+    <link rel="prev" title="Available Controllers" href="zend.mvc.controllers.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.mvc.examples.html" title="Examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.mvc.controllers.html" title="Available Controllers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="controller-plugins">
+<span id="zend-mvc-controller-plugins"></span><h1>Controller Plugins<a class="headerlink" href="#controller-plugins" title="Permalink to this headline">¶</a></h1>
+<p>When using the <tt class="docutils literal"><span class="pre">AbstractActionController</span></tt> or <tt class="docutils literal"><span class="pre">AbstractRestfulController</span></tt>, or if you compose the
+<tt class="docutils literal"><span class="pre">Zend\Mvc\Controller\PluginBroker</span></tt> in your custom controllers, you have access to a number of pre-built plugins.
+Additionally, you can register your own custom plugins with the broker, just as you would with
+<tt class="docutils literal"><span class="pre">Zend\Loader\PluginBroker</span></tt>.</p>
+<p>The built-in plugins are:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Mvc\Controller\Plugin\FlashMessenger</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Mvc\Controller\Plugin\Forward</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Mvc\Controller\Plugin\PostRedirectGet</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Mvc\Controller\Plugin\Redirect</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Mvc\Controller\Plugin\Url</span></tt></li>
+</ul>
+<p>If your controller implements the <tt class="docutils literal"><span class="pre">Zend\Loader\Pluggable</span></tt> interface, you can access these using their shortname
+via the <tt class="docutils literal"><span class="pre">plugin()</span></tt> method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$plugin</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">plugin</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>For an extra layer of convenience, both <tt class="docutils literal"><span class="pre">AbstractActionController</span></tt> and <tt class="docutils literal"><span class="pre">AbstractRestfulController</span></tt> have
+<tt class="docutils literal"><span class="pre">__call()</span></tt> implementations that allow you to retrieve plugins via method calls:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$plugin</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="the-flashmessenger">
+<span id="zend-mvc-controller-plugins-flashmessenger"></span><h2>The FlashMessenger<a class="headerlink" href="#the-flashmessenger" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">FlashMessenger</span></tt> is a plugin designed to create and retrieve self-expiring, session-based messages. It
+exposes a number of methods:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">setSessionManager()</span></tt> allows you to specify an alternate session manager, if desired.</li>
+<li><tt class="docutils literal"><span class="pre">getSessionManager()</span></tt> allows you to retrieve the session manager registered.</li>
+<li><tt class="docutils literal"><span class="pre">getContainer()</span></tt> returns the <tt class="docutils literal"><span class="pre">Zend\Session\Container</span></tt> instance in which the flash messages are stored.</li>
+<li><tt class="docutils literal"><span class="pre">setNamespace()</span></tt> allows you to specify a specific namespace in the container in which to store or from which to
+retrieve flash messages.</li>
+<li><tt class="docutils literal"><span class="pre">getNamespace()</span></tt> retrieves the name of the flash message namespace.</li>
+<li><tt class="docutils literal"><span class="pre">addMessage()</span></tt> allows you to add a message to the current namespace of the session container.</li>
+<li><tt class="docutils literal"><span class="pre">hasMessages()</span></tt> lets you determine if there are any flash messages from the current namespace in the session
+container.</li>
+<li><tt class="docutils literal"><span class="pre">getMessages()</span></tt> retrieves the flash messages from the current namespace of the session container.</li>
+<li><tt class="docutils literal"><span class="pre">clearMessages()</span></tt> clears all flash messages in current namespace of the session container.</li>
+<li><tt class="docutils literal"><span class="pre">hasCurrentMessages()</span></tt> indicates whether any messages were added during the current request.</li>
+<li><tt class="docutils literal"><span class="pre">getCurrentMessages()</span></tt> retrieves any messages added during the current request.</li>
+<li><tt class="docutils literal"><span class="pre">clearCurrentMessages()</span></tt> removes any messages added during the current request.</li>
+</ul>
+<p>Additionally, the <tt class="docutils literal"><span class="pre">FlashMessenger</span></tt> implements both <tt class="docutils literal"><span class="pre">IteratorAggregate</span></tt> and <tt class="docutils literal"><span class="pre">Countable</span></tt>, allowing you to
+iterate over and count the flash messages in the current namespace within the session container.</p>
+<div class="section" id="examples">
+<span id="zend-mvc-controller-plugins-examples"></span><h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">processAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// ... do some work ...</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">flashMessenger</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">addMessage</span><span class="p">(</span><span class="s1">&#39;You are now logged in.&#39;</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toRoute</span><span class="p">(</span><span class="s1">&#39;user-success&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">successAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$return</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;success&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">);</span>
+    <span class="nv">$flashMessenger</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">flashMessenger</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$flashMessenger</span><span class="o">-&gt;</span><span class="na">hasMessages</span><span class="p">())</span> <span class="p">{</span>
+        <span class="nv">$return</span><span class="p">[</span><span class="s1">&#39;messages&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$flashMessenger</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nv">$return</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="the-forward-plugin">
+<span id="zend-mvc-controller-plugins-forward"></span><h2>The Forward Plugin<a class="headerlink" href="#the-forward-plugin" title="Permalink to this headline">¶</a></h2>
+<p>Occasionally, you may want to dispatch additional controllers from within the matched controller &#8211; for instance,
+you might use this approach to build up &#8220;widgetized&#8221; content. The <tt class="docutils literal"><span class="pre">Forward</span></tt> plugin helps enable this.</p>
+<p>For the <tt class="docutils literal"><span class="pre">Forward</span></tt> plugin to work, the controller calling it must be <tt class="docutils literal"><span class="pre">ServiceManagerAware</span></tt>; otherwise, the
+plugin will be unable to retrieve a configured and injected instance of the requested controller.</p>
+<p>The plugin exposes a single method, <tt class="docutils literal"><span class="pre">dispatch()</span></tt>, which takes two arguments:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">$name</span></tt>, the name of the controller to invoke. This may be either the fully qualified class name, or an alias
+defined and recognized by the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> instance attached to the invoking controller.</li>
+<li><tt class="docutils literal"><span class="pre">$params</span></tt> is an optional array of parameters with which to see a <tt class="docutils literal"><span class="pre">RouteMatch</span></tt> object for purposes of this
+specific request.</li>
+</ul>
+<p><tt class="docutils literal"><span class="pre">Forward</span></tt> returns the results of dispatching the requested controller; it is up to the developer to determine
+what, if anything, to do with those results. One recommendation is to aggregate them in any return value from the
+invoking controller.</p>
+<p>As an example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$foo</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">forward</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;process&#39;</span><span class="p">));</span>
+<span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;somekey&#39;</span> <span class="o">=&gt;</span> <span class="nv">$somevalue</span><span class="p">,</span>
+    <span class="s1">&#39;foo&#39;</span>     <span class="o">=&gt;</span> <span class="nv">$foo</span><span class="p">,</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="the-post-redirect-get-plugin">
+<span id="zend-mvc-controller-plugins-postredirectget"></span><h2>The Post/Redirect/Get Plugin<a class="headerlink" href="#the-post-redirect-get-plugin" title="Permalink to this headline">¶</a></h2>
+<p>When a user sends a POST request (e.g. after submitting a form), their browser will try to protect them from
+sending the POST again, breaking the back button, causing browser warnings and pop-ups, and sometimes reposting
+the form. Instead, when receiving a POST, we should store the data in a session container and redirect the user
+to a GET request.</p>
+<p>This plugin can be invoked with two arguments:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">$redirect</span></tt>, a string containing the redirect location which can either be a named route or a URL, based on
+the contents of the second parameter.</li>
+<li><tt class="docutils literal"><span class="pre">$redirectToUrl</span></tt>, a boolean that when set to TRUE, causes the first parameter to be treated as a URL instead
+of a route name (this is required when redirecting to a URL instead of a route). This argument defaults to false.</li>
+</ul>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Pass in the route/url you want to redirect to after the POST</span>
+<span class="nv">$prg</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">prg</span><span class="p">(</span><span class="s1">&#39;/user/register&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$prg</span> <span class="nx">instanceof</span> <span class="nx">\Zend\Http\PhpEnvironment\Response</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// returned a response to redirect us</span>
+    <span class="k">return</span> <span class="nv">$prg</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$prg</span> <span class="o">===</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// this wasn&#39;t a POST request, but there were no params in the flash messenger</span>
+    <span class="c1">// probably this is the first time the form was loaded</span>
+    <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;form&#39;</span> <span class="o">=&gt;</span> <span class="nv">$myForm</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// $prg is an array containing the POST params from the previous request</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$prg</span><span class="p">);</span>
+
+<span class="c1">// ... your form processing code here</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="the-redirect-plugin">
+<span id="zend-mvc-controller-plugins-redirect"></span><h2>The Redirect Plugin<a class="headerlink" href="#the-redirect-plugin" title="Permalink to this headline">¶</a></h2>
+<p>Redirections are quite common operations within applications. If done manually, you will need to do the following
+steps:</p>
+<ul class="simple">
+<li>Assemble a url using the router</li>
+<li>Create and inject a &#8220;Location&#8221; header into the <tt class="docutils literal"><span class="pre">Response</span></tt> object, pointing to the assembled URL</li>
+<li>Set the status code of the <tt class="docutils literal"><span class="pre">Response</span></tt> object to one of the 3xx HTTP statuses.</li>
+</ul>
+<p>The <tt class="docutils literal"><span class="pre">Redirect</span></tt> plugin does this work for you. It offers two methods:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">toRoute($route,</span> <span class="pre">array</span> <span class="pre">$params</span> <span class="pre">=</span> <span class="pre">array(),</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array())</span></tt>: Redirects to a named route, using the
+provided <tt class="docutils literal"><span class="pre">$params</span></tt> and <tt class="docutils literal"><span class="pre">$options</span></tt> to assembled the URL.</li>
+<li><tt class="docutils literal"><span class="pre">toUrl($url)</span></tt>: Simply redirects to the given URL.</li>
+</ul>
+<p>In each case, the <tt class="docutils literal"><span class="pre">Response</span></tt> object is returned. If you return this immediately, you can effectively
+short-circuit execution of the request.</p>
+<p>One note: this plugin requires that the controller invoking it implements <tt class="docutils literal"><span class="pre">InjectApplicationEvent</span></tt>, and thus has
+an <tt class="docutils literal"><span class="pre">MvcEvent</span></tt> composed, as it retrieves the router from the event object.</p>
+<p>As an example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toRoute</span><span class="p">(</span><span class="s1">&#39;login-success&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="the-url-plugin">
+<span id="zend-mvc-controller-plugins-url"></span><h2>The Url Plugin<a class="headerlink" href="#the-url-plugin" title="Permalink to this headline">¶</a></h2>
+<p>Often you may want to generate URLs from route definitions within your controllers &#8211; in order to seed the view,
+generate headers, etc. While the <tt class="docutils literal"><span class="pre">MvcEvent</span></tt> object composes the router, doing so manually would require this
+workflow:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$router</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEvent</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getRouter</span><span class="p">();</span>
+<span class="nv">$url</span>    <span class="o">=</span> <span class="nv">$router</span><span class="o">-&gt;</span><span class="na">assemble</span><span class="p">(</span><span class="nv">$params</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;route-name&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">Url</span></tt> helper makes this slightly more convenient:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$url</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">fromRoute</span><span class="p">(</span><span class="s1">&#39;route-name&#39;</span><span class="p">,</span> <span class="nv">$params</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">fromRoute()</span></tt> method is the only public method defined, and has the following signature:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">fromRoute</span><span class="p">(</span><span class="nv">$route</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$params</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="k">array</span> <span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+</pre></div>
+</td></tr></table></div>
+<p>One note: this plugin requires that the controller invoking it implements <tt class="docutils literal"><span class="pre">InjectApplicationEvent</span></tt>, and thus has
+an <tt class="docutils literal"><span class="pre">MvcEvent</span></tt> composed, as it retrieves the router from the event object.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Controller Plugins</a><ul>
+<li><a class="reference internal" href="#the-flashmessenger">The FlashMessenger</a><ul>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-forward-plugin">The Forward Plugin</a></li>
+<li><a class="reference internal" href="#the-post-redirect-get-plugin">The Post/Redirect/Get Plugin</a></li>
+<li><a class="reference internal" href="#the-redirect-plugin">The Redirect Plugin</a></li>
+<li><a class="reference internal" href="#the-url-plugin">The Url Plugin</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.mvc.controllers.html"
+                        title="previous chapter">Available Controllers</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.mvc.examples.html"
+                        title="next chapter">Examples</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.mvc.plugins.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.mvc.plugins.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.mvc.examples.html" title="Examples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.mvc.controllers.html" title="Available Controllers"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.mvc.plugins.rst">
+                Controller Plugins
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

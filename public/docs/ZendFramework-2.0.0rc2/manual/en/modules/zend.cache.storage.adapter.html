@@ -1,0 +1,639 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Cache\Storage\Adapter &mdash; Zend Framework 2 2.0.0rc1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc1 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Cache\Storage\Capabilities" href="zend.cache.storage.capabilities.html" />
+    <link rel="prev" title="Zend_Cache Frontends" href="zend.cache.frontends.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.cache.storage.capabilities.html" title="Zend\Cache\Storage\Capabilities"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.cache.frontends.html" title="Zend_Cache Frontends"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-cache-storage-adapter">
+<span id="id1"></span><h1>Zend\Cache\Storage\Adapter<a class="headerlink" href="#zend-cache-storage-adapter" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-cache-storage-adapter-intro"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Storage adapters are wrappers for real storage resources such as memory and the filesystem, using the well known
+adapter pattern.</p>
+<p>They comes with tons of methods to read, write and modify stored items and to get information about stored items
+and the storage.</p>
+<p>All adapters implements the interface <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter</span></tt> and most extend
+<tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\AbstractAdapter</span></tt>, which comes with basic logic.</p>
+<p>Configuration is handled by either <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\AdapterOptions</span></tt>, or an adapter-specific options
+class if it exists. You may pass the options instance to the class at instantiation or via the <tt class="docutils literal"><span class="pre">setOptions()</span></tt>
+method, or alternately pass an associative array of options in either place (internally, these are then passed to
+an options class instance). Alternately, you can pass either the options instance or associative array to the
+<tt class="docutils literal"><span class="pre">Zend\Cache\StorageFactory::factory</span></tt> method.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Many methods throw exceptions</strong></p>
+<p class="last">Because many caching methods can throw exceptions, you need to catch them manually or you can use the plug-in
+<tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Plugin\ExceptionHandler</span></tt> to automatically catch them and redirect exceptions into a log
+file using the option &#8220;exception_callback&#8221;.</p>
+</div>
+</div>
+<div class="section" id="quick-start">
+<span id="zend-cache-storage-adapter-quick-start"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>Caching adapters can either be created from the provided <tt class="docutils literal"><span class="pre">Zend\Cache\StorageFactory</span></tt> factory, or by simply
+instantiating one of the <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\*</span></tt>classes.</p>
+<p>To make life easier, the <tt class="docutils literal"><span class="pre">Zend\Cache\StorageFactory</span></tt> comes with a <tt class="docutils literal"><span class="pre">factory</span></tt> method to create an adapter and
+create/add all requested plugins at once.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Cache\StorageFactory</span><span class="p">;</span>
+
+<span class="c1">// Via factory:</span>
+<span class="nv">$cache</span> <span class="o">=</span> <span class="nx">StorageFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;apc&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;plugins&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;exception_handler&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;throw_exceptions&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+
+<span class="c1">// Alternately:</span>
+<span class="nv">$cache</span>  <span class="o">=</span> <span class="nx">StorageFactory</span><span class="o">::</span><span class="na">adapterFactory</span><span class="p">(</span><span class="s1">&#39;apc&#39;</span><span class="p">);</span>
+<span class="nv">$plugin</span> <span class="o">=</span> <span class="nx">StorageFactory</span><span class="o">::</span><span class="na">pluginFactory</span><span class="p">(</span><span class="s1">&#39;exception_handler&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;throw_exceptions&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+<span class="p">));</span>
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">addPlugin</span><span class="p">(</span><span class="nv">$plugin</span><span class="p">);</span>
+
+<span class="c1">// Or manually:</span>
+<span class="nv">$cache</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Cache\Storage\Adapter\Apc</span><span class="p">();</span>
+<span class="nv">$plugin</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Cache\Storage\Plugin\ExceptionHandler</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;throw_exceptions&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+<span class="p">));</span>
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">addPlugin</span><span class="p">(</span><span class="nv">$plugin</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="configuration-options">
+<span id="zend-cache-storage-adapter-options"></span><h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="zend-cache-storage-adapter-options-ignore-missing-items">
+<dt><strong>ignore_missing_items</strong></dt>
+<dd><p class="first">Enables or disables ignoring of missing items.</p>
+<p>If enabled and a missing item was requested:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">getItem</span></tt>, <tt class="docutils literal"><span class="pre">getMetadata</span></tt>: return false</li>
+<li><tt class="docutils literal"><span class="pre">removeItem[s]</span></tt>: return true</li>
+<li><tt class="docutils literal"><span class="pre">incrementItem[s]</span></tt>, <tt class="docutils literal"><span class="pre">decrementItem[s]</span></tt>: add a new item with 0 as base</li>
+<li><tt class="docutils literal"><span class="pre">touchItem[s]</span></tt>: add new empty item</li>
+</ul>
+<p>If disabled and a missing item was requested:</p>
+<ul class="last simple">
+<li><tt class="docutils literal"><span class="pre">getItem</span></tt>, <tt class="docutils literal"><span class="pre">getMetadata</span></tt>, <tt class="docutils literal"><span class="pre">incrementItem[s]</span></tt>, <tt class="docutils literal"><span class="pre">decrementItem[s]</span></tt>, <tt class="docutils literal"><span class="pre">touchItem[s]</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">setIgnoreMissingItems(boolean</span> <span class="pre">$flag)</span></tt>
+Implements a fluent interface.</li>
+<li><tt class="docutils literal"><span class="pre">getIgnoreMissingItems()</span></tt>
+Returns boolean</li>
+</ul>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-options-key-pattern">
+<dt><strong>key_pattern</strong></dt>
+<dd><p class="first">Pattern against which to validate cache keys.</p>
+<ul class="last simple">
+<li><tt class="docutils literal"><span class="pre">setKeyPattern(null|string</span> <span class="pre">$pattern)</span></tt>
+Implements a fluent interface.</li>
+<li><tt class="docutils literal"><span class="pre">getKeyPattern()</span></tt>
+Returns string</li>
+</ul>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-options-namespace">
+<dt><strong>namespace</strong></dt>
+<dd><p class="first">The &#8220;namespace&#8221; in which cache items will live.</p>
+<ul class="last simple">
+<li><tt class="docutils literal"><span class="pre">setNamespace(string</span> <span class="pre">$namespace)</span></tt>
+Implements a fluent interface.</li>
+<li><tt class="docutils literal"><span class="pre">getNamespace()</span></tt>
+Returns string</li>
+</ul>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-options-namespace-pattern">
+<dt><strong>namespace_pattern</strong></dt>
+<dd><p class="first">Pattern against which to validate namespace values.</p>
+<ul class="last simple">
+<li><tt class="docutils literal"><span class="pre">setNamespacePattern(null|string</span> <span class="pre">$pattern)</span></tt>
+Implements a fluent interface.</li>
+<li><tt class="docutils literal"><span class="pre">getNamespacePattern()</span></tt>
+Returns string</li>
+</ul>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-options-readable">
+<dt><strong>readable</strong></dt>
+<dd><p class="first">Enable/Disable reading data from cache.</p>
+<ul class="last simple">
+<li><tt class="docutils literal"><span class="pre">setReadable(boolean</span> <span class="pre">$flag)</span></tt>
+Implements a fluent interface.</li>
+<li><tt class="docutils literal"><span class="pre">getReadable()</span></tt>
+Returns boolean</li>
+</ul>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-options-ttl">
+<dt><strong>ttl</strong></dt>
+<dd><p class="first">Set time to live.</p>
+<ul class="last simple">
+<li><tt class="docutils literal"><span class="pre">setTtl(int|float</span> <span class="pre">$ttl)</span></tt>
+Implements a fluent interface.</li>
+<li><tt class="docutils literal"><span class="pre">getTtl()</span></tt>
+Returns float</li>
+</ul>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-options-writable">
+<dt><strong>writable</strong></dt>
+<dd><p class="first">Enable/Disable writing data to cache.</p>
+<ul class="last simple">
+<li><tt class="docutils literal"><span class="pre">setWritable(boolean</span> <span class="pre">$flag)</span></tt>
+Implements a fluent interface.</li>
+<li><tt class="docutils literal"><span class="pre">getWritable()</span></tt>
+Returns boolean</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="available-methods">
+<span id="zend-cache-storage-adapter-methods"></span><h2>Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-set-options">
+<dt><strong>setOptions</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setOptions(array|Traversable|Zend\Cache\Storage\Adapter\AdapterOptions</span> <span class="pre">$options)</span></tt></p>
+<p>Set options.</p>
+<p class="last">Implements a fluent interface.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-get-options">
+<dt><strong>getOptions</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getOptions()</span></tt></p>
+<p>Get options</p>
+<p class="last">Returns Zend\Cache\Storage\Adapter\AdapterOptions</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-get-item">
+<dt><strong>getItem</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getItem(string</span> <span class="pre">$key,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Get an item.</p>
+<p class="last">Returns mixed</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-get-items">
+<dt><strong>getItems</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getItems(array</span> <span class="pre">$keys,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Get multiple items.</p>
+<p class="last">Returns array</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-has-item">
+<dt><strong>hasItem</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">hasItem(string</span> <span class="pre">$key,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Test if an item exists.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-has-items">
+<dt><strong>hasItems</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">hasItems(array</span> <span class="pre">$keys,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Test multiple items.</p>
+<p class="last">Returns array</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-get-metadata">
+<dt><strong>getMetadata</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getMetadata(string</span> <span class="pre">$key,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Get metadata of an item.</p>
+<p class="last">Returns array|boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-get-metadatas">
+<dt><strong>getMetadatas</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getMetadatas(array</span> <span class="pre">$keys,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Get multiple metadata</p>
+<p class="last">Returns array</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-set-item">
+<dt><strong>setItem</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setItem(string</span> <span class="pre">$key,</span> <span class="pre">mixed</span> <span class="pre">$value,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Store an item.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-set-items">
+<dt><strong>setItems</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setItems(array</span> <span class="pre">$keyValuePairs,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Store multiple items.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-add-item">
+<dt><strong>addItem</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">addItem(string</span> <span class="pre">$key,</span> <span class="pre">mixed</span> <span class="pre">$value,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Add an item.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-add-items">
+<dt><strong>addItems</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">addItems(array</span> <span class="pre">$keyValuePairs,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Add multiple items.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-replace-item">
+<dt><strong>replaceItem</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">replaceItem(string</span> <span class="pre">$key,</span> <span class="pre">mixed</span> <span class="pre">$value,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Replace an item.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-replace-items">
+<dt><strong>replaceItems</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">replaceItems(array</span> <span class="pre">$keyValuePairs,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Replace multiple items.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-check-and-set-item">
+<dt><strong>checkAndSetItem</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">checkAndSetItem(mixed</span> <span class="pre">$token,</span> <span class="pre">string|null</span> <span class="pre">$key,</span> <span class="pre">mixed</span> <span class="pre">$value,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Set item only if token matches</p>
+<p>It uses the token from received from <tt class="docutils literal"><span class="pre">getItem()</span></tt> to check if the item has changed before overwriting it.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-touch-item">
+<dt><strong>touchItem</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">touchItem(string</span> <span class="pre">$key,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Reset lifetime of an item</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-touch-items">
+<dt><strong>touchItems</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">touchItems(array</span> <span class="pre">$keys,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Reset lifetime of multiple items.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-remove-item">
+<dt><strong>removeItem</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">removeItem(string</span> <span class="pre">$key,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Remove an item.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-remove-items">
+<dt><strong>removeItems</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">removeItems(array</span> <span class="pre">$keys,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Remove multiple items.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-increment-item">
+<dt><strong>incrementItem</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">incrementItem(string</span> <span class="pre">$key,</span> <span class="pre">int</span> <span class="pre">$value,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Increment an item.</p>
+<p class="last">Returns int|boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-increment-items">
+<dt><strong>incrementItems</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">incrementItems(array</span> <span class="pre">$keyValuePairs,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Increment multiple items.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-decrement-item">
+<dt><strong>decrementItem</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">decrementItem(string</span> <span class="pre">$key,</span> <span class="pre">int</span> <span class="pre">$value,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Decrement an item.</p>
+<p class="last">Returns int|boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-decrement-items">
+<dt><strong>decrementItems</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">decrementItems(array</span> <span class="pre">$keyValuePairs,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Decrement multiple items.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-get-delayed">
+<dt><strong>getDelayed</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getDelayed(array</span> <span class="pre">$keys,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Request multiple items.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-find">
+<dt><strong>find</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">find(int</span> <span class="pre">$mode</span> <span class="pre">=</span> <span class="pre">2,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Find items.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-fetch">
+<dt><strong>fetch</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">fetch()</span></tt></p>
+<p>Fetches the next item from result set</p>
+<p class="last">Returns array|boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-fetch-all">
+<dt><strong>fetchAll</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">fetchAll()</span></tt></p>
+<p>Returns all items of result set.</p>
+<p class="last">Returns array</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-clear">
+<dt><strong>clear</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">clear(int</span> <span class="pre">$mode</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Clear items off all namespaces.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-clear-by-namespace">
+<dt><strong>clearByNamespace</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">clearByNamespace(int</span> <span class="pre">$mode</span> <span class="pre">=</span> <span class="pre">1,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Clear items by namespace.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-optimize">
+<dt><strong>optimize</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">optimize(array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Optimize adapter storage.</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-get-capabilities">
+<dt><strong>getCapabilities</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getCapabilities()</span></tt></p>
+<p>Capabilities of this storage</p>
+<p class="last">Returns Zend\Cache\Storage\Capabilities</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-adapter-methods-get-capacity">
+<dt><strong>getCapacity</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getCapacity(array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">())</span></tt></p>
+<p>Get storage capacity.</p>
+<p class="last">Returns array|boolean</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="todo-examples">
+<span id="zend-cache-storage-adapter-examples"></span><h2>TODO: Examples<a class="headerlink" href="#todo-examples" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Cache\Storage\Adapter</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#available-methods">Available Methods</a></li>
+<li><a class="reference internal" href="#todo-examples">TODO: Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.cache.frontends.html"
+                        title="previous chapter">Zend_Cache Frontends</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.cache.storage.capabilities.html"
+                        title="next chapter">Zend\Cache\Storage\Capabilities</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.cache.storage.adapter.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.cache.storage.adapter.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.cache.storage.capabilities.html" title="Zend\Cache\Storage\Capabilities"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.cache.frontends.html" title="Zend_Cache Frontends"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.cache.storage.adapter.rst">
+                Zend\Cache\Storage\Adapter
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,652 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Encrypt and Decrypt &mdash; Zend Framework 2 2.0.0rc1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc1 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="encrypt-and-decrypt">
+<span id="zend-filter-set-encrypt"></span><h1>Encrypt and Decrypt<a class="headerlink" href="#encrypt-and-decrypt" title="Permalink to this headline">¶</a></h1>
+<p>These filters allow to encrypt and decrypt any given string. Therefor they make use of Adapters. Actually there are
+adapters for the <tt class="docutils literal"><span class="pre">Mcrypt</span></tt> and <tt class="docutils literal"><span class="pre">OpenSSL</span></tt> extensions from <em>PHP</em>.</p>
+<div class="section" id="supported-options-for-zend-filter-encrypt-and-zend-filter-decrypt">
+<span id="zend-filter-set-encrypt-options"></span><h2>Supported options for Zend_Filter_Encrypt and Zend_Filter_Decrypt<a class="headerlink" href="#supported-options-for-zend-filter-encrypt-and-zend-filter-decrypt" title="Permalink to this headline">¶</a></h2>
+<p>The following options are supported for <tt class="docutils literal"><span class="pre">Zend_Filter_Encrypt</span></tt> and <tt class="docutils literal"><span class="pre">Zend_Filter_Decrypt</span></tt>:</p>
+<ul class="simple">
+<li><strong>adapter</strong>: This sets the encryption adapter which should be used</li>
+<li><strong>algorithm</strong>: Only <tt class="docutils literal"><span class="pre">MCrypt</span></tt>. The algorithm which has to be used. It should be one of the algorithm ciphers
+which can be found under <a class="reference external" href="http://php.net/mcrypt">PHP&#8217;s mcrypt ciphers</a>. If not set it defaults to <tt class="docutils literal"><span class="pre">blowfish</span></tt>.</li>
+<li><strong>algorithm_directory</strong>: Only <tt class="docutils literal"><span class="pre">MCrypt</span></tt>. The directory where the algorithm can be found. If not set it defaults
+to the path set within the mcrypt extension.</li>
+<li><strong>compression</strong>: If the encrypted value should be compressed. Default is no compression.</li>
+<li><strong>envelope</strong>: Only <tt class="docutils literal"><span class="pre">OpenSSL</span></tt>. The encrypted envelope key from the user who encrypted the content. You can
+either provide the path and filename of the key file, or just the content of the key file itself. When the
+<tt class="docutils literal"><span class="pre">package</span></tt> option has been set, then you can omit this parameter.</li>
+<li><strong>key</strong>: Only <tt class="docutils literal"><span class="pre">MCrypt</span></tt>. The encryption key with which the input will be encrypted. You need the same key for
+decryption.</li>
+<li><strong>mode</strong>: Only <tt class="docutils literal"><span class="pre">MCrypt</span></tt>. The encryption mode which has to be used. It should be one of the modes which can be
+found under <a class="reference external" href="http://php.net/mcrypt">PHP&#8217;s mcrypt modes</a>. If not set it defaults to &#8216;cbc&#8217;.</li>
+<li><strong>mode_directory</strong>: Only <tt class="docutils literal"><span class="pre">MCrypt</span></tt>. The directory where the mode can be found. If not set it defaults to the
+path set within the <tt class="docutils literal"><span class="pre">Mcrypt</span></tt> extension.</li>
+<li><strong>package</strong>: Only <tt class="docutils literal"><span class="pre">OpenSSL</span></tt>. If the envelope key should be packed with the encrypted value. Default is
+<tt class="docutils literal"><span class="pre">FALSE</span></tt>.</li>
+<li><strong>private</strong>: Only <tt class="docutils literal"><span class="pre">OpenSSL</span></tt>. Your private key which will be used for encrypting the content. Also the private
+key can be either a filename with path of the key file, or just the content of the key file itself.</li>
+<li><strong>public</strong>: Only <tt class="docutils literal"><span class="pre">OpenSSL</span></tt>. The public key of the user whom you want to provide the encrpted content. You can
+give multiple public keys by using an array. You can eigther provide the path and filename of the key file, or
+just the content of the key file itself.</li>
+<li><strong>salt</strong>: Only <tt class="docutils literal"><span class="pre">MCrypt</span></tt>. If the key should be used as salt value. The key used for encryption will then itself
+also be encrypted. Default is <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</li>
+<li><strong>vector</strong>: Only <tt class="docutils literal"><span class="pre">MCrypt</span></tt>. The initialization vector which shall be used. If not set it will be a random
+vector.</li>
+</ul>
+</div>
+<div class="section" id="adapter-usage">
+<span id="zend-filter-set-encrypt-adapterusage"></span><h2>Adapter usage<a class="headerlink" href="#adapter-usage" title="Permalink to this headline">¶</a></h2>
+<p>As these two encryption methodologies work completely different, also the usage of the adapters differ. You have to
+select the adapter you want to use when initiating the filter.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Use the Mcrypt adapter</span>
+<span class="nv">$filter1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Encrypt</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;mcrypt&#39;</span><span class="p">));</span>
+
+<span class="c1">// Use the OpenSSL adapter</span>
+<span class="nv">$filter2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Encrypt</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;openssl&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>To set another adapter you can also use <tt class="docutils literal"><span class="pre">setAdapter()</span></tt>, and the <tt class="docutils literal"><span class="pre">getAdapter()</span></tt> method to receive the actual set
+adapter.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Use the Mcrypt adapter</span>
+<span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Encrypt</span><span class="p">();</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setAdapter</span><span class="p">(</span><span class="s1">&#39;openssl&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When you do not supply the <tt class="docutils literal"><span class="pre">adapter</span></tt> option or do not use <tt class="docutils literal"><span class="pre">setAdapter()</span></tt>, then the <tt class="docutils literal"><span class="pre">Mcrypt</span></tt> adapter will
+be used per default.</p>
+</div>
+</div>
+<div class="section" id="encryption-with-mcrypt">
+<span id="zend-filter-set-encrypt-mcrypt"></span><h2>Encryption with Mcrypt<a class="headerlink" href="#encryption-with-mcrypt" title="Permalink to this headline">¶</a></h2>
+<p>When you have installed the <tt class="docutils literal"><span class="pre">Mcrypt</span></tt> extension you can use the <tt class="docutils literal"><span class="pre">Mcrypt</span></tt> adapter. If you provide a string
+instead of an array of options, this string will be used as key.</p>
+<p>You can get and set the encryption values also afterwards with the <tt class="docutils literal"><span class="pre">getEncryption()</span></tt> and <tt class="docutils literal"><span class="pre">setEncryption()</span></tt>
+methods.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that you will get an exception if the mcrypt extension is not available in your environment.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You should also note that all settings which be checked when you create the instance or when you call
+<tt class="docutils literal"><span class="pre">setEncryption()</span></tt>. If mcrypt detects problem with your settings an exception will be thrown.</p>
+</div>
+<p>You can get or set the encryption vector by calling <tt class="docutils literal"><span class="pre">getVector()</span></tt> and <tt class="docutils literal"><span class="pre">setVector()</span></tt>. A given string will be
+truncated or padded to the needed vector size of the used algorithm.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that when you are not using an own vector, you must get the vector and store it. Otherwise you will not be
+able to decode the encoded string.</p>
+</div>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Use the default blowfish settings</span>
+<span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Encrypt</span><span class="p">(</span><span class="s1">&#39;myencryptionkey&#39;</span><span class="p">);</span>
+
+<span class="c1">// Set a own vector, otherwise you must call getVector()</span>
+<span class="c1">// and store this vector for later decryption</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setVector</span><span class="p">(</span><span class="s1">&#39;myvector&#39;</span><span class="p">);</span>
+<span class="c1">// $filter-&gt;getVector();</span>
+
+<span class="nv">$encrypted</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;text_to_be_encoded&#39;</span><span class="p">);</span>
+<span class="k">print</span> <span class="nv">$encrypted</span><span class="p">;</span>
+
+<span class="c1">// For decryption look at the Decrypt filter</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="decryption-with-mcrypt">
+<span id="zend-filter-set-encrypt-mcryptdecrypt"></span><h2>Decryption with Mcrypt<a class="headerlink" href="#decryption-with-mcrypt" title="Permalink to this headline">¶</a></h2>
+<p>For decrypting content which was previously encrypted with <tt class="docutils literal"><span class="pre">Mcrypt</span></tt> you need to have the options with which the
+encryption has been called.</p>
+<p>There is one eminent difference for you. When you did not provide a vector at encryption you need to get it after
+you encrypted the content by using the <tt class="docutils literal"><span class="pre">getVector()</span></tt> method on the encryption filter. Without the correct vector
+you will not be able to decrypt the content.</p>
+<p>As soon as you have provided all options decryption is as simple as encryption.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Use the default blowfish settings</span>
+<span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Decrypt</span><span class="p">(</span><span class="s1">&#39;myencryptionkey&#39;</span><span class="p">);</span>
+
+<span class="c1">// Set the vector with which the content was encrypted</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setVector</span><span class="p">(</span><span class="s1">&#39;myvector&#39;</span><span class="p">);</span>
+
+<span class="nv">$decrypted</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;encoded_text_normally_unreadable&#39;</span><span class="p">);</span>
+<span class="k">print</span> <span class="nv">$decrypted</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that you will get an exception if the mcrypt extension is not available in your environment.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You should also note that all settings which be checked when you create the instance or when you call
+<tt class="docutils literal"><span class="pre">setEncryption()</span></tt>. If mcrypt detects problem with your settings an exception will be thrown.</p>
+</div>
+</div>
+<div class="section" id="encryption-with-openssl">
+<span id="zend-filter-set-encrypt-openssl"></span><h2>Encryption with OpenSSL<a class="headerlink" href="#encryption-with-openssl" title="Permalink to this headline">¶</a></h2>
+<p>When you have installed the <tt class="docutils literal"><span class="pre">OpenSSL</span></tt> extension you can use the <tt class="docutils literal"><span class="pre">OpenSSL</span></tt> adapter. You can get or set the
+public keys also afterwards with the <tt class="docutils literal"><span class="pre">getPublicKey()</span></tt> and <tt class="docutils literal"><span class="pre">setPublicKey()</span></tt> methods. The private key can also be
+get and set with the related <tt class="docutils literal"><span class="pre">getPrivateKey()</span></tt> and <tt class="docutils literal"><span class="pre">setPrivateKey()</span></tt> methods.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Use openssl and provide a private key</span>
+<span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Encrypt</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;openssl&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;private&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/mykey/private.pem&#39;</span>
+<span class="p">));</span>
+
+<span class="c1">// of course you can also give the public keys at initiation</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setPublicKey</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;/public/key/path/first.pem&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;/public/key/path/second.pem&#39;</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that the <tt class="docutils literal"><span class="pre">OpenSSL</span></tt> adapter will not work when you do not provide valid keys.</p>
+</div>
+<p>When you want to encode also the keys, then you have to provide a passphrase with the <tt class="docutils literal"><span class="pre">setPassphrase()</span></tt> method.
+When you want to decode content which was encoded with a passphrase you will not only need the public key, but also
+the passphrase to decode the encrypted key.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Use openssl and provide a private key</span>
+<span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Encrypt</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;openssl&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;private&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/mykey/private.pem&#39;</span>
+<span class="p">));</span>
+
+<span class="c1">// of course you can also give the public keys at initiation</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setPublicKey</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;/public/key/path/first.pem&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;/public/key/path/second.pem&#39;</span>
+<span class="p">));</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setPassphrase</span><span class="p">(</span><span class="s1">&#39;mypassphrase&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>At last, when you use OpenSSL you need to give the receiver the encrypted content, the passphrase when have
+provided one, and the envelope keys for decryption.</p>
+<p>This means for you, that you have to get the envelope keys after the encryption with the <tt class="docutils literal"><span class="pre">getEnvelopeKey()</span></tt>
+method.</p>
+<p>So our complete example for encrypting content with <tt class="docutils literal"><span class="pre">OpenSSL</span></tt> look like this.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Use openssl and provide a private key</span>
+<span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Encrypt</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;openssl&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;private&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/mykey/private.pem&#39;</span>
+<span class="p">));</span>
+
+<span class="c1">// of course you can also give the public keys at initiation</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setPublicKey</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;/public/key/path/first.pem&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;/public/key/path/second.pem&#39;</span>
+<span class="p">));</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setPassphrase</span><span class="p">(</span><span class="s1">&#39;mypassphrase&#39;</span><span class="p">);</span>
+
+<span class="nv">$encrypted</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;text_to_be_encoded&#39;</span><span class="p">);</span>
+<span class="nv">$envelope</span>  <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">getEnvelopeKey</span><span class="p">();</span>
+<span class="k">print</span> <span class="nv">$encrypted</span><span class="p">;</span>
+
+<span class="c1">// For decryption look at the Decrypt filter</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="simplified-usage-with-openssl">
+<span id="zend-filter-set-encrypt-openssl-simplified"></span><h3>Simplified usage with Openssl<a class="headerlink" href="#simplified-usage-with-openssl" title="Permalink to this headline">¶</a></h3>
+<p>As seen before, you need to get the envelope key to be able to decrypt the previous encrypted value. This can be
+very annoying when you work with multiple values.</p>
+<p>To have a simplified usage you can set the <tt class="docutils literal"><span class="pre">package</span></tt> option to <tt class="docutils literal"><span class="pre">TRUE</span></tt>. The default value is <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Use openssl and provide a private key</span>
+<span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Encrypt</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;openssl&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;private&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/mykey/private.pem&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;public&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;/public/key/path/public.pem&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;package&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+<span class="p">));</span>
+
+<span class="nv">$encrypted</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;text_to_be_encoded&#39;</span><span class="p">);</span>
+<span class="k">print</span> <span class="nv">$encrypted</span><span class="p">;</span>
+
+<span class="c1">// For decryption look at the Decrypt filter</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now the returned value contains the encrypted value and the envelope. You don&#8217;t need to get them after the
+compression. But, and this is the negative aspect of this feature, the encrypted value can now only be decrypted by
+using <tt class="docutils literal"><span class="pre">Zend_Filter_Encrypt</span></tt>.</p>
+</div>
+<div class="section" id="compressing-the-content">
+<span id="zend-filter-set-encrypt-openssl-compressed"></span><h3>Compressing the content<a class="headerlink" href="#compressing-the-content" title="Permalink to this headline">¶</a></h3>
+<p>Based on the original value, the encrypted value can be a very large string. To reduce the value
+<tt class="docutils literal"><span class="pre">Zend_Filter_Encrypt</span></tt> allows the usage of compression.</p>
+<p>The <tt class="docutils literal"><span class="pre">compression</span></tt> option can eighter be set to the name of a compression adapter, or to an array which sets all
+wished options for the compression adapter.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Use basic compression adapter</span>
+<span class="nv">$filter1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Encrypt</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;adapter&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;openssl&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;private&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/mykey/private.pem&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;public&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;/public/key/path/public.pem&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;package&#39;</span>     <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+   <span class="s1">&#39;compression&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;bz2&#39;</span>
+<span class="p">));</span>
+
+<span class="c1">// Use basic compression adapter</span>
+<span class="nv">$filter2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Encrypt</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;adapter&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;openssl&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;private&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/mykey/private.pem&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;public&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;/public/key/path/public.pem&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;package&#39;</span>     <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+   <span class="s1">&#39;compression&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;zip&#39;</span><span class="p">,</span> <span class="s1">&#39;target&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;\usr\tmp\tmp.zip&#39;</span><span class="p">)</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Decryption with same settings</strong></p>
+<p class="last">When you want to decrypt a value which is additionally compressed, then you need to set the same compression
+settings for decryption as for encryption. Otherwise the decryption will fail.</p>
+</div>
+</div>
+</div>
+<div class="section" id="decryption-with-openssl">
+<span id="zend-filter-set-encrypt-openssldecrypt"></span><h2>Decryption with OpenSSL<a class="headerlink" href="#decryption-with-openssl" title="Permalink to this headline">¶</a></h2>
+<p>Decryption with <tt class="docutils literal"><span class="pre">OpenSSL</span></tt> is as simple as encryption. But you need to have all data from the person who encrypted
+the content. See the following example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Use openssl and provide a private key</span>
+<span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Decrypt</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;openssl&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;private&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/mykey/private.pem&#39;</span>
+<span class="p">));</span>
+
+<span class="c1">// of course you can also give the envelope keys at initiation</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setEnvelopeKey</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;/key/from/encoder/first.pem&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;/key/from/encoder/second.pem&#39;</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that the <tt class="docutils literal"><span class="pre">OpenSSL</span></tt> adapter will not work when you do not provide valid keys.</p>
+</div>
+<p>Optionally it could be necessary to provide the passphrase for decrypting the keys themself by using the
+<tt class="docutils literal"><span class="pre">setPassphrase()</span></tt> method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Use openssl and provide a private key</span>
+<span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Decrypt</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;openssl&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;private&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/mykey/private.pem&#39;</span>
+<span class="p">));</span>
+
+<span class="c1">// of course you can also give the envelope keys at initiation</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setEnvelopeKey</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;/key/from/encoder/first.pem&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;/key/from/encoder/second.pem&#39;</span>
+<span class="p">));</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setPassphrase</span><span class="p">(</span><span class="s1">&#39;mypassphrase&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>At last, decode the content. Our complete example for decrypting the previously encrypted content looks like this.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Use openssl and provide a private key</span>
+<span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Decrypt</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;openssl&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;private&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/mykey/private.pem&#39;</span>
+<span class="p">));</span>
+
+<span class="c1">// of course you can also give the envelope keys at initiation</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setEnvelopeKey</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;/key/from/encoder/first.pem&#39;</span><span class="p">,</span>
+   <span class="s1">&#39;/key/from/encoder/second.pem&#39;</span>
+<span class="p">));</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">setPassphrase</span><span class="p">(</span><span class="s1">&#39;mypassphrase&#39;</span><span class="p">);</span>
+
+<span class="nv">$decrypted</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;encoded_text_normally_unreadable&#39;</span><span class="p">);</span>
+<span class="k">print</span> <span class="nv">$decrypted</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Encrypt and Decrypt</a><ul>
+<li><a class="reference internal" href="#supported-options-for-zend-filter-encrypt-and-zend-filter-decrypt">Supported options for Zend_Filter_Encrypt and Zend_Filter_Decrypt</a></li>
+<li><a class="reference internal" href="#adapter-usage">Adapter usage</a></li>
+<li><a class="reference internal" href="#encryption-with-mcrypt">Encryption with Mcrypt</a></li>
+<li><a class="reference internal" href="#decryption-with-mcrypt">Decryption with Mcrypt</a></li>
+<li><a class="reference internal" href="#encryption-with-openssl">Encryption with OpenSSL</a><ul>
+<li><a class="reference internal" href="#simplified-usage-with-openssl">Simplified usage with Openssl</a></li>
+<li><a class="reference internal" href="#compressing-the-content">Compressing the content</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#decryption-with-openssl">Decryption with OpenSSL</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.filter.encryption.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.filter.encryption.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.filter.encryption.rst">
+                Encrypt and Decrypt
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

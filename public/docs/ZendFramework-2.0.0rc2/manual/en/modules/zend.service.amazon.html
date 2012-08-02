@@ -1,0 +1,894 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend_Service_Amazon &mdash; Zend Framework 2 2.0.0rc1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc1 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-service-amazon">
+<span id="id1"></span><h1>Zend_Service_Amazon<a class="headerlink" href="#zend-service-amazon" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-service-amazon-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Service_Amazon</span></tt> is a simple <em>API</em> for using Amazon web services. <tt class="docutils literal"><span class="pre">Zend_Service_Amazon</span></tt> has two <em>API</em>s:
+a more traditional one that follows Amazon&#8217;s own <em>API</em>, and a simpler &#8220;Query <em>API</em>&#8221; for constructing even complex
+search queries easily.</p>
+<p><tt class="docutils literal"><span class="pre">Zend_Service_Amazon</span></tt> enables developers to retrieve information appearing throughout Amazon.com web sites
+directly through the Amazon Web Services <em>API</em>. Examples include:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Store item information, such as images, descriptions, pricing, and more</li>
+<li>Customer and editorial reviews</li>
+<li>Similar products and accessories</li>
+<li>Amazon.com offers</li>
+<li>ListMania lists</li>
+</ul>
+</div></blockquote>
+<p>In order to use <tt class="docutils literal"><span class="pre">Zend_Service_Amazon</span></tt>, you should already have an Amazon developer <em>API</em> key aswell as a secret
+key. To get a key and for more information, please visit the <a class="reference external" href="http://aws.amazon.com/">Amazon Web Services</a> web site. As of August 15th,
+2009 you can only use the Amazon Product Advertising <em>API</em> through <tt class="docutils literal"><span class="pre">Zend_Service_Amazon</span></tt>, when specifying the
+additional secret key.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Attention</strong></p>
+<p class="last">Your Amazon developer <em>API</em> and secret keys are linked to your Amazon identity, so take appropriate measures to
+keep them private.</p>
+</div>
+<p class="rubric" id="zend-service-amazon-introduction-example-itemsearch">Search Amazon Using the Traditional API</p>
+<p>In this example, we search for <em>PHP</em> books at Amazon and loop through the results, printing them.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$amazon</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon</span><span class="p">(</span><span class="s1">&#39;AMAZON_API_KEY&#39;</span><span class="p">,</span> <span class="s1">&#39;US&#39;</span><span class="p">,</span> <span class="s1">&#39;AMAZON_SECRET_KEY&#39;</span><span class="p">);</span>
+<span class="nv">$results</span> <span class="o">=</span> <span class="nv">$amazon</span><span class="o">-&gt;</span><span class="na">itemSearch</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;SearchIndex&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Books&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;Keywords&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;php&#39;</span><span class="p">));</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$results</span> <span class="k">as</span> <span class="nv">$result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="na">Title</span> <span class="o">.</span> <span class="s1">&#39;&lt;br /&gt;&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-service-amazon-introduction-example-query-api">Search Amazon Using the Query API</p>
+<p>Here, we also search for <em>PHP</em> books at Amazon, but we instead use the Query <em>API</em>, which resembles the Fluent
+Interface design pattern.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Query</span><span class="p">(</span><span class="s1">&#39;AMAZON_API_KEY&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;US&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;AMAZON_SECRET_KEY&#39;</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">category</span><span class="p">(</span><span class="s1">&#39;Books&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">Keywords</span><span class="p">(</span><span class="s1">&#39;PHP&#39;</span><span class="p">);</span>
+<span class="nv">$results</span> <span class="o">=</span> <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">();</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$results</span> <span class="k">as</span> <span class="nv">$result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="na">Title</span> <span class="o">.</span> <span class="s1">&#39;&lt;br /&gt;&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="country-codes">
+<span id="zend-service-amazon-countrycodes"></span><h2>Country Codes<a class="headerlink" href="#country-codes" title="Permalink to this headline">¶</a></h2>
+<p>By default, <tt class="docutils literal"><span class="pre">Zend_Service_Amazon</span></tt> connects to the United States (&#8220;<em>US</em>&#8221;) Amazon web service. To connect from a
+different country, simply specify the appropriate country code string as the second parameter to the constructor:</p>
+<p class="rubric" id="zend-service-amazon-countrycodes-example-country-code">Choosing an Amazon Web Service Country</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Connect to Amazon in Japan</span>
+<span class="nv">$amazon</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon</span><span class="p">(</span><span class="s1">&#39;AMAZON_API_KEY&#39;</span><span class="p">,</span> <span class="s1">&#39;JP&#39;</span><span class="p">,</span> <span class="s1">&#39;AMAZON_SECRET_KEY&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Country codes</strong></p>
+<p class="last">Valid country codes are: <em>CA</em>, <em>DE</em>, <em>FR</em>, <em>JP</em>, <em>UK</em>, and <em>US</em>.</p>
+</div>
+</div>
+<div class="section" id="looking-up-a-specific-amazon-item-by-asin">
+<span id="zend-service-amazon-itemlookup"></span><h2>Looking up a Specific Amazon Item by ASIN<a class="headerlink" href="#looking-up-a-specific-amazon-item-by-asin" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">itemLookup()</span></tt> method provides the ability to fetch a particular Amazon item when the <em>ASIN</em> is known.</p>
+<p class="rubric" id="zend-service-amazon-itemlookup-example-asin">Looking up a Specific Amazon Item by ASIN</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$amazon</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon</span><span class="p">(</span><span class="s1">&#39;AMAZON_API_KEY&#39;</span><span class="p">,</span> <span class="s1">&#39;US&#39;</span><span class="p">,</span> <span class="s1">&#39;AMAZON_SECRET_KEY&#39;</span><span class="p">);</span>
+<span class="nv">$item</span> <span class="o">=</span> <span class="nv">$amazon</span><span class="o">-&gt;</span><span class="na">itemLookup</span><span class="p">(</span><span class="s1">&#39;B0000A432X&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">itemLookup()</span></tt> method also accepts an optional second parameter for handling search options. For full
+details, including a list of available options, please see the <a class="reference external" href="http://www.amazon.com/gp/aws/sdk/main.html/102-9041115-9057709?s=AWSEcommerceService&amp;v=2011-08-01&amp;p=ApiReference/ItemSearchOperation">relevant Amazon documentation</a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Image information</strong></p>
+<p class="last">To retrieve images information for your search results, you must set <em>ResponseGroup</em> option to <em>Medium</em> or
+<em>Large</em>.</p>
+</div>
+</div>
+<div class="section" id="performing-amazon-item-searches">
+<span id="zend-service-amazon-itemsearch"></span><h2>Performing Amazon Item Searches<a class="headerlink" href="#performing-amazon-item-searches" title="Permalink to this headline">¶</a></h2>
+<p>Searching for items based on any of various available criteria are made simple using the <tt class="docutils literal"><span class="pre">itemSearch()</span></tt> method,
+as in the following example:</p>
+<p class="rubric" id="zend-service-amazon-itemsearch-example-basic">Performing Amazon Item Searches</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$amazon</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon</span><span class="p">(</span><span class="s1">&#39;AMAZON_API_KEY&#39;</span><span class="p">,</span> <span class="s1">&#39;US&#39;</span><span class="p">,</span> <span class="s1">&#39;AMAZON_SECRET_KEY&#39;</span><span class="p">);</span>
+<span class="nv">$results</span> <span class="o">=</span> <span class="nv">$amazon</span><span class="o">-&gt;</span><span class="na">itemSearch</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;SearchIndex&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Books&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;Keywords&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;php&#39;</span><span class="p">));</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$results</span> <span class="k">as</span> <span class="nv">$result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="na">Title</span> <span class="o">.</span> <span class="s1">&#39;&lt;br /&gt;&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-service-amazon-itemsearch-example-responsegroup">Using the ResponseGroup Option</p>
+<p>The <em>ResponseGroup</em> option is used to control the specific information that will be returned in the response.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$amazon</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon</span><span class="p">(</span><span class="s1">&#39;AMAZON_API_KEY&#39;</span><span class="p">,</span> <span class="s1">&#39;US&#39;</span><span class="p">,</span> <span class="s1">&#39;AMAZON_SECRET_KEY&#39;</span><span class="p">);</span>
+<span class="nv">$results</span> <span class="o">=</span> <span class="nv">$amazon</span><span class="o">-&gt;</span><span class="na">itemSearch</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;SearchIndex&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;Books&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Keywords&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;php&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ResponseGroup&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Small,ItemAttributes,Images,SalesRank,Reviews,&#39;</span> <span class="o">.</span>
+                       <span class="s1">&#39;EditorialReview,Similarities,ListmaniaLists&#39;</span>
+    <span class="p">));</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$results</span> <span class="k">as</span> <span class="nv">$result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="na">Title</span> <span class="o">.</span> <span class="s1">&#39;&lt;br /&gt;&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">itemSearch()</span></tt> method accepts a single array parameter for handling search options. For full details,
+including a list of available options, please see the <a class="reference external" href="http://www.amazon.com/gp/aws/sdk/main.html/102-9041115-9057709?s=AWSEcommerceService&amp;v=2011-08-01&amp;p=ApiReference/ItemSearchOperation">relevant Amazon documentation</a></p>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">The <a class="reference internal" href="#zend-service-amazon-query"><em>Zend_Service_Amazon_Query</em></a> class is an easy to use wrapper around this
+method.</p>
+</div>
+</div>
+<div class="section" id="using-the-alternative-query-api">
+<span id="zend-service-amazon-query"></span><h2>Using the Alternative Query API<a class="headerlink" href="#using-the-alternative-query-api" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="zend-service-amazon-query-introduction">
+<span id="id2"></span><h3>Introduction<a class="headerlink" href="#zend-service-amazon-query-introduction" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">Zend_Service_Amazon_Query</span></tt> provides an alternative <em>API</em> for using the Amazon Web Service. The alternative <em>API</em>
+uses the Fluent Interface pattern. That is, all calls can be made using chained method calls. (e.g.,
+<em>$obj-&gt;method()-&gt;method2($arg)</em>)</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend_Service_Amazon_Query</span></tt> <em>API</em> uses overloading to easily set up an item search and then allows you to
+search based upon the criteria specified. Each of the options is provided as a method call, and each method&#8217;s
+argument corresponds to the named option&#8217;s value:</p>
+<p class="rubric" id="zend-service-amazon-query-introduction-example-basic">Search Amazon Using the Alternative Query API</p>
+<p>In this example, the alternative query <em>API</em> is used as a fluent interface to specify options and their respective
+values:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Query</span><span class="p">(</span><span class="s1">&#39;MY_API_KEY&#39;</span><span class="p">,</span> <span class="s1">&#39;US&#39;</span><span class="p">,</span> <span class="s1">&#39;AMAZON_SECRET_KEY&#39;</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">Category</span><span class="p">(</span><span class="s1">&#39;Books&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">Keywords</span><span class="p">(</span><span class="s1">&#39;PHP&#39;</span><span class="p">);</span>
+<span class="nv">$results</span> <span class="o">=</span> <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">();</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$results</span> <span class="k">as</span> <span class="nv">$result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="na">Title</span> <span class="o">.</span> <span class="s1">&#39;&lt;br /&gt;&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This sets the option <em>Category</em> to &#8220;Books&#8221; and <em>Keywords</em> to &#8220;PHP&#8221;.</p>
+<p>For more information on the available options, please refer to the <a class="reference external" href="http://www.amazon.com/gp/aws/sdk/main.html/102-9041115-9057709?s=AWSEcommerceService&amp;v=2011-08-01&amp;p=ApiReference/ItemSearchOperation">relevant Amazon documentation</a>.</p>
+</div>
+</div>
+<div class="section" id="zend-service-amazon-classes">
+<span id="id3"></span><h2>Zend_Service_Amazon Classes<a class="headerlink" href="#zend-service-amazon-classes" title="Permalink to this headline">¶</a></h2>
+<p>The following classes are all returned by <a class="reference internal" href="#zend-service-amazon-itemlookup"><em>Zend_Service_Amazon::itemLookup()</em></a>
+and <a class="reference internal" href="#zend-service-amazon-itemsearch"><em>Zend_Service_Amazon::itemSearch()</em></a>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#zend-service-amazon-classes-item"><em>Zend_Service_Amazon_Item</em></a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-image"><em>Zend_Service_Amazon_Image</em></a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-resultset"><em>Zend_Service_Amazon_ResultSet</em></a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-offerset"><em>Zend_Service_Amazon_OfferSet</em></a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-offer"><em>Zend_Service_Amazon_Offer</em></a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-similarproduct"><em>Zend_Service_Amazon_SimilarProduct</em></a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-accessories"><em>Zend_Service_Amazon_Accessories</em></a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-customerreview"><em>Zend_Service_Amazon_CustomerReview</em></a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-editorialreview"><em>Zend_Service_Amazon_EditorialReview</em></a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-listmania"><em>Zend_Service_Amazon_ListMania</em></a></li>
+</ul>
+</div></blockquote>
+<div class="section" id="zend-service-amazon-item">
+<span id="zend-service-amazon-classes-item"></span><h3>Zend_Service_Amazon_Item<a class="headerlink" href="#zend-service-amazon-item" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">Zend_Service_Amazon_Item</span></tt> is the class type used to represent an Amazon item returned by the web service. It
+encompasses all of the items attributes, including title, description, reviews, etc.</p>
+</div>
+<div class="section" id="zend-service-amazon-item-asxml">
+<span id="zend-service-amazon-classes-item-asxml"></span><h3>Zend_Service_Amazon_Item::asXML()<a class="headerlink" href="#zend-service-amazon-item-asxml" title="Permalink to this headline">¶</a></h3>
+<p>string:<tt class="docutils literal"><span class="pre">asXML()</span></tt></p>
+<p>Return the original <em>XML</em> for the item</p>
+</div>
+<div class="section" id="properties">
+<span id="zend-service-amazon-classes-item-properties"></span><h3>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">Zend_Service_Amazon_Item</span></tt> has a number of properties directly related to their standard Amazon <em>API</em>
+counterparts.</p>
+<table border="1" class="docutils" id="zend-service-amazon-classes-item-properties-table-1">
+<caption>Zend_Service_Amazon_Item Properties</caption>
+<colgroup>
+<col width="12%" />
+<col width="21%" />
+<col width="67%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Type</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ASIN</td>
+<td>string</td>
+<td>Amazon Item ID</td>
+</tr>
+<tr class="row-odd"><td>DetailPageURL</td>
+<td>string</td>
+<td>URL to the Items Details Page</td>
+</tr>
+<tr class="row-even"><td>SalesRank</td>
+<td>int</td>
+<td>Sales Rank for the Item</td>
+</tr>
+<tr class="row-odd"><td>SmallImage</td>
+<td>Zend_Service_Amazon_Image</td>
+<td>Small Image of the Item</td>
+</tr>
+<tr class="row-even"><td>MediumImage</td>
+<td>Zend_Service_Amazon_Image</td>
+<td>Medium Image of the Item</td>
+</tr>
+<tr class="row-odd"><td>LargeImage</td>
+<td>Zend_Service_Amazon_Image</td>
+<td>Large Image of the Item</td>
+</tr>
+<tr class="row-even"><td>Subjects</td>
+<td>array</td>
+<td>Item Subjects</td>
+</tr>
+<tr class="row-odd"><td>Offers</td>
+<td>Zend_Service_Amazon_OfferSet</td>
+<td>Offer Summary and Offers for the Item</td>
+</tr>
+<tr class="row-even"><td>CustomerReviews</td>
+<td>array</td>
+<td>Customer reviews represented as an array of Zend_Service_Amazon_CustomerReview objects</td>
+</tr>
+<tr class="row-odd"><td>EditorialReviews</td>
+<td>array</td>
+<td>Editorial reviews represented as an array of Zend_Service_Amazon_EditorialReview objects</td>
+</tr>
+<tr class="row-even"><td>SimilarProducts</td>
+<td>array</td>
+<td>Similar Products represented as an array of Zend_Service_Amazon_SimilarProduct objects</td>
+</tr>
+<tr class="row-odd"><td>Accessories</td>
+<td>array</td>
+<td>Accessories for the item represented as an array of Zend_Service_Amazon_Accessories objects</td>
+</tr>
+<tr class="row-even"><td>Tracks</td>
+<td>array</td>
+<td>An array of track numbers and names for Music CDs and DVDs</td>
+</tr>
+<tr class="row-odd"><td>ListmaniaLists</td>
+<td>array</td>
+<td>Item related Listmania Lists as an array of Zend_Service_Amazon_ListmainList objects</td>
+</tr>
+<tr class="row-even"><td>PromotionalTag</td>
+<td>string</td>
+<td>Item Promotional Tag</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#zend-service-amazon-classes"><em>Back to Class List</em></a></p>
+</div>
+<div class="section" id="zend-service-amazon-image">
+<span id="zend-service-amazon-classes-image"></span><h3>Zend_Service_Amazon_Image<a class="headerlink" href="#zend-service-amazon-image" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">Zend_Service_Amazon_Image</span></tt> represents a remote Image for a product.</p>
+</div>
+<div class="section" id="zend-service-amazon-classes-image-properties">
+<span id="id4"></span><h3>Properties<a class="headerlink" href="#zend-service-amazon-classes-image-properties" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils" id="zend-service-amazon-classes-image-properties-table-1">
+<caption>Zend_Service_Amazon_Image Properties</caption>
+<colgroup>
+<col width="13%" />
+<col width="17%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Type</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Url</td>
+<td>Zend_Uri</td>
+<td>Remote URL for the Image</td>
+</tr>
+<tr class="row-odd"><td>Height</td>
+<td>int</td>
+<td>The Height of the image in pixels</td>
+</tr>
+<tr class="row-even"><td>Width</td>
+<td>int</td>
+<td>The Width of the image in pixels</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#zend-service-amazon-classes"><em>Back to Class List</em></a></p>
+</div>
+<div class="section" id="zend-service-amazon-resultset">
+<span id="zend-service-amazon-classes-resultset"></span><h3>Zend_Service_Amazon_ResultSet<a class="headerlink" href="#zend-service-amazon-resultset" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">Zend_Service_Amazon_ResultSet</span></tt> objects are returned by <a class="reference internal" href="#zend-service-amazon-itemsearch"><em>Zend_Service_Amazon::itemSearch()</em></a> and allow you to easily handle the multiple results returned.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>SeekableIterator</strong></p>
+<p class="last">Implements the <em>SeekableIterator</em> for easy iteration (e.g. using <em>foreach</em>), as well as direct access to a
+specific result using <tt class="docutils literal"><span class="pre">seek()</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="zend-service-amazon-resultset-totalresults">
+<span id="zend-service-amazon-classes-resultset-totalresults"></span><h3>Zend_Service_Amazon_ResultSet::totalResults()<a class="headerlink" href="#zend-service-amazon-resultset-totalresults" title="Permalink to this headline">¶</a></h3>
+<p>int:<tt class="docutils literal"><span class="pre">totalResults()</span></tt>
+Returns the total number of results returned by the search</p>
+<p><a class="reference internal" href="#zend-service-amazon-classes"><em>Back to Class List</em></a></p>
+</div>
+<div class="section" id="zend-service-amazon-offerset">
+<span id="zend-service-amazon-classes-offerset"></span><h3>Zend_Service_Amazon_OfferSet<a class="headerlink" href="#zend-service-amazon-offerset" title="Permalink to this headline">¶</a></h3>
+<p>Each result returned by <a class="reference internal" href="#zend-service-amazon-itemsearch"><em>Zend_Service_Amazon::itemSearch()</em></a> and
+<a class="reference internal" href="#zend-service-amazon-itemlookup"><em>Zend_Service_Amazon::itemLookup()</em></a> contains a
+<tt class="docutils literal"><span class="pre">Zend_Service_Amazon_OfferSet</span></tt> object through which pricing information for the item can be retrieved.</p>
+</div>
+<div class="section" id="zend-service-amazon-classes-offerset-parameters">
+<span id="id5"></span><h3>Properties<a class="headerlink" href="#zend-service-amazon-classes-offerset-parameters" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils" id="zend-service-amazon-classes-offerset-parameters-table-1">
+<caption>Zend_Service_Amazon_OfferSet Properties</caption>
+<colgroup>
+<col width="24%" />
+<col width="7%" />
+<col width="69%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Type</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>LowestNewPrice</td>
+<td>int</td>
+<td>Lowest Price for the item in &#8220;New&#8221; condition</td>
+</tr>
+<tr class="row-odd"><td>LowestNewPriceCurrency</td>
+<td>string</td>
+<td>The currency for the LowestNewPrice</td>
+</tr>
+<tr class="row-even"><td>LowestOldPrice</td>
+<td>int</td>
+<td>Lowest Price for the item in &#8220;Used&#8221; condition</td>
+</tr>
+<tr class="row-odd"><td>LowestOldPriceCurrency</td>
+<td>string</td>
+<td>The currency for the LowestOldPrice</td>
+</tr>
+<tr class="row-even"><td>TotalNew</td>
+<td>int</td>
+<td>Total number of &#8220;new&#8221; condition available for the item</td>
+</tr>
+<tr class="row-odd"><td>TotalUsed</td>
+<td>int</td>
+<td>Total number of &#8220;used&#8221; condition available for the item</td>
+</tr>
+<tr class="row-even"><td>TotalCollectible</td>
+<td>int</td>
+<td>Total number of &#8220;collectible&#8221; condition available for the item</td>
+</tr>
+<tr class="row-odd"><td>TotalRefurbished</td>
+<td>int</td>
+<td>Total number of &#8220;refurbished&#8221; condition available for the item</td>
+</tr>
+<tr class="row-even"><td>Offers</td>
+<td>array</td>
+<td>An array of Zend_Service_Amazon_Offer objects.</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#zend-service-amazon-classes"><em>Back to Class List</em></a></p>
+</div>
+<div class="section" id="zend-service-amazon-offer">
+<span id="zend-service-amazon-classes-offer"></span><h3>Zend_Service_Amazon_Offer<a class="headerlink" href="#zend-service-amazon-offer" title="Permalink to this headline">¶</a></h3>
+<p>Each offer for an item is returned as an <tt class="docutils literal"><span class="pre">Zend_Service_Amazon_Offer</span></tt> object.</p>
+</div>
+<div class="section" id="zend-service-amazon-offer-properties">
+<span id="zend-service-amazon-classes-offer-properties"></span><h3>Zend_Service_Amazon_Offer Properties<a class="headerlink" href="#zend-service-amazon-offer-properties" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils" id="zend-service-amazon-classes-offer-properties-table-1">
+<caption>Properties</caption>
+<colgroup>
+<col width="24%" />
+<col width="5%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Type</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>MerchantId</td>
+<td>string</td>
+<td>Merchants Amazon ID</td>
+</tr>
+<tr class="row-odd"><td>MerchantName</td>
+<td>string</td>
+<td>Merchants Amazon Name. Requires setting the ResponseGroup option to OfferFull to retrieve.</td>
+</tr>
+<tr class="row-even"><td>GlancePage</td>
+<td>string</td>
+<td>URL for a page with a summary of the Merchant</td>
+</tr>
+<tr class="row-odd"><td>Condition</td>
+<td>string</td>
+<td>Condition of the item</td>
+</tr>
+<tr class="row-even"><td>OfferListingId</td>
+<td>string</td>
+<td>ID of the Offer Listing</td>
+</tr>
+<tr class="row-odd"><td>Price</td>
+<td>int</td>
+<td>Price for the item</td>
+</tr>
+<tr class="row-even"><td>CurrencyCode</td>
+<td>string</td>
+<td>Currency Code for the price of the item</td>
+</tr>
+<tr class="row-odd"><td>Availability</td>
+<td>string</td>
+<td>Availability of the item</td>
+</tr>
+<tr class="row-even"><td>IsEligibleForSuperSaverShipping</td>
+<td>boolean</td>
+<td>Whether the item is eligible for Super Saver Shipping or not</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#zend-service-amazon-classes"><em>Back to Class List</em></a></p>
+</div>
+<div class="section" id="zend-service-amazon-similarproduct">
+<span id="zend-service-amazon-classes-similarproduct"></span><h3>Zend_Service_Amazon_SimilarProduct<a class="headerlink" href="#zend-service-amazon-similarproduct" title="Permalink to this headline">¶</a></h3>
+<p>When searching for items, Amazon also returns a list of similar products that the searcher may find to their
+liking. Each of these is returned as a <tt class="docutils literal"><span class="pre">Zend_Service_Amazon_SimilarProduct</span></tt> object.</p>
+<p>Each object contains the information to allow you to make sub-sequent requests to get the full information on the
+item.</p>
+</div>
+<div class="section" id="zend-service-amazon-classes-similarproduct-properties">
+<span id="id6"></span><h3>Properties<a class="headerlink" href="#zend-service-amazon-classes-similarproduct-properties" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils" id="zend-service-amazon-classes-similarproduct-properties-table-1">
+<caption>Zend_Service_Amazon_SimilarProduct Properties</caption>
+<colgroup>
+<col width="12%" />
+<col width="14%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Type</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ASIN</td>
+<td>string</td>
+<td>Products Amazon Unique ID (ASIN)</td>
+</tr>
+<tr class="row-odd"><td>Title</td>
+<td>string</td>
+<td>Products Title</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#zend-service-amazon-classes"><em>Back to Class List</em></a></p>
+</div>
+<div class="section" id="zend-service-amazon-accessories">
+<span id="zend-service-amazon-classes-accessories"></span><h3>Zend_Service_Amazon_Accessories<a class="headerlink" href="#zend-service-amazon-accessories" title="Permalink to this headline">¶</a></h3>
+<p>Accessories for the returned item are represented as <tt class="docutils literal"><span class="pre">Zend_Service_Amazon_Accessories</span></tt> objects</p>
+</div>
+<div class="section" id="zend-service-amazon-classes-accessories-properties">
+<span id="id7"></span><h3>Properties<a class="headerlink" href="#zend-service-amazon-classes-accessories-properties" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils" id="zend-service-amazon-classes-accessories-properties-table-1">
+<caption>Zend_Service_Amazon_Accessories Properties</caption>
+<colgroup>
+<col width="12%" />
+<col width="14%" />
+<col width="74%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Type</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ASIN</td>
+<td>string</td>
+<td>Products Amazon Unique ID (ASIN)</td>
+</tr>
+<tr class="row-odd"><td>Title</td>
+<td>string</td>
+<td>Products Title</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#zend-service-amazon-classes"><em>Back to Class List</em></a></p>
+</div>
+<div class="section" id="zend-service-amazon-customerreview">
+<span id="zend-service-amazon-classes-customerreview"></span><h3>Zend_Service_Amazon_CustomerReview<a class="headerlink" href="#zend-service-amazon-customerreview" title="Permalink to this headline">¶</a></h3>
+<p>Each Customer Review is returned as a <tt class="docutils literal"><span class="pre">Zend_Service_Amazon_CustomerReview</span></tt> object.</p>
+</div>
+<div class="section" id="zend-service-amazon-classes-customerreview-properties">
+<span id="id8"></span><h3>Properties<a class="headerlink" href="#zend-service-amazon-classes-customerreview-properties" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils" id="zend-service-amazon-classes-customerreview-properties-table-1">
+<caption>Zend_Service_Amazon_CustomerReview Properties</caption>
+<colgroup>
+<col width="23%" />
+<col width="12%" />
+<col width="65%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Type</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Rating</td>
+<td>string</td>
+<td>Item Rating</td>
+</tr>
+<tr class="row-odd"><td>HelpfulVotes</td>
+<td>string</td>
+<td>Votes on how helpful the review is</td>
+</tr>
+<tr class="row-even"><td>CustomerId</td>
+<td>string</td>
+<td>Customer ID</td>
+</tr>
+<tr class="row-odd"><td>TotalVotes</td>
+<td>string</td>
+<td>Total Votes</td>
+</tr>
+<tr class="row-even"><td>Date</td>
+<td>string</td>
+<td>Date of the Review</td>
+</tr>
+<tr class="row-odd"><td>Summary</td>
+<td>string</td>
+<td>Review Summary</td>
+</tr>
+<tr class="row-even"><td>Content</td>
+<td>string</td>
+<td>Review Content</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#zend-service-amazon-classes"><em>Back to Class List</em></a></p>
+</div>
+<div class="section" id="zend-service-amazon-editorialreview">
+<span id="zend-service-amazon-classes-editorialreview"></span><h3>Zend_Service_Amazon_EditorialReview<a class="headerlink" href="#zend-service-amazon-editorialreview" title="Permalink to this headline">¶</a></h3>
+<p>Each items Editorial Reviews are returned as a <tt class="docutils literal"><span class="pre">Zend_Service_Amazon_EditorialReview</span></tt> object</p>
+</div>
+<div class="section" id="zend-service-amazon-classes-editorialreview-properties">
+<span id="id9"></span><h3>Properties<a class="headerlink" href="#zend-service-amazon-classes-editorialreview-properties" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils" id="zend-service-amazon-classes-editorialreview-properties-table-1">
+<caption>Zend_Service_Amazon_EditorialReview Properties</caption>
+<colgroup>
+<col width="16%" />
+<col width="14%" />
+<col width="70%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Type</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Source</td>
+<td>string</td>
+<td>Source of the Editorial Review</td>
+</tr>
+<tr class="row-odd"><td>Content</td>
+<td>string</td>
+<td>Review Content</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#zend-service-amazon-classes"><em>Back to Class List</em></a></p>
+</div>
+<div class="section" id="zend-service-amazon-listmania">
+<span id="zend-service-amazon-classes-listmania"></span><h3>Zend_Service_Amazon_Listmania<a class="headerlink" href="#zend-service-amazon-listmania" title="Permalink to this headline">¶</a></h3>
+<p>Each results List Mania List items are returned as <tt class="docutils literal"><span class="pre">Zend_Service_Amazon_Listmania</span></tt> objects.</p>
+</div>
+<div class="section" id="zend-service-amazon-classes-listmania-properties">
+<span id="id10"></span><h3>Properties<a class="headerlink" href="#zend-service-amazon-classes-listmania-properties" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils" id="zend-service-amazon-classes-listmania-properties-table-1">
+<caption>Zend_Service_Amazon_Listmania Properties</caption>
+<colgroup>
+<col width="32%" />
+<col width="24%" />
+<col width="44%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Type</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ListId</td>
+<td>string</td>
+<td>List ID</td>
+</tr>
+<tr class="row-odd"><td>ListName</td>
+<td>string</td>
+<td>List Name</td>
+</tr>
+</tbody>
+</table>
+<p><a class="reference internal" href="#zend-service-amazon-classes"><em>Back to Class List</em></a></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend_Service_Amazon</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#country-codes">Country Codes</a></li>
+<li><a class="reference internal" href="#looking-up-a-specific-amazon-item-by-asin">Looking up a Specific Amazon Item by ASIN</a></li>
+<li><a class="reference internal" href="#performing-amazon-item-searches">Performing Amazon Item Searches</a></li>
+<li><a class="reference internal" href="#using-the-alternative-query-api">Using the Alternative Query API</a><ul>
+<li><a class="reference internal" href="#zend-service-amazon-query-introduction">Introduction</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zend-service-amazon-classes">Zend_Service_Amazon Classes</a><ul>
+<li><a class="reference internal" href="#zend-service-amazon-item">Zend_Service_Amazon_Item</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-item-asxml">Zend_Service_Amazon_Item::asXML()</a></li>
+<li><a class="reference internal" href="#properties">Properties</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-image">Zend_Service_Amazon_Image</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-image-properties">Properties</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-resultset">Zend_Service_Amazon_ResultSet</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-resultset-totalresults">Zend_Service_Amazon_ResultSet::totalResults()</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-offerset">Zend_Service_Amazon_OfferSet</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-offerset-parameters">Properties</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-offer">Zend_Service_Amazon_Offer</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-offer-properties">Zend_Service_Amazon_Offer Properties</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-similarproduct">Zend_Service_Amazon_SimilarProduct</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-similarproduct-properties">Properties</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-accessories">Zend_Service_Amazon_Accessories</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-accessories-properties">Properties</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-customerreview">Zend_Service_Amazon_CustomerReview</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-customerreview-properties">Properties</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-editorialreview">Zend_Service_Amazon_EditorialReview</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-editorialreview-properties">Properties</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-listmania">Zend_Service_Amazon_Listmania</a></li>
+<li><a class="reference internal" href="#zend-service-amazon-classes-listmania-properties">Properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.service.amazon.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.service.amazon.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.service.amazon.rst">
+                Zend_Service_Amazon
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

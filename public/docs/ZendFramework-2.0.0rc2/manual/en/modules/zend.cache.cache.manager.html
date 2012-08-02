@@ -1,0 +1,486 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Cache Manager &mdash; Zend Framework 2 2.0.0rc1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc1 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-cache-manager">
+<span id="zend-cache-cache-manager"></span><h1>The Cache Manager<a class="headerlink" href="#the-cache-manager" title="Permalink to this headline">¶</a></h1>
+<p>It&#8217;s the nature of applications to require a multitude of caches of any type often dependent on the controller,
+library or domain model being accessed. To allow for a simple means of defining <tt class="docutils literal"><span class="pre">Zend_Cache</span></tt> options in advance
+(such as from a bootstrap) so that accessing a cache object requires minimum setup within the application source
+code, the <tt class="docutils literal"><span class="pre">Zend_Cache_Manager</span></tt> class was written. This class is accompanied by
+<tt class="docutils literal"><span class="pre">Zend_Application_Resource_Cachemanager</span></tt> ensuring bootstrap configuration is available and
+<tt class="docutils literal"><span class="pre">Zend_Controller_Action_Helper_Cache</span></tt> to allow simple cache access and instantiation from controllers and other
+helpers.</p>
+<p>The basic operation of this component is as follows. The Cache Manager allows users to setup &#8220;option templates&#8221;,
+basically options for a set of named caches. These can be set using the method
+<tt class="docutils literal"><span class="pre">Zend_Cache_Manager::setCacheTemplate()</span></tt>. These templates do not give rise to a cache until the user attempts to
+retrieve a named cache (associated with an existing option template) using the method
+<tt class="docutils literal"><span class="pre">Zend_Cache_Manager::getCache()</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$manager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Cache_Manager</span><span class="p">;</span>
+
+<span class="nv">$dbCache</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;frontend&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Core&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;lifetime&#39;</span> <span class="o">=&gt;</span> <span class="mi">7200</span><span class="p">,</span>
+            <span class="s1">&#39;automatic_serialization&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;backend&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Core&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;cache_dir&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/cache&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">setCacheTemplate</span><span class="p">(</span><span class="s1">&#39;database&#39;</span><span class="p">,</span> <span class="nv">$dbCache</span><span class="p">);</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Anywhere else where the Cache Manager is available...</span>
+<span class="sd"> */</span>
+<span class="nv">$databaseCache</span> <span class="o">=</span> <span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">getCache</span><span class="p">(</span><span class="s1">&#39;database&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The Cache Manager also allows simple setting of pre-instantiated caches using the method
+<tt class="docutils literal"><span class="pre">Zend_Cache_Manager::setCache()</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$frontendOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;lifetime&#39;</span> <span class="o">=&gt;</span> <span class="mi">7200</span><span class="p">,</span>
+   <span class="s1">&#39;automatic_serialization&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+<span class="p">);</span>
+
+<span class="nv">$backendOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;cache_dir&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/cache&#39;</span>
+<span class="p">);</span>
+
+<span class="nv">$dbCache</span> <span class="o">=</span> <span class="nx">Zend_Cache</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;Core&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;File&#39;</span><span class="p">,</span>
+                             <span class="nv">$frontendOptions</span><span class="p">,</span>
+                             <span class="nv">$backendOptions</span><span class="p">);</span>
+
+<span class="nv">$manager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Cache_Manager</span><span class="p">;</span>
+<span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">setCache</span><span class="p">(</span><span class="s1">&#39;database&#39;</span><span class="p">,</span> <span class="nv">$dbCache</span><span class="p">);</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Anywhere else where the Cache Manager is available...</span>
+<span class="sd"> */</span>
+<span class="nv">$databaseCache</span> <span class="o">=</span> <span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">getCache</span><span class="p">(</span><span class="s1">&#39;database&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If for any reason, you are unsure where the Cache Manager contains a pre-instantiated cache or a relevant option
+cache template to create one on request, you can check for the existence of a name cache configuration or instance
+using the method <tt class="docutils literal"><span class="pre">Zend_Cache_Manager::hasCache()</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$manager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Cache_Manager</span><span class="p">;</span>
+
+<span class="nv">$dbCache</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;frontend&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Core&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;lifetime&#39;</span> <span class="o">=&gt;</span> <span class="mi">7200</span><span class="p">,</span>
+            <span class="s1">&#39;automatic_serialization&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;backend&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Core&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;cache_dir&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/cache&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">setCacheTemplate</span><span class="p">(</span><span class="s1">&#39;database&#39;</span><span class="p">,</span> <span class="nv">$dbCache</span><span class="p">);</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Anywhere else where the Cache Manager is available...</span>
+<span class="sd"> */</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">hasCache</span><span class="p">(</span><span class="s1">&#39;database&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$databaseCache</span> <span class="o">=</span> <span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">getCache</span><span class="p">(</span><span class="s1">&#39;database&#39;</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// create a cache from scratch if none available from Manager</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>In some scenarios, you may have defined a number of general use caches using <tt class="docutils literal"><span class="pre">Zend_Cache_Manager</span></tt> but need to
+fine-tune their options before use depending on the circumstances. You can edit previously set cache templates on
+the fly before they are instantiated using the method <tt class="docutils literal"><span class="pre">Zend_Cache_Manager::setTemplateOptions()</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$manager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Cache_Manager</span><span class="p">;</span>
+
+<span class="nv">$dbCache</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;frontend&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Core&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;lifetime&#39;</span> <span class="o">=&gt;</span> <span class="mi">7200</span><span class="p">,</span>
+            <span class="s1">&#39;automatic_serialization&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;backend&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Core&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;cache_dir&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/cache&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">setCacheTemplate</span><span class="p">(</span><span class="s1">&#39;database&#39;</span><span class="p">,</span> <span class="nv">$dbCache</span><span class="p">);</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Anywhere else where the Cache Manager is available...</span>
+<span class="sd"> * Here we decided to store some upcoming database queries to Memcached instead</span>
+<span class="sd"> * of the preconfigured File backend.</span>
+<span class="sd"> */</span>
+<span class="nv">$fineTuning</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;backend&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Memcached&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;servers&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;host&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;port&#39;</span> <span class="o">=&gt;</span> <span class="mi">11211</span><span class="p">,</span>
+                    <span class="s1">&#39;persistent&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                    <span class="s1">&#39;weight&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
+                    <span class="s1">&#39;timeout&#39;</span> <span class="o">=&gt;</span> <span class="mi">5</span><span class="p">,</span>
+                    <span class="s1">&#39;retry_interval&#39;</span> <span class="o">=&gt;</span> <span class="mi">15</span><span class="p">,</span>
+                    <span class="s1">&#39;status&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                    <span class="s1">&#39;failure_callback&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;&#39;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+<span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">setTemplateOptions</span><span class="p">(</span><span class="s1">&#39;database&#39;</span><span class="p">,</span> <span class="nv">$fineTuning</span><span class="p">);</span>
+<span class="nv">$databaseCache</span> <span class="o">=</span> <span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">getCache</span><span class="p">(</span><span class="s1">&#39;database&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>To assist in making the Cache Manager more useful, it is accompanied by <tt class="docutils literal"><span class="pre">Zend_Application_Resource_Cachemanager</span></tt>
+and also the <tt class="docutils literal"><span class="pre">Zend_Controller_Action_Helper_Cache</span></tt> Action Helper. Both of these are described in their relevant
+areas of the Reference Guide.</p>
+<p>Out of the box, <tt class="docutils literal"><span class="pre">Zend_Cache_Manager</span></tt> already includes four pre-defined cache templates called &#8220;skeleton&#8221;,
+&#8220;default&#8221;, &#8220;page&#8221; and &#8220;tagcache&#8221;. The default cache is a simple File based cache using the Core frontend which
+assumes a cache_dir called &#8220;cache&#8221; exists at the same level as the conventional &#8220;public&#8221; directory of a Zend
+Framework application. The skeleton cache is actually a <tt class="docutils literal"><span class="pre">NULL</span></tt> cache, i.e. it contains no options. The remaining
+two caches are used to implement a default Static Page Cache where static <em>HTML</em>, <em>XML</em> or even <em>JSON</em> may be
+written to static files in <tt class="docutils literal"><span class="pre">/public</span></tt>. Control over a Static Page Cache is offered via
+<tt class="docutils literal"><span class="pre">Zend_Controller_Action_Helper_Cache</span></tt>, though you may alter the settings of this &#8220;page&#8221; the &#8220;tagcache&#8221; it uses to
+track tags using <tt class="docutils literal"><span class="pre">Zend_Cache_Manager::setTemplateOptions()</span></tt> or even <tt class="docutils literal"><span class="pre">Zend_Cache_Manager::setCacheTemplate()</span></tt> if
+overloading all of their options.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.cache.cache.manager.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.cache.cache.manager.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.cache.cache.manager.rst">
+                The Cache Manager
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

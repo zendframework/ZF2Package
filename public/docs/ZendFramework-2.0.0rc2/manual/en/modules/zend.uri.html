@@ -1,0 +1,433 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend_Uri &mdash; Zend Framework 2 2.0.0rc1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc1 documentation" href="../index.html" />
+    <link rel="next" title="Introduction" href="zend.validator.html" />
+    <link rel="prev" title="Zend\Stdlib\Hydrator" href="zend.stdlib.hydrator.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.validator.html" title="Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.stdlib.hydrator.html" title="Zend\Stdlib\Hydrator"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-uri">
+<span id="zend-uri-chapter"></span><h1>Zend_Uri<a class="headerlink" href="#zend-uri" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-uri-overview"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Uri</span></tt> is a component that aids in manipulating and validating <a class="reference external" href="http://www.w3.org/Addressing/">Uniform Resource Identifiers</a> (URIs).
+<tt class="docutils literal"><span class="pre">Zend_Uri</span></tt> exists primarily to service other components, such as <tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt>, but is also useful as a
+standalone utility.</p>
+<p><em>URI</em>s always begin with a scheme, followed by a colon. The construction of the many different schemes varies
+significantly. The <tt class="docutils literal"><span class="pre">Zend_Uri</span></tt> class provides a factory that returns a subclass of itself which specializes in
+each scheme. The subclass will be named <tt class="docutils literal"><span class="pre">Zend_Uri_&lt;scheme&gt;</span></tt>, where <strong>&lt;scheme&gt;</strong> is the scheme, lowercased with
+the first letter capitalized. An exception to this rule is <em>HTTPS</em>, which is also handled by <tt class="docutils literal"><span class="pre">Zend_Uri_Http</span></tt>.</p>
+</div>
+<div class="section" id="creating-a-new-uri">
+<span id="zend-uri-creation"></span><h2>Creating a New URI<a class="headerlink" href="#creating-a-new-uri" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Uri</span></tt> will build a new <em>URI</em> from scratch if only a scheme is passed to <tt class="docutils literal"><span class="pre">Zend_Uri::factory()</span></tt>.</p>
+<p class="rubric" id="zend-uri-creation-example-1">Creating a New URI with Zend_Uri::factory()</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// To create a new URI from scratch, pass only the scheme.</span>
+<span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend_Uri</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">);</span>
+
+<span class="c1">// $uri instanceof Zend_Uri_Http</span>
+</pre></div>
+</td></tr></table></div>
+<p>To create a new <em>URI</em> from scratch, pass only the scheme to <tt class="docutils literal"><span class="pre">Zend_Uri::factory()</span></tt> <a class="footnote-reference" href="#id2" id="id1">[1]</a>. If an unsupported scheme
+is passed and no scheme-specific class is specified, a <tt class="docutils literal"><span class="pre">Zend_Uri_Exception</span></tt> will be thrown.</p>
+<p>If the scheme or <em>URI</em> passed is supported, <tt class="docutils literal"><span class="pre">Zend_Uri::factory()</span></tt> will return a subclass of itself that
+specializes in the scheme to be created.</p>
+<div class="section" id="creating-a-new-custom-class-uri">
+<h3>Creating a New Custom-Class URI<a class="headerlink" href="#creating-a-new-custom-class-uri" title="Permalink to this headline">¶</a></h3>
+<p>Starting from Zend Framework 1.10.5, you can specify a custom class to be used when creating the Zend_Uri instance,
+as a second parameter to the <tt class="docutils literal"><span class="pre">Zend_Uri::factory()</span></tt> method. This enables you to subclass Zend_Uri and create your
+own custom URI classes, and instantiate new URI objects based on your own custom classes.</p>
+<p>The 2nd parameter passed to <tt class="docutils literal"><span class="pre">Zend_Uri::factory()</span></tt> must be a string with the name of a class extending
+<tt class="docutils literal"><span class="pre">Zend_Uri</span></tt>. The class must either be alredy-loaded, or loadable using <tt class="docutils literal"><span class="pre">Zend_Loader::loadClass()</span></tt>- that is, it
+must follow the Zend Framework class and file naming conventions, and must be in your include_path.</p>
+<p class="rubric" id="zend-uri-creation-custom-example-1">Creating a URI using a custom class</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create a new &#39;ftp&#39; URI based on a custom class</span>
+<span class="nv">$ftpUri</span> <span class="o">=</span> <span class="nx">Zend_Uri</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span>
+    <span class="s1">&#39;ftp://user@ftp.example.com/path/file&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MyLibrary_Uri_Ftp&#39;</span>
+<span class="p">);</span>
+
+<span class="c1">// $ftpUri is an instance of MyLibrary_Uri_Ftp, which is a subclass of Zend_Uri</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="manipulating-an-existing-uri">
+<span id="zend-uri-manipulation"></span><h2>Manipulating an Existing URI<a class="headerlink" href="#manipulating-an-existing-uri" title="Permalink to this headline">¶</a></h2>
+<p>To manipulate an existing <em>URI</em>, pass the entire <em>URI</em> to <tt class="docutils literal"><span class="pre">Zend_Uri::factory()</span></tt>.</p>
+<p class="rubric" id="zend-uri-manipulation-example-1">Manipulating an Existing URI with Zend_Uri::factory()</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// To manipulate an existing URI, pass it in.</span>
+<span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend_Uri</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://www.zend.com&#39;</span><span class="p">);</span>
+
+<span class="c1">// $uri instanceof Zend_Uri_Http</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <em>URI</em> will be parsed and validated. If it is found to be invalid, a <tt class="docutils literal"><span class="pre">Zend_Uri_Exception</span></tt> will be thrown
+immediately. Otherwise, <tt class="docutils literal"><span class="pre">Zend_Uri::factory()</span></tt> will return a subclass of itself that specializes in the scheme to
+be manipulated.</p>
+</div>
+<div class="section" id="uri-validation">
+<span id="zend-uri-validation"></span><h2>URI Validation<a class="headerlink" href="#uri-validation" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend_Uri::check()</span></tt> method can only be used if validation of an existing <em>URI</em> is needed.</p>
+<p class="rubric" id="zend-uri-validation-example-1">URI Validation with Zend_Uri::check()</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Validate whether a given URI is well formed</span>
+<span class="nv">$valid</span> <span class="o">=</span> <span class="nx">Zend_Uri</span><span class="o">::</span><span class="na">check</span><span class="p">(</span><span class="s1">&#39;http://uri.in.question&#39;</span><span class="p">);</span>
+
+<span class="c1">// $valid is TRUE for a valid URI, or FALSE otherwise.</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">Zend_Uri::check()</span></tt> returns a boolean, which is more convenient than using <tt class="docutils literal"><span class="pre">Zend_Uri::factory()</span></tt> and catching
+the exception.</p>
+<div class="section" id="allowing-unwise-characters-in-uris">
+<span id="zend-uri-validation-allowunwise"></span><h3>Allowing &#8220;Unwise&#8221; characters in URIs<a class="headerlink" href="#allowing-unwise-characters-in-uris" title="Permalink to this headline">¶</a></h3>
+<p>By default, <tt class="docutils literal"><span class="pre">Zend_Uri</span></tt> will not accept the following characters: <strong>&#8220;{&#8221;, &#8220;}&#8221;, &#8220;|&#8221;, &#8220;&#8221;, &#8220;^&#8221;, &#8220;`&#8221;</strong>. These
+characters are defined by the <em>RFC</em> as &#8220;unwise&#8221; and invalid; however, many implementations do accept these
+characters as valid.</p>
+<p><tt class="docutils literal"><span class="pre">Zend_Uri</span></tt> can be set to accept these &#8220;unwise&#8221; characters by setting the &#8216;allow_unwise&#8217; option to boolean
+<tt class="docutils literal"><span class="pre">TRUE</span></tt> using <tt class="docutils literal"><span class="pre">Zend_Uri::setConfig()</span></tt>:</p>
+<p class="rubric" id="zend-uri-validation-allowunwise-example-1">Allowing special characters in URIs</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Contains &#39;|&#39; symbol</span>
+<span class="c1">// Normally, this would return false:</span>
+<span class="nv">$valid</span> <span class="o">=</span> <span class="nx">Zend_Uri</span><span class="o">::</span><span class="na">check</span><span class="p">(</span><span class="s1">&#39;http://example.com/?q=this|that&#39;</span><span class="p">);</span>
+
+<span class="c1">// However, you can allow &quot;unwise&quot; characters</span>
+<span class="nx">Zend_Uri</span><span class="o">::</span><span class="na">setConfig</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;allow_unwise&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">));</span>
+
+<span class="c1">// will return &#39;true&#39;</span>
+<span class="nv">$valid</span> <span class="o">=</span> <span class="nx">Zend_Uri</span><span class="o">::</span><span class="na">check</span><span class="p">(</span><span class="s1">&#39;http://example.com/?q=this|that&#39;</span><span class="p">);</span>
+
+<span class="c1">// Reset the &#39;allow_unwise&#39; value to the default FALSE</span>
+<span class="nx">Zend_Uri</span><span class="o">::</span><span class="na">setConfig</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;allow_unwise&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><tt class="docutils literal"><span class="pre">Zend_Uri::setConfig()</span></tt> sets configuration options globally. It is recommended to reset the &#8216;allow_unwise&#8217;
+option to &#8216;<tt class="docutils literal"><span class="pre">FALSE</span></tt>&#8216;, like in the example above, unless you are certain you want to always allow unwise
+characters globally.</p>
+</div>
+</div>
+</div>
+<div class="section" id="common-instance-methods">
+<span id="zend-uri-instance-methods"></span><h2>Common Instance Methods<a class="headerlink" href="#common-instance-methods" title="Permalink to this headline">¶</a></h2>
+<p>Every instance of a <tt class="docutils literal"><span class="pre">Zend_Uri</span></tt> subclass (e.g. <tt class="docutils literal"><span class="pre">Zend_Uri_Http</span></tt>) has several instance methods that are useful for
+working with any kind of <em>URI</em>.</p>
+<div class="section" id="getting-the-scheme-of-the-uri">
+<span id="zend-uri-instance-methods-getscheme"></span><h3>Getting the Scheme of the URI<a class="headerlink" href="#getting-the-scheme-of-the-uri" title="Permalink to this headline">¶</a></h3>
+<p>The scheme of the <em>URI</em> is the part of the <em>URI</em> that precedes the colon. For example, the scheme of
+<tt class="docutils literal"><span class="pre">http://www.zend.com</span></tt> is &#8216;http&#8217;.</p>
+<p class="rubric" id="zend-uri-instance-methods-getscheme-example-1">Getting the Scheme from a Zend_Uri_* Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend_Uri</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://www.zend.com&#39;</span><span class="p">);</span>
+
+<span class="nv">$scheme</span> <span class="o">=</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getScheme</span><span class="p">();</span>  <span class="c1">// &quot;http&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getScheme()</span></tt> instance method returns only the scheme part of the <em>URI</em> object.</p>
+</div>
+<div class="section" id="getting-the-entire-uri">
+<span id="zend-uri-instance-methods-geturi"></span><h3>Getting the Entire URI<a class="headerlink" href="#getting-the-entire-uri" title="Permalink to this headline">¶</a></h3>
+<p class="rubric" id="zend-uri-instance-methods-geturi-example-1">Getting the Entire URI from a Zend_Uri_* Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend_Uri</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://www.zend.com&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getUri</span><span class="p">();</span>  <span class="c1">// &quot;http://www.zend.com&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getUri()</span></tt> method returns the string representation of the entire <em>URI</em>.</p>
+</div>
+<div class="section" id="validating-the-uri">
+<span id="zend-uri-instance-methods-valid"></span><h3>Validating the URI<a class="headerlink" href="#validating-the-uri" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">Zend_Uri::factory()</span></tt> will always validate any <em>URI</em> passed to it and will not instantiate a new <tt class="docutils literal"><span class="pre">Zend_Uri</span></tt>
+subclass if the given <em>URI</em> is found to be invalid. However, after the <tt class="docutils literal"><span class="pre">Zend_Uri</span></tt> subclass is instantiated for a
+new <em>URI</em> or an existing valid one, it is possible that the <em>URI</em> can later become invalid after it is manipulated.</p>
+<p class="rubric" id="zend-uri-instance-methods-valid-example-1">Validating a Zend_Uri_* Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend_Uri</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://www.zend.com&#39;</span><span class="p">);</span>
+
+<span class="nv">$isValid</span> <span class="o">=</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">valid</span><span class="p">();</span>  <span class="c1">// TRUE</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">valid()</span></tt> instance method provides a means to check that the <em>URI</em> object is still valid.</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>At the time of writing, <tt class="docutils literal"><span class="pre">Zend_Uri</span></tt> only provides built-in support for the <em>HTTP</em> and <em>HTTPS</em> schemes.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend_Uri</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#creating-a-new-uri">Creating a New URI</a><ul>
+<li><a class="reference internal" href="#creating-a-new-custom-class-uri">Creating a New Custom-Class URI</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#manipulating-an-existing-uri">Manipulating an Existing URI</a></li>
+<li><a class="reference internal" href="#uri-validation">URI Validation</a><ul>
+<li><a class="reference internal" href="#allowing-unwise-characters-in-uris">Allowing &#8220;Unwise&#8221; characters in URIs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#common-instance-methods">Common Instance Methods</a><ul>
+<li><a class="reference internal" href="#getting-the-scheme-of-the-uri">Getting the Scheme of the URI</a></li>
+<li><a class="reference internal" href="#getting-the-entire-uri">Getting the Entire URI</a></li>
+<li><a class="reference internal" href="#validating-the-uri">Validating the URI</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.stdlib.hydrator.html"
+                        title="previous chapter">Zend\Stdlib\Hydrator</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.validator.html"
+                        title="next chapter">Introduction</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.uri.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.uri.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.validator.html" title="Introduction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.stdlib.hydrator.html" title="Zend\Stdlib\Hydrator"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.uri.rst">
+                Zend_Uri
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
