@@ -16,6 +16,7 @@ $apidoc_release_dir = ROOT . '/public/docs/ZendFramework-' . $release . '/apidoc
 mkdir($apidoc_release_tmp, 0777, true);
 script_run_command('unzip ' . $apidoc_package . ' -d ' . $apidoc_release_tmp);
 script_run_command('mv ' . $apidoc_release_tmp . '/ZendFramework-' . $release . ' ' . $apidoc_release_dir);
+rmdir($apidoc_release_tmp);
 
 $apidoc_packages    = ROOT . '/packages/apidoc/ZendFramework-' . $release . '-apidoc.*';
 $apidoc_release_dir = ROOT . '/public/releases/ZendFramework-' . $release . '/';
