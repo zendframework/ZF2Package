@@ -41,6 +41,10 @@ foreach ($composers as $composer) {
     if (!isset($packages[$composer['name']])) {
         $packages[$composer['name']] = array();
     }
+    if (!isset($composer['version'])) {
+        echo "Missing composer version for package " . $composer['name'] . "; skipping\n";
+        continue;
+    }
     $packages[$composer['name']][$composer['version']] = $composer;
 }
 file_put_contents(ROOT . '/public/packages.json', json_encode($packages, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
