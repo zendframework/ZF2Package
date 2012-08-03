@@ -41,12 +41,21 @@ foreach ($composers as $filename => $composer) {
     if (!isset($packages[$composer['name']])) {
         $packages[$composer['name']] = array();
     }
+
+    // check some needed info
     if (!isset($composer['version'])) {
         list($filename_name, $filename_version) = preg_split('#-#', pathinfo($filename)['filename'], 2);
         $composer['version'] = $filename_version;
     }
+    if (!isset($composer['repositories'])) {
+        $composer['repositories'] = array('type' => 'composer', 'url' => 'http://packages.zendframework.com/');
+    }
+    if (!isset($composer['type'])) {
+        $composer['type'] = 'library';
+    }
     $packages[$composer['name']][$composer['version']] = $composer;
+
 }
 
-file_put_contents(ROOT . '/public/packages.json', json_encode($packages, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
+file_put_contents(ROOT . '/public/packages.json', json_encode(array('packages' => $packages), JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
 
