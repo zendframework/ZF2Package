@@ -55,7 +55,14 @@ foreach ($di as $file) {
     $zip->close();
 }
 
-$packages = array();
+$zf2_metapackage_template = [
+    'name'    => 'zendframework/zf2',
+    'type'    => 'metapackage',
+    'require' => [],
+];
+$zf2_metapackage = [];
+
+$packages = [];
 foreach ($composers as $filename => $composer) {
     if (!isset($packages[$composer['name']])) {
         $packages[$composer['name']] = array();
@@ -74,8 +81,14 @@ foreach ($composers as $filename => $composer) {
     }
     $packages[$composer['name']][$composer['version']] = $composer;
 
+    if (!isset($zf2_metapackage[$composer['version']])) {
+        $zf2_metapackage[$composer['version']] = $zf2_metapackage_template;
+        $zf2_metapackage[$composer['version']]['version'] = $composer['version'];
+    }
+    $zf2_metapackage[$composer['version']]['require'][$composer['name']] = "self.version";
 }
 
+$packages['zendframework/zf2'] = $zf2_metapackage;
 $packages = array('packages' => $packages);
 
 file_put_contents(ROOT . '/public/packages.json', json_encode($packages, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
