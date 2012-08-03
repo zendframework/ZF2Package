@@ -37,25 +37,43 @@ function glob_recursive($pattern, $flags = 0) {
 
 function create_composer_json_stub($filename)
 {
-    $composer = array();
 
-    list($package_name, $package_release) = preg_split('#-#', pathinfo($filename)['filename'], 2);
+    list($package_name, $package_release) = explode('-', pathinfo($filename)['filename'], 2);
 
     if (!$package_name || !$package_release) {
         script_exit('Unable to determine either package name or package release from filename "' . $filename . '"');
     }
 
-    $composer['name'] = strtolower(str_replace('_', '-', $package_name));
-    $composer['name'] = 'zendframework/' . $composer['name'];
-    $composer['version'] = $package_release;
-    $composer['license'] = 'BSD-3-Clause';
-    $composer['keywords'] = array('zf2', strtolower(str_replace('Zend_', '', $package_name)));
-    $composer['autoload']['psr-0'][str_replace('_', '\\', $package_name)] = '';
-    $composer['require']['php'] = ">=5.3.3";
-    $composer['repositories'] = array('type' => 'composer', 'url' => 'http://packages.zendframework.com/');
-    $composer['type'] = 'library';
-    $composer['dist']['url'] = "http://packages.zendframework.com/composer/{$package_name}-{$package_release}.zip";
-    $composer['dist']['type'] = "zip";
+    $name      = strtolower(str_replace('_', '-', $package_name));
+    $name      = 'zendframework/' . $name;
+    $component = str_replace('_', '\\', $package_name);
+
+    return [
+        'name'     => $name,
+        'version'  => $package_release,
+        'license'  => 'BSD-3-Clause',
+        'type'     => 'library',
+        'keywords' => [
+            'zf2',
+            strtolower(str_replace('Zend_', '', $package_name))
+        ],
+        'autoload' => [
+            'psr-0' => [
+                $component => '',
+            ]
+        ],
+        'repositories'   => [
+            'type' => 'composer',
+            'url'  => 'http://packages.zendframework.com/'
+        ],
+        'require' => [
+            'php' => ">=5.3.3"
+        ],
+        'dist' => [
+            'url'  => "http://packages.zendframework.com/composer/{$package_name}-{$package_release}.zip",
+            'type' => 'zip',
+        ],
+    ];
 
     return $composer;
 }

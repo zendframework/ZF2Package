@@ -5,7 +5,16 @@ include 'functions.php';
 
 define('ROOT', realpath(__DIR__ . '/../../'));
 
-$composers = array();
+$default_data = [
+    'type'         => 'library',
+    'homepage'     => 'http://packages.zendframework.com/',
+    'repositories' => [
+        'type' => 'composer',
+        'url'  => 'http://packages.zendframework.com/',
+    ],
+];
+
+$composers = [];
 
 // move composer files first
 script_run_command('cp ' . ROOT . '/packages/component-composer/*.zip ' . ROOT . '/public/composer/');
@@ -32,6 +41,16 @@ foreach ($di as $file) {
             $composer_content = create_composer_json_stub($file->getBasename());
         }
     }
+
+    $composer_content = array_merge($default_data, $composer_content);
+
+    if (!isset($composer_content['dist'])) {
+        $composer_content['dist'] = [
+            'url'  => 'http://packages.zendframework.com/composer/' . $file->getFilename(),
+            'type' => 'zip',
+        ];
+    }
+
     $composers[$file->getBasename()] = $composer_content;
     $zip->close();
 }
@@ -57,5 +76,6 @@ foreach ($composers as $filename => $composer) {
 
 }
 
-file_put_contents(ROOT . '/public/packages.json', json_encode(array('packages' => $packages), JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
+$packages = array('packages' => $packages);
 
+file_put_contents(ROOT . '/public/packages.json', json_encode($packages, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
