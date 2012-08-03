@@ -19,7 +19,7 @@ script_run_command('rm -Rf ' . ROOT . '/packages/component-composer/' . $package
 mkdir(ROOT . '/packages/component-composer/' . $package_name);
 
 chdir($package_source);
-script_run_command('tar -cf - ' . $package_filter . ' | tar -C ' . ROOT . '/packages/component-composer/' . $package_name . ' -xf -');
+script_run_command('cp -R ' . $package_filter . ' ' . ROOT . '/packages/component-composer/' . $package_name);
 chdir(ROOT . '/packages/component-composer/' . $package_name);
 
 script_run_command('cp -a ' . __DIR__ . '/composer-templates/* ./');
@@ -41,7 +41,6 @@ if ($composer_index_in_root !== false) {
         $fp = $zip->getStream($zip->getNameIndex($composer_index_anywhere));
         $composer_content = json_decode(stream_get_contents($fp), true);
     } else {
-        var_dump($composer_index_anywhere);
         echo 'A composer.json was not found in ' . $package_name_full . '.zip';
         exit -1;
     }
@@ -50,10 +49,6 @@ if ($composer_index_in_root !== false) {
 $composer_content['version'] = $package_release;
 $composer_content['dist']['url'] = "http://packages.zendframework.com/composer/{$package_name_full}.zip";
 $composer_content['dist']['type'] = "zip";
-
-if (isset($composer_content['target-dir'])) {
-    unset($composer_content['target-dir']);
-}
 
 $zip->addFromString('composer.json', json_encode($composer_content));
 $zip->close();
