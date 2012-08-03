@@ -66,7 +66,11 @@ $zf2_metapackage_template = [
         'zendframework/zf2' => 'self.version',
     ],
 ];
-$zf2_metapackage = [];
+$dev_master_package = $zf2_metapackage_template;
+$dev_master_package['version'] = 'dev-master';
+$dev_master_package['require']['zendframework/zf2'] = 'master';
+
+$zf2_metapackage = ['dev-master' => $dev_master_package];
 
 $packages = [];
 foreach ($composers as $filename => $composer) {
