@@ -81,6 +81,10 @@ foreach ($composers as $filename => $composer) {
     }
     $packages[$composer['name']][$composer['version']] = $composer;
 
+    if (!preg_match('#^zendframework/zend-#', $composer['name'])) {
+        continue;
+    }
+
     if (!isset($zf2_metapackage[$composer['version']])) {
         $zf2_metapackage[$composer['version']] = $zf2_metapackage_template;
         $zf2_metapackage[$composer['version']]['version'] = $composer['version'];
