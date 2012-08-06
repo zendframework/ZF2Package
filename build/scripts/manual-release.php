@@ -12,6 +12,11 @@ if (!$release) {
 
 $manual_package     = ROOT . '/packages/manual/ZendFramework-' . $release . '-manual-en.zip';
 $manual_release_dir = ROOT . '/public/docs/ZendFramework-' . $release . '/manual/en';
+
+if (!file_exists($manual_package)) {
+    exit(0);
+}
+
 mkdir($manual_release_dir, 0777, true);
 script_run_command('unzip ' . $manual_package . ' -d ' . $manual_release_dir);
 

@@ -12,6 +12,11 @@ if (!$release) {
 
 $package_glob = ROOT . '/packages/plain/ZendFramework-*' . $release . '.*';
 $release_dir  = ROOT . '/public/releases/ZendFramework-' . $release . '';
+
+if (glob_recursive(ROOT . '/packages/plain/ZendFramework-*' . $release . '.*') === array()) {
+    exit(0);
+}
+
 if (!is_dir($release_dir)) {
     mkdir($release_dir, 0777, true);
 }

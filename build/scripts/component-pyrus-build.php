@@ -37,7 +37,13 @@ chdir(ROOT . '/packages/component-pyrus/' . $package_name);
 script_run_command('rm -Rf ./src/');
 
 chdir($package_source);
-script_run_command('tar -cf - ' . $package_filter . ' | tar -C ' . ROOT . '/packages/component-pyrus/' . $package_name . ' -xf -');
+
+if ($package_filter === 'metadata-package') {
+    script_run_command('cp -R ' . ROOT . '/build/scripts/pyrus-meta-templates/* ' . ROOT . '/packages/component-pyrus/' . $package_name);
+} else {
+    script_run_command('tar -cf - ' . $package_filter . ' | tar -C ' . ROOT . '/packages/component-pyrus/' . $package_name . ' -xf -');
+}
+
 chdir(ROOT . '/packages/component-pyrus/' . $package_name);
 
 if (file_exists('./library')) {
@@ -68,12 +74,10 @@ $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] = null;
 $composers = glob_recursive('composer.json');
 if ($composers) {
     $composer_file = $composers[0];
-}
 
-if (isset($composer_file)) {
     $content  = file_get_contents($composer_file);
     $composer = json_decode($content, true);
-    $package_info = array();
+    $package_info = array('required' => array());
     foreach($composer['require'] as $dep => $version) {
         $vendor = $name = $dep;
         if (strpos($dep, '/')) {
@@ -81,7 +85,7 @@ if (isset($composer_file)) {
         }
         if ($vendor == 'zendframework') {
             $name = ucwords(str_replace('-', ' ', $name));
-            $package_info['required'] = str_replace(' ', '_', $name);
+            $package_info['required'][] = str_replace(array(' ', 'manager'), array('_', 'Manager'), $name);
         }
     }
     if (isset($composer['suggest'])) {
@@ -96,9 +100,7 @@ if (isset($composer_file)) {
             }
         }
     }
-}
 
-if (isset($package_info)) {
     $packagexmlsetup_content = '<?php' . PHP_EOL;
     if (isset($package_info['required'])) {
         if (is_string($package_info['required'])) {
@@ -124,8 +126,11 @@ if (isset($package_info)) {
     file_put_contents('packagexmlsetup.php', $packagexmlsetup_content);
 }
 
-echo 'Writing: stub.php' . PHP_EOL;
-file_put_contents('stub.php', '<?php' . "\n" . trim(apply_replacements(file_get_contents(ROOT . '/build/scripts/pyrus-templates/stub.php'), $file_replacements)));
+
+if ($package_filter !== 'metadata-package') {
+    echo 'Writing: stub.php' . PHP_EOL;
+    file_put_contents('stub.php', '<?php' . "\n" . trim(apply_replacements(file_get_contents(ROOT . '/build/scripts/pyrus-templates/stub.php'), $file_replacements)));
+} 
 
 script_run_command($pyrus_path . ' make');
 script_run_command($pyrus_path . ' package -p');

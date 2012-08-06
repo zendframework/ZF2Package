@@ -11,7 +11,7 @@ $php = $_SERVER["_"];
 
 $di = new DirectoryIterator(ROOT . '/packages/component-pyrus/'); // change this to actual public directory
 foreach ($di as $file) {
-    if ($file->isDot()) {
+    if ($file->isDot() || $file->getFilename() == '.placeholder' || $file->isDir()) {
         continue;
     }
     script_run_command($php . ' ' . ROOT . '/build/scripts/pyrus.phar scs-release ' . $file->getPathname());
