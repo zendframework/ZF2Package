@@ -77,15 +77,14 @@ if ($composers) {
 
     $content  = file_get_contents($composer_file);
     $composer = json_decode($content, true);
-    $package_info = array('required' => array());
+    $package_info = array('required' => array(), 'optional' => array());
     foreach($composer['require'] as $dep => $version) {
         $vendor = $name = $dep;
         if (strpos($dep, '/')) {
             list($vendor, $name) = explode('/', $dep, 2);
         }
         if ($vendor == 'zendframework') {
-            $name = ucwords(str_replace('-', ' ', $name));
-            $package_info['required'][] = str_replace(array(' ', 'manager'), array('_', 'Manager'), $name);
+            $package_info['required'][] = composer_name_to_package_name($name);
         }
     }
     if (isset($composer['suggest'])) {
@@ -95,17 +94,13 @@ if ($composers) {
                 list($vendor, $name) = explode('/', $dep, 2);
             }
             if ($vendor == 'zendframework') {
-                $name = ucwords(str_replace('-', ' ', $name));
-                $package_info['optional'] = str_replace(' ', '_', $name);
+                $package_info['optional'][] = composer_name_to_package_name($name);
             }
         }
     }
 
     $packagexmlsetup_content = '<?php' . PHP_EOL;
     if (isset($package_info['required'])) {
-        if (is_string($package_info['required'])) {
-            $package_info['required'] = array($package_info['required']);
-        }
         foreach ($package_info['required'] as $dependency) {
             $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] .= 'require_once \'' . $dependency . '-' . trim($package_release) . '.phar\';' . "\n";
             $file_replacements['{PACKAGE_DEPENDENCY}'] = trim($dependency);
@@ -113,11 +108,7 @@ if ($composers) {
         }
     }
     if (isset($package_info['optional'])) {
-        if (is_string($package_info['optional'])) {
-            $package_info['optional'] = array($package_info['optional']);
-        }
         foreach ($package_info['optional'] as $dependency) {
-            $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] .= 'require_once \'' . $dependency . '-' . trim($package_release) . '.phar\';' . "\n";
             $file_replacements['{PACKAGE_DEPENDENCY}'] = trim($dependency);
             $packagexmlsetup_content .= apply_replacements(file_get_contents(ROOT . '/build/scripts/pyrus-templates/packagexmlsetup-optional.php'), $file_replacements);
         }
@@ -125,7 +116,6 @@ if ($composers) {
     echo 'Writing: packagexmlsetup.php' . PHP_EOL;
     file_put_contents('packagexmlsetup.php', $packagexmlsetup_content);
 }
-
 
 if ($package_filter !== 'metadata-package') {
     echo 'Writing: stub.php' . PHP_EOL;
