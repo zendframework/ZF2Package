@@ -1,0 +1,360 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Formatters &mdash; Zend Framework 2 2.0.0rc3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc3 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Mail\Message" href="zend.mail.message.html" />
+    <link rel="prev" title="Filters" href="zend.log.filters.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.mail.message.html" title="Zend\Mail\Message"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.log.filters.html" title="Filters"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="formatters">
+<span id="zend-log-formatters"></span><h1>Formatters<a class="headerlink" href="#formatters" title="Permalink to this headline">¶</a></h1>
+<p>A Formatter is an object that is responsible for taking an <tt class="docutils literal"><span class="pre">event</span></tt> array describing a log event and outputting a
+string with a formatted log line.</p>
+<p>Some Writers are not line-oriented and cannot use a Formatter. An example is the Database Writer, which inserts the
+event items directly into database columns. For Writers that cannot support a Formatter, an exception is thrown if
+you attempt to set a Formatter.</p>
+<div class="section" id="simple-formatting">
+<span id="zend-log-formatters-simple"></span><h2>Simple Formatting<a class="headerlink" href="#simple-formatting" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Log\Formatter\Simple</span></tt> is the default formatter. It is configured automatically when you specify no
+formatter. The default configuration is equivalent to the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$format</span> <span class="o">=</span> <span class="s1">&#39;%timestamp% %priorityName% (%priority%): %message%&#39;</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+<span class="nv">$formatter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Formatter\Simple</span><span class="p">(</span><span class="nv">$format</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>A formatter is set on an individual Writer object using the Writer&#8217;s <tt class="docutils literal"><span class="pre">setFormatter()</span></tt> method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Writer\Stream</span><span class="p">(</span><span class="s1">&#39;php://output&#39;</span><span class="p">);</span>
+<span class="nv">$formatter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Formatter\Simple</span><span class="p">(</span><span class="s1">&#39;hello %message%&#39;</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span>
+<span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">setFormatter</span><span class="p">(</span><span class="nv">$formatter</span><span class="p">);</span>
+
+<span class="nv">$logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Logger</span><span class="p">();</span>
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">addWriter</span><span class="p">(</span><span class="nv">$writer</span><span class="p">);</span>
+
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s1">&#39;there&#39;</span><span class="p">);</span>
+
+<span class="c1">// outputs &quot;hello there&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The constructor of <tt class="docutils literal"><span class="pre">Zend\Log\Formatter\Simple</span></tt> accepts a single parameter: the format string. This string
+contains keys surrounded by percent signs (e.g. <tt class="docutils literal"><span class="pre">%message%</span></tt>). The format string may contain any key from the
+event data array. You can retrieve the default keys by using the DEFAULT_FORMAT constant from
+<tt class="docutils literal"><span class="pre">Zend\Log\Formatter\Simple</span></tt>.</p>
+</div>
+<div class="section" id="formatting-to-xml">
+<span id="zend-log-formatters-xml"></span><h2>Formatting to XML<a class="headerlink" href="#formatting-to-xml" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Log\Formatter\Xml</span></tt> formats log data into <em>XML</em> strings. By default, it automatically logs all items in the
+event data array:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Writer\Stream</span><span class="p">(</span><span class="s1">&#39;php://output&#39;</span><span class="p">);</span>
+<span class="nv">$formatter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Formatter\Xml</span><span class="p">();</span>
+<span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">setFormatter</span><span class="p">(</span><span class="nv">$formatter</span><span class="p">);</span>
+
+<span class="nv">$logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Logger</span><span class="p">();</span>
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">addWriter</span><span class="p">(</span><span class="nv">$writer</span><span class="p">);</span>
+
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s1">&#39;informational message&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The code above outputs the following <em>XML</em> (space added for clarity):</p>
+<div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nt">&lt;logEntry&gt;</span>
+  <span class="nt">&lt;timestamp&gt;</span>2007-04-06T07:24:37-07:00<span class="nt">&lt;/timestamp&gt;</span>
+  <span class="nt">&lt;message&gt;</span>informational message<span class="nt">&lt;/message&gt;</span>
+  <span class="nt">&lt;priority&gt;</span>6<span class="nt">&lt;/priority&gt;</span>
+  <span class="nt">&lt;priorityName&gt;</span>INFO<span class="nt">&lt;/priorityName&gt;</span>
+<span class="nt">&lt;/logEntry&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>It&#8217;s possible to customize the root element as well as specify a mapping of <em>XML</em> elements to the items in the
+event data array. The constructor of <tt class="docutils literal"><span class="pre">Zend\Log\Formatter\Xml</span></tt> accepts a string with the name of the root element
+as the first parameter and an associative array with the element mapping as the second parameter:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Writer\Stream</span><span class="p">(</span><span class="s1">&#39;php://output&#39;</span><span class="p">);</span>
+<span class="nv">$formatter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Formatter\Xml</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">,</span>
+                                        <span class="k">array</span><span class="p">(</span><span class="s1">&#39;msg&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;message&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;level&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;priorityName&#39;</span><span class="p">)</span>
+                                       <span class="p">);</span>
+<span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">setFormatter</span><span class="p">(</span><span class="nv">$formatter</span><span class="p">);</span>
+
+<span class="nv">$logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Logger</span><span class="p">();</span>
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">addWriter</span><span class="p">(</span><span class="nv">$writer</span><span class="p">);</span>
+
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s1">&#39;informational message&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The code above changes the root element from its default of <tt class="docutils literal"><span class="pre">logEntry</span></tt> to <tt class="docutils literal"><span class="pre">log</span></tt>. It also maps the element
+<tt class="docutils literal"><span class="pre">msg</span></tt> to the event data item <tt class="docutils literal"><span class="pre">message</span></tt>. This results in the following output:</p>
+<div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nt">&lt;log&gt;</span>
+  <span class="nt">&lt;msg&gt;</span>informational message<span class="nt">&lt;/msg&gt;</span>
+  <span class="nt">&lt;level&gt;</span>INFO<span class="nt">&lt;/level&gt;</span>
+<span class="nt">&lt;/log&gt;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="formatting-to-firephp">
+<span id="zend-log-formatters-firebug"></span><h2>Formatting to FirePhp<a class="headerlink" href="#formatting-to-firephp" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Log\Formatter\FirePhp</span></tt> formats log data for the <a class="reference external" href="http://getfirebug.com/">Firebug</a> extension for Firefox.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Formatters</a><ul>
+<li><a class="reference internal" href="#simple-formatting">Simple Formatting</a></li>
+<li><a class="reference internal" href="#formatting-to-xml">Formatting to XML</a></li>
+<li><a class="reference internal" href="#formatting-to-firephp">Formatting to FirePhp</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.log.filters.html"
+                        title="previous chapter">Filters</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.mail.message.html"
+                        title="next chapter">Zend\Mail\Message</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.log.formatters.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.log.formatters.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.mail.message.html" title="Zend\Mail\Message"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.log.filters.html" title="Filters"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.log.formatters.rst">
+                Formatters
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

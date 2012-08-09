@@ -1,0 +1,1192 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend_Feed_Reader &mdash; Zend Framework 2 2.0.0rc3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc3 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-feed-reader">
+<span id="id1"></span><h1>Zend_Feed_Reader<a class="headerlink" href="#zend-feed-reader" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-feed-reader-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> is a component used to consume <em>RSS</em> and Atom feeds of any version, including <em>RDF</em>/<em>RSS</em> 1.0,
+<em>RSS</em> 2.0, Atom 0.3 and Atom 1.0. The <em>API</em> for retrieving feed data is deliberately simple since
+<tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> is capable of searching any feed of any type for the information requested through the <em>API</em>.
+If the typical elements containing this information are not present, it will adapt and fall back on a variety of
+alternative elements instead. This ability to choose from alternatives removes the need for users to create their
+own abstraction layer on top of the component to make it useful or have any in-depth knowledge of the underlying
+standards, current alternatives, and namespaced extensions.</p>
+<p>Internally, <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> works almost entirely on the basis of making XPath queries against the feed
+<em>XML</em>&#8216;s Document Object Model. The <em>DOM</em> is not exposed though a chained property <em>API</em> like <tt class="docutils literal"><span class="pre">Zend_Feed</span></tt> though
+the underlying DOMDocument, DOMElement and DOMXPath objects are exposed for external manipulation. This singular
+approach to parsing is consistent and the component offers a plugin system to add to the Feed and Entry level <em>API</em>
+by writing Extensions on a similar basis.</p>
+<p>Performance is assisted in three ways. First of all, <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> supports caching using <tt class="docutils literal"><span class="pre">Zend_Cache</span></tt> to
+maintain a copy of the original feed <em>XML</em>. This allows you to skip network requests for a feed <em>URI</em> if the cache
+is valid. Second, the Feed and Entry level <em>API</em> is backed by an internal cache (non-persistant) so repeat <em>API</em>
+calls for the same feed will avoid additional <em>DOM</em> or XPath use. Thirdly, importing feeds from a <em>URI</em> can take
+advantage of <em>HTTP</em> Conditional <tt class="docutils literal"><span class="pre">GET</span></tt> requests which allow servers to issue an empty 304 response when the
+requested feed has not changed since the last time you requested it. In the final case, an instance of
+<tt class="docutils literal"><span class="pre">Zend_Cache</span></tt> will hold the last received feed along with the ETag and Last-Modified header values sent in the
+<em>HTTP</em> response.</p>
+<p>In relation to <tt class="docutils literal"><span class="pre">Zend_Feed</span></tt>, <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> was formulated as a free standing replacement for <tt class="docutils literal"><span class="pre">Zend_Feed</span></tt>
+but it is not backwards compatible with <tt class="docutils literal"><span class="pre">Zend_Feed</span></tt>. Rather it is an alternative following a different ideology
+focused on being simple to use, flexible, consistent and extendable through the plugin system. <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt>
+is also not capable of constructing feeds and delegates this responsibility to <tt class="docutils literal"><span class="pre">Zend_Feed_Writer</span></tt>, its sibling in
+arms.</p>
+</div>
+<div class="section" id="importing-feeds">
+<span id="zend-feed-reader-import"></span><h2>Importing Feeds<a class="headerlink" href="#importing-feeds" title="Permalink to this headline">¶</a></h2>
+<p>Importing a feed with <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> is not that much different to <tt class="docutils literal"><span class="pre">Zend_Feed</span></tt>. Feeds can be imported from
+a string, file, <em>URI</em> or an instance of type <tt class="docutils literal"><span class="pre">Zend_Feed_Abstract</span></tt>. Importing from a <em>URI</em> can additionally
+utilise a <em>HTTP</em> Conditional <tt class="docutils literal"><span class="pre">GET</span></tt> request. If importing fails, an exception will be raised. The end result will
+be an object of type <tt class="docutils literal"><span class="pre">Zend_Feed_Reader_FeedInterface</span></tt>, the core implementations of which are
+<tt class="docutils literal"><span class="pre">Zend_Feed_Reader_Feed_Rss</span></tt> and <tt class="docutils literal"><span class="pre">Zend_Feed_Reader_Feed_Atom</span></tt> (<tt class="docutils literal"><span class="pre">Zend_Feed</span></tt> took all the short names!). Both
+objects support multiple (all existing) versions of these broad feed types.</p>
+<p>In the following example, we import an <em>RDF</em>/<em>RSS</em> 1.0 feed and extract some basic information that can be saved to
+a database or elsewhere.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://www.planet-php.net/rdf/&#39;</span><span class="p">);</span>
+<span class="nv">$data</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;title&#39;</span>        <span class="o">=&gt;</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getTitle</span><span class="p">(),</span>
+    <span class="s1">&#39;link&#39;</span>         <span class="o">=&gt;</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getLink</span><span class="p">(),</span>
+    <span class="s1">&#39;dateModified&#39;</span> <span class="o">=&gt;</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getDateModified</span><span class="p">(),</span>
+    <span class="s1">&#39;description&#39;</span>  <span class="o">=&gt;</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getDescription</span><span class="p">(),</span>
+    <span class="s1">&#39;language&#39;</span>     <span class="o">=&gt;</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getLanguage</span><span class="p">(),</span>
+    <span class="s1">&#39;entries&#39;</span>      <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(),</span>
+<span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$entry</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$edata</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;title&#39;</span>        <span class="o">=&gt;</span> <span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">getTitle</span><span class="p">(),</span>
+        <span class="s1">&#39;description&#39;</span>  <span class="o">=&gt;</span> <span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">getDescription</span><span class="p">(),</span>
+        <span class="s1">&#39;dateModified&#39;</span> <span class="o">=&gt;</span> <span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">getDateModified</span><span class="p">(),</span>
+        <span class="s1">&#39;authors&#39;</span>       <span class="o">=&gt;</span> <span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">getAuthors</span><span class="p">(),</span>
+        <span class="s1">&#39;link&#39;</span>         <span class="o">=&gt;</span> <span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">getLink</span><span class="p">(),</span>
+        <span class="s1">&#39;content&#39;</span>      <span class="o">=&gt;</span> <span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">getContent</span><span class="p">()</span>
+    <span class="p">);</span>
+    <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;entries&#39;</span><span class="p">][]</span> <span class="o">=</span> <span class="nv">$edata</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The example above demonstrates <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt>&#8216;s <em>API</em>, and it also demonstrates some of its internal
+operation. In reality, the <em>RDF</em> feed selected does not have any native date or author elements, however it does
+utilise the Dublin Core 1.1 module which offers namespaced creator and date elements. <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> falls
+back on these and similar options if no relevant native elements exist. If it absolutely cannot find an alternative
+it will return <tt class="docutils literal"><span class="pre">NULL</span></tt>, indicating the information could not be found in the feed. You should note that classes
+implementing <tt class="docutils literal"><span class="pre">Zend_Feed_Reader_FeedInterface</span></tt> also implement the <em>SPL</em> <tt class="docutils literal"><span class="pre">Iterator</span></tt> and <tt class="docutils literal"><span class="pre">Countable</span></tt> interfaces.</p>
+<p>Feeds can also be imported from strings, files, and even objects of type <tt class="docutils literal"><span class="pre">Zend_Feed_Abstract</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// from a URI</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://www.planet-php.net/rdf/&#39;</span><span class="p">);</span>
+
+<span class="c1">// from a String</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">importString</span><span class="p">(</span><span class="nv">$feedXmlString</span><span class="p">);</span>
+
+<span class="c1">// from a file</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">importFile</span><span class="p">(</span><span class="s1">&#39;./feed.xml&#39;</span><span class="p">);</span>
+
+<span class="c1">// from a Zend_Feed_Abstract object</span>
+<span class="nv">$zfeed</span> <span class="o">=</span> <span class="nx">Zend_Feed</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://www.planet-php.net/atom/&#39;</span><span class="p">);</span>
+<span class="nv">$feed</span>  <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">importFeed</span><span class="p">(</span><span class="nv">$zfeed</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-underlying-feed-and-entry-sources">
+<span id="zend-feed-reader-sources"></span><h2>Retrieving Underlying Feed and Entry Sources<a class="headerlink" href="#retrieving-underlying-feed-and-entry-sources" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> does its best not to stick you in a narrow confine. If you need to work on a feed outside of
+<tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt>, you can extract the base DOMDocument or DOMElement objects from any class, or even an <em>XML</em>
+string containing these. Also provided are methods to extract the current DOMXPath object (with all core and
+Extension namespaces registered) and the correct prefix used in all XPath queries for the current Feed or Entry.
+The basic methods to use (on any object) are <tt class="docutils literal"><span class="pre">saveXml()</span></tt>, <tt class="docutils literal"><span class="pre">getDomDocument()</span></tt>, <tt class="docutils literal"><span class="pre">getElement()</span></tt>, <tt class="docutils literal"><span class="pre">getXpath()</span></tt>
+and <tt class="docutils literal"><span class="pre">getXpathPrefix()</span></tt>. These will let you break free of <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> and do whatever else you want.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">saveXml()</span></tt> returns an <em>XML</em> string containing only the element representing the current object.</li>
+<li><tt class="docutils literal"><span class="pre">getDomDocument()</span></tt> returns the DOMDocument object representing the entire feed (even if called from an Entry
+object).</li>
+<li><tt class="docutils literal"><span class="pre">getElement()</span></tt> returns the DOMElement of the current object (i.e. the Feed or current Entry).</li>
+<li><tt class="docutils literal"><span class="pre">getXpath()</span></tt> returns the DOMXPath object for the current feed (even if called from an Entry object) with the
+namespaces of the current feed type and all loaded Extensions pre-registered.</li>
+<li><tt class="docutils literal"><span class="pre">getXpathPrefix()</span></tt> returns the query prefix for the current object (i.e. the Feed or current Entry) which
+includes the correct XPath query path for that specific Feed or Entry.</li>
+</ul>
+<p>Here&#8217;s an example where a feed might include an <em>RSS</em> Extension not supported by <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> out of the
+box. Notably, you could write and register an Extension (covered later) to do this, but that&#8217;s not always warranted
+for a quick check. You must register any new namespaces on the DOMXPath object before use unless they are
+registered by <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> or an Extension beforehand.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span>        <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://www.planet-php.net/rdf/&#39;</span><span class="p">);</span>
+<span class="nv">$xpathPrefix</span> <span class="o">=</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getXpathPrefix</span><span class="p">();</span>
+<span class="nv">$xpath</span>       <span class="o">=</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getXpath</span><span class="p">();</span>
+<span class="nv">$xpath</span><span class="o">-&gt;</span><span class="na">registerNamespace</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">,</span> <span class="s1">&#39;http://webns.net/mvcb/&#39;</span><span class="p">);</span>
+<span class="nv">$reportErrorsTo</span> <span class="o">=</span> <span class="nv">$xpath</span><span class="o">-&gt;</span><span class="na">evaluate</span><span class="p">(</span><span class="s1">&#39;string(&#39;</span>
+                                 <span class="o">.</span> <span class="nv">$xpathPrefix</span>
+                                 <span class="o">.</span> <span class="s1">&#39;/admin:errorReportsTo)&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If you register an already registered namespace with a different prefix name to that used internally by
+<tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt>, it will break the internal operation of this component.</p>
+</div>
+</div>
+<div class="section" id="cache-support-and-intelligent-requests">
+<span id="zend-feed-reader-cache-request"></span><h2>Cache Support and Intelligent Requests<a class="headerlink" href="#cache-support-and-intelligent-requests" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="adding-cache-support-to-zend-feed-reader">
+<span id="zend-feed-reader-cache-request-cache"></span><h3>Adding Cache Support to Zend_Feed_Reader<a class="headerlink" href="#adding-cache-support-to-zend-feed-reader" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> supports using an instance of <tt class="docutils literal"><span class="pre">Zend_Cache</span></tt> to cache feeds (as <em>XML</em>) to avoid unnecessary
+network requests. Adding a cache is as simple here as it is for other Zend Framework components, create and
+configure your cache and then tell <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> to use it! The cache key used is &#8220;<tt class="docutils literal"><span class="pre">Zend_Feed_Reader_</span></tt>&#8221;
+followed by the <em>MD5</em> hash of the feed&#8217;s <em>URI</em>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$frontendOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;lifetime&#39;</span> <span class="o">=&gt;</span> <span class="mi">7200</span><span class="p">,</span>
+   <span class="s1">&#39;automatic_serialization&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+<span class="p">);</span>
+<span class="nv">$backendOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;cache_dir&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;./tmp/&#39;</span><span class="p">);</span>
+<span class="nv">$cache</span> <span class="o">=</span> <span class="nx">Zend_Cache</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span>
+    <span class="s1">&#39;Core&#39;</span><span class="p">,</span> <span class="s1">&#39;File&#39;</span><span class="p">,</span> <span class="nv">$frontendOptions</span><span class="p">,</span> <span class="nv">$backendOptions</span>
+<span class="p">);</span>
+
+<span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">setCache</span><span class="p">(</span><span class="nv">$cache</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">While it&#8217;s a little off track, you should also consider adding a cache to <tt class="docutils literal"><span class="pre">Zend_Loader_PluginLoader</span></tt> which is
+used by <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> to load Extensions.</p>
+</div>
+</div>
+<div class="section" id="http-conditional-get-support">
+<span id="zend-feed-reader-cache-request-http-conditional-get"></span><h3>HTTP Conditional GET Support<a class="headerlink" href="#http-conditional-get-support" title="Permalink to this headline">¶</a></h3>
+<p>The big question often asked when importing a feed frequently, is if it has even changed. With a cache enabled, you
+can add <em>HTTP</em> Conditional <tt class="docutils literal"><span class="pre">GET</span></tt> support to your arsenal to answer that question.</p>
+<p>Using this method, you can request feeds from <em>URI</em>s and include their last known ETag and Last-Modified response
+header values with the request (using the If-None-Match and If-Modified-Since headers). If the feed on the server
+remains unchanged, you should receive a 304 response which tells <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> to use the cached version. If
+a full feed is sent in a response with a status code of 200, this means the feed has changed and
+<tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> will parse the new version and save it to the cache. It will also cache the new ETag and
+Last-Modified header values for future use.</p>
+<p>These &#8220;conditional&#8221; requests are not guaranteed to be supported by the server you request a <em>URI</em> of, but can be
+attempted regardless. Most common feed sources like blogs should however have this supported. To enable conditional
+requests, you will need to provide a cache to <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$frontendOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+   <span class="s1">&#39;lifetime&#39;</span> <span class="o">=&gt;</span> <span class="mi">86400</span><span class="p">,</span>
+   <span class="s1">&#39;automatic_serialization&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+<span class="p">);</span>
+<span class="nv">$backendOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;cache_dir&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;./tmp/&#39;</span><span class="p">);</span>
+<span class="nv">$cache</span> <span class="o">=</span> <span class="nx">Zend_Cache</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span>
+    <span class="s1">&#39;Core&#39;</span><span class="p">,</span> <span class="s1">&#39;File&#39;</span><span class="p">,</span> <span class="nv">$frontendOptions</span><span class="p">,</span> <span class="nv">$backendOptions</span>
+<span class="p">);</span>
+
+<span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">setCache</span><span class="p">(</span><span class="nv">$cache</span><span class="p">);</span>
+<span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">useHttpConditionalGet</span><span class="p">();</span>
+
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://www.planet-php.net/rdf/&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>In the example above, with <em>HTTP</em> Conditional <tt class="docutils literal"><span class="pre">GET</span></tt> requests enabled, the response header values for ETag and
+Last-Modified will be cached along with the feed. For the next 24hrs (the cache lifetime), feeds will only be
+updated on the cache if a non-304 response is received containing a valid <em>RSS</em> or Atom <em>XML</em> document.</p>
+<p>If you intend on managing request headers from outside <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt>, you can set the relevant
+If-None-Matches and If-Modified-Since request headers via the <em>URI</em> import method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$lastEtagReceived</span> <span class="o">=</span> <span class="s1">&#39;5e6cefe7df5a7e95c8b1ba1a2ccaff3d&#39;</span><span class="p">;</span>
+<span class="nv">$lastModifiedDateReceived</span> <span class="o">=</span> <span class="s1">&#39;Wed, 08 Jul 2009 13:37:22 GMT&#39;</span><span class="p">;</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span>
+    <span class="nv">$uri</span><span class="p">,</span> <span class="nv">$lastEtagReceived</span><span class="p">,</span> <span class="nv">$lastModifiedDateReceived</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="locating-feed-uris-from-websites">
+<span id="zend-feed-reader-locate"></span><h2>Locating Feed URIs from Websites<a class="headerlink" href="#locating-feed-uris-from-websites" title="Permalink to this headline">¶</a></h2>
+<p>These days, many websites are aware that the location of their <em>XML</em> feeds is not always obvious. A small <em>RDF</em>,
+<em>RSS</em> or Atom graphic helps when the user is reading the page, but what about when a machine visits trying to
+identify where your feeds are located? To assist in this, websites may point to their feeds using &lt;link&gt; tags in
+the &lt;head&gt; section of their <em>HTML</em>. To take advantage of this, you can use <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> to locate these
+feeds using the static <tt class="docutils literal"><span class="pre">findFeedLinks()</span></tt> method.</p>
+<p>This method calls any <em>URI</em> and searches for the location of <em>RSS</em>, <em>RDF</em> and Atom feeds assuming the website&#8217;s
+<em>HTML</em> contains the relevant links. It then returns a value object where you can check for the existence of a
+<em>RSS</em>, <em>RDF</em> or Atom feed <em>URI</em>.</p>
+<p>The returned object is an <tt class="docutils literal"><span class="pre">ArrayObject</span></tt> subclass called <tt class="docutils literal"><span class="pre">Zend_Feed_Reader_Collection_FeedLink</span></tt> so you can cast
+it to an array, or iterate over it, to access all the detected links. However, as a simple shortcut, you can just
+grab the first <em>RSS</em>, <em>RDF</em> or Atom link using its public properties as in the example below. Otherwise, each
+element of the <tt class="docutils literal"><span class="pre">ArrayObject</span></tt> is a simple array with the keys &#8220;type&#8221; and &#8220;uri&#8221; where the type is one of &#8220;rdf&#8221;,
+&#8220;rss&#8221; or &#8220;atom&#8221;.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$links</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">findFeedLinks</span><span class="p">(</span><span class="s1">&#39;http://www.planet-php.net&#39;</span><span class="p">);</span>
+
+<span class="k">if</span><span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$links</span><span class="o">-&gt;</span><span class="na">rdf</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$links</span><span class="o">-&gt;</span><span class="na">rdf</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span> <span class="c1">// http://www.planet-php.org/rdf/</span>
+<span class="p">}</span>
+<span class="k">if</span><span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$links</span><span class="o">-&gt;</span><span class="na">rss</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$links</span><span class="o">-&gt;</span><span class="na">rss</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span> <span class="c1">// http://www.planet-php.org/rss/</span>
+<span class="p">}</span>
+<span class="k">if</span><span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$links</span><span class="o">-&gt;</span><span class="na">atom</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$links</span><span class="o">-&gt;</span><span class="na">atom</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span> <span class="c1">// http://www.planet-php.org/atom/</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Based on these links, you can then import from whichever source you wish in the usual manner.</p>
+<p>This quick method only gives you one link for each feed type, but websites may indicate many links of any type.
+Perhaps it&#8217;s a news site with a <em>RSS</em> feed for each news category. You can iterate over all links using the
+ArrayObject&#8217;s iterator.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$links</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">findFeedLinks</span><span class="p">(</span><span class="s1">&#39;http://www.planet-php.net&#39;</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$links</span> <span class="k">as</span> <span class="nv">$link</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$link</span><span class="p">[</span><span class="s1">&#39;uri&#39;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="attribute-collections">
+<span id="zend-feed-reader-attribute-collections"></span><h2>Attribute Collections<a class="headerlink" href="#attribute-collections" title="Permalink to this headline">¶</a></h2>
+<p>In an attempt to simplify return types, with Zend Framework 1.10 return types from the various feed and entry level
+methods may include an object of type <tt class="docutils literal"><span class="pre">Zend_Feed_Reader_Collection_CollectionAbstract</span></tt>. Despite the special class
+name which I&#8217;ll explain below, this is just a simple subclass of <em>SPL</em>&#8216;s <tt class="docutils literal"><span class="pre">ArrayObject</span></tt>.</p>
+<p>The main purpose here is to allow the presentation of as much data as possible from the requested elements, while
+still allowing access to the most relevant data as a simple array. This also enforces a standard approach to
+returning such data which previously may have wandered between arrays and objects.</p>
+<p>The new class type acts identically to <tt class="docutils literal"><span class="pre">ArrayObject</span></tt> with the sole addition being a new method <tt class="docutils literal"><span class="pre">getValues()</span></tt>
+which returns a simple flat array containing the most relevant information.</p>
+<p>A simple example of this is <tt class="docutils literal"><span class="pre">Zend_Feed_Reader_FeedInterface::getCategories()</span></tt>. When used with any <em>RSS</em> or Atom
+feed, this method will return category data as a container object called <tt class="docutils literal"><span class="pre">Zend_Feed_Reader_Collection_Category</span></tt>.
+The container object will contain, per category, three fields of data: term, scheme and label. The &#8220;term&#8221; is the
+basic category name, often machine readable (i.e. plays nice with <em>URI</em>s). The scheme represents a categorisation
+scheme (usually a <em>URI</em> identifier) also known as a &#8220;domain&#8221; in <em>RSS</em> 2.0. The &#8220;label&#8221; is a human readable category
+name which supports <em>HTML</em> entities. In <em>RSS</em> 2.0, there is no label attribute so it is always set to the same
+value as the term for convenience.</p>
+<p>To access category labels by themselves in a simple value array, you might commit to something like:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://www.example.com/atom.xml&#39;</span><span class="p">);</span>
+<span class="nv">$categories</span> <span class="o">=</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getCategories</span><span class="p">();</span>
+<span class="nv">$labels</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$categories</span> <span class="k">as</span> <span class="nv">$cat</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$labels</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$cat</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>It&#8217;s a contrived example, but the point is that the labels are tied up with other information.</p>
+<p>However, the container class allows you to access the &#8220;most relevant&#8221; data as a simple array using the
+<tt class="docutils literal"><span class="pre">getValues()</span></tt> method. The concept of &#8220;most relevant&#8221; is obviously a judgement call. For categories it means the
+category labels (not the terms or schemes) while for authors it would be the authors&#8217; names (not their email
+addresses or <em>URI</em>s). The simple array is flat (just values) and passed through <tt class="docutils literal"><span class="pre">array_unique()</span></tt> to remove
+duplication.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://www.example.com/atom.xml&#39;</span><span class="p">);</span>
+<span class="nv">$categories</span> <span class="o">=</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getCategories</span><span class="p">();</span>
+<span class="nv">$labels</span> <span class="o">=</span> <span class="nv">$categories</span><span class="o">-&gt;</span><span class="na">getValues</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above example shows how to extract only labels and nothing else thus giving simple access to the category
+labels without any additional work to extract that data by itself.</p>
+</div>
+<div class="section" id="retrieving-feed-information">
+<span id="zend-feed-reader-retrieve-info"></span><h2>Retrieving Feed Information<a class="headerlink" href="#retrieving-feed-information" title="Permalink to this headline">¶</a></h2>
+<p>Retrieving information from a feed (we&#8217;ll cover entries and items in the next section though they follow identical
+principals) uses a clearly defined <em>API</em> which is exactly the same regardless of whether the feed in question is
+<em>RSS</em>, <em>RDF</em> or Atom. The same goes for sub-versions of these standards and we&#8217;ve tested every single <em>RSS</em> and
+Atom version. While the underlying feed <em>XML</em> can differ substantially in terms of the tags and elements they
+present, they nonetheless are all trying to convey similar information and to reflect this all the differences and
+wrangling over alternative tags are handled internally by <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> presenting you with an identical
+interface for each. Ideally, you should not have to care whether a feed is <em>RSS</em> or Atom so long as you can extract
+the information you want.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">While determining common ground between feed types is itself complex, it should be noted that <em>RSS</em> in
+particular is a constantly disputed &#8220;specification&#8221;. This has its roots in the original <em>RSS</em> 2.0 document which
+contains ambiguities and does not detail the correct treatment of all elements. As a result, this component
+rigorously applies the <em>RSS</em> 2.0.11 Specification published by the <em>RSS</em> Advisory Board and its accompanying
+<em>RSS</em> Best Practices Profile. No other interpretation of <em>RSS</em> 2.0 will be supported though exceptions may be
+allowed where it does not directly prevent the application of the two documents mentioned above.</p>
+</div>
+<p>Of course, we don&#8217;t live in an ideal world so there may be times the <em>API</em> just does not cover what you&#8217;re looking
+for. To assist you, <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> offers a plugin system which allows you to write Extensions to expand the
+core <em>API</em> and cover any additional data you are trying to extract from feeds. If writing another Extension is too
+much trouble, you can simply grab the underlying <em>DOM</em> or XPath objects and do it by hand in your application. Of
+course, we really do encourage writing an Extension simply to make it more portable and reusable, and useful
+Extensions may be proposed to the Framework for formal addition.</p>
+<p>Here&#8217;s a summary of the Core <em>API</em> for Feeds. You should note it comprises not only the basic <em>RSS</em> and Atom
+standards, but also accounts for a number of included Extensions bundled with <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt>. The naming of
+these Extension sourced methods remain fairly generic - all Extension methods operate at the same level as the Core
+<em>API</em> though we do allow you to retrieve any specific Extension object separately if required.</p>
+<table border="1" class="docutils">
+<caption>Feed Level API Methods</caption>
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>getId()</td>
+<td>Returns a unique ID associated with this feed</td>
+</tr>
+<tr class="row-even"><td>getTitle()</td>
+<td>Returns the title of the feed</td>
+</tr>
+<tr class="row-odd"><td>getDescription()</td>
+<td>Returns the text description of the feed.</td>
+</tr>
+<tr class="row-even"><td>getLink()</td>
+<td>Returns a URI to the HTML website containing the same or similar information as this feed (i.e. if the feed is from a blog, it should provide the blog&#8217;s URI where the HTML version of the entries can be read).</td>
+</tr>
+<tr class="row-odd"><td>getFeedLink()</td>
+<td>Returns the URI of this feed, which may be the same as the URI used to import the feed. There are important cases where the feed link may differ because the source URI is being updated and is intended to be removed in the future.</td>
+</tr>
+<tr class="row-even"><td>getAuthors()</td>
+<td>Returns an object of type Zend_Feed_Reader_Collection_Author which is an ArrayObject whose elements are each simple arrays containing any combination of the keys &#8220;name&#8221;, &#8220;email&#8221; and &#8220;uri&#8221;. Where irrelevant to the source data, some of these keys may be omitted.</td>
+</tr>
+<tr class="row-odd"><td>getAuthor(integer $index = 0)</td>
+<td>Returns either the first author known, or with the optional $index parameter any specific index on the array of Authors as described above (returning NULL if an invalid index).</td>
+</tr>
+<tr class="row-even"><td>getDateCreated()</td>
+<td>Returns the date on which this feed was created. Generally only applicable to Atom where it represents the date the resource described by an Atom 1.0 document was created. The returned date will be a DateTime object.</td>
+</tr>
+<tr class="row-odd"><td>getDateModified()</td>
+<td>Returns the date on which this feed was last modified. The returned date will be a DateTime object.</td>
+</tr>
+<tr class="row-even"><td>getLastBuildDate()</td>
+<td>Returns the date on which this feed was last built. The returned date will be a DateTime object. This is only supported by RSS - Atom feeds will always return NULL.</td>
+</tr>
+<tr class="row-odd"><td>getLanguage()</td>
+<td>Returns the language of the feed (if defined) or simply the language noted in the XML document.</td>
+</tr>
+<tr class="row-even"><td>getGenerator()</td>
+<td>Returns the generator of the feed, e.g. the software which generated it. This may differ between RSS and Atom since Atom defines a different notation.</td>
+</tr>
+<tr class="row-odd"><td>getCopyright()</td>
+<td>Returns any copyright notice associated with the feed.</td>
+</tr>
+<tr class="row-even"><td>getHubs()</td>
+<td>Returns an array of all Hub Server URI endpoints which are advertised by the feed for use with the Pubsubhubbub Protocol, allowing subscriptions to the feed for real-time updates.</td>
+</tr>
+<tr class="row-odd"><td>getCategories()</td>
+<td>Returns a Zend_Feed_Reader_Collection_Category object containing the details of any categories associated with the overall feed. The supported fields include &#8220;term&#8221; (the machine readable category name), &#8220;scheme&#8221; (the categorisation scheme and domain for this category), and &#8220;label&#8221; (a HTML decoded human readable category name). Where any of the three fields are absent from the field, they are either set to the closest available alternative or, in the case of &#8220;scheme&#8221;, set to NULL.</td>
+</tr>
+<tr class="row-even"><td>getImage()</td>
+<td>Returns an array containing data relating to any feed image or logo, or NULL if no image found. The resulting array may contain the following keys: uri, link, title, description, height, and width. Atom logos only contain a URI so the remaining metadata is drawn from RSS feeds only.</td>
+</tr>
+</tbody>
+</table>
+<p>Given the variety of feeds in the wild, some of these methods will undoubtedly return <tt class="docutils literal"><span class="pre">NULL</span></tt> indicating the
+relevant information couldn&#8217;t be located. Where possible, <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> will fall back on alternative
+elements during its search. For example, searching an <em>RSS</em> feed for a modification date is more complicated than
+it looks. <em>RSS</em> 2.0 feeds should include a <tt class="docutils literal"><span class="pre">&lt;lastBuildDate&gt;</span></tt> tag and (or) a <tt class="docutils literal"><span class="pre">&lt;pubDate&gt;</span></tt> element. But what if it
+doesn&#8217;t, maybe this is an <em>RSS</em> 1.0 feed? Perhaps it instead has an <tt class="docutils literal"><span class="pre">&lt;atom:updated&gt;</span></tt> element with identical
+information (Atom may be used to supplement <em>RSS</em>&#8216;s syntax)? Failing that, we could simply look at the entries,
+pick the most recent, and use its <tt class="docutils literal"><span class="pre">&lt;pubDate&gt;</span></tt> element. Assuming it exists... Many feeds also use Dublin Core 1.0
+or 1.1 <tt class="docutils literal"><span class="pre">&lt;dc:date&gt;</span></tt> elements for feeds and entries. Or we could find Atom lurking again.</p>
+<p>The point is, <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> was designed to know this. When you ask for the modification date (or anything
+else), it will run off and search for all these alternatives until it either gives up and returns <tt class="docutils literal"><span class="pre">NULL</span></tt>, or
+finds an alternative that should have the right answer.</p>
+<p>In addition to the above methods, all Feed objects implement methods for retrieving the <em>DOM</em> and XPath objects for
+the current feeds as described earlier. Feed objects also implement the <em>SPL</em> Iterator and Countable interfaces.
+The extended <em>API</em> is summarised below.</p>
+<table border="1" class="docutils">
+<caption>Extended Feed Level API Methods</caption>
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>getDomDocument()</td>
+<td>Returns the parent DOMDocument object for the entire source XML document</td>
+</tr>
+<tr class="row-even"><td>getElement()</td>
+<td>Returns the current feed level DOMElement object</td>
+</tr>
+<tr class="row-odd"><td>saveXml()</td>
+<td>Returns a string containing an XML document of the entire feed element (this is not the original document but a rebuilt version)</td>
+</tr>
+<tr class="row-even"><td>getXpath()</td>
+<td>Returns the DOMXPath object used internally to run queries on the DOMDocument object (this includes core and Extension namespaces pre-registered)</td>
+</tr>
+<tr class="row-odd"><td>getXpathPrefix()</td>
+<td>Returns the valid DOM path prefix prepended to all XPath queries matching the feed being queried</td>
+</tr>
+<tr class="row-even"><td>getEncoding()</td>
+<td>Returns the encoding of the source XML document (note: this cannot account for errors such as the server sending documents in a different encoding). Where not defined, the default UTF-8 encoding of Unicode is applied.</td>
+</tr>
+<tr class="row-odd"><td>count()</td>
+<td>Returns a count of the entries or items this feed contains (implements SPLCountable interface)</td>
+</tr>
+<tr class="row-even"><td>current()</td>
+<td>Returns either the current entry (using the current index from key())</td>
+</tr>
+<tr class="row-odd"><td>key()</td>
+<td>Returns the current entry index</td>
+</tr>
+<tr class="row-even"><td>next()</td>
+<td>Increments the entry index value by one</td>
+</tr>
+<tr class="row-odd"><td>rewind()</td>
+<td>Resets the entry index to 0</td>
+</tr>
+<tr class="row-even"><td>valid()</td>
+<td>Checks that the current entry index is valid, i.e. it does fall below 0 and does not exceed the number of entries existing.</td>
+</tr>
+<tr class="row-odd"><td>getExtensions()</td>
+<td>Returns an array of all Extension objects loaded for the current feed (note: both feed-level and entry-level Extensions exist, and only feed-level Extensions are returned here). The array keys are of the form {ExtensionName}_Feed.</td>
+</tr>
+<tr class="row-even"><td>getExtension(string $name)</td>
+<td>Returns an Extension object for the feed registered under the provided name. This allows more fine-grained access to Extensions which may otherwise be hidden within the implementation of the standard API methods.</td>
+</tr>
+<tr class="row-odd"><td>getType()</td>
+<td>Returns a static class constant (e.g. Zend_Feed_Reader::TYPE_ATOM_03, i.e. Atom 0.3) indicating exactly what kind of feed is being consumed.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="retrieving-entry-item-information">
+<span id="zend-feed-reader-entry"></span><h2>Retrieving Entry/Item Information<a class="headerlink" href="#retrieving-entry-item-information" title="Permalink to this headline">¶</a></h2>
+<p>Retrieving information for specific entries or items (depending on whether you speak Atom or <em>RSS</em>) is identical to
+feed level data. Accessing entries is simply a matter of iterating over a Feed object or using the <em>SPL</em>
+<tt class="docutils literal"><span class="pre">Iterator</span></tt> interface Feed objects implement and calling the appropriate method on each.</p>
+<table border="1" class="docutils">
+<caption>Entry Level API Methods</caption>
+<colgroup>
+<col width="9%" />
+<col width="91%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>getId()</td>
+<td>Returns a unique ID for the current entry.</td>
+</tr>
+<tr class="row-even"><td>getTitle()</td>
+<td>Returns the title of the current entry.</td>
+</tr>
+<tr class="row-odd"><td>getDescription()</td>
+<td>Returns a description of the current entry.</td>
+</tr>
+<tr class="row-even"><td>getLink()</td>
+<td>Returns a URI to the HTML version of the current entry.</td>
+</tr>
+<tr class="row-odd"><td>getPermaLink()</td>
+<td>Returns the permanent link to the current entry. In most cases, this is the same as using getLink().</td>
+</tr>
+<tr class="row-even"><td>getAuthors()</td>
+<td>Returns an object of type Zend_Feed_Reader_Collection_Author which is an ArrayObject whose elements are each simple arrays containing any combination of the keys &#8220;name&#8221;, &#8220;email&#8221; and &#8220;uri&#8221;. Where irrelevant to the source data, some of these keys may be omitted.</td>
+</tr>
+<tr class="row-odd"><td>getAuthor(integer $index = 0)</td>
+<td>Returns either the first author known, or with the optional $index parameter any specific index on the array of Authors as described above (returning NULL if an invalid index).</td>
+</tr>
+<tr class="row-even"><td>getDateCreated()</td>
+<td>Returns the date on which the current entry was created. Generally only applicable to Atom where it represents the date the resource described by an Atom 1.0 document was created.</td>
+</tr>
+<tr class="row-odd"><td>getDateModified()</td>
+<td>Returns the date on which the current entry was last modified</td>
+</tr>
+<tr class="row-even"><td>getContent()</td>
+<td>Returns the content of the current entry (this has any entities reversed if possible assuming the content type is HTML). The description is returned if a separate content element does not exist.</td>
+</tr>
+<tr class="row-odd"><td>getEnclosure()</td>
+<td>Returns an array containing the value of all attributes from a multi-media &lt;enclosure&gt; element including as array keys: url, length, type. In accordance with the RSS Best Practices Profile of the RSS Advisory Board, no support is offers for multiple enclosures since such support forms no part of the RSS specification.</td>
+</tr>
+<tr class="row-even"><td>getCommentCount()</td>
+<td>Returns the number of comments made on this entry at the time the feed was last generated</td>
+</tr>
+<tr class="row-odd"><td>getCommentLink()</td>
+<td>Returns a URI pointing to the HTML page where comments can be made on this entry</td>
+</tr>
+<tr class="row-even"><td>getCommentFeedLink([string $type = &#8216;atom&#8217;|&#8217;rss&#8217;])</td>
+<td>Returns a URI pointing to a feed of the provided type containing all comments for this entry (type defaults to Atom/RSS depending on current feed type).</td>
+</tr>
+<tr class="row-odd"><td>getCategories()</td>
+<td>Returns a Zend_Feed_Reader_Collection_Category object containing the details of any categories associated with the entry. The supported fields include &#8220;term&#8221; (the machine readable category name), &#8220;scheme&#8221; (the categorisation scheme and domain for this category), and &#8220;label&#8221; (a HTML decoded human readable category name). Where any of the three fields are absent from the field, they are either set to the closest available alternative or, in the case of &#8220;scheme&#8221;, set to NULL.</td>
+</tr>
+</tbody>
+</table>
+<p>The extended <em>API</em> for entries is identical to that for feeds with the exception of the Iterator methods which are
+not needed here.</p>
+<div class="admonition caution">
+<p class="first admonition-title">Caution</p>
+<p>There is often confusion over the concepts of modified and created dates. In Atom, these are two clearly defined
+concepts (so knock yourself out) but in <em>RSS</em> they are vague. <em>RSS</em> 2.0 defines a single <strong>&lt;pubDate&gt;</strong> element
+which typically refers to the date this entry was published, i.e. a creation date of sorts. This is not always
+the case, and it may change with updates or not. As a result, if you really want to check whether an entry has
+changed, don&#8217;t rely on the results of <tt class="docutils literal"><span class="pre">getDateModified()</span></tt>. Instead, consider tracking the <em>MD5</em> hash of three
+other elements concatenated, e.g. using <tt class="docutils literal"><span class="pre">getTitle()</span></tt>, <tt class="docutils literal"><span class="pre">getDescription()</span></tt> and <tt class="docutils literal"><span class="pre">getContent()</span></tt>. If the entry
+was truly updated, this hash computation will give a different result than previously saved hashes for the same
+entry. This is obviously content oriented, and will not assist in detecting changes to other relevant elements.
+Atom feeds should not require such steps.</p>
+<p class="last">Further muddying the waters, dates in feeds may follow different standards. Atom and Dublin Core dates should
+follow <em>ISO</em> 8601, and <em>RSS</em> dates should follow <em>RFC</em> 822 or <em>RFC</em> 2822 which is also common. Date methods will
+throw an exception if <tt class="docutils literal"><span class="pre">DateTime</span></tt> cannot load the date string using one of the above standards, or the <em>PHP</em>
+recognised possibilities for <em>RSS</em> dates.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The values returned from these methods are not validated. This means users must perform validation on all
+retrieved data including the filtering of any <em>HTML</em> such as from <tt class="docutils literal"><span class="pre">getContent()</span></tt> before it is output from your
+application. Remember that most feeds come from external sources, and therefore the default assumption should be
+that they cannot be trusted.</p>
+</div>
+<table border="1" class="docutils">
+<caption>Extended Entry Level API Methods</caption>
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>getDomDocument()</td>
+<td>Returns the parent DOMDocument object for the entire feed (not just the current entry)</td>
+</tr>
+<tr class="row-even"><td>getElement()</td>
+<td>Returns the current entry level DOMElement object</td>
+</tr>
+<tr class="row-odd"><td>getXpath()</td>
+<td>Returns the DOMXPath object used internally to run queries on the DOMDocument object (this includes core and Extension namespaces pre-registered)</td>
+</tr>
+<tr class="row-even"><td>getXpathPrefix()</td>
+<td>Returns the valid DOM path prefix prepended to all XPath queries matching the entry being queried</td>
+</tr>
+<tr class="row-odd"><td>getEncoding()</td>
+<td>Returns the encoding of the source XML document (note: this cannot account for errors such as the server sending documents in a different encoding). The default encoding applied in the absence of any other is the UTF-8 encoding of Unicode.</td>
+</tr>
+<tr class="row-even"><td>getExtensions()</td>
+<td>Returns an array of all Extension objects loaded for the current entry (note: both feed-level and entry-level Extensions exist, and only entry-level Extensions are returned here). The array keys are in the form {ExtensionName}_Entry.</td>
+</tr>
+<tr class="row-odd"><td>getExtension(string $name)</td>
+<td>Returns an Extension object for the entry registered under the provided name. This allows more fine-grained access to Extensions which may otherwise be hidden within the implementation of the standard API methods.</td>
+</tr>
+<tr class="row-even"><td>getType()</td>
+<td>Returns a static class constant (e.g. Zend_Feed_Reader::TYPE_ATOM_03, i.e. Atom 0.3) indicating exactly what kind of feed is being consumed.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="extending-feed-and-entry-apis">
+<span id="zend-feed-reader-extending"></span><h2>Extending Feed and Entry APIs<a class="headerlink" href="#extending-feed-and-entry-apis" title="Permalink to this headline">¶</a></h2>
+<p>Extending <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> allows you to add methods at both the feed and entry level which cover the retrieval
+of information not already supported by <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt>. Given the number of <em>RSS</em> and Atom extensions that
+exist, this is a good thing since <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> couldn&#8217;t possibly add everything.</p>
+<p>There are two types of Extensions possible, those which retrieve information from elements which are immediate
+children of the root element (e.g. <tt class="docutils literal"><span class="pre">&lt;channel&gt;</span></tt> for <em>RSS</em> or <tt class="docutils literal"><span class="pre">&lt;feed&gt;</span></tt> for Atom) and those who retrieve
+information from child elements of an entry (e.g. <tt class="docutils literal"><span class="pre">&lt;item&gt;</span></tt> for <em>RSS</em> or <tt class="docutils literal"><span class="pre">&lt;entry&gt;</span></tt> for Atom). On the filesystem
+these are grouped as classes within a namespace based on the extension standard&#8217;s name. For example, internally we
+have <tt class="docutils literal"><span class="pre">Zend_Feed_Reader_Extension_DublinCore_Feed</span></tt> and <tt class="docutils literal"><span class="pre">Zend_Feed_Reader_Extension_DublinCore_Entry</span></tt> classes
+which are two Extensions implementing Dublin Core 1.0 and 1.1 support.</p>
+<p>Extensions are loaded into <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> using <tt class="docutils literal"><span class="pre">Zend_Loader_PluginLoader</span></tt>, so their operation will be
+familiar from other Zend Framework components. <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> already bundles a number of these Extensions,
+however those which are not used internally and registered by default (so called Core Extensions) must be
+registered to <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> before they are used. The bundled Extensions include:</p>
+<table border="1" class="docutils">
+<caption>Core Extensions (pre-registered)</caption>
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>DublinCore (Feed and Entry)</td>
+<td>Implements support for Dublin Core Metadata Element Set 1.0 and 1.1</td>
+</tr>
+<tr class="row-even"><td>Content (Entry only)</td>
+<td>Implements support for Content 1.0</td>
+</tr>
+<tr class="row-odd"><td>Atom (Feed and Entry)</td>
+<td>Implements support for Atom 0.3 and Atom 1.0</td>
+</tr>
+<tr class="row-even"><td>Slash</td>
+<td>Implements support for the Slash RSS 1.0 module</td>
+</tr>
+<tr class="row-odd"><td>WellFormedWeb</td>
+<td>Implements support for the Well Formed Web CommentAPI 1.0</td>
+</tr>
+<tr class="row-even"><td>Thread</td>
+<td>Implements support for Atom Threading Extensions as described in RFC 4685</td>
+</tr>
+<tr class="row-odd"><td>Podcast</td>
+<td>Implements support for the Podcast 1.0 DTD from Apple</td>
+</tr>
+</tbody>
+</table>
+<p>The Core Extensions are somewhat special since they are extremely common and multi-faceted. For example, we have a
+Core Extension for Atom. Atom is implemented as an Extension (not just a base class) because it doubles as a valid
+<em>RSS</em> module - you can insert Atom elements into <em>RSS</em> feeds. I&#8217;ve even seen <em>RDF</em> feeds which use a lot of Atom in
+place of more common Extensions like Dublin Core.</p>
+<table border="1" class="docutils">
+<caption>Non-Core Extensions (must register manually)</caption>
+<colgroup>
+<col width="11%" />
+<col width="89%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Syndication</td>
+<td>Implements Syndication 1.0 support for RSS feeds</td>
+</tr>
+<tr class="row-even"><td>CreativeCommons</td>
+<td>A RSS module that adds an element at the &lt;channel&gt; or &lt;item&gt; level that specifies which Creative Commons license applies.</td>
+</tr>
+</tbody>
+</table>
+<p>The additional non-Core Extensions are offered but not registered to <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> by default. If you want
+to use them, you&#8217;ll need to tell <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> to load them in advance of importing a feed. Additional
+non-Core Extensions will be included in future iterations of the component.</p>
+<p>Registering an Extension with <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt>, so it is loaded and its <em>API</em> is available to Feed and Entry
+objects, is a simple affair using the <tt class="docutils literal"><span class="pre">Zend_Loader_PluginLoader</span></tt>. Here we register the optional Slash Extension,
+and discover that it can be directly called from the Entry level <em>API</em> without any effort. Note that Extension
+names are case sensitive and use camel casing for multiple terms.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">registerExtension</span><span class="p">(</span><span class="s1">&#39;Syndication&#39;</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://rss.slashdot.org/Slashdot/slashdot&#39;</span><span class="p">);</span>
+<span class="nv">$updatePeriod</span> <span class="o">=</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">current</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getUpdatePeriod</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>In the simple example above, we checked how frequently a feed is being updated using the <tt class="docutils literal"><span class="pre">getUpdatePeriod()</span></tt>
+method. Since it&#8217;s not part of <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt>&#8216;s core <em>API</em>, it could only be a method supported by the newly
+registered Syndication Extension.</p>
+<p>As you can also notice, the new methods from Extensions are accessible from the main <em>API</em> using <em>PHP</em>&#8216;s magic
+methods. As an alternative, you can also directly access any Extension object for a similar result as seen below.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">registerExtension</span><span class="p">(</span><span class="s1">&#39;Syndication&#39;</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://rss.slashdot.org/Slashdot/slashdot&#39;</span><span class="p">);</span>
+<span class="nv">$syndication</span> <span class="o">=</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getExtension</span><span class="p">(</span><span class="s1">&#39;Syndication&#39;</span><span class="p">);</span>
+<span class="nv">$updatePeriod</span> <span class="o">=</span> <span class="nv">$syndication</span><span class="o">-&gt;</span><span class="na">getUpdatePeriod</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="writing-zend-feed-reader-extensions">
+<span id="zend-feed-reader-extending-feed"></span><h3>Writing Zend_Feed_Reader Extensions<a class="headerlink" href="#writing-zend-feed-reader-extensions" title="Permalink to this headline">¶</a></h3>
+<p>Inevitably, there will be times when the <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> <em>API</em> is just not capable of getting something you
+need from a feed or entry. You can use the underlying source objects, like DOMDocument, to get these by hand
+however there is a more reusable method available by writing Extensions supporting these new queries.</p>
+<p>As an example, let&#8217;s take the case of a purely fictitious corporation named Jungle Books. Jungle Books have been
+publishing a lot of reviews on books they sell (from external sources and customers), which are distributed as an
+<em>RSS</em> 2.0 feed. Their marketing department realises that web applications using this feed cannot currently figure
+out exactly what book is being reviewed. To make life easier for everyone, they determine that the geek department
+needs to extend <em>RSS</em> 2.0 to include a new element per entry supplying the <em>ISBN</em>-10 or <em>ISBN</em>-13 number of the
+publication the entry concerns. They define the new <tt class="docutils literal"><span class="pre">&lt;isbn&gt;</span></tt> element quite simply with a standard name and
+namespace <em>URI</em>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">JungleBooks</span> <span class="mf">1.0</span><span class="o">:</span>
+<span class="nx">http</span><span class="o">://</span><span class="nx">example</span><span class="o">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">junglebooks</span><span class="o">/</span><span class="nx">rss</span><span class="o">/</span><span class="nx">module</span><span class="o">/</span><span class="mf">1.0</span><span class="o">/</span>
+</pre></div>
+</td></tr></table></div>
+<p>A snippet of <em>RSS</em> containing this extension in practice could be something similar to:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">xml</span> <span class="nx">version</span><span class="o">=</span><span class="s2">&quot;1.0&quot;</span> <span class="nx">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;rss version=&quot;2.0&quot;</span>
+<span class="x">   xmlns:content=&quot;http://purl.org/rss/1.0/modules/content/&quot;</span>
+<span class="x">   xmlns:jungle=&quot;http://example.com/junglebooks/rss/module/1.0/&quot;&gt;</span>
+<span class="x">&lt;channel&gt;</span>
+<span class="x">    &lt;title&gt;Jungle Books Customer Reviews&lt;/title&gt;</span>
+<span class="x">    &lt;link&gt;http://example.com/junglebooks&lt;/link&gt;</span>
+<span class="x">    &lt;description&gt;Many book reviews!&lt;/description&gt;</span>
+<span class="x">    &lt;pubDate&gt;Fri, 26 Jun 2009 19:15:10 GMT&lt;/pubDate&gt;</span>
+<span class="x">    &lt;jungle:dayPopular&gt;</span>
+<span class="x">        http://example.com/junglebooks/book/938</span>
+<span class="x">    &lt;/jungle:dayPopular&gt;</span>
+<span class="x">    &lt;item&gt;</span>
+<span class="x">        &lt;title&gt;Review Of Flatland: A Romance of Many Dimensions&lt;/title&gt;</span>
+<span class="x">        &lt;link&gt;http://example.com/junglebooks/review/987&lt;/link&gt;</span>
+<span class="x">        &lt;author&gt;Confused Physics Student&lt;/author&gt;</span>
+<span class="x">        &lt;content:encoded&gt;</span>
+<span class="x">        A romantic square?!</span>
+<span class="x">        &lt;/content:encoded&gt;</span>
+<span class="x">        &lt;pubDate&gt;Thu, 25 Jun 2009 20:03:28 -0700&lt;/pubDate&gt;</span>
+<span class="x">        &lt;jungle:isbn&gt;048627263X&lt;/jungle:isbn&gt;</span>
+<span class="x">    &lt;/item&gt;</span>
+<span class="x">&lt;/channel&gt;</span>
+<span class="x">&lt;/rss&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Implementing this new <em>ISBN</em> element as a simple entry level extension would require the following class (using
+your own class namespace outside of Zend).</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">My_FeedReader_Extension_JungleBooks_Entry</span>
+    <span class="k">extends</span> <span class="nx">Zend_Feed_Reader_Extension_EntryAbstract</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getIsbn</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_data</span><span class="p">[</span><span class="s1">&#39;isbn&#39;</span><span class="p">]))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_data</span><span class="p">[</span><span class="s1">&#39;isbn&#39;</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="nv">$isbn</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_xpath</span><span class="o">-&gt;</span><span class="na">evaluate</span><span class="p">(</span>
+            <span class="s1">&#39;string(&#39;</span> <span class="o">.</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getXpathPrefix</span><span class="p">()</span> <span class="o">.</span> <span class="s1">&#39;/jungle:isbn)&#39;</span>
+        <span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$isbn</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$isbn</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_data</span><span class="p">[</span><span class="s1">&#39;isbn&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$isbn</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_data</span><span class="p">[</span><span class="s1">&#39;isbn&#39;</span><span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">_registerNamespaces</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_xpath</span><span class="o">-&gt;</span><span class="na">registerNamespace</span><span class="p">(</span>
+            <span class="s1">&#39;jungle&#39;</span><span class="p">,</span> <span class="s1">&#39;http://example.com/junglebooks/rss/module/1.0/&#39;</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This extension is easy enough to follow. It creates a new method <tt class="docutils literal"><span class="pre">getIsbn()</span></tt> which runs an XPath query on the
+current entry to extract the <em>ISBN</em> number enclosed by the <tt class="docutils literal"><span class="pre">&lt;jungle:isbn&gt;</span></tt> element. It can optionally store this
+to the internal non-persistent cache (no need to keep querying the <em>DOM</em> if it&#8217;s called again on the same entry).
+The value is returned to the caller. At the end we have a protected method (it&#8217;s abstract so it must exist) which
+registers the Jungle Books namespace for their custom <em>RSS</em> module. While we call this an <em>RSS</em> module, there&#8217;s
+nothing to prevent the same element being used in Atom feeds - and all Extensions which use the prefix provided by
+<tt class="docutils literal"><span class="pre">getXpathPrefix()</span></tt> are actually neutral and work on <em>RSS</em> or Atom feeds with no extra code.</p>
+<p>Since this Extension is stored outside of Zend Framework, you&#8217;ll need to register the path prefix for your
+Extensions so <tt class="docutils literal"><span class="pre">Zend_Loader_PluginLoader</span></tt> can find them. After that, it&#8217;s merely a matter of registering the
+Extension, if it&#8217;s not already loaded, and using it in practice.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">isRegistered</span><span class="p">(</span><span class="s1">&#39;JungleBooks&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">addPrefixPath</span><span class="p">(</span>
+        <span class="s1">&#39;My_FeedReader_Extension&#39;</span><span class="p">,</span> <span class="s1">&#39;/path/to/My/FeedReader/Extension&#39;</span>
+    <span class="p">);</span>
+    <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">registerExtension</span><span class="p">(</span><span class="s1">&#39;JungleBooks&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://example.com/junglebooks/rss&#39;</span><span class="p">);</span>
+
+<span class="c1">// ISBN for whatever book the first entry in the feed was concerned with</span>
+<span class="nv">$firstIsbn</span> <span class="o">=</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">current</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getIsbn</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>Writing a feed level Extension is not much different. The example feed from earlier included an unmentioned
+<tt class="docutils literal"><span class="pre">&lt;jungle:dayPopular&gt;</span></tt> element which Jungle Books have added to their standard to include a link to the day&#8217;s most
+popular book (in terms of visitor traffic). Here&#8217;s an Extension which adds a <tt class="docutils literal"><span class="pre">getDaysPopularBookLink()</span></tt> method to
+the feel level <em>API</em>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">My_FeedReader_Extension_JungleBooks_Feed</span>
+    <span class="k">extends</span> <span class="nx">Zend_Feed_Reader_Extension_FeedAbstract</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getDaysPopularBookLink</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_data</span><span class="p">[</span><span class="s1">&#39;dayPopular&#39;</span><span class="p">]))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_data</span><span class="p">[</span><span class="s1">&#39;dayPopular&#39;</span><span class="p">];</span>
+        <span class="p">}</span>
+        <span class="nv">$dayPopular</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_xpath</span><span class="o">-&gt;</span><span class="na">evaluate</span><span class="p">(</span>
+            <span class="s1">&#39;string(&#39;</span> <span class="o">.</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getXpathPrefix</span><span class="p">()</span> <span class="o">.</span> <span class="s1">&#39;/jungle:dayPopular)&#39;</span>
+        <span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$dayPopular</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$dayPopular</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_data</span><span class="p">[</span><span class="s1">&#39;dayPopular&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$dayPopular</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_data</span><span class="p">[</span><span class="s1">&#39;dayPopular&#39;</span><span class="p">];</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">_registerNamespaces</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_xpath</span><span class="o">-&gt;</span><span class="na">registerNamespace</span><span class="p">(</span>
+            <span class="s1">&#39;jungle&#39;</span><span class="p">,</span> <span class="s1">&#39;http://example.com/junglebooks/rss/module/1.0/&#39;</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Let&#8217;s repeat the last example using a custom Extension to show the method being used.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">isRegistered</span><span class="p">(</span><span class="s1">&#39;JungleBooks&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">addPrefixPath</span><span class="p">(</span>
+        <span class="s1">&#39;My_FeedReader_Extension&#39;</span><span class="p">,</span> <span class="s1">&#39;/path/to/My/FeedReader/Extension&#39;</span>
+    <span class="p">);</span>
+    <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">registerExtension</span><span class="p">(</span><span class="s1">&#39;JungleBooks&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nx">Zend_Feed_Reader</span><span class="o">::</span><span class="na">import</span><span class="p">(</span><span class="s1">&#39;http://example.com/junglebooks/rss&#39;</span><span class="p">);</span>
+
+<span class="c1">// URI to the information page of the day&#39;s most popular book with visitors</span>
+<span class="nv">$daysPopularBookLink</span> <span class="o">=</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">getDaysPopularBookLink</span><span class="p">();</span>
+
+<span class="c1">// ISBN for whatever book the first entry in the feed was concerned with</span>
+<span class="nv">$firstIsbn</span> <span class="o">=</span> <span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">current</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getIsbn</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>Going through these examples, you&#8217;ll note that we don&#8217;t register feed and entry Extensions separately. Extensions
+within the same standard may or may not include both a feed and entry class, so <tt class="docutils literal"><span class="pre">Zend_Feed_Reader</span></tt> only requires
+you to register the overall parent name, e.g. JungleBooks, DublinCore, Slash. Internally, it can check at what
+level Extensions exist and load them up if found. In our case, we have a full set of Extensions now:
+<tt class="docutils literal"><span class="pre">JungleBooks_Feed</span></tt> and <tt class="docutils literal"><span class="pre">JungleBooks_Entry</span></tt>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend_Feed_Reader</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#importing-feeds">Importing Feeds</a></li>
+<li><a class="reference internal" href="#retrieving-underlying-feed-and-entry-sources">Retrieving Underlying Feed and Entry Sources</a></li>
+<li><a class="reference internal" href="#cache-support-and-intelligent-requests">Cache Support and Intelligent Requests</a><ul>
+<li><a class="reference internal" href="#adding-cache-support-to-zend-feed-reader">Adding Cache Support to Zend_Feed_Reader</a></li>
+<li><a class="reference internal" href="#http-conditional-get-support">HTTP Conditional GET Support</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#locating-feed-uris-from-websites">Locating Feed URIs from Websites</a></li>
+<li><a class="reference internal" href="#attribute-collections">Attribute Collections</a></li>
+<li><a class="reference internal" href="#retrieving-feed-information">Retrieving Feed Information</a></li>
+<li><a class="reference internal" href="#retrieving-entry-item-information">Retrieving Entry/Item Information</a></li>
+<li><a class="reference internal" href="#extending-feed-and-entry-apis">Extending Feed and Entry APIs</a><ul>
+<li><a class="reference internal" href="#writing-zend-feed-reader-extensions">Writing Zend_Feed_Reader Extensions</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.feed.reader.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.feed.reader.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.feed.reader.rst">
+                Zend_Feed_Reader
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

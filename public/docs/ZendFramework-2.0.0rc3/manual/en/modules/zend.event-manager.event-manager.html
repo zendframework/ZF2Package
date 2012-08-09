@@ -1,0 +1,942 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The EventManager &mdash; Zend Framework 2 2.0.0rc3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc3 documentation" href="../index.html" />
+    <link rel="next" title="Introduction to Zend\Form" href="zend.form.intro.html" />
+    <link rel="prev" title="Zend\Dom\Query" href="zend.dom.query.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.form.intro.html" title="Introduction to Zend\Form"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.dom.query.html" title="Zend\Dom\Query"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-eventmanager">
+<span id="zend-event-manager-event-manager"></span><h1>The EventManager<a class="headerlink" href="#the-eventmanager" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-event-manager-event-manager-intro"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">EventManager</span></tt> is a component designed for the following use cases:</p>
+<ul class="simple">
+<li>Implementing simple subject/observer patterns.</li>
+<li>Implementing Aspect-Oriented designs.</li>
+<li>Implementing event-driven architectures.</li>
+</ul>
+<p>The basic architecture allows you to attach and detach listeners to named events, both on a per-instance basis as
+well as via shared collections; trigger events; and interrupt execution of listeners.</p>
+</div>
+<div class="section" id="quick-start">
+<span id="zend-event-manager-event-manager-quick-start"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>Typically, you will compose an <tt class="docutils literal"><span class="pre">EventManager</span></tt> instance in a class.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\EventManager\EventCollection</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\EventManager\EventManager</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\EventManager\EventManagerAware</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Foo</span> <span class="k">implements</span> <span class="nx">EventManagerAware</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$events</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setEventManager</span><span class="p">(</span><span class="nx">EventCollection</span> <span class="nv">$events</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$events</span><span class="o">-&gt;</span><span class="na">setIdentifiers</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="nx">__CLASS__</span><span class="p">,</span>
+            <span class="nb">get_called_class</span><span class="p">(),</span>
+        <span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">events</span> <span class="o">=</span> <span class="nv">$events</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getEventManager</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">null</span> <span class="o">===</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">events</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setEventManager</span><span class="p">(</span><span class="k">new</span> <span class="nx">EventManager</span><span class="p">());</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">events</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above allows users to access the <tt class="docutils literal"><span class="pre">EventManager</span></tt> instance, or reset it with a new instance; if one does not
+exist, it will be lazily instantiated on-demand.</p>
+<p>An <tt class="docutils literal"><span class="pre">EventManager</span></tt> is really only interesting if it triggers some events. Basic triggering takes three arguments:
+the event name, which is usually the current function/method name; the &#8220;context&#8221;, which is usually the current
+object instance; and the arguments, which are usually the arguments provided to the current function/method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Foo</span>
+<span class="p">{</span>
+    <span class="c1">// ... assume events definition from above</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">bar</span><span class="p">(</span><span class="nv">$baz</span><span class="p">,</span> <span class="nv">$bat</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$params</span> <span class="o">=</span> <span class="nb">compact</span><span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">,</span> <span class="s1">&#39;bat&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">trigger</span><span class="p">(</span><span class="nx">__FUNCTION__</span><span class="p">,</span> <span class="nv">$this</span><span class="p">,</span> <span class="nv">$params</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>In turn, triggering events is only interesting if something is listening for the event. Listeners attach to the
+<tt class="docutils literal"><span class="pre">EventManager</span></tt>, specifying a named event and the callback to notify. The callback receives an <tt class="docutils literal"><span class="pre">Event</span></tt> object,
+which has accessors for retrieving the event name, context, and parameters. Let&#8217;s add a listener, and trigger the
+event.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Log\Factory</span> <span class="k">as</span> <span class="nx">LogFactory</span><span class="p">;</span>
+
+<span class="nv">$log</span> <span class="o">=</span> <span class="nx">LogFactory</span><span class="p">(</span><span class="nv">$someConfig</span><span class="p">);</span>
+<span class="nv">$foo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Foo</span><span class="p">();</span>
+<span class="nv">$foo</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$e</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$log</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$event</span>  <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
+    <span class="nv">$target</span> <span class="o">=</span> <span class="nb">get_class</span><span class="p">(</span><span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getTarget</span><span class="p">());</span>
+    <span class="nv">$params</span> <span class="o">=</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getParams</span><span class="p">());</span>
+
+    <span class="nv">$log</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span>
+        <span class="s1">&#39;%s called on %s, using params %s&#39;</span><span class="p">,</span>
+        <span class="nv">$event</span><span class="p">,</span>
+        <span class="nv">$target</span><span class="p">,</span>
+        <span class="nv">$params</span>
+    <span class="p">));</span>
+<span class="p">});</span>
+
+<span class="c1">// Results in log message:</span>
+<span class="nv">$foo</span><span class="o">-&gt;</span><span class="na">bar</span><span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">,</span> <span class="s1">&#39;bat&#39;</span><span class="p">);</span>
+<span class="c1">// reading: bar called on Foo, using params {&quot;baz&quot; : &quot;baz&quot;, &quot;bat&quot; : &quot;bat&quot;}&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that the second argument to <tt class="docutils literal"><span class="pre">attach()</span></tt> is any valid callback; an anonymous function is shown in the example
+in order to keep the example self-contained. However, you could also utilize a valid function name, a functor, a
+string referencing a static method, or an array callback with a named static method or instance method. Again, any
+PHP callback is valid.</p>
+<p>Sometimes you may want to specify listeners without yet having an object instance of the class composing an
+<tt class="docutils literal"><span class="pre">EventManager</span></tt>. Zend Framework enables this through the concept of a <tt class="docutils literal"><span class="pre">SharedEventCollection</span></tt>. Simply put, you
+can inject individual <tt class="docutils literal"><span class="pre">EventManager</span></tt> instances with a well-known <tt class="docutils literal"><span class="pre">SharedEventCollection</span></tt>, and the
+<tt class="docutils literal"><span class="pre">EventManager</span></tt> instance will query it for additional listeners. Listeners attach to a <tt class="docutils literal"><span class="pre">SharedEventCollection</span></tt>
+in roughly the same way the do normal event managers; the call to <tt class="docutils literal"><span class="pre">attach</span></tt> is identical to the <tt class="docutils literal"><span class="pre">EventManager</span></tt>,
+but expects an additional parameter at the beginning: a named instance. Remember the example of composing an
+<tt class="docutils literal"><span class="pre">EventManager</span></tt>, how we passed it <tt class="docutils literal"><span class="pre">__CLASS__</span></tt>? That value, or any strings you provide in an array to the
+constructor, may be used to identify an instance when using a <tt class="docutils literal"><span class="pre">SharedEventCollection</span></tt>. As an example, assuming we
+have a <tt class="docutils literal"><span class="pre">SharedEventManager</span></tt> instance that we know has been injected in our <tt class="docutils literal"><span class="pre">EventManager</span></tt> instances (for
+instance, via dependency injection), we could change the above example to attach via the shared collection:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Log\Factory</span> <span class="k">as</span> <span class="nx">LogFactory</span><span class="p">;</span>
+
+<span class="c1">// Assume $events is a Zend\EventManager\SharedEventManager instance</span>
+
+<span class="nv">$log</span> <span class="o">=</span> <span class="nx">LogFactory</span><span class="p">(</span><span class="nv">$someConfig</span><span class="p">);</span>
+<span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$e</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$log</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$event</span>  <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>
+    <span class="nv">$target</span> <span class="o">=</span> <span class="nb">get_class</span><span class="p">(</span><span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getTarget</span><span class="p">());</span>
+    <span class="nv">$params</span> <span class="o">=</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getParams</span><span class="p">());</span>
+
+    <span class="nv">$log</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="nb">sprintf</span><span class="p">(</span>
+        <span class="s1">&#39;%s called on %s, using params %s&#39;</span><span class="p">,</span>
+        <span class="nv">$event</span><span class="p">,</span>
+        <span class="nv">$target</span><span class="p">,</span>
+        <span class="nv">$params</span>
+    <span class="p">));</span>
+<span class="p">});</span>
+
+<span class="c1">// Later, instantiate Foo:</span>
+<span class="nv">$foo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Foo</span><span class="p">();</span>
+<span class="nv">$foo</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setSharedEventCollection</span><span class="p">(</span><span class="nv">$events</span><span class="p">);</span>
+
+<span class="c1">// And we can still trigger the above event:</span>
+<span class="nv">$foo</span><span class="o">-&gt;</span><span class="na">bar</span><span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">,</span> <span class="s1">&#39;bat&#39;</span><span class="p">);</span>
+<span class="c1">// results in log message:</span>
+<span class="c1">// bar called on Foo, using params {&quot;baz&quot; : &quot;baz&quot;, &quot;bat&quot; : &quot;bat&quot;}&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>StaticEventManager</strong></p>
+<p>As of 2.0.0beta3, you can use the <tt class="docutils literal"><span class="pre">StaticEventManager</span></tt> singleton as a <tt class="docutils literal"><span class="pre">SharedEventCollection</span></tt>. As such, you
+do not need to worry about where and how to get access to the <tt class="docutils literal"><span class="pre">SharedEventCollection</span></tt>; it&#8217;s globally available
+by simply calling <em>StaticEventManager::getInstance()</em>.</p>
+<p class="last">Be aware, however, that its usage is deprecated within the framework, and starting with 2.0.0beta4, you will
+instead configure a <tt class="docutils literal"><span class="pre">SharedEventManager</span></tt> instance that will be injected by the framework into individual
+<tt class="docutils literal"><span class="pre">EventManager</span></tt> instances.</p>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">EventManager</span></tt> also provides the ability to detach listeners, short-circuit execution of an event either from
+within a listener or by testing return values of listeners, test and loop through the results returned by
+listeners, prioritize listeners, and more. Many of these features are detailed in the examples.</p>
+<div class="section" id="wildcard-listeners">
+<span id="zend-event-manager-event-manager-quick-start-wildcard"></span><h3>Wildcard Listeners<a class="headerlink" href="#wildcard-listeners" title="Permalink to this headline">¶</a></h3>
+<p>Sometimes you&#8217;ll want to attach the same listener to many events or to all events of a given instance &#8211; or
+potentially, with a shared event collection, many contexts, and many events. The <tt class="docutils literal"><span class="pre">EventManager</span></tt> component allows
+for this.</p>
+<p class="rubric" id="zend-event-manager-event-manager-quick-start-wildcard-many">Attaching to many events at once</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$events</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventManager</span><span class="p">();</span>
+<span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;these&#39;</span><span class="p">,</span> <span class="s1">&#39;are&#39;</span><span class="p">,</span> <span class="s1">&#39;event&#39;</span><span class="p">,</span> <span class="s1">&#39;names&#39;</span><span class="p">),</span> <span class="nv">$callback</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that if you specify a priority, that priority will be used for all events specified.</p>
+<p class="rubric" id="zend-event-manager-event-manager-quick-start-wildcard-wildcard">Attaching using the wildcard</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$events</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventManager</span><span class="p">();</span>
+<span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="nv">$callback</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that if you specify a priority, that priority will be used for this listener for any event triggered.</p>
+<p>What the above specifies is that <strong>any</strong> event triggered will result in notification of this particular listener.</p>
+<p class="rubric" id="zend-event-manager-event-manager-quick-start-wildcard-shared-many">Attaching to many events at once via a SharedEventManager</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$events</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SharedEventManager</span><span class="p">();</span>
+<span class="c1">// Attach to many events on the context &quot;foo&quot;</span>
+<span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;these&#39;</span><span class="p">,</span> <span class="s1">&#39;are&#39;</span><span class="p">,</span> <span class="s1">&#39;event&#39;</span><span class="p">,</span> <span class="s1">&#39;names&#39;</span><span class="p">),</span> <span class="nv">$callback</span><span class="p">);</span>
+
+<span class="c1">// Attach to many events on the contexts &quot;foo&quot; and &quot;bar&quot;</span>
+<span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">),</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;these&#39;</span><span class="p">,</span> <span class="s1">&#39;are&#39;</span><span class="p">,</span> <span class="s1">&#39;event&#39;</span><span class="p">,</span> <span class="s1">&#39;names&#39;</span><span class="p">),</span> <span class="nv">$callback</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that if you specify a priority, that priority will be used for all events specified.</p>
+<p class="rubric" id="zend-event-manager-event-manager-quick-start-wildcard-shared-wildcard">Attaching to many events at once via a SharedEventManager</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$events</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SharedEventManager</span><span class="p">();</span>
+<span class="c1">// Attach to all events on the context &quot;foo&quot;</span>
+<span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="nv">$callback</span><span class="p">);</span>
+
+<span class="c1">// Attach to all events on the contexts &quot;foo&quot; and &quot;bar&quot;</span>
+<span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">),</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="nv">$callback</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that if you specify a priority, that priority will be used for all events specified.</p>
+<p>The above is specifying that for the contexts &#8220;foo&#8221; and &#8220;bar&#8221;, the specified listener should be notified for any
+event they trigger.</p>
+</div>
+</div>
+<div class="section" id="configuration-options">
+<span id="zend-event-manager-event-manager-options"></span><h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">EventManager Options</p>
+<dl class="docutils">
+<dt><strong>identifier</strong></dt>
+<dd>A string or array of strings to which the given <tt class="docutils literal"><span class="pre">EventManager</span></tt> instance can answer when accessed via a
+<tt class="docutils literal"><span class="pre">SharedEventManager</span></tt>.</dd>
+<dt><strong>event_class</strong></dt>
+<dd>The name of an alternate <tt class="docutils literal"><span class="pre">Event</span></tt> class to use for representing events passed to listeners.</dd>
+<dt><strong>shared_collections</strong></dt>
+<dd>An instance of a <tt class="docutils literal"><span class="pre">SharedEventCollection</span></tt> instance to use when triggering events.</dd>
+</dl>
+</div>
+<div class="section" id="available-methods">
+<span id="zend-event-manager-event-manager-methods"></span><h2>Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-constructor">
+<dt><strong>__construct</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">__construct(null|string|int</span> <span class="pre">$identifier)</span></tt></p>
+<p class="last">Constructs a new <tt class="docutils literal"><span class="pre">EventManager</span></tt> instance, using the given identifier, if provided, for purposes of shared
+collections.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-set-event-class">
+<dt><strong>setEventClass</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setEventClass(string</span> <span class="pre">$class)</span></tt></p>
+<p class="last">Provide the name of an alternate <tt class="docutils literal"><span class="pre">Event</span></tt> class to use when creating events to pass to triggered listeners.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-set-shared-collections">
+<dt><strong>setSharedCollections</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setSharedCollections(SharedEventCollection</span> <span class="pre">$collections</span> <span class="pre">=</span> <span class="pre">null)</span></tt></p>
+<p class="last">An instance of a <tt class="docutils literal"><span class="pre">SharedEventCollection</span></tt> instance to use when triggering events.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-get-shared-collections">
+<dt><strong>getSharedCollections</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getSharedCollections()</span></tt></p>
+<p class="last">Returns the currently attached <tt class="docutils literal"><span class="pre">SharedEventCollection</span></tt> instance. Returns either a <tt class="docutils literal"><span class="pre">null</span></tt> if no collection is
+attached, or a <tt class="docutils literal"><span class="pre">SharedEventCollection</span></tt> instance otherwise.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-trigger">
+<dt><strong>trigger</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">trigger(string</span> <span class="pre">$event,</span> <span class="pre">mixed</span> <span class="pre">$target,</span> <span class="pre">mixed</span> <span class="pre">$argv,</span> <span class="pre">callback</span> <span class="pre">$callback)</span></tt></p>
+<p>Triggers all listeners to a named event. The recommendation is to use the current function/method name for
+<tt class="docutils literal"><span class="pre">$event</span></tt>, appending it with values such as &#8221;.pre&#8221;, &#8221;.post&#8221;, etc. as needed. <tt class="docutils literal"><span class="pre">$context</span></tt> should be the current
+object instance, or the name of the function if not triggering within an object. <tt class="docutils literal"><span class="pre">$params</span></tt> should typically be
+an associative array or <tt class="docutils literal"><span class="pre">ArrayAccess</span></tt> instance; we recommend using the parameters passed to the
+function/method (<tt class="docutils literal"><span class="pre">compact()</span></tt> is often useful here). This method can also take a callback and behave in the
+same way as <tt class="docutils literal"><span class="pre">triggerUntil()</span></tt>.</p>
+<p class="last">The method returns an instance of <tt class="docutils literal"><span class="pre">ResponseCollection</span></tt>, which may be used to introspect return values of the
+various listeners, test for short-circuiting, and more.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-trigger-until">
+<dt><strong>triggerUntil</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">triggerUntil(string</span> <span class="pre">$event,</span> <span class="pre">mixed</span> <span class="pre">$context,</span> <span class="pre">mixed</span> <span class="pre">$argv,</span> <span class="pre">callback</span> <span class="pre">$callback)</span></tt></p>
+<p class="last">Triggers all listeners to a named event, just like <a class="reference internal" href="#zend-event-manager-event-manager-methods-trigger"><em>trigger()</em></a>, with the addition that it passes the return value from each
+listener to <tt class="docutils literal"><span class="pre">$callback</span></tt>; if <tt class="docutils literal"><span class="pre">$callback</span></tt> returns a boolean <tt class="docutils literal"><span class="pre">true</span></tt> value, execution of the listeners is
+interrupted. You can test for this using <em>$result-&gt;stopped()</em>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-attach">
+<dt><strong>attach</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">attach(string</span> <span class="pre">$event,</span> <span class="pre">callback</span> <span class="pre">$callback,</span> <span class="pre">int</span> <span class="pre">$priority)</span></tt></p>
+<p>Attaches <tt class="docutils literal"><span class="pre">$callback</span></tt> to the <tt class="docutils literal"><span class="pre">EventManager</span></tt> instance, listening for the event <tt class="docutils literal"><span class="pre">$event</span></tt>. If a <tt class="docutils literal"><span class="pre">$priority</span></tt>
+is provided, the listener will be inserted into the internal listener stack using that priority; higher values
+execute earliest. (Default priority is &#8220;1&#8221;, and negative priorities are allowed.)</p>
+<p class="last">The method returns an instance of <tt class="docutils literal"><span class="pre">Zend\Stdlib\CallbackHandler</span></tt>; this value can later be passed to
+<tt class="docutils literal"><span class="pre">detach()</span></tt> if desired.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-attach-aggregate">
+<dt><strong>attachAggregate</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">attachAggregate(string|ListenerAggregate</span> <span class="pre">$aggregate)</span></tt></p>
+<p>If a string is passed for <tt class="docutils literal"><span class="pre">$aggregate</span></tt>, instantiates that class. The <tt class="docutils literal"><span class="pre">$aggregate</span></tt> is then passed the
+<tt class="docutils literal"><span class="pre">EventManager</span></tt> instance to its <tt class="docutils literal"><span class="pre">attach()</span></tt> method so that it may register listeners.</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">ListenerAggregate</span></tt> instance is returned.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-detach">
+<dt><strong>detach</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">detach(CallbackHandler</span> <span class="pre">$listener)</span></tt></p>
+<p>Scans all listeners, and detaches any that match <tt class="docutils literal"><span class="pre">$listener</span></tt> so that they will no longer be triggered.</p>
+<p class="last">Returns a boolean <tt class="docutils literal"><span class="pre">true</span></tt> if any listeners have been identified and unsubscribed, and a boolean <tt class="docutils literal"><span class="pre">false</span></tt>
+otherwise.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-detach-aggregate">
+<dt><strong>detachAggregate</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">detachAggregate(ListenerAggregate</span> <span class="pre">$aggregate)</span></tt></p>
+<p>Loops through all listeners of all events to identify listeners that are represented by the aggregate; for all
+matches, the listeners will be removed.</p>
+<p class="last">Returns a boolean <tt class="docutils literal"><span class="pre">true</span></tt> if any listeners have been identified and unsubscribed, and a boolean <tt class="docutils literal"><span class="pre">false</span></tt>
+otherwise.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-get-events">
+<dt><strong>getEvents</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getEvents()</span></tt></p>
+<p class="last">Returns an array of all event names that have listeners attached.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-get-listeners">
+<dt><strong>getListeners</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getListeners(string</span> <span class="pre">$event)</span></tt></p>
+<p class="last">Returns a <tt class="docutils literal"><span class="pre">Zend\Stdlib\PriorityQueue</span></tt> instance of all listeners attached to <tt class="docutils literal"><span class="pre">$event</span></tt>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-clear-listeners">
+<dt><strong>clearListeners</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">clearListeners(string</span> <span class="pre">$event)</span></tt></p>
+<p class="last">Removes all listeners attached to <tt class="docutils literal"><span class="pre">$event</span></tt>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-event-manager-event-manager-methods-prepare-args">
+<dt><strong>prepareArgs</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">prepareArgs(array</span> <span class="pre">$args)</span></tt></p>
+<p class="last">Creates an <tt class="docutils literal"><span class="pre">ArrayObject</span></tt> from the provided <tt class="docutils literal"><span class="pre">$args</span></tt>. This can be useful if you want yours listeners to be
+able to modify arguments such that later listeners or the triggering method can see the changes.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<span id="zend-event-manager-event-manager-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zend-event-manager-event-manager-examples-modifying-args">Modifying Arguments</p>
+<p>Occasionally it can be useful to allow listeners to modify the arguments they receive so that later listeners or
+the calling method will receive those changed values.</p>
+<p>As an example, you might want to pre-filter a date that you know will arrive as a string and convert it to a
+<tt class="docutils literal"><span class="pre">DateTime</span></tt> argument.</p>
+<p>To do this, you can pass your arguments to <tt class="docutils literal"><span class="pre">prepareArgs()</span></tt>, and pass this new object when triggering an event.
+You will then pull that value back into your method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ValueObject</span>
+<span class="p">{</span>
+    <span class="c1">// assume a composed event manager</span>
+
+    <span class="k">function</span> <span class="nf">inject</span><span class="p">(</span><span class="k">array</span> <span class="nv">$values</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$argv</span> <span class="o">=</span> <span class="nb">compact</span><span class="p">(</span><span class="s1">&#39;values&#39;</span><span class="p">);</span>
+        <span class="nv">$argv</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">prepareArgs</span><span class="p">(</span><span class="nv">$argv</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">trigger</span><span class="p">(</span><span class="nx">__FUNCTION__</span><span class="p">,</span> <span class="nv">$this</span><span class="p">,</span> <span class="nv">$argv</span><span class="p">);</span>
+        <span class="nv">$date</span> <span class="o">=</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$argv</span><span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">][</span><span class="s1">&#39;date&#39;</span><span class="p">])</span> <span class="o">?</span> <span class="nv">$argv</span><span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">][</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">:</span> <span class="k">new</span> <span class="nx">DateTime</span><span class="p">(</span><span class="s1">&#39;now&#39;</span><span class="p">);</span>
+
+        <span class="c1">// ...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$v</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ValueObject</span><span class="p">();</span>
+
+<span class="nv">$v</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;inject&#39;</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$values</span> <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;values&#39;</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$values</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$values</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="nv">$values</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DateTime</span><span class="p">(</span><span class="s1">&#39;now&#39;</span><span class="p">);</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nv">$values</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Datetime</span><span class="p">(</span><span class="nv">$values</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]);</span>
+<span class="p">});</span>
+
+<span class="nv">$v</span><span class="o">-&gt;</span><span class="na">inject</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;date&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;2011-08-10 15:30:29&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-event-manager-event-manager-examples-short-circuiting">Short Circuiting</p>
+<p>One common use case for events is to trigger listeners until either one indicates no further processing should be
+done, or until a return value meets specific criteria. As examples, if an event creates a Response object, it may
+want execution to stop.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$listener</span> <span class="o">=</span> <span class="k">function</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// do some work</span>
+
+    <span class="c1">// Stop propagation and return a response</span>
+    <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">stopPropagation</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nv">$response</span><span class="p">;</span>
+<span class="p">};</span>
+</pre></div>
+</td></tr></table></div>
+<p>Alternately, we could do the check from the method triggering the event.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Foo</span> <span class="k">implements</span> <span class="nx">DispatchableInterface</span>
+<span class="p">{</span>
+    <span class="c1">// assume composed event manager</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">dispatch</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">,</span> <span class="nx">Response</span> <span class="nv">$response</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$argv</span> <span class="o">=</span> <span class="nb">compact</span><span class="p">(</span><span class="s1">&#39;request&#39;</span><span class="p">,</span> <span class="s1">&#39;response&#39;</span><span class="p">);</span>
+        <span class="nv">$results</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">triggerUntil</span><span class="p">(</span><span class="nx">__FUNCTION__</span><span class="p">,</span> <span class="nv">$this</span><span class="p">,</span> <span class="nv">$argv</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$v</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="nv">$v</span> <span class="nx">instanceof</span> <span class="nx">Response</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Typically, you may want to return a value that stopped execution, or use it some way. Both <tt class="docutils literal"><span class="pre">trigger()</span></tt> and
+<tt class="docutils literal"><span class="pre">triggerUntil()</span></tt> return a <tt class="docutils literal"><span class="pre">ResponseCollection</span></tt> instance; call its <tt class="docutils literal"><span class="pre">stopped()</span></tt> method to test if execution was
+stopped, and <tt class="docutils literal"><span class="pre">last()</span></tt> method to retrieve the return value from the last executed listener:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Foo</span> <span class="k">implements</span> <span class="nx">DispatchableInterface</span>
+<span class="p">{</span>
+    <span class="c1">// assume composed event manager</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">dispatch</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">,</span> <span class="nx">Response</span> <span class="nv">$response</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$argv</span> <span class="o">=</span> <span class="nb">compact</span><span class="p">(</span><span class="s1">&#39;request&#39;</span><span class="p">,</span> <span class="s1">&#39;response&#39;</span><span class="p">);</span>
+        <span class="nv">$results</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">triggerUntil</span><span class="p">(</span><span class="nx">__FUNCTION__</span><span class="p">,</span> <span class="nv">$this</span><span class="p">,</span> <span class="nv">$argv</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$v</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="p">(</span><span class="nv">$v</span> <span class="nx">instanceof</span> <span class="nx">Response</span><span class="p">);</span>
+        <span class="p">});</span>
+
+        <span class="c1">// Test if execution was halted, and return last result:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$results</span><span class="o">-&gt;</span><span class="na">stopped</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$results</span><span class="o">-&gt;</span><span class="na">last</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="c1">// continue...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-event-manager-event-manager-examples-priority">Assigning Priority to Listeners</p>
+<p>One use case for the <tt class="docutils literal"><span class="pre">EventManager</span></tt> is for implementing caching systems. As such, you often want to check the
+cache early, and save to it late.</p>
+<p>The third argument to <tt class="docutils literal"><span class="pre">attach()</span></tt> is a priority value. The higher this number, the earlier that listener will
+execute; the lower it is, the later it executes. The value defaults to 1, and values will trigger in the order
+registered within a given priority.</p>
+<p>So, to implement a caching system, our method will need to trigger an event at method start as well as at method
+end. At method start, we want an event that will trigger early; at method end, an event should trigger late.</p>
+<p>Here is the class in which we want caching:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">SomeValueObject</span>
+<span class="p">{</span>
+    <span class="c1">// assume it composes an event manager</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">get</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$params</span> <span class="o">=</span> <span class="nb">compact</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">);</span>
+        <span class="nv">$results</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">trigger</span><span class="p">(</span><span class="s1">&#39;get.pre&#39;</span><span class="p">,</span> <span class="nv">$this</span><span class="p">,</span> <span class="nv">$params</span><span class="p">);</span>
+
+        <span class="c1">// If an event stopped propagation, return the value</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$results</span><span class="o">-&gt;</span><span class="na">stopped</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$results</span><span class="o">-&gt;</span><span class="na">last</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="c1">// do some work...</span>
+
+        <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;__RESULT__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$someComputedContent</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">trigger</span><span class="p">(</span><span class="s1">&#39;get.post&#39;</span><span class="p">,</span> <span class="nv">$this</span><span class="p">,</span> <span class="nv">$params</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now, let&#8217;s create a <tt class="docutils literal"><span class="pre">ListenerAggregate</span></tt> that can handle caching for us:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Cache\Cache</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\EventManager\EventCollection</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\EventManager\ListenerAggregate</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">CacheListener</span> <span class="k">implements</span> <span class="nx">ListenerAggregate</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$cache</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">Cache</span> <span class="nv">$cache</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">cache</span> <span class="o">=</span> <span class="nv">$cache</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">attach</span><span class="p">(</span><span class="nx">EventCollection</span> <span class="nv">$events</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;get.pre&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;load&#39;</span><span class="p">),</span> <span class="mi">100</span><span class="p">);</span>
+        <span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;get.post&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;save&#39;</span><span class="p">),</span> <span class="o">-</span><span class="mi">100</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">load</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$id</span> <span class="o">=</span> <span class="nb">get_class</span><span class="p">(</span><span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getTarget</span><span class="p">())</span> <span class="o">.</span> <span class="s1">&#39;-&#39;</span> <span class="o">.</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getParams</span><span class="p">());</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">false</span> <span class="o">!==</span> <span class="p">(</span><span class="nv">$content</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">cache</span><span class="o">-&gt;</span><span class="na">load</span><span class="p">(</span><span class="nv">$id</span><span class="p">)))</span> <span class="p">{</span>
+            <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">stopPropagation</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+            <span class="k">return</span> <span class="nv">$content</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">save</span><span class="p">(</span><span class="nv">$e</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$params</span>  <span class="o">=</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getParams</span><span class="p">();</span>
+        <span class="nv">$content</span> <span class="o">=</span> <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;__RESULT__&#39;</span><span class="p">];</span>
+        <span class="nb">unset</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;__RESULT__&#39;</span><span class="p">]);</span>
+
+        <span class="nv">$id</span> <span class="o">=</span> <span class="nb">get_class</span><span class="p">(</span><span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getTarget</span><span class="p">())</span> <span class="o">.</span> <span class="s1">&#39;-&#39;</span> <span class="o">.</span> <span class="nb">json_encode</span><span class="p">(</span><span class="nv">$params</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">cache</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">(</span><span class="nv">$content</span><span class="p">,</span> <span class="nv">$id</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>We can then attach the aggregate to an instance.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$value</span>         <span class="o">=</span> <span class="k">new</span> <span class="nx">SomeValueObject</span><span class="p">();</span>
+<span class="nv">$cacheListener</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CacheListener</span><span class="p">(</span><span class="nv">$cache</span><span class="p">);</span>
+<span class="nv">$value</span><span class="o">-&gt;</span><span class="na">getEventManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">attachAggregate</span><span class="p">(</span><span class="nv">$cacheListener</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now, as we call <tt class="docutils literal"><span class="pre">get()</span></tt>, if we have a cached entry, it will be returned immediately; if not, a computed entry
+will be cached when we complete the method.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The EventManager</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a><ul>
+<li><a class="reference internal" href="#wildcard-listeners">Wildcard Listeners</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#available-methods">Available Methods</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.dom.query.html"
+                        title="previous chapter">Zend\Dom\Query</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.form.intro.html"
+                        title="next chapter">Introduction to Zend\Form</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.event-manager.event-manager.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.event-manager.event-manager.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.form.intro.html" title="Introduction to Zend\Form"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.dom.query.html" title="Zend\Dom\Query"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.event-manager.event-manager.rst">
+                The EventManager
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

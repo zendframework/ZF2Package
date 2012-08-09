@@ -1,0 +1,562 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Compress and Decompress &mdash; Zend Framework 2 2.0.0rc3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc3 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="compress-and-decompress">
+<span id="zend-filter-set-compress"></span><h1>Compress and Decompress<a class="headerlink" href="#compress-and-decompress" title="Permalink to this headline">¶</a></h1>
+<p>These two filters are capable of compressing and decompressing strings, files, and directories.</p>
+<div class="section" id="supported-options-for-zend-filter-compress-and-zend-filter-decompress">
+<span id="zend-filter-set-compress-options"></span><h2>Supported options for Zend_Filter_Compress and Zend_Filter_Decompress<a class="headerlink" href="#supported-options-for-zend-filter-compress-and-zend-filter-decompress" title="Permalink to this headline">¶</a></h2>
+<p>The following options are supported for <tt class="docutils literal"><span class="pre">Zend_Filter_Compress</span></tt> and <tt class="docutils literal"><span class="pre">Zend_Filter_Decompress</span></tt>:</p>
+<ul class="simple">
+<li><strong>adapter</strong>: The compression adapter which should be used. It defaults to <tt class="docutils literal"><span class="pre">Gz</span></tt>.</li>
+<li><strong>options</strong>: Additional options which are given to the adapter at initiation. Each adapter supports it&#8217;s own
+options.</li>
+</ul>
+</div>
+<div class="section" id="supported-compression-adapters">
+<span id="zend-filter-set-compress-basic"></span><h2>Supported compression adapters<a class="headerlink" href="#supported-compression-adapters" title="Permalink to this headline">¶</a></h2>
+<p>The following compression formats are supported by their own adapter:</p>
+<ul class="simple">
+<li><strong>Bz2</strong></li>
+<li><strong>Gz</strong></li>
+<li><strong>Lzf</strong></li>
+<li><strong>Rar</strong></li>
+<li><strong>Tar</strong></li>
+<li><strong>Zip</strong></li>
+</ul>
+<p>Each compression format has different capabilities as described below. All compression filters may be used in
+approximately the same ways, and differ primarily in the options available and the type of compression they offer
+(both algorithmically as well as string vs. file vs. directory)</p>
+</div>
+<div class="section" id="generic-handling">
+<span id="zend-filter-set-compress-generic"></span><h2>Generic handling<a class="headerlink" href="#generic-handling" title="Permalink to this headline">¶</a></h2>
+<p>To create a compression filter you need to select the compression format you want to use. The following description
+takes the <strong>Bz2</strong> adapter. Details for all other adapters are described after this section.</p>
+<p>The two filters are basically identical, in that they utilize the same backends. <tt class="docutils literal"><span class="pre">Zend_Filter_Compress</span></tt> should be
+used when you wish to compress items, and <tt class="docutils literal"><span class="pre">Zend_Filter_Decompress</span></tt> should be used when you wish to decompress
+items.</p>
+<p>For instance, if we want to compress a string, we have to initiate <tt class="docutils literal"><span class="pre">Zend_Filter_Compress</span></tt> and indicate the
+desired adapter.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Compress</span><span class="p">(</span><span class="s1">&#39;Bz2&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>To use a different adapter, you simply specify it to the constructor.</p>
+<p>You may also provide an array of options or <tt class="docutils literal"><span class="pre">Zend_Config</span></tt> object. If you do, provide minimally the key &#8220;adapter&#8221;,
+and then either the key &#8220;options&#8221; or &#8220;adapterOptions&#8221; (which should be an array of options to provide to the
+adapter on instantiation).</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Compress</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bz2&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;blocksize&#39;</span> <span class="o">=&gt;</span> <span class="mi">8</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Default compression Adapter</strong></p>
+<p class="last">When no compression adapter is given, then the <strong>Gz</strong> adapter will be used.</p>
+</div>
+<p>Almost the same usage is we want to decompress a string. We just have to use the decompression filter in this case.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Decompress</span><span class="p">(</span><span class="s1">&#39;Bz2&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>To get the compressed string, we have to give the original string. The filtered value is the compressed version of
+the original string.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filter</span>     <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Compress</span><span class="p">(</span><span class="s1">&#39;Bz2&#39;</span><span class="p">);</span>
+<span class="nv">$compressed</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;Uncompressed string&#39;</span><span class="p">);</span>
+<span class="c1">// Returns the compressed string</span>
+</pre></div>
+</td></tr></table></div>
+<p>Decompression works the same way.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filter</span>     <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Decompress</span><span class="p">(</span><span class="s1">&#39;Bz2&#39;</span><span class="p">);</span>
+<span class="nv">$compressed</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;Compressed string&#39;</span><span class="p">);</span>
+<span class="c1">// Returns the uncompressed string</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Note on string compression</strong></p>
+<p class="last">Not all adapters support string compression. Compression formats like <strong>Rar</strong> can only handle files and
+directories. For details, consult the section for the adapter you wish to use.</p>
+</div>
+</div>
+<div class="section" id="creating-an-archive">
+<span id="zend-filter-set-compress-archive"></span><h2>Creating an archive<a class="headerlink" href="#creating-an-archive" title="Permalink to this headline">¶</a></h2>
+<p>Creating an archive file works almost the same as compressing a string. However, in this case we need an additional
+parameter which holds the name of the archive we want to create.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filter</span>     <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Compress</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bz2&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;archive&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;filename.bz2&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+<span class="nv">$compressed</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;Uncompressed string&#39;</span><span class="p">);</span>
+<span class="c1">// Returns true on success and creates the archive file</span>
+</pre></div>
+</td></tr></table></div>
+<p>In the above example the uncompressed string is compressed, and is then written into the given archive file.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Existing archives will be overwritten</strong></p>
+<p class="last">The content of any existing file will be overwritten when the given filename of the archive already exists.</p>
+</div>
+<p>When you want to compress a file, then you must give the name of the file with its path.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filter</span>     <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Compress</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bz2&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;archive&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;filename.bz2&#39;</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+<span class="nv">$compressed</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;C:\temp\compressme.txt&#39;</span><span class="p">);</span>
+<span class="c1">// Returns true on success and creates the archive file</span>
+</pre></div>
+</td></tr></table></div>
+<p>You may also specify a directory instead of a filename. In this case the whole directory with all its files and
+subdirectories will be compressed into the archive.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filter</span>     <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Compress</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bz2&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;archive&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;filename.bz2&#39;</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+<span class="nv">$compressed</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;C:\temp\somedir&#39;</span><span class="p">);</span>
+<span class="c1">// Returns true on success and creates the archive file</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Do not compress large or base directories</strong></p>
+<p class="last">You should never compress large or base directories like a complete partition. Compressing a complete partition
+is a very time consuming task which can lead to massive problems on your server when there is not enough space
+or your script takes too much time.</p>
+</div>
+</div>
+<div class="section" id="decompressing-an-archive">
+<span id="zend-filter-set-compress-decompress"></span><h2>Decompressing an archive<a class="headerlink" href="#decompressing-an-archive" title="Permalink to this headline">¶</a></h2>
+<p>Decompressing an archive file works almost like compressing it. You must specify either the <tt class="docutils literal"><span class="pre">archive</span></tt> parameter,
+or give the filename of the archive when you decompress the file.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filter</span>     <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Decompress</span><span class="p">(</span><span class="s1">&#39;Bz2&#39;</span><span class="p">);</span>
+<span class="nv">$compressed</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;filename.bz2&#39;</span><span class="p">);</span>
+<span class="c1">// Returns true on success and decompresses the archive file</span>
+</pre></div>
+</td></tr></table></div>
+<p>Some adapters support decompressing the archive into another subdirectory. In this case you can set the <tt class="docutils literal"><span class="pre">target</span></tt>
+parameter.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filter</span>     <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Decompress</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zip&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;target&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;C:\temp&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">));</span>
+<span class="nv">$compressed</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;filename.zip&#39;</span><span class="p">);</span>
+<span class="c1">// Returns true on success and decompresses the archive file</span>
+<span class="c1">// into the given target directory</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Directories to extract to must exist</strong></p>
+<p class="last">When you want to decompress an archive into a directory, then that directory must exist.</p>
+</div>
+</div>
+<div class="section" id="bz2-adapter">
+<span id="zend-filter-set-compress-bz2"></span><h2>Bz2 Adapter<a class="headerlink" href="#bz2-adapter" title="Permalink to this headline">¶</a></h2>
+<p>The Bz2 Adapter can compress and decompress:</p>
+<ul class="simple">
+<li>Strings</li>
+<li>Files</li>
+<li>Directories</li>
+</ul>
+<p>This adapter makes use of <em>PHP</em>&#8216;s Bz2 extension.</p>
+<p>To customize compression, this adapter supports the following options:</p>
+<ul class="simple">
+<li><strong>Archive</strong>: This parameter sets the archive file which should be used or created.</li>
+<li><strong>Blocksize</strong>: This parameter sets the blocksize to use. It can be from &#8216;0&#8217; to &#8216;9&#8217;. The default value is &#8216;4&#8217;.</li>
+</ul>
+<p>All options can be set at instantiation or by using a related method. For example, the related methods for
+&#8216;Blocksize&#8217; are <tt class="docutils literal"><span class="pre">getBlocksize()</span></tt> and <tt class="docutils literal"><span class="pre">setBlocksize()</span></tt>. You can also use the <tt class="docutils literal"><span class="pre">setOptions()</span></tt> method which
+accepts all options as array.</p>
+</div>
+<div class="section" id="gz-adapter">
+<span id="zend-filter-set-compress-gz"></span><h2>Gz Adapter<a class="headerlink" href="#gz-adapter" title="Permalink to this headline">¶</a></h2>
+<p>The Gz Adapter can compress and decompress:</p>
+<ul class="simple">
+<li>Strings</li>
+<li>Files</li>
+<li>Directories</li>
+</ul>
+<p>This adapter makes use of <em>PHP</em>&#8216;s Zlib extension.</p>
+<p>To customize the compression this adapter supports the following options:</p>
+<ul class="simple">
+<li><strong>Archive</strong>: This parameter sets the archive file which should be used or created.</li>
+<li><strong>Level</strong>: This compression level to use. It can be from &#8216;0&#8217; to &#8216;9&#8217;. The default value is &#8216;9&#8217;.</li>
+<li><strong>Mode</strong>: There are two supported modes. &#8216;compress&#8217; and &#8216;deflate&#8217;. The default value is &#8216;compress&#8217;.</li>
+</ul>
+<p>All options can be set at initiation or by using a related method. For example, the related methods for &#8216;Level&#8217; are
+<tt class="docutils literal"><span class="pre">getLevel()</span></tt> and <tt class="docutils literal"><span class="pre">setLevel()</span></tt>. You can also use the <tt class="docutils literal"><span class="pre">setOptions()</span></tt> method which accepts all options as array.</p>
+</div>
+<div class="section" id="lzf-adapter">
+<span id="zend-filter-set-compress-lzf"></span><h2>Lzf Adapter<a class="headerlink" href="#lzf-adapter" title="Permalink to this headline">¶</a></h2>
+<p>The Lzf Adapter can compress and decompress:</p>
+<ul class="simple">
+<li>Strings</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Lzf supports only strings</strong></p>
+<p class="last">The Lzf adapter can not handle files and directories.</p>
+</div>
+<p>This adapter makes use of <em>PHP</em>&#8216;s Lzf extension.</p>
+<p>There are no options available to customize this adapter.</p>
+</div>
+<div class="section" id="rar-adapter">
+<span id="zend-filter-set-compress-rar"></span><h2>Rar Adapter<a class="headerlink" href="#rar-adapter" title="Permalink to this headline">¶</a></h2>
+<p>The Rar Adapter can compress and decompress:</p>
+<ul class="simple">
+<li>Files</li>
+<li>Directories</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Rar does not support strings</strong></p>
+<p class="last">The Rar Adapter can not handle strings.</p>
+</div>
+<p>This adapter makes use of <em>PHP</em>&#8216;s Rar extension.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Rar compression not supported</strong></p>
+<p class="last">Due to restrictions with the Rar compression format, there is no compression available for free. When you want
+to compress files into a new Rar archive, you must provide a callback to the adapter that can invoke a Rar
+compression program.</p>
+</div>
+<p>To customize the compression this adapter supports the following options:</p>
+<ul class="simple">
+<li><strong>Archive</strong>: This parameter sets the archive file which should be used or created.</li>
+<li><strong>Callback</strong>: A callback which provides compression support to this adapter.</li>
+<li><strong>Password</strong>: The password which has to be used for decompression.</li>
+<li><strong>Target</strong>: The target where the decompressed files will be written to.</li>
+</ul>
+<p>All options can be set at instantiation or by using a related method. For example, the related methods for &#8216;Target&#8217;
+are <tt class="docutils literal"><span class="pre">getTarget()</span></tt> and <tt class="docutils literal"><span class="pre">setTarget()</span></tt>. You can also use the <tt class="docutils literal"><span class="pre">setOptions()</span></tt> method which accepts all options as
+array.</p>
+</div>
+<div class="section" id="tar-adapter">
+<span id="zend-filter-set-compress-tar"></span><h2>Tar Adapter<a class="headerlink" href="#tar-adapter" title="Permalink to this headline">¶</a></h2>
+<p>The Tar Adapter can compress and decompress:</p>
+<ul class="simple">
+<li>Files</li>
+<li>Directories</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Tar does not support strings</strong></p>
+<p class="last">The Tar Adapter can not handle strings.</p>
+</div>
+<p>This adapter makes use of <em>PEAR</em>&#8216;s <tt class="docutils literal"><span class="pre">Archive_Tar</span></tt> component.</p>
+<p>To customize the compression this adapter supports the following options:</p>
+<ul class="simple">
+<li><strong>Archive</strong>: This parameter sets the archive file which should be used or created.</li>
+<li><strong>Mode</strong>: A mode to use for compression. Supported are either &#8216;<tt class="docutils literal"><span class="pre">NULL</span></tt>&#8216; which means no compression at all, &#8216;Gz&#8217;
+which makes use of <em>PHP</em>&#8216;s Zlib extension and &#8216;Bz2&#8217; which makes use of <em>PHP</em>&#8216;s Bz2 extension. The default value
+is &#8216;<tt class="docutils literal"><span class="pre">NULL</span></tt>&#8216;.</li>
+<li><strong>Target</strong>: The target where the decompressed files will be written to.</li>
+</ul>
+<p>All options can be set at instantiation or by using a related method. For example, the related methods for &#8216;Target&#8217;
+are <tt class="docutils literal"><span class="pre">getTarget()</span></tt> and <tt class="docutils literal"><span class="pre">setTarget()</span></tt>. You can also use the <tt class="docutils literal"><span class="pre">setOptions()</span></tt> method which accepts all options as
+array.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Directory usage</strong></p>
+<p class="last">When compressing directories with Tar then the complete file path is used. This means that created Tar files
+will not only have the subdirectory but the complete path for the compressed file.</p>
+</div>
+</div>
+<div class="section" id="zip-adapter">
+<span id="zend-filter-set-compress-zip"></span><h2>Zip Adapter<a class="headerlink" href="#zip-adapter" title="Permalink to this headline">¶</a></h2>
+<p>The Zip Adapter can compress and decompress:</p>
+<ul class="simple">
+<li>Strings</li>
+<li>Files</li>
+<li>Directories</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Zip does not support string decompression</strong></p>
+<p class="last">The Zip Adapter can not handle decompression to a string; decompression will always be written to a file.</p>
+</div>
+<p>This adapter makes use of <em>PHP</em>&#8216;s <tt class="docutils literal"><span class="pre">Zip</span></tt> extension.</p>
+<p>To customize the compression this adapter supports the following options:</p>
+<ul class="simple">
+<li><strong>Archive</strong>: This parameter sets the archive file which should be used or created.</li>
+<li><strong>Target</strong>: The target where the decompressed files will be written to.</li>
+</ul>
+<p>All options can be set at instantiation or by using a related method. For example, the related methods for &#8216;Target&#8217;
+are <tt class="docutils literal"><span class="pre">getTarget()</span></tt> and <tt class="docutils literal"><span class="pre">setTarget()</span></tt>. You can also use the <tt class="docutils literal"><span class="pre">setOptions()</span></tt> method which accepts all options as
+array.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Compress and Decompress</a><ul>
+<li><a class="reference internal" href="#supported-options-for-zend-filter-compress-and-zend-filter-decompress">Supported options for Zend_Filter_Compress and Zend_Filter_Decompress</a></li>
+<li><a class="reference internal" href="#supported-compression-adapters">Supported compression adapters</a></li>
+<li><a class="reference internal" href="#generic-handling">Generic handling</a></li>
+<li><a class="reference internal" href="#creating-an-archive">Creating an archive</a></li>
+<li><a class="reference internal" href="#decompressing-an-archive">Decompressing an archive</a></li>
+<li><a class="reference internal" href="#bz2-adapter">Bz2 Adapter</a></li>
+<li><a class="reference internal" href="#gz-adapter">Gz Adapter</a></li>
+<li><a class="reference internal" href="#lzf-adapter">Lzf Adapter</a></li>
+<li><a class="reference internal" href="#rar-adapter">Rar Adapter</a></li>
+<li><a class="reference internal" href="#tar-adapter">Tar Adapter</a></li>
+<li><a class="reference internal" href="#zip-adapter">Zip Adapter</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.filter.compress.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.filter.compress.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.filter.compress.rst">
+                Compress and Decompress
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
