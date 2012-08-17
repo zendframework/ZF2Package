@@ -1,0 +1,314 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Zend Framework 2 2.0.0rc3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc3 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<span id="zend-filter-introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">Zend_Filter</span></tt> component provides a set of commonly needed data filters. It also provides a simple filter
+chaining mechanism by which multiple filters may be applied to a single datum in a user-defined order.</p>
+<div class="section" id="what-is-a-filter">
+<span id="zend-filter-introduction-definition"></span><h2>What is a filter?<a class="headerlink" href="#what-is-a-filter" title="Permalink to this headline">¶</a></h2>
+<p>In the physical world, a filter is typically used for removing unwanted portions of input, and the desired portion
+of the input passes through as filter output (e.g., coffee). In such scenarios, a filter is an operator that
+produces a subset of the input. This type of filtering is useful for web applications - removing illegal input,
+trimming unnecessary white space, etc.</p>
+<p>This basic definition of a filter may be extended to include generalized transformations upon input. A common
+transformation applied in web applications is the escaping of <em>HTML</em> entities. For example, if a form field is
+automatically populated with untrusted input (e.g., from a web browser), this value should either be free of <em>HTML</em>
+entities or contain only escaped <em>HTML</em> entities, in order to prevent undesired behavior and security
+vulnerabilities. To meet this requirement, <em>HTML</em> entities that appear in the input must either be removed or
+escaped. Of course, which approach is more appropriate depends on the situation. A filter that removes the <em>HTML</em>
+entities operates within the scope of the first definition of filter - an operator that produces a subset of the
+input. A filter that escapes the <em>HTML</em> entities, however, transforms the input (e.g., &#8220;&amp;&#8221; is transformed to
+&#8220;&amp;amp;&#8221;). Supporting such use cases for web developers is important, and &#8220;to filter,&#8221; in the context of using
+<tt class="docutils literal"><span class="pre">Zend_Filter</span></tt>, means to perform some transformations upon input data.</p>
+</div>
+<div class="section" id="basic-usage-of-filters">
+<span id="zend-filter-introduction-using"></span><h2>Basic usage of filters<a class="headerlink" href="#basic-usage-of-filters" title="Permalink to this headline">¶</a></h2>
+<p>Having this filter definition established provides the foundation for <tt class="docutils literal"><span class="pre">Zend_Filter_Interface</span></tt>, which requires a
+single method named <tt class="docutils literal"><span class="pre">filter()</span></tt> to be implemented by a filter class.</p>
+<p>Following is a basic example of using a filter upon two input data, the ampersand (<strong>&amp;</strong>) and double quote (<strong>&#8220;</strong>)
+characters:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$htmlEntities</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_HtmlEntities</span><span class="p">();</span>
+
+<span class="k">echo</span> <span class="nv">$htmlEntities</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">);</span> <span class="c1">// &amp;</span>
+<span class="k">echo</span> <span class="nv">$htmlEntities</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">);</span> <span class="c1">// &quot;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="using-the-staticfilter">
+<span id="zend-filter-introduction-staticfilter"></span><h1>Using the StaticFilter<a class="headerlink" href="#using-the-staticfilter" title="Permalink to this headline">¶</a></h1>
+<p>If it is inconvenient to load a given filter class and create an instance of the filter, you can use
+<tt class="docutils literal"><span class="pre">StaticFilter</span></tt> with it&#8217;s method <tt class="docutils literal"><span class="pre">execute()</span></tt> as an alternative invocation style. The first argument of this
+method is a data input value, that you would pass to the <tt class="docutils literal"><span class="pre">filter()</span></tt> method. The second argument is a string,
+which corresponds to the basename of the filter class, relative to the <tt class="docutils literal"><span class="pre">Zend_Filter</span></tt> namespace. The <tt class="docutils literal"><span class="pre">execute()</span></tt>
+method automatically loads the class, creates an instance, and applies the <tt class="docutils literal"><span class="pre">filter()</span></tt> method to the data input.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">echo</span> <span class="nx">StaticFilter</span><span class="o">::</span><span class="na">execute</span><span class="p">(</span><span class="s1">&#39;&amp;&#39;</span><span class="p">,</span> <span class="s1">&#39;HtmlEntities&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can also pass an array of constructor arguments, if they are needed for the filter class.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">echo</span> <span class="nx">StaticFilter</span><span class="o">::</span><span class="na">execute</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
+                           <span class="s1">&#39;HtmlEntities&#39;</span><span class="p">,</span>
+                           <span class="k">array</span><span class="p">(</span><span class="s1">&#39;quotestyle&#39;</span> <span class="o">=&gt;</span> <span class="nx">ENT_QUOTES</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>The static usage can be convenient for invoking a filter ad hoc, but if you have the need to run a filter for
+multiple inputs, it&#8217;s more efficient to follow the first example above, creating an instance of the filter object
+and calling its <tt class="docutils literal"><span class="pre">filter()</span></tt> method.</p>
+<p>Also, the <tt class="docutils literal"><span class="pre">FilterChain</span></tt> class allows you to instantiate and run multiple filter and validator classes on demand
+to process sets of input data. See <em class="xref std std-ref">FilterChain</em>.</p>
+<div class="section" id="double-filtering">
+<span id="zend-filter-introduction-caveats"></span><h2>Double filtering<a class="headerlink" href="#double-filtering" title="Permalink to this headline">¶</a></h2>
+<p>When using two filters after each other you have to keep in mind that it is often not possible to get the original
+output by using the opposite filter. Take the following example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$original</span> <span class="o">=</span> <span class="s2">&quot;my_original_content&quot;</span><span class="p">;</span>
+
+<span class="c1">// Attach a filter</span>
+<span class="nv">$filter</span>   <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Word_UnderscoreToCamelCase</span><span class="p">();</span>
+<span class="nv">$filtered</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="nv">$original</span><span class="p">);</span>
+
+<span class="c1">// Use it&#39;s opposite</span>
+<span class="nv">$filter2</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Word_CamelCaseToUnderscore</span><span class="p">();</span>
+<span class="nv">$filtered</span> <span class="o">=</span> <span class="nv">$filter2</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="nv">$filtered</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above code example could lead to the impression that you will get the original output after the second filter
+has been applied. But thinking logically this is not the case. After applying the first filter
+<strong>my_original_content</strong> will be changed to <strong>MyOriginalContent</strong>. But after applying the second filter the result
+is <strong>My_Original_Content</strong>.</p>
+<p>As you can see it is not always possible to get the original output by using a filter which seems to be the
+opposite. It depends on the filter and also on the given input.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#what-is-a-filter">What is a filter?</a></li>
+<li><a class="reference internal" href="#basic-usage-of-filters">Basic usage of filters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-staticfilter">Using the StaticFilter</a><ul>
+<li><a class="reference internal" href="#double-filtering">Double filtering</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.filter.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.filter.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.filter.rst">
+                Introduction
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

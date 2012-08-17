@@ -1,0 +1,1529 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Form Quick Start &mdash; Zend Framework 2 2.0.0rc3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc3 documentation" href="../index.html" />
+    <link rel="next" title="Form Collections" href="zend.form.collections.html" />
+    <link rel="prev" title="Introduction to Zend\Form" href="zend.form.intro.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.form.collections.html" title="Form Collections"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.form.intro.html" title="Introduction to Zend\Form"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="form-quick-start">
+<span id="zend-form-quick-start"></span><h1>Form Quick Start<a class="headerlink" href="#form-quick-start" title="Permalink to this headline">¶</a></h1>
+<p>Forms are relatively easy to create. At the bare minimum, each element or fieldset requires a name; typically,
+you&#8217;ll also provide some attributes to hint to the view layer how it might render the item. The form itself will
+also typically compose an <tt class="docutils literal"><span class="pre">InputFilter</span></tt>&#8211; which you can also conveniently create directly in the form via a
+factory. Individual elements can hint as to what defaults to use when generating a related input for the input
+filter.</p>
+<p>Form validation is as easy as providing an array of data to the <tt class="docutils literal"><span class="pre">setData()</span></tt> method. If you want to simplify your
+work even more, you can bind an object to the form; on successful validation, it will be populated from the
+validated values.</p>
+<p class="rubric" id="zend-form-quick-start-programmatic">Programmatic Form Creation</p>
+<p>If nothing else, you can simply start creating elements, fieldsets, and forms and wiring them together.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Captcha</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Element</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Fieldset</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Form</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\Input</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilter</span><span class="p">;</span>
+
+<span class="nv">$name</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Element</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">);</span>
+<span class="nv">$name</span><span class="o">-&gt;</span><span class="na">setAttributes</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Your name&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="nv">$email</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Element</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">);</span>
+<span class="nv">$email</span><span class="o">-&gt;</span><span class="na">setAttributes</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Your email address&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="nv">$subject</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Element</span><span class="p">(</span><span class="s1">&#39;subject&#39;</span><span class="p">);</span>
+<span class="nv">$subject</span><span class="o">-&gt;</span><span class="na">setAttributes</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Subject&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="nv">$message</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Element</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">);</span>
+<span class="nv">$message</span><span class="o">-&gt;</span><span class="na">setAttributes</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;textarea&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Message&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="nv">$captcha</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Element\Captcha</span><span class="p">(</span><span class="s1">&#39;captcha&#39;</span><span class="p">);</span>
+<span class="nv">$captcha</span><span class="o">-&gt;</span><span class="na">setCaptcha</span><span class="p">(</span><span class="k">new</span> <span class="nx">Captcha\Dumb</span><span class="p">());</span>
+<span class="nv">$captcha</span><span class="o">-&gt;</span><span class="na">setAttributes</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Please verify you are human&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="nv">$csrf</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Element\Csrf</span><span class="p">(</span><span class="s1">&#39;security&#39;</span><span class="p">);</span>
+
+<span class="nv">$submit</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Element</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">);</span>
+<span class="nv">$submit</span><span class="o">-&gt;</span><span class="na">setAttributes</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Send&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+
+
+<span class="nv">$form</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Form</span><span class="p">(</span><span class="s1">&#39;contact&#39;</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$email</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$subject</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$message</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$captcha</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$csrf</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$send</span><span class="p">);</span>
+
+<span class="nv">$nameInput</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Input</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">);</span>
+<span class="c1">// configure input... and all others</span>
+<span class="nv">$inputFilter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InputFilter</span><span class="p">();</span>
+<span class="c1">// attach all inputs</span>
+
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setInputFilter</span><span class="p">(</span><span class="nv">$inputFilter</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>As a demonstration of fieldsets, let&#8217;s alter the above slightly. We&#8217;ll create two fieldsets, one for the sender
+information, and another for the message details.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$sender</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Fieldset</span><span class="p">(</span><span class="s1">&#39;sender&#39;</span><span class="p">);</span>
+<span class="nv">$sender</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span>
+<span class="nv">$sender</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$email</span><span class="p">);</span>
+
+<span class="nv">$details</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Fieldset</span><span class="p">(</span><span class="s1">&#39;details&#39;</span><span class="p">);</span>
+<span class="nv">$details</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$subject</span><span class="p">);</span>
+<span class="nv">$details</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$message</span><span class="p">);</span>
+
+<span class="nv">$form</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Form</span><span class="p">(</span><span class="s1">&#39;contact&#39;</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$sender</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$details</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$captcha</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$csrf</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$send</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Regardles of approach, as you can see, this can be tedious.</p>
+<p class="rubric" id="zend-form-quick-start-factory">Creation via Factory</p>
+<p>You can create the entire form, and input filter, using the <tt class="docutils literal"><span class="pre">Factory</span></tt>. This is particularly nice if you want to
+store your forms as pure configuration; you can simply pass the configuration to the factory and be done.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Form\Factory</span><span class="p">;</span>
+<span class="nv">$factory</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Factory</span><span class="p">();</span>
+<span class="nv">$form</span>    <span class="o">=</span> <span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">createForm</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;hydrator&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Stdlib\Hydrator\ArraySerializable&#39;</span>
+    <span class="s1">&#39;elements&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Your name&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Your email address&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;subject&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Subject&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;message&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;textarea&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Message&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Form\Element\Captcha&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;captcha&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Please verify you are human&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;captcha&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;class&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Dumb&#39;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Form\Element\Csrf&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;security&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;send&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Send&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="cm">/* If we had fieldsets, they&#39;d go here; fieldsets contain</span>
+<span class="cm">     * &quot;elements&quot; and &quot;fieldsets&quot; keys, and potentially a &quot;type&quot;</span>
+<span class="cm">     * key indicating the specific FieldsetInterface</span>
+<span class="cm">     * implementation to use.</span>
+<span class="cm">    &#39;fieldsets&#39; =&gt; array(</span>
+<span class="cm">    ),</span>
+<span class="cm">     */</span>
+
+    <span class="c1">// Configuration to pass on to</span>
+    <span class="c1">// Zend\InputFilter\Factory::createInputFilter()</span>
+    <span class="s1">&#39;input_filter&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="cm">/* ... */</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>If we wanted to use fieldsets, as we demonstrated in the previous example, we could do the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Form\Factory</span><span class="p">;</span>
+<span class="nv">$factory</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Factory</span><span class="p">();</span>
+<span class="nv">$form</span>    <span class="o">=</span> <span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">createForm</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;hydrator&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Stdlib\Hydrator\ArraySerializable&#39;</span>
+    <span class="s1">&#39;fieldsets&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;sender&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;elements&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Your name&#39;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Your email address&#39;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;details&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;elements&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;subject&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Subject&#39;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;message&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;textarea&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Message&#39;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;elements&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Form\Element\Captcha&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;captcha&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Please verify you are human&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;captcha&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;class&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Dumb&#39;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Form\Element\Csrf&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;security&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;send&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Send&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+
+    <span class="c1">// Configuration to pass on to</span>
+    <span class="c1">// Zend\InputFilter\Factory::createInputFilter()</span>
+    <span class="s1">&#39;input_filter&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="cm">/* ... */</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that the chief difference is nesting; otherwise, the information is basically the same.</p>
+<p>The chief benefits to using the <tt class="docutils literal"><span class="pre">Factory</span></tt> are allowing you to store definitions in configuration, and usage of
+significant whitespace.</p>
+<p class="rubric" id="zend-form-quick-start-extension">Factory-backed Form Extension</p>
+<p>The default <tt class="docutils literal"><span class="pre">Form</span></tt> implementation is backed by the <tt class="docutils literal"><span class="pre">Factory</span></tt>. This allows you to extend it, and define your
+form internally. This has the benefit of allowing a mixture of programmatic and factory-backed creation, as well as
+defining a form for re-use in your application.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Contact</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Captcha\AdapterInterface</span> <span class="k">as</span> <span class="nx">CaptchaAdapter</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Element</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Form</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">ContactForm</span> <span class="k">extends</span> <span class="nx">Form</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$captcha</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setCaptcha</span><span class="p">(</span><span class="nx">CaptchaAdapter</span> <span class="nv">$captcha</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">captcha</span> <span class="o">=</span> <span class="nv">$captcha</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">prepareElements</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// add() can take either an Element/Fieldset instance,</span>
+        <span class="c1">// or a specification, from which the appropriate object</span>
+        <span class="c1">// will be built.</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Your name&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Your email address&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;subject&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Subject&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;message&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;textarea&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Message&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Form\Element\Captcha&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;captcha&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Please verify you are human&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;captcha&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">captcha</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)),</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">new</span> <span class="nx">Element\Csrf</span><span class="p">(</span><span class="s1">&#39;security&#39;</span><span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;send&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Send&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">));</span>
+
+        <span class="c1">// We could also define the input filter here, or</span>
+        <span class="c1">// lazy-create it in the getInputFilter() method.</span>
+    <span class="p">}</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>You&#8217;ll note that this example introduces a method, <tt class="docutils literal"><span class="pre">prepareElements()</span></tt>. This is done to allow altering and/or
+configuring either the form or input filter factory instances, which could then have bearing on how elements,
+inputs, etc. are created. In this case, it also allows injection of the CAPTCHA adapter, allowing us to configure
+it elsewhere in our application and inject it into the form.</p>
+<p class="rubric" id="zend-form-quick-start-validation">Validating Forms</p>
+<p>Validating forms requires three steps. First, the form must have an input filter attached. Second, you must inject
+the data to validate into the form. Third, you validate the form. If invalid, you can retrieve the error messages,
+if any.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$form</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Contact\ContactForm</span><span class="p">();</span>
+
+<span class="c1">// If the form doesn&#39;t define an input filter by default, inject one.</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setInputFilter</span><span class="p">(</span><span class="k">new</span> <span class="nx">Contact\ContactFilter</span><span class="p">());</span>
+
+<span class="c1">// Get the data. In an MVC application, you might try:</span>
+<span class="nv">$data</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">post</span><span class="p">();</span>  <span class="c1">// for POST data</span>
+<span class="nv">$data</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">();</span> <span class="c1">// for GET (or query string) data</span>
+
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+
+<span class="c1">// Validate the form</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nv">$validatedData</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getData</span><span class="p">();</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nv">$messages</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can get the raw data if you want, by accessing the composed input filter.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filter</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getInputFilter</span><span class="p">();</span>
+
+<span class="nv">$rawValues</span>    <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">getRawValues</span><span class="p">();</span>
+<span class="nv">$nameRawValue</span> <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">getRawValue</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-form-quick-start-input-specification">Hinting to the Input Filter</p>
+<p>Often, you&#8217;ll create elements that you expect to behave in the same way on each usage, and for which you&#8217;ll want
+specific filters or validation as well. Since the input filter is a separate object, how can you achieve these
+latter points?</p>
+<p>Because the default form implementation composes a factory, and the default factory composes an input filter
+factory, you can have your elements and/or fieldsets hint to the input filter. If no input or input filter is
+provided in the input filter for that element, these hints will be retrieved and used to create them.</p>
+<p>To do so, one of the following must occur. For elements, they must implement
+<tt class="docutils literal"><span class="pre">Zend\InputFilter\InputProviderInterface</span></tt>, which defines a <tt class="docutils literal"><span class="pre">getInputSpecification()</span></tt> method; for fieldsets,
+they must implement <tt class="docutils literal"><span class="pre">Zend\InputFilter\InputFilterProviderInterface</span></tt>, which defines a
+<tt class="docutils literal"><span class="pre">getInputFilterSpecification()</span></tt> method.</p>
+<p>In the case of an element, the <tt class="docutils literal"><span class="pre">getInputSpecification()</span></tt> method should return data to be used by the input filter
+factory to create an input.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Contact\Form</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Form\Element</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputProviderInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Validator</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">EmailElement</span> <span class="k">extends</span> <span class="nx">Element</span> <span class="k">implements</span> <span class="nx">InputProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$attributes</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span>
+    <span class="p">);</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getInputSpecification</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span>     <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">(),</span>
+            <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+            <span class="s1">&#39;filters&#39;</span>  <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Filter\StringTrim&#39;</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;validators&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="k">new</span> <span class="nx">Validator\Email</span><span class="p">(),</span>
+            <span class="p">),</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above would hint to the input filter to create and attach an input named after the element, marking it as
+required, and giving it a <tt class="docutils literal"><span class="pre">StringTrim</span></tt> filter and an <tt class="docutils literal"><span class="pre">Email</span></tt> validator. Note that you can either rely on the
+input filter to create filters and validators, or directly instantiate them.</p>
+<p>For fieldsets, you do very similarly; the difference is that <tt class="docutils literal"><span class="pre">getInputFilterSpecification()</span></tt> must return
+configuration for an input filter.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Contact\Form</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Form\Fieldset</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilterProviderInterface</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">SenderFieldset</span> <span class="k">extends</span> <span class="nx">Fieldset</span> <span class="k">implements</span> <span class="nx">InputFilterProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getInputFilterSpecification</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                <span class="s1">&#39;filters&#39;</span>  <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Filter\StringTrim&#39;</span><span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;email&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                <span class="s1">&#39;filters&#39;</span>  <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Filter\StringTrim&#39;</span><span class="p">),</span>
+                <span class="p">),</span>
+                <span class="s1">&#39;validators&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">new</span> <span class="nx">Validator\Email</span><span class="p">(),</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Specifications are a great way to make forms, fieldsets, and elements re-usable trivially in your applications. In
+fact, the <tt class="docutils literal"><span class="pre">Captcha</span></tt> and <tt class="docutils literal"><span class="pre">Csrf</span></tt> elements define specifications in order to ensure they can work without
+additional user configuration!</p>
+<p class="rubric" id="zend-form-quick-start-binding">Binding an object</p>
+<p>As noted in the intro, forms in Zend Framework bridge the domain model and the view layer. Let&#8217;s see that in
+action.</p>
+<p>When you <tt class="docutils literal"><span class="pre">bind()</span></tt> an object to the form, the following happens:</p>
+<ul class="simple">
+<li>The composed <tt class="docutils literal"><span class="pre">Hydrator</span></tt> calls <tt class="docutils literal"><span class="pre">extract()</span></tt> on the object, and uses the values returned, if any, to populate
+the <tt class="docutils literal"><span class="pre">value</span></tt> attributes of all elements.</li>
+<li>When <tt class="docutils literal"><span class="pre">isValid()</span></tt> is called, if <tt class="docutils literal"><span class="pre">setData()</span></tt> has not been previously set, the form uses the composed
+<tt class="docutils literal"><span class="pre">Hydrator</span></tt> to extract values from the object, and uses those during validation.</li>
+<li>If <tt class="docutils literal"><span class="pre">isValid()</span></tt> is successful (and the <tt class="docutils literal"><span class="pre">bindOnValidate</span></tt> flag is enabled, which is true by default), then the
+<tt class="docutils literal"><span class="pre">Hydrator</span></tt> will be passed the validated values to use to hydrate the bound object. (If you do not want this
+behavior, call <tt class="docutils literal"><span class="pre">setBindOnValidate(FormInterface::BIND_MANUAL)</span></tt>).</li>
+<li>If the object implements <tt class="docutils literal"><span class="pre">Zend\InputFilter\InputFilterAwareInterface</span></tt>, the input filter it composes will be
+used instead of the one composed on the form.</li>
+</ul>
+<p>This is easier to understand in practice.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$contact</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArrayObject</span><span class="p">;</span>
+<span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;subject&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;[Contact Form] &#39;</span><span class="p">;</span>
+<span class="nv">$contact</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Type your message here&#39;</span><span class="p">;</span>
+
+<span class="nv">$form</span>    <span class="o">=</span> <span class="k">new</span> <span class="nx">Contact\ContactForm</span><span class="p">;</span>
+
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">bind</span><span class="p">(</span><span class="nv">$contact</span><span class="p">);</span> <span class="c1">// form now has default values for</span>
+                       <span class="c1">// &#39;subject&#39; and &#39;message&#39;</span>
+
+<span class="nv">$data</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;name&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;John Doe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;email&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;j.doe@example.tld&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;subject&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;[Contact Form] \&#39;sup?&#39;</span><span class="p">,</span>
+<span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+    <span class="c1">// $contact now looks like:</span>
+    <span class="c1">// array(</span>
+    <span class="c1">//     &#39;name&#39;    =&gt; &#39;John Doe&#39;,</span>
+    <span class="c1">//     &#39;email&#39;   =&gt; &#39;j.doe@example.tld&#39;,</span>
+    <span class="c1">//     &#39;subject&#39; =&gt; &#39;[Contact Form] \&#39;sup?&#39;,</span>
+    <span class="c1">//     &#39;message&#39; =&gt; &#39;Type your message here&#39;,</span>
+    <span class="c1">// )</span>
+    <span class="c1">// only as an ArrayObject</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>When an object is bound to the form, calling <tt class="docutils literal"><span class="pre">getData()</span></tt> will return that object by default. If you want to
+return an associative array instead, you can pass the <tt class="docutils literal"><span class="pre">FormInterface::VALUES_AS_ARRAY</span></tt> flag to the method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Form\FormInterface</span><span class="p">;</span>
+<span class="nv">$data</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getData</span><span class="p">(</span><span class="nx">FormInterface</span><span class="o">::</span><span class="na">VALUES_AS_ARRAY</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Zend Framework ships several standard <a class="reference internal" href="zend.stdlib.hydrator.html#zend-stdlib-hydrator"><em>hydrators</em></a>, and implementation is as simple as
+implementing <tt class="docutils literal"><span class="pre">Zend\Stdlib\Hydrator\HydratorInterface</span></tt>, which looks like this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Zend\Stdlib\Hydrator</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="nx">Hydrator</span>
+<span class="p">{</span>
+    <span class="sd">/** @return array */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">extract</span><span class="p">(</span><span class="nv">$object</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">hydrate</span><span class="p">(</span><span class="k">array</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$object</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-form-quick-start-rendering">Rendering</p>
+<p>As noted previously, forms are meant to bridge the domain model and view layer. We&#8217;ve discussed the domain model
+binding, but what about the view?</p>
+<p>The form component ships a set of form-specific view helpers. These accept the various form objects, and introspect
+them in order to generate markup. Typically, they will inspect the attributes, but in special cases, they may look
+at other properties and composed objects.</p>
+<p>When preparing to render, you will likely want to call <tt class="docutils literal"><span class="pre">prepare()</span></tt>. This method ensures that certain injections
+are done, and will likely in the future munge names to allow for <tt class="docutils literal"><span class="pre">scoped[array][notation]</span></tt>.</p>
+<p>The simplest view helpers available are <tt class="docutils literal"><span class="pre">Form</span></tt>, <tt class="docutils literal"><span class="pre">FormElement</span></tt>, <tt class="docutils literal"><span class="pre">FormLabel</span></tt>, and
+<tt class="docutils literal"><span class="pre">FormElementErrors</span></tt>. Let&#8217;s use them to display the contact form.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">// within a view script</span>
+<span class="nv">$form</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">;</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">prepare</span><span class="p">();</span>
+
+<span class="c1">// Assuming the &quot;contact/process&quot; route exists...</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="s1">&#39;contact/process&#39;</span><span class="p">));</span>
+
+<span class="c1">// Set the method attribute for the form</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="s1">&#39;post&#39;</span><span class="p">);</span>
+
+<span class="c1">// Get the form label plugin</span>
+<span class="nv">$formLabel</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">plugin</span><span class="p">(</span><span class="s1">&#39;formLabel&#39;</span><span class="p">);</span>
+
+<span class="c1">// Render the opening tag</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">openTag</span><span class="p">(</span><span class="nv">$form</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;div class=&quot;form_element&quot;&gt;</span>
+<span class="cp">&lt;?php</span>
+    <span class="nv">$name</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$formLabel</span><span class="o">-&gt;</span><span class="na">openTag</span><span class="p">()</span> <span class="o">.</span> <span class="nv">$name</span><span class="o">-&gt;</span><span class="na">getAttribute</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formInput</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElementErrors</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$formLabel</span><span class="o">-&gt;</span><span class="na">closeTag</span><span class="p">();</span>
+<span class="cp">?&gt;</span><span class="x">&lt;/div&gt;</span>
+
+<span class="x">&lt;div class=&quot;form_element&quot;&gt;</span>
+<span class="cp">&lt;?php</span>
+    <span class="nv">$subject</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;subject&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$formLabel</span><span class="o">-&gt;</span><span class="na">openTag</span><span class="p">()</span> <span class="o">.</span> <span class="nv">$subject</span><span class="o">-&gt;</span><span class="na">getAttribute</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formInput</span><span class="p">(</span><span class="nv">$subject</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElementErrors</span><span class="p">(</span><span class="nv">$subject</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$formLabel</span><span class="o">-&gt;</span><span class="na">closeTag</span><span class="p">();</span>
+<span class="cp">?&gt;</span><span class="x">&lt;/div&gt;</span>
+
+<span class="x">&lt;div class=&quot;form_element&quot;&gt;</span>
+<span class="cp">&lt;?php</span>
+    <span class="nv">$message</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$formLabel</span><span class="o">-&gt;</span><span class="na">openTag</span><span class="p">()</span> <span class="o">.</span> <span class="nv">$message</span><span class="o">-&gt;</span><span class="na">getAttribute</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formInput</span><span class="p">(</span><span class="nv">$message</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElementErrors</span><span class="p">(</span><span class="nv">$message</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$formLabel</span><span class="o">-&gt;</span><span class="na">closeTag</span><span class="p">();</span>
+<span class="cp">?&gt;</span><span class="x">&lt;/div&gt;</span>
+
+<span class="x">&lt;div class=&quot;form_element&quot;&gt;</span>
+<span class="cp">&lt;?php</span>
+    <span class="nv">$captcha</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;captcha&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$formLabel</span><span class="o">-&gt;</span><span class="na">openTag</span><span class="p">()</span> <span class="o">.</span> <span class="nv">$captcha</span><span class="o">-&gt;</span><span class="na">getAttribute</span><span class="p">(</span><span class="s1">&#39;label&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formInput</span><span class="p">(</span><span class="nv">$captcha</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElementErrors</span><span class="p">(</span><span class="nv">$captcha</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$formLabel</span><span class="o">-&gt;</span><span class="na">closeTag</span><span class="p">();</span>
+<span class="cp">?&gt;</span><span class="x">&lt;/div&gt;</span>
+
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElement</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;security&#39;</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElement</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">closeTag</span><span class="p">()</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<p>There are a few things to note about this. First, to prevent confusion in IDEs and editors when syntax
+highlighting, we use helpers to both open and close the form and label tags. Second, there&#8217;s a lot of repetition
+happening here; we could easily create a partial view script or a composite helper to reduce boilerplate. Third,
+note that not all elements are created equal &#8211; the CSRF and submit elements don&#8217;t need labels or error messages
+necessarily. Finally, note that the <tt class="docutils literal"><span class="pre">FormElement</span></tt> helper tries to do the right thing &#8211; it delegates actual
+markup generation toother view helpers; however, it can only guess what specific form helper to delegate to based
+on the list it has. If you introduce new form view helpers, you&#8217;ll need to extend the <tt class="docutils literal"><span class="pre">FormElement</span></tt> helper, or
+create your own.</p>
+<p>However, your view files can quickly become long and repetitive to write. While we do not currently provide a
+single-line form view helper (as this reduces the form customization), the most simplest and recommended way to
+render your form is by using the <tt class="docutils literal"><span class="pre">FormRow</span></tt> view helper. This view helper automatically renders a label (if present),
+the element itself using the <tt class="docutils literal"><span class="pre">FormElement</span></tt> helper, as well as any errors that could arise. Here is the previous form,
+rewritten to take advantage of this helper :</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">// within a view script</span>
+<span class="nv">$form</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">;</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">prepare</span><span class="p">();</span>
+
+<span class="c1">// Assuming the &quot;contact/process&quot; route exists...</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="s1">&#39;contact/process&#39;</span><span class="p">));</span>
+
+<span class="c1">// Set the method attribute for the form</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="s1">&#39;post&#39;</span><span class="p">);</span>
+
+<span class="c1">// Render the opening tag</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">openTag</span><span class="p">(</span><span class="nv">$form</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;div class=&quot;form_element&quot;&gt;</span>
+<span class="cp">&lt;?php</span>
+    <span class="nv">$name</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x">&lt;/div&gt;</span>
+
+<span class="x">&lt;div class=&quot;form_element&quot;&gt;</span>
+<span class="cp">&lt;?php</span>
+    <span class="nv">$subject</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;subject&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$subject</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x">&lt;/div&gt;</span>
+
+<span class="x">&lt;div class=&quot;form_element&quot;&gt;</span>
+<span class="cp">&lt;?php</span>
+    <span class="nv">$message</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$message</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x">&lt;/div&gt;</span>
+
+<span class="x">&lt;div class=&quot;form_element&quot;&gt;</span>
+<span class="cp">&lt;?php</span>
+    <span class="nv">$captcha</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;captcha&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$captcha</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x">&lt;/div&gt;</span>
+
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElement</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;security&#39;</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElement</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;send&#39;</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">closeTag</span><span class="p">()</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that <tt class="docutils literal"><span class="pre">FormRow</span></tt> helper automatically prepends the label. If you want it to be rendered after the element itself,
+you can pass an optional parameter to the <tt class="docutils literal"><span class="pre">FormRow</span></tt> view helper :</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">class</span><span class="o">=</span><span class="s2">&quot;form_element&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;?</span><span class="nx">php</span>
+    <span class="nv">$name</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="o">**</span><span class="s1">&#39;append&#39;</span><span class="o">**</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x">&lt;/div&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-form-quick-start-partial">Validation Groups</p>
+<p>Sometimes you want to validate only a subset of form elements. As an example, let&#8217;s say we&#8217;re re-using our contact
+form over a web service; in this case, the <tt class="docutils literal"><span class="pre">Csrf</span></tt>, <tt class="docutils literal"><span class="pre">Captcha</span></tt>, and submit button elements are not of interest,
+and shouldn&#8217;t be validated.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Form</span></tt> provides a proxy method to the underlying <tt class="docutils literal"><span class="pre">InputFilter</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">setValidationGroup()</span></tt> method, allowing
+us to perform this operation.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setValidationGroup</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="s1">&#39;subject&#39;</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+    <span class="c1">// Contains only the &quot;name&quot;, &quot;email&quot;, &quot;subject&quot;, and &quot;message&quot; values</span>
+    <span class="nv">$data</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getData</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you later want to reset the form to validate all, simply pass the <tt class="docutils literal"><span class="pre">FormInterface::VALIDATE_ALL</span></tt> flag to the
+<tt class="docutils literal"><span class="pre">setValidationGroup()</span></tt> method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Form\FormInterface</span><span class="p">;</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setValidationGroup</span><span class="p">(</span><span class="nx">FormInterface</span><span class="o">::</span><span class="na">VALIDATE_ALL</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>When your form contains nested fieldsets, you can use an array notation to validate only a subset of the fieldsets :</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setValidationGroup</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+             <span class="s1">&#39;profile&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+             <span class="s1">&#39;firstname&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;lastname&#39;</span>
+             <span class="p">)</span>
+<span class="p">));</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+    <span class="c1">// Contains only the &quot;firstname&quot; and &quot;lastname&quot; values from the</span>
+    <span class="c1">// &quot;profile&quot; fieldset</span>
+    <span class="nv">$data</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getData</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-form-quick-start-annotations">Using Annotations</p>
+<p>Creating a complete forms solution can often be tedious: you&#8217;ll create some domain model object, an input filter
+for validating it, a form object for providing a representation for it, and potentially a hydrator for mapping the
+form elements and fieldsets to the domain model. Wouldn&#8217;t it be nice to have a central place to define all of
+these?</p>
+<p>Annotations allow us to solve this problem. You can define the following behaviors with the shipped annotations in
+<tt class="docutils literal"><span class="pre">Zend\Form</span></tt>:</p>
+<ul class="simple">
+<li><em>AllowEmpty</em>: mark an input as allowing an empty value. This annotation does not require a value.</li>
+<li><em>Attributes</em>: specify the form, fieldset, or element attributes. This annotation requires an associative array of
+values, in a JSON object format: <em>&#64;Attributes({&#8220;class&#8221;:&#8221;zend_form&#8221;,&#8221;type&#8221;:&#8221;text&#8221;})</em>.</li>
+<li><em>ComposedObject</em>: specify another object with annotations to parse. Typically, this is used if a property
+references another object, which will then be added to your form as an additional fieldset. Expects a string
+value indicating the class for the object being composed.</li>
+<li><em>ErrorMessage</em>: specify the error message to return for an element in the case of a failed validation. Expects a
+string value.</li>
+<li><em>Exclude</em>: mark a property to exclude from the form or fieldset. This annotation does not require a value.</li>
+<li><em>Filter</em>: provide a specification for a filter to use on a given element. Expects an associative array of values,
+with a &#8220;name&#8221; key pointing to a string filter name, and an &#8220;options&#8221; key pointing to an associatve array of
+filter options for the constructor: <em>&#64;Filter({&#8220;name&#8221;: &#8220;Boolean&#8221;, &#8220;options&#8221;: {&#8220;casting&#8221;:true}})</em>. This annotation
+may be specified multiple times.</li>
+<li><em>Flags</em>: flags to pass to the fieldset or form composing an element or fieldset; these are usually used to
+specify the name or priority. The annotation expects an associative array: <em>&#64;Flags({&#8220;priority&#8221;: 100})</em>.</li>
+<li><em>Hydrator</em>: specify the hydrator class to use for this given form or fieldset. A string value is expected.</li>
+<li><em>InputFilter</em>: specify the input filter class to use for this given form or fieldset. A string value is expected.</li>
+<li><em>Input</em>: specify the input class to use for this given element. A string value is expected.</li>
+<li><em>Name</em>: specify the name of the current element, fieldset, or form. A string value is expected.</li>
+<li><em>Options</em>: options to pass to the fieldset or form that are used to inform behavior &#8211; things that are not
+attributes; e.g. labels, CAPTCHA adapters, etc. The annotation expects an associative array: <em>&#64;Options({&#8220;label&#8221;:
+&#8220;Username:&#8221;})</em>.</li>
+<li><em>Required</em>: indicate whether an element is required. A boolean value is expected. By default, all elements are
+required, so this annotation is mainly present to allow disabling a requirement.</li>
+<li><em>Type</em>: indicate the class to use for the current element, fieldset, or form. A string value is expected.</li>
+<li><em>Validator</em>: provide a specification for a validator to use on a given element. Expects an associative array of
+values, with a &#8220;name&#8221; key pointing to a string validator name, and an &#8220;options&#8221; key pointing to an associatve
+array of validator options for the constructor: <em>&#64;Validator({&#8220;name&#8221;: &#8220;StringLength&#8221;, &#8220;options&#8221;: {&#8220;min&#8221;:3, &#8220;max&#8221;:
+25}})</em>. This annotation may be specified multiple times.</li>
+</ul>
+<p>To use annotations, you simply include them in your class and/or property docblocks. Annotation names will be
+resolved according to the import statements in your class; as such, you can make them as long or as short as you
+want depending on what you import.</p>
+<p>Here&#8217;s a simple example.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Form\Annotation</span><span class="p">;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @Annotation\Name(&quot;user&quot;)</span>
+<span class="sd"> * @Annotation\Hydrator(&quot;Zend\Stdlib\Hydrator\ObjectProperty&quot;)</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">User</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @Annotation\Exclude()</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="nv">$id</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @Annotation\Filter({&quot;name&quot;:&quot;StringTrim&quot;})</span>
+<span class="sd">     * @Annotation\Validator({&quot;name&quot;:&quot;StringLength&quot;, &quot;options&quot;:{&quot;min&quot;:1, &quot;max&quot;:25}})</span>
+<span class="sd">     * @Annotation\Validator({&quot;name&quot;:&quot;Regex&quot;, &quot;options&quot;:{&quot;pattern&quot;:&quot;/^[a-zA-Z][a-zA-Z0-9_-]{0,24}$/&quot;}})</span>
+<span class="sd">     * @Annotation\Attributes({&quot;type&quot;:&quot;text&quot;})</span>
+<span class="sd">     * @Annotation\Options({&quot;label&quot;:&quot;Username:&quot;})</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="nv">$username</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @Annotation\Type(&quot;Zend\Form\Element\Email&quot;)</span>
+<span class="sd">     * @Annotation\Options({&quot;label&quot;:&quot;Your email address:&quot;})</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="nv">$email</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above will hint to the annotation build to create a form with name &#8220;user&#8221;, which uses the hydrator
+<tt class="docutils literal"><span class="pre">Zend\Stdlib\Hydrator\ObjectProperty</span></tt>. That form will have two elements, &#8220;username&#8221; and &#8220;email&#8221;. The &#8220;username&#8221;
+element will have an associated input that has a <tt class="docutils literal"><span class="pre">StringTrim</span></tt> filter, and two validators: a <tt class="docutils literal"><span class="pre">StringLength</span></tt>
+validator indicating the username is between 1 and 25 characters, and a <tt class="docutils literal"><span class="pre">Regex</span></tt> validator asserting it follows a
+specific accepted pattern. The form element itself will have an attribute &#8220;type&#8221; with value &#8220;text&#8221; (a text
+element), and a label &#8220;Username:&#8221;. The &#8220;email&#8221; element will be of type <tt class="docutils literal"><span class="pre">Zend\Form\Element\Email</span></tt>, and have the
+label &#8220;Your email address:&#8221;.</p>
+<p>To use the above, we need <tt class="docutils literal"><span class="pre">Zend\Form\Annotation\AnnotationBuilder</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Form\Annotation\AnnotationBuilder</span><span class="p">;</span>
+
+<span class="nv">$builder</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AnnotationBuilder</span><span class="p">();</span>
+<span class="nv">$form</span>    <span class="o">=</span> <span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">createForm</span><span class="p">(</span><span class="s1">&#39;User&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>At this point, you have a form with the appropriate hydrator attached, an input filter with the appropriate inputs,
+and all elements.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>You&#8217;re not done</strong></p>
+<p class="last">In all likelihood, you&#8217;ll need to add some more elements to the form you construct. For example, you&#8217;ll want a
+submit button, and likely a CSRF-protection element. We recommend creating a fieldset with common elements such
+as these that you can then attach to the form you build via annotations.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.form.intro.html"
+                        title="previous chapter">Introduction to Zend\Form</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.form.collections.html"
+                        title="next chapter">Form Collections</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.form.quick-start.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.form.quick-start.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.form.collections.html" title="Form Collections"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.form.intro.html" title="Introduction to Zend\Form"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.form.quick-start.rst">
+                Form Quick Start
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

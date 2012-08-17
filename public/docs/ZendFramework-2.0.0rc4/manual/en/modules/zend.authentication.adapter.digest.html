@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Digest Authentication &mdash; Zend Framework 2 2.0.0rc3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc3 documentation" href="../index.html" />
+    <link rel="next" title="HTTP Authentication Adapter" href="zend.authentication.adapter.http.html" />
+    <link rel="prev" title="Database Table Authentication" href="zend.authentication.adapter.dbtable.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.authentication.adapter.http.html" title="HTTP Authentication Adapter"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.authentication.adapter.dbtable.html" title="Database Table Authentication"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="digest-authentication">
+<span id="zend-authentication-adapter-digest"></span><h1>Digest Authentication<a class="headerlink" href="#digest-authentication" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-authentication-adapter-digest-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://en.wikipedia.org/wiki/Digest_access_authentication">Digest authentication</a> is a method of <em>HTTP</em> authentication that improves upon <a class="reference external" href="http://en.wikipedia.org/wiki/Basic_authentication_scheme">Basic authentication</a> by
+providing a way to authenticate without having to transmit the password in clear text across the network.</p>
+<p>This adapter allows authentication against text files containing lines having the basic elements of Digest
+authentication:</p>
+<ul class="simple">
+<li>username, such as &#8220;<strong>joe.user</strong>&#8220;</li>
+<li>realm, such as &#8220;<strong>Administrative Area</strong>&#8220;</li>
+<li><em>MD5</em> hash of the username, realm, and password, separated by colons</li>
+</ul>
+<p>The above elements are separated by colons, as in the following example (in which the password is
+&#8220;<strong>somePassword</strong>&#8221;):</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>someUser:Some Realm:fde17b91c3a510ecbaf7dbd37f59d4f8
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="specifics">
+<span id="zend-authentication-adapter-digest-specifics"></span><h2>Specifics<a class="headerlink" href="#specifics" title="Permalink to this headline">¶</a></h2>
+<p>The digest authentication adapter, <tt class="docutils literal"><span class="pre">Zend\Authentication\Adapter\Digest</span></tt>, requires several input parameters:</p>
+<ul class="simple">
+<li>filename - Filename against which authentication queries are performed</li>
+<li>realm - Digest authentication realm</li>
+<li>username - Digest authentication user</li>
+<li>password - Password for the user of the realm</li>
+</ul>
+<p>These parameters must be set prior to calling <tt class="docutils literal"><span class="pre">authenticate()</span></tt>.</p>
+</div>
+<div class="section" id="zend-authentication-adapter-digest-identity">
+<span id="identity"></span><h2>Identity<a class="headerlink" href="#zend-authentication-adapter-digest-identity" title="Permalink to this headline">¶</a></h2>
+<p>The digest authentication adapter returns a <tt class="docutils literal"><span class="pre">Zend\Authentication\Result</span></tt> object, which has been populated with
+the identity as an array having keys of <strong>realm</strong> and <strong>username</strong>. The respective array values associated with
+these keys correspond to the values set before <tt class="docutils literal"><span class="pre">authenticate()</span></tt> is called.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Authentication\Adapter\Digest</span> <span class="k">as</span> <span class="nx">AuthAdapter</span><span class="p">;</span>
+
+<span class="nv">$adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AuthAdapter</span><span class="p">(</span><span class="nv">$filename</span><span class="p">,</span>
+                           <span class="nv">$realm</span><span class="p">,</span>
+                           <span class="nv">$username</span><span class="p">,</span>
+                           <span class="nv">$password</span><span class="p">);</span>
+
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">authenticate</span><span class="p">();</span>
+
+<span class="nv">$identity</span> <span class="o">=</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="na">getIdentity</span><span class="p">();</span>
+
+<span class="nb">print_r</span><span class="p">(</span><span class="nv">$identity</span><span class="p">);</span>
+
+<span class="cm">/*</span>
+<span class="cm">Array</span>
+<span class="cm">(</span>
+<span class="cm">    [realm] =&gt; Some Realm</span>
+<span class="cm">    [username] =&gt; someUser</span>
+<span class="cm">)</span>
+<span class="cm">*/</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Digest Authentication</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#specifics">Specifics</a></li>
+<li><a class="reference internal" href="#zend-authentication-adapter-digest-identity">Identity</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.authentication.adapter.dbtable.html"
+                        title="previous chapter">Database Table Authentication</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.authentication.adapter.http.html"
+                        title="next chapter">HTTP Authentication Adapter</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.authentication.adapter.digest.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.authentication.adapter.digest.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.authentication.adapter.http.html" title="HTTP Authentication Adapter"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.authentication.adapter.dbtable.html" title="Database Table Authentication"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.authentication.adapter.digest.rst">
+                Digest Authentication
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

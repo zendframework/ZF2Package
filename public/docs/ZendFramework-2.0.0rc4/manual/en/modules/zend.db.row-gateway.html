@@ -1,0 +1,321 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Db\RowGateway &mdash; Zend Framework 2 2.0.0rc3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc3 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Db\Metadata" href="zend.db.metadata.html" />
+    <link rel="prev" title="Zend\Db\TableGateway" href="zend.db.table-gateway.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.db.metadata.html" title="Zend\Db\Metadata"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.db.table-gateway.html" title="Zend\Db\TableGateway"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-db-rowgateway">
+<span id="zend-db-row-gateway"></span><h1>Zend\Db\RowGateway<a class="headerlink" href="#zend-db-rowgateway" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Db\RowGateway</span></tt> is a sub-component of Zend\Db that implements the Row Gateway pattern from PoEAA. This
+effectively means that Row Gateway objects primarily model a row in a database, and have methods such as save() and
+delete() that will help persist this row-as-an-object in the database itself. Likewise, after a row from the
+database is retrieved, it can then be manipulated and save()&#8217;d back to the database in the same position (row), or
+it can be delete()&#8217;d from the table.</p>
+<p>The interface for a Row Gateway object simply adds save() and delete() and this is the interface that should be
+assumed when a component has a dependency that is expected to be an instance of a RowGateway object:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">interface</span> <span class="nx">RowGatewayInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">save</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">delete</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="quickstart">
+<span id="zend-db-row-gateway-row-gateway"></span><h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
+<p>While most of the time, RowGateway will be used in conjucntion with other Zend\Db\ResultSet producing objects, it
+is possible to use it standalone. To use it standalone, you simply need an Adapter and a set of data to work with.
+The following use case demonstrates Zend\Db\RowGateway\RowGateway usage in its simplest form:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Db\RowGateway\RowGateway</span><span class="p">;</span>
+
+<span class="c1">// query the database</span>
+<span class="nv">$resultSet</span> <span class="o">=</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s1">&#39;SELECT * FROM `user` WHERE `id` = ?&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
+
+<span class="c1">// get array of data</span>
+<span class="nv">$rowData</span> <span class="o">=</span> <span class="nv">$resultSet</span><span class="o">-&gt;</span><span class="na">current</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getArrayCopy</span><span class="p">();</span>
+
+<span class="c1">// row gateway</span>
+<span class="nv">$rowGateway</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RowGateway</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;my_table&#39;</span><span class="p">,</span> <span class="nv">$adapter</span><span class="p">);</span>
+<span class="nv">$rowGateway</span><span class="o">-&gt;</span><span class="na">populate</span><span class="p">(</span><span class="nv">$rowData</span><span class="p">);</span>
+
+<span class="nv">$rowGateway</span><span class="o">-&gt;</span><span class="na">first_name</span> <span class="o">=</span> <span class="s1">&#39;New Name&#39;</span><span class="p">;</span>
+<span class="nv">$rowGateway</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+
+<span class="c1">// or delete this row:</span>
+<span class="nv">$rowGateway</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The workflow described above is greatly simplified when RowGateway is used in conjunction with the TableGateway
+feature. What this achieves is a Table Gateway object that when select()&#8217;ing from a table, will produce a ResultSet
+that is then capable of producing valid Row Gateway objects. Its usage looks like this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Db\TableGateway\Feature\RowGatewayFeature</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Db\TableGateway\TableGateway</span><span class="p">;</span>
+
+<span class="nv">$table</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">TableGateway</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span><span class="p">,</span> <span class="nv">$adapter</span><span class="p">,</span> <span class="k">new</span> <span class="nx">RowGatewayFeature</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">));</span>
+<span class="nv">$results</span> <span class="o">=</span> <span class="nv">$table</span><span class="o">-&gt;</span><span class="na">select</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">));</span>
+
+<span class="nv">$artistRow</span> <span class="o">=</span> <span class="nv">$results</span><span class="o">-&gt;</span><span class="na">current</span><span class="p">();</span>
+<span class="nv">$artistRow</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="s1">&#39;New Name&#39;</span><span class="p">;</span>
+<span class="nv">$artistRow</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Db\RowGateway</a><ul>
+<li><a class="reference internal" href="#quickstart">Quickstart</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.db.table-gateway.html"
+                        title="previous chapter">Zend\Db\TableGateway</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.db.metadata.html"
+                        title="next chapter">Zend\Db\Metadata</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/modules/zend.db.row-gateway.txt"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.db.row-gateway.rst"
+           rel="nofollow">Edit Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.db.metadata.html" title="Zend\Db\Metadata"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.db.table-gateway.html" title="Zend\Db\TableGateway"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.db.row-gateway.rst">
+                Zend\Db\RowGateway
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
