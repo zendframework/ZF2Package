@@ -1,0 +1,924 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\XmlRpc\Server &mdash; Zend Framework 2 2.0.0rc5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc5 documentation" href="../index.html" />
+    <link rel="next" title="ZendService\LiveDocx" href="zendservice.livedocx.html" />
+    <link rel="prev" title="Zend\XmlRpc\Client" href="zend.xmlrpc.client.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zendservice.livedocx.html" title="ZendService\LiveDocx"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.xmlrpc.client.html" title="Zend\XmlRpc\Client"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-xmlrpc-server">
+<span id="id1"></span><h1>Zend\XmlRpc\Server<a class="headerlink" href="#zend-xmlrpc-server" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-xmlrpc-server-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server</span></tt> is intended as a fully-featured <em>XML-RPC</em> server, following <a class="reference external" href="http://www.xmlrpc.com/spec">the specifications outlined at
+www.xmlrpc.com</a>. Additionally, it implements the <tt class="docutils literal"><span class="pre">system.multicall()</span></tt> method, allowing boxcarring of requests.</p>
+</div>
+<div class="section" id="basic-usage">
+<span id="zend-xmlrpc-server-usage"></span><h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>An example of the most basic use case:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;My\Service\Class&#39;</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="server-structure">
+<span id="zend-xmlrpc-server-structure"></span><h2>Server Structure<a class="headerlink" href="#server-structure" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server</span></tt> is composed of a variety of components, ranging from the server itself to request, response,
+and fault objects.</p>
+<p>To bootstrap <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server</span></tt>, the developer must attach one or more classes or functions to the server, via
+the <tt class="docutils literal"><span class="pre">setClass()</span></tt> and <tt class="docutils literal"><span class="pre">addFunction()</span></tt> methods.</p>
+<p>Once done, you may either pass a <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Request</span></tt> object to <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server::handle()</span></tt>, or it will
+instantiate a <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Request\Http</span></tt> object if none is provided &#8211; thus grabbing the request from
+<tt class="docutils literal"><span class="pre">php://input</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server::handle()</span></tt> then attempts to dispatch to the appropriate handler based on the method
+requested. It then returns either a <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Response</span></tt>-based object or a <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server\Fault</span></tt>object. These objects both have <tt class="docutils literal"><span class="pre">__toString()</span></tt> methods that create valid <em>XML-RPC</em> <em>XML</em> responses, allowing them
+to be directly echoed.</p>
+</div>
+<div class="section" id="anatomy-of-a-webservice">
+<span id="zend-xmlrpc-server-anatomy"></span><h2>Anatomy of a webservice<a class="headerlink" href="#anatomy-of-a-webservice" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="general-considerations">
+<span id="zend-xmlrpc-server-anatomy-general"></span><h3>General considerations<a class="headerlink" href="#general-considerations" title="Permalink to this headline">¶</a></h3>
+<p>For maximum performance it is recommended to use a simple bootstrap file for the server component. Using
+<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server</span></tt> inside a <em class="xref std std-ref">Zend\Controller</em> is strongly discouraged to avoid the
+overhead.</p>
+<p>Services change over time and while webservices are generally less change intense as code-native <em>APIs</em>, it is
+recommended to version your service. Do so to lay grounds to provide compatibility for clients using older versions
+of your service and manage your service lifecycle including deprecation timeframes.To do so just include a version
+number into your <em>URI</em>. It is also recommended to include the remote protocol name in the <em>URI</em> to allow easy
+integration of upcoming remoting technologies. <a class="reference external" href="http://myservice.ws/">http://myservice.ws/</a><strong>1.0/XMLRPC/</strong>.</p>
+</div>
+<div class="section" id="what-to-expose">
+<span id="zend-xmlrpc-server-anatomy-expose"></span><h3>What to expose?<a class="headerlink" href="#what-to-expose" title="Permalink to this headline">¶</a></h3>
+<p>Most of the time it is not sensible to expose business objects directly. Business objects are usually small and
+under heavy change, because change is cheap in this layer of your application. Once deployed and adopted, web
+services are hard to change. Another concern is <em>I/O</em> and latency: the best webservice calls are those not
+happening. Therefore service calls need to be more coarse-grained than usual business logic is. Often an additional
+layer in front of your business objects makes sense. This layer is sometimes referred to as <a class="reference external" href="http://martinfowler.com/eaaCatalog/remoteFacade.html">Remote Facade</a>. Such
+a service layer adds a coarse grained interface on top of your business logic and groups verbose operations into
+smaller ones.</p>
+</div>
+</div>
+<div class="section" id="conventions">
+<span id="zend-xmlrpc-server-conventions"></span><h2>Conventions<a class="headerlink" href="#conventions" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server</span></tt> allows the developer to attach functions and class method calls as dispatchable <em>XML-RPC</em>
+methods. Via <tt class="docutils literal"><span class="pre">Zend\Server\Reflection</span></tt>, it does introspection on all attached methods, using the function and
+method docblocks to determine the method help text and method signatures.</p>
+<p><em>XML-RPC</em> types do not necessarily map one-to-one to <em>PHP</em> types. However, the code will do its best to guess the
+appropriate type based on the values listed in &#64;param and &#64;return lines. Some <em>XML-RPC</em> types have no immediate
+<em>PHP</em> equivalent, however, and should be hinted using the <em>XML-RPC</em> type in the PHPDoc. These include:</p>
+<ul class="simple">
+<li><strong>dateTime.iso8601</strong>, a string formatted as &#8216;<tt class="docutils literal"><span class="pre">YYYYMMDDTHH:mm:ss</span></tt>&#8216;</li>
+<li><strong>base64</strong>, base64 encoded data</li>
+<li><strong>struct</strong>, any associative array</li>
+</ul>
+<p>An example of how to hint follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">/**</span>
+<span class="sd">* This is a sample function</span>
+<span class="sd">*</span>
+<span class="sd">* @param base64 $val1 Base64-encoded data</span>
+<span class="sd">* @param dateTime.iso8601 $val2 An ISO date</span>
+<span class="sd">* @param struct $val3 An associative array</span>
+<span class="sd">* @return struct</span>
+<span class="sd">*/</span>
+<span class="k">function</span> <span class="nf">myFunc</span><span class="p">(</span><span class="nv">$val1</span><span class="p">,</span> <span class="nv">$val2</span><span class="p">,</span> <span class="nv">$val3</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>PhpDocumentor does no validation of the types specified for params or return values, so this will have no impact on
+your <em>API</em> documentation. Providing the hinting is necessary, however, when the server is validating the parameters
+provided to the method call.</p>
+<p>It is perfectly valid to specify multiple types for both params and return values; the <em>XML-RPC</em> specification even
+suggests that system.methodSignature should return an array of all possible method signatures (i.e., all possible
+combinations of param and return values). You may do so just as you normally would with PhpDocumentor, using the
+&#8216;|&#8217; operator:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">/**</span>
+<span class="sd">* This is a sample function</span>
+<span class="sd">*</span>
+<span class="sd">* @param string|base64 $val1 String or base64-encoded data</span>
+<span class="sd">* @param string|dateTime.iso8601 $val2 String or an ISO date</span>
+<span class="sd">* @param array|struct $val3 Normal indexed array or an associative array</span>
+<span class="sd">* @return boolean|struct</span>
+<span class="sd">*/</span>
+<span class="k">function</span> <span class="nf">myFunc</span><span class="p">(</span><span class="nv">$val1</span><span class="p">,</span> <span class="nv">$val2</span><span class="p">,</span> <span class="nv">$val3</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Allowing multiple signatures can lead to confusion for developers using the services; to keep things simple, a
+<em>XML-RPC</em> service method should only have a single signature.</p>
+</div>
+</div>
+<div class="section" id="utilizing-namespaces">
+<span id="zend-xmlrpc-server-namespaces"></span><h2>Utilizing Namespaces<a class="headerlink" href="#utilizing-namespaces" title="Permalink to this headline">¶</a></h2>
+<p><em>XML-RPC</em> has a concept of namespacing; basically, it allows grouping <em>XML-RPC</em> methods by dot-delimited
+namespaces. This helps prevent naming collisions between methods served by different classes. As an example, the
+<em>XML-RPC</em> server is expected to server several methods in the &#8216;system&#8217; namespace:</p>
+<ul class="simple">
+<li>system.listMethods</li>
+<li>system.methodHelp</li>
+<li>system.methodSignature</li>
+</ul>
+<p>Internally, these map to the methods of the same name in <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server</span></tt>.</p>
+<p>If you want to add namespaces to the methods you serve, simply provide a namespace to the appropriate method when
+attaching a function or class:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// All public methods in My_Service_Class will be accessible as</span>
+<span class="c1">// myservice.METHODNAME</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;My\Service\Class&#39;</span><span class="p">,</span> <span class="s1">&#39;myservice&#39;</span><span class="p">);</span>
+
+<span class="c1">// Function &#39;somefunc&#39; will be accessible as funcs.somefunc</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">addFunction</span><span class="p">(</span><span class="s1">&#39;somefunc&#39;</span><span class="p">,</span> <span class="s1">&#39;funcs&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="custom-request-objects">
+<span id="zend-xmlrpc-server-request"></span><h2>Custom Request Objects<a class="headerlink" href="#custom-request-objects" title="Permalink to this headline">¶</a></h2>
+<p>Most of the time, you&#8217;ll simply use the default request type included with <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server</span></tt>,
+<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Request\Http</span></tt>. However, there may be times when you need <em>XML-RPC</em> to be available via the <em>CLI</em>, a
+<em>GUI</em>, or other environment, or want to log incoming requests. To do so, you may create a custom request object
+that extends <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Request</span></tt>. The most important thing to remember is to ensure that the <tt class="docutils literal"><span class="pre">getMethod()</span></tt>
+and <tt class="docutils literal"><span class="pre">getParams()</span></tt> methods are implemented so that the <em>XML-RPC</em> server can retrieve that information in order to
+dispatch the request.</p>
+</div>
+<div class="section" id="custom-responses">
+<span id="zend-xmlrpc-server-response"></span><h2>Custom Responses<a class="headerlink" href="#custom-responses" title="Permalink to this headline">¶</a></h2>
+<p>Similar to request objects, <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server</span></tt> can return custom response objects; by default, a
+<tt class="docutils literal"><span class="pre">Zend_XmlRpc_Response_Http</span></tt> object is returned, which sends an appropriate Content-Type <em>HTTP</em> header for use
+with <em>XML-RPC</em>. Possible uses of a custom object would be to log responses, or to send responses back to
+<tt class="docutils literal"><span class="pre">STDOUT</span></tt>.</p>
+<p>To use a custom response class, use <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server::setResponseClass()</span></tt> prior to calling <tt class="docutils literal"><span class="pre">handle()</span></tt>.</p>
+</div>
+<div class="section" id="handling-exceptions-via-faults">
+<span id="zend-xmlrpc-server-fault"></span><h2>Handling Exceptions via Faults<a class="headerlink" href="#handling-exceptions-via-faults" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_XmlRpc_Server</span></tt> catches Exceptions generated by a dispatched method, and generates an <em>XML-RPC</em> fault
+response when such an exception is caught. By default, however, the exception messages and codes are not used in a
+fault response. This is an intentional decision to protect your code; many exceptions expose more information about
+the code or environment than a developer would necessarily intend (a prime example includes database abstraction or
+access layer exceptions).</p>
+<p>Exception classes can be whitelisted to be used as fault responses, however. To do so, simply utilize
+<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server\Fault::attachFaultException()</span></tt> to pass an exception class to whitelist:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Zend\XmlRpc\Server\Fault</span><span class="o">::</span><span class="na">attachFaultException</span><span class="p">(</span><span class="s1">&#39;My\Project\Exception&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you utilize an exception class that your other project exceptions inherit, you can then whitelist a whole family
+of exceptions at a time. <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server\Exception</span></tt>s are always whitelisted, to allow reporting specific
+internal errors (undefined methods, etc.).</p>
+<p>Any exception not specifically whitelisted will generate a fault response with a code of &#8216;404&#8217; and a message of
+&#8216;Unknown error&#8217;.</p>
+</div>
+<div class="section" id="caching-server-definitions-between-requests">
+<span id="zend-xmlrpc-server-caching"></span><h2>Caching Server Definitions Between Requests<a class="headerlink" href="#caching-server-definitions-between-requests" title="Permalink to this headline">¶</a></h2>
+<p>Attaching many classes to an <em>XML-RPC</em> server instance can utilize a lot of resources; each class must introspect
+using the Reflection <em>API</em> (via <tt class="docutils literal"><span class="pre">Zend_Server_Reflection</span></tt>), which in turn generates a list of all possible method
+signatures to provide to the server class.</p>
+<p>To reduce this performance hit somewhat, <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server\Cache</span></tt> can be used to cache the server definition
+between requests. When combined with <tt class="docutils literal"><span class="pre">__autoload()</span></tt>, this can greatly increase performance.</p>
+<p>An sample usage follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\XmlRpc\Server</span> <span class="k">as</span> <span class="nx">XmlRpcServer</span><span class="p">;</span>
+
+<span class="c1">// Register the &quot;My\Services&quot; namespace</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Loader\StandardAutoloader</span><span class="p">();</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">registerNamespace</span><span class="p">(</span><span class="s1">&#39;My\Services&#39;</span><span class="p">,</span> <span class="s1">&#39;path to My/Services&#39;</span><span class="p">);</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">register</span><span class="p">();</span>
+
+<span class="nv">$cacheFile</span> <span class="o">=</span> <span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/xmlrpc.cache&#39;</span><span class="p">;</span>
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XmlRpcServer</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">XmlRpcServer\Cache</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="nv">$cacheFile</span><span class="p">,</span> <span class="nv">$server</span><span class="p">))</span> <span class="p">{</span>
+
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;My\Services\Glue&#39;</span><span class="p">,</span> <span class="s1">&#39;glue&#39;</span><span class="p">);</span>   <span class="c1">// glue. namespace</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;My\Services\Paste&#39;</span><span class="p">,</span> <span class="s1">&#39;paste&#39;</span><span class="p">);</span> <span class="c1">// paste. namespace</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;My\Services\Tape&#39;</span><span class="p">,</span> <span class="s1">&#39;tape&#39;</span><span class="p">);</span>   <span class="c1">// tape. namespace</span>
+
+    <span class="nx">XmlRpcServer\Cache</span><span class="o">::</span><span class="na">save</span><span class="p">(</span><span class="nv">$cacheFile</span><span class="p">,</span> <span class="nv">$server</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">echo</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above example attempts to retrieve a server definition from <tt class="docutils literal"><span class="pre">xmlrpc.cache</span></tt> in the same directory as the
+script. If unsuccessful, it loads the service classes it needs, attaches them to the server instance, and then
+attempts to create a new cache file with the server definition.</p>
+</div>
+<div class="section" id="usage-examples">
+<span id="zend-xmlrpc-server-use"></span><h2>Usage Examples<a class="headerlink" href="#usage-examples" title="Permalink to this headline">¶</a></h2>
+<p>Below are several usage examples, showing the full spectrum of options available to developers. Usage examples will
+each build on the previous example provided.</p>
+<p class="rubric" id="zend-xmlrpc-server-use-attach-function">Basic Usage</p>
+<p>The example below attaches a function as a dispatchable <em>XML-RPC</em> method and handles incoming calls.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">/**</span>
+<span class="sd"> * Return the MD5 sum of a value</span>
+<span class="sd"> *</span>
+<span class="sd"> * @param string $value Value to md5sum</span>
+<span class="sd"> * @return string MD5 sum of value</span>
+<span class="sd"> */</span>
+<span class="k">function</span> <span class="nf">md5Value</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nb">md5</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">addFunction</span><span class="p">(</span><span class="s1">&#39;md5Value&#39;</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-xmlrpc-server-use-attach-class">Attaching a class</p>
+<p>The example below illustrates attaching a class&#8217; public methods as dispatchable <em>XML-RPC</em> methods.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">require_once</span> <span class="s1">&#39;Services/Comb.php&#39;</span><span class="p">;</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Comb&#39;</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-xmlrpc-server-use-attach-class-with-arguments">Attaching a class with arguments</p>
+<p>The following example illustrates how to attach a class&#8217; public methods and passing arguments to its methods. This
+can be used to specify certain defaults when registering service classes.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Services_PricingService</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * Calculate current price of product with $productId</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param ProductRepository $productRepository</span>
+<span class="sd">     * @param PurchaseRepository $purchaseRepository</span>
+<span class="sd">     * @param integer $productId</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">calculate</span><span class="p">(</span><span class="nx">ProductRepository</span> <span class="nv">$productRepository</span><span class="p">,</span>
+                              <span class="nx">PurchaseRepository</span> <span class="nv">$purchaseRepository</span><span class="p">,</span>
+                              <span class="nv">$productId</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\PricingService&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;pricing&#39;</span><span class="p">,</span>
+                  <span class="k">new</span> <span class="nx">ProductRepository</span><span class="p">(),</span>
+                  <span class="k">new</span> <span class="nx">PurchaseRepository</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>The arguments passed at <tt class="docutils literal"><span class="pre">setClass()</span></tt> at server construction time are injected into the method call
+<tt class="docutils literal"><span class="pre">pricing.calculate()</span></tt> on remote invokation. In the example above, only the argument <tt class="docutils literal"><span class="pre">$purchaseId</span></tt> is expected
+from the client.</p>
+<p class="rubric" id="zend-xmlrpc-server-use-attach-class-with-arguments-constructor">Passing arguments only to constructor</p>
+<p><tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server</span></tt> allows to restrict argument passing to constructors only. This can be used for constructor
+dependency injection. To limit injection to constructors, call <tt class="docutils literal"><span class="pre">sendArgumentsToAllMethods</span></tt> and pass <tt class="docutils literal"><span class="pre">FALSE</span></tt> as
+an argument. This disables the default behavior of all arguments being injected into the remote method. In the
+example below the instance of <tt class="docutils literal"><span class="pre">ProductRepository</span></tt> and <tt class="docutils literal"><span class="pre">PurchaseRepository</span></tt> is only injected into the
+constructor of <tt class="docutils literal"><span class="pre">Services_PricingService2</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Services\PricingService2</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @param ProductRepository $productRepository</span>
+<span class="sd">     * @param PurchaseRepository $purchaseRepository</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">ProductRepository</span> <span class="nv">$productRepository</span><span class="p">,</span>
+                                <span class="nx">PurchaseRepository</span> <span class="nv">$purchaseRepository</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Calculate current price of product with $productId</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param integer $productId</span>
+<span class="sd">     * @return double</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">calculate</span><span class="p">(</span><span class="nv">$productId</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">sendArgumentsToAllMethods</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\PricingService2&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;pricing&#39;</span><span class="p">,</span>
+                  <span class="k">new</span> <span class="nx">ProductRepository</span><span class="p">(),</span>
+                  <span class="k">new</span> <span class="nx">PurchaseRepository</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-xmlrpc-server-use-attach-instance">Attaching a class instance</p>
+<p><tt class="docutils literal"><span class="pre">setClass()</span></tt> allows to register a previously instantiated object at the server. Just pass an instance instead of
+the class name. Obviously passing arguments to the constructor is not possible with pre-instantiated objects.</p>
+<p class="rubric" id="zend-xmlrpc-server-use-attach-several-classes-namespaces">Attaching several classes using namespaces</p>
+<p>The example below illustrates attaching several classes, each with their own namespace.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">require_once</span> <span class="s1">&#39;Services/Comb.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Brush.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Pick.php&#39;</span><span class="p">;</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Comb&#39;</span><span class="p">,</span> <span class="s1">&#39;comb&#39;</span><span class="p">);</span>   <span class="c1">// methods called as comb.*</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Brush&#39;</span><span class="p">,</span> <span class="s1">&#39;brush&#39;</span><span class="p">);</span> <span class="c1">// methods called as brush.*</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Pick&#39;</span><span class="p">,</span> <span class="s1">&#39;pick&#39;</span><span class="p">);</span>   <span class="c1">// methods called as pick.*</span>
+<span class="k">echo</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-xmlrpc-server-use-exceptions-faults">Specifying exceptions to use as valid fault responses</p>
+<p>The example below allows any <tt class="docutils literal"><span class="pre">Services\Exception</span></tt>-derived class to report its code and message in the fault
+response.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">require_once</span> <span class="s1">&#39;Services/Exception.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Comb.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Brush.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Pick.php&#39;</span><span class="p">;</span>
+
+<span class="c1">// Allow Services_Exceptions to report as fault responses</span>
+<span class="nx">Zend\XmlRpc\Server\Fault</span><span class="o">::</span><span class="na">attachFaultException</span><span class="p">(</span><span class="s1">&#39;Services\Exception&#39;</span><span class="p">);</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Comb&#39;</span><span class="p">,</span> <span class="s1">&#39;comb&#39;</span><span class="p">);</span>   <span class="c1">// methods called as comb.*</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Brush&#39;</span><span class="p">,</span> <span class="s1">&#39;brush&#39;</span><span class="p">);</span> <span class="c1">// methods called as brush.*</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Pick&#39;</span><span class="p">,</span> <span class="s1">&#39;pick&#39;</span><span class="p">);</span>   <span class="c1">// methods called as pick.*</span>
+<span class="k">echo</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-xmlrpc-server-use-custom-request-object">Utilizing custom request and response objects</p>
+<p>Some use cases require to utilize a custom request object. For example, <em>XML/RPC</em> is not bound to <em>HTTP</em> as a
+transfer protocol. It is possible to use other transfer protocols like <em>SSH</em> or telnet to send the request and
+response data over the wire. Another use case is authentication and authorization. In case of a different transfer
+protocol, one need to change the implementation to read request data.</p>
+<p>The example below instantiates a custom request object and passes it to the server to handle.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">require_once</span> <span class="s1">&#39;Services/Request.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Exception.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Comb.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Brush.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Pick.php&#39;</span><span class="p">;</span>
+
+<span class="c1">// Allow Services_Exceptions to report as fault responses</span>
+<span class="nx">Zend\XmlRpc\Server\Fault</span><span class="o">::</span><span class="na">attachFaultException</span><span class="p">(</span><span class="s1">&#39;Services\Exception&#39;</span><span class="p">);</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Comb&#39;</span><span class="p">,</span> <span class="s1">&#39;comb&#39;</span><span class="p">);</span>   <span class="c1">// methods called as comb.*</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Brush&#39;</span><span class="p">,</span> <span class="s1">&#39;brush&#39;</span><span class="p">);</span> <span class="c1">// methods called as brush.*</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Pick&#39;</span><span class="p">,</span> <span class="s1">&#39;pick&#39;</span><span class="p">);</span>   <span class="c1">// methods called as pick.*</span>
+
+<span class="c1">// Create a request object</span>
+<span class="nv">$request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Services\Request</span><span class="p">();</span>
+
+<span class="k">echo</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-xmlrpc-server-use-custom-response-object">Specifying a custom response class</p>
+<p>The example below illustrates specifying a custom response class for the returned response.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">require_once</span> <span class="s1">&#39;Services/Request.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Response.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Exception.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Comb.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Brush.php&#39;</span><span class="p">;</span>
+<span class="k">require_once</span> <span class="s1">&#39;Services/Pick.php&#39;</span><span class="p">;</span>
+
+<span class="c1">// Allow Services_Exceptions to report as fault responses</span>
+<span class="nx">Zend\XmlRpc\Server\Fault</span><span class="o">::</span><span class="na">attachFaultException</span><span class="p">(</span><span class="s1">&#39;Services\Exception&#39;</span><span class="p">);</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Comb&#39;</span><span class="p">,</span> <span class="s1">&#39;comb&#39;</span><span class="p">);</span>   <span class="c1">// methods called as comb.*</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Brush&#39;</span><span class="p">,</span> <span class="s1">&#39;brush&#39;</span><span class="p">);</span> <span class="c1">// methods called as brush.*</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Pick&#39;</span><span class="p">,</span> <span class="s1">&#39;pick&#39;</span><span class="p">);</span>   <span class="c1">// methods called as pick.*</span>
+
+<span class="c1">// Create a request object</span>
+<span class="nv">$request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Services\Request</span><span class="p">();</span>
+
+<span class="c1">// Utilize a custom response</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setResponseClass</span><span class="p">(</span><span class="s1">&#39;Services\Response&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="performance-optimization">
+<span id="zend-xmlrpc-server-performance"></span><h2>Performance optimization<a class="headerlink" href="#performance-optimization" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zend-xmlrpc-server-performance-caching">Cache server definitions between requests</p>
+<p>The example below illustrates caching server definitions between requests.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\XmlRpc\Server</span> <span class="k">as</span> <span class="nx">XmlRpcServer</span><span class="p">;</span>
+
+<span class="c1">// Register the &quot;Services&quot; namespace</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Loader\StandardAutoloader</span><span class="p">();</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">registerNamespace</span><span class="p">(</span><span class="s1">&#39;Services&#39;</span><span class="p">,</span> <span class="s1">&#39;path to Services&#39;</span><span class="p">);</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">register</span><span class="p">();</span>
+
+<span class="c1">// Specify a cache file</span>
+<span class="nv">$cacheFile</span> <span class="o">=</span> <span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/xmlrpc.cache&#39;</span><span class="p">;</span>
+
+<span class="c1">// Allow Services\Exceptions to report as fault responses</span>
+<span class="nx">XmlRpcServer\Fault</span><span class="o">::</span><span class="na">attachFaultException</span><span class="p">(</span><span class="s1">&#39;Services\Exception&#39;</span><span class="p">);</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XmlRpcServer</span><span class="p">();</span>
+
+<span class="c1">// Attempt to retrieve server definition from cache</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">XmlRpcServer\Cache</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="nv">$cacheFile</span><span class="p">,</span> <span class="nv">$server</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Comb&#39;</span><span class="p">,</span> <span class="s1">&#39;comb&#39;</span><span class="p">);</span>   <span class="c1">// methods called as comb.*</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Brush&#39;</span><span class="p">,</span> <span class="s1">&#39;brush&#39;</span><span class="p">);</span> <span class="c1">// methods called as brush.*</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Services\Pick&#39;</span><span class="p">,</span> <span class="s1">&#39;pick&#39;</span><span class="p">);</span>   <span class="c1">// methods called as pick.*</span>
+
+    <span class="c1">// Save cache</span>
+    <span class="nx">XmlRpcServer\Cache</span><span class="o">::</span><span class="na">save</span><span class="p">(</span><span class="nv">$cacheFile</span><span class="p">,</span> <span class="nv">$server</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// Create a request object</span>
+<span class="nv">$request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Services\Request</span><span class="p">();</span>
+
+<span class="c1">// Utilize a custom response</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setResponseClass</span><span class="p">(</span><span class="s1">&#39;Services\Response&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The server cache file should be located outside the document root.</p>
+</div>
+<p class="rubric" id="zend-xmlrpc-server-performance-xmlgen">Optimizing XML generation</p>
+<p><tt class="docutils literal"><span class="pre">Zend\XmlRpc\Server</span></tt> uses <tt class="docutils literal"><span class="pre">DOMDocument</span></tt> of <em>PHP</em> extension <strong>ext/dom</strong> to generate it&#8217;s <em>XML</em> output. While
+<strong>ext/dom</strong> is available on a lot of hosts it is not exactly the fastest. Benchmarks have shown, that <tt class="docutils literal"><span class="pre">XmlWriter</span></tt>
+from <strong>ext/xmlwriter</strong> performs better.</p>
+<p>If <strong>ext/xmlwriter</strong> is available on your host, you can select a the <tt class="docutils literal"><span class="pre">XmlWriter</span></tt>-based generator to leaverage the
+performance differences.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\XmlRpc</span><span class="p">;</span>
+
+<span class="nx">XmlRpc\Value</span><span class="o">::</span><span class="na">setGenerator</span><span class="p">(</span><span class="k">new</span> <span class="nx">XmlRpc\Generator\XmlWriter</span><span class="p">());</span>
+
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XmlRpc\Server</span><span class="p">();</span>
+<span class="o">...</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Benchmark your application</strong></p>
+<p class="last">Performance is determined by a lot of parameters and benchmarks only apply for the specific test case.
+Differences come from <em>PHP</em> version, installed extensions, webserver and operating system just to name a few.
+Please make sure to benchmark your application on your own and decide which generator to use based on <strong>your</strong>
+numbers.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Benchmark your client</strong></p>
+<p class="last">This optimization makes sense for the client side too. Just select the alternate <em>XML</em> generator before doing
+any work with <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\XmlRpc\Server</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li><a class="reference internal" href="#server-structure">Server Structure</a></li>
+<li><a class="reference internal" href="#anatomy-of-a-webservice">Anatomy of a webservice</a><ul>
+<li><a class="reference internal" href="#general-considerations">General considerations</a></li>
+<li><a class="reference internal" href="#what-to-expose">What to expose?</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conventions">Conventions</a></li>
+<li><a class="reference internal" href="#utilizing-namespaces">Utilizing Namespaces</a></li>
+<li><a class="reference internal" href="#custom-request-objects">Custom Request Objects</a></li>
+<li><a class="reference internal" href="#custom-responses">Custom Responses</a></li>
+<li><a class="reference internal" href="#handling-exceptions-via-faults">Handling Exceptions via Faults</a></li>
+<li><a class="reference internal" href="#caching-server-definitions-between-requests">Caching Server Definitions Between Requests</a></li>
+<li><a class="reference internal" href="#usage-examples">Usage Examples</a></li>
+<li><a class="reference internal" href="#performance-optimization">Performance optimization</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.xmlrpc.client.html"
+                        title="previous chapter">Zend\XmlRpc\Client</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zendservice.livedocx.html"
+                        title="next chapter"><tt class="docutils literal"><span class="pre">ZendService\LiveDocx</span></tt></a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.xmlrpc.server.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.xmlrpc.server.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.xmlrpc.server.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: For edit the files you need stay logged with your <a href="http://www.github.com">GitHub account</a> first.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zendservice.livedocx.html" title="ZendService\LiveDocx"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.xmlrpc.client.html" title="Zend\XmlRpc\Client"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.xmlrpc.server.rst">
+                Zend\XmlRpc\Server
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

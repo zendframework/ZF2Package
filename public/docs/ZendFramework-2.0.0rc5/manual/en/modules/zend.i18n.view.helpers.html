@@ -1,0 +1,711 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>I18n View Helpers &mdash; Zend Framework 2 2.0.0rc5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc5 documentation" href="../index.html" />
+    <link rel="next" title="I18n Filters" href="zend.i18n.filters.html" />
+    <link rel="prev" title="Translating" href="zend.i18n.translating.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.i18n.filters.html" title="I18n Filters"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.i18n.translating.html" title="Translating"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="i18n-view-helpers">
+<span id="zend-i18n-view-helpers"></span><h1>I18n View Helpers<a class="headerlink" href="#i18n-view-helpers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-i18n-view-helpers-intro"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Zend Framework comes with an initial set of helper classes related to Internationalization: e.g., formatting a
+date, formatting currency, or displaying translated content. You can use helper, or plugin, classes to perform
+these behaviors for you.</p>
+<p>See the section on <a class="reference internal" href="zend.view.helpers.html#zend-view-helpers"><em>view helpers</em></a> for more information.</p>
+</div>
+<div class="section" id="currencyformat-helper">
+<span id="zend-i18n-view-helper-currency-format"></span><h2>CurrencyFormat Helper<a class="headerlink" href="#currencyformat-helper" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">CurrencyFormat</span></tt> view helper can be used to simplify rendering of localized currency values. It acts as a
+wrapper for the <tt class="docutils literal"><span class="pre">NumberFormatter</span></tt> class within the Internationalization extension (Intl).</p>
+<p id="zend-i18n-view-helper-currency-format-usage"><strong>Basic Usage</strong></p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Within your view</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">currencyFormat</span><span class="p">(</span><span class="mf">1234.56</span><span class="p">,</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="s2">&quot;en_US&quot;</span><span class="p">);</span>
+<span class="c1">// This returns: &quot;$1,234.56&quot;</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">currencyFormat</span><span class="p">(</span><span class="mf">1234.56</span><span class="p">,</span> <span class="s2">&quot;EUR&quot;</span><span class="p">,</span> <span class="s2">&quot;de_DE&quot;</span><span class="p">);</span>
+<span class="c1">// This returns: &quot;1.234,56 €&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<dl class="function">
+<dt>
+<tt class="descname">currencyFormat</tt><big>(</big><em>float $number</em>, <em>string $currencyCode</em><span class="optional">[</span>, <em>string $locale</em><span class="optional">]</span><big>)</big></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>$number</strong> &#8211; The numeric currency value.</li>
+<li><strong>$currencyCode</strong> &#8211; The 3-letter ISO 4217 currency code indicating the currency to use.</li>
+<li><strong>$locale</strong> &#8211; (Optional) Locale in which the currency would be formatted (locale name, e.g. en_US). If unset, it will use the default locale (<tt class="docutils literal"><span class="pre">Locale::getDefault()</span></tt>)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p id="zend-i18n-view-helper-currency-format-setter-usage"><strong>Public Methods</strong></p>
+<p>The <tt class="docutils literal"><span class="pre">$currencyCode</span></tt> and <tt class="docutils literal"><span class="pre">$locale</span></tt> options can be set prior to formatting and will be applied each time the
+helper is used:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Within your view</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">plugin</span><span class="p">(</span><span class="s2">&quot;currencyformat&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setCurrencyCode</span><span class="p">(</span><span class="s2">&quot;USD&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setLocale</span><span class="p">(</span><span class="s2">&quot;en_US&quot;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">currencyFormat</span><span class="p">(</span><span class="mf">1234.56</span><span class="p">);</span>  <span class="c1">// &quot;$1,234.56&quot;</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">currencyFormat</span><span class="p">(</span><span class="mf">5678.90</span><span class="p">);</span>  <span class="c1">// &quot;$5,678.90&quot;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="dateformat-helper">
+<span id="zend-i18n-view-helper-date-format"></span><h2>DateFormat Helper<a class="headerlink" href="#dateformat-helper" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">DateFormat</span></tt> view helper can be used to simplify rendering of localized date/time values. It acts as a
+wrapper for the <tt class="docutils literal"><span class="pre">IntlDateFormatter</span></tt> class within the Internationalization extension (Intl).</p>
+<p id="zend-i18n-view-helper-date-format-usage"><strong>Basic Usage</strong></p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Within your view</span>
+
+<span class="c1">// Date and Time</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dateFormat</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">DateTime</span><span class="p">(),</span>
+    <span class="nx">IntlDateFormatter</span><span class="o">::</span><span class="na">MEDIUM</span><span class="p">,</span> <span class="c1">// date</span>
+    <span class="nx">IntlDateFormatter</span><span class="o">::</span><span class="na">MEDIUM</span><span class="p">,</span> <span class="c1">// time</span>
+    <span class="s2">&quot;en_US&quot;</span>
+<span class="p">);</span>
+<span class="c1">// This returns: &quot;Jul 2, 2012 6:44:03 PM&quot;</span>
+
+<span class="c1">// Date Only</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dateFormat</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">DateTime</span><span class="p">(),</span>
+    <span class="nx">IntlDateFormatter</span><span class="o">::</span><span class="na">LONG</span><span class="p">,</span> <span class="c1">// date</span>
+    <span class="nx">IntlDateFormatter</span><span class="o">::</span><span class="na">NONE</span><span class="p">,</span> <span class="c1">// time</span>
+    <span class="s2">&quot;en_US&quot;</span>
+<span class="p">);</span>
+<span class="c1">// This returns: &quot;July 2, 2012&quot;</span>
+
+<span class="c1">// Time Only</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dateFormat</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">DateTime</span><span class="p">(),</span>
+    <span class="nx">IntlDateFormatter</span><span class="o">::</span><span class="na">NONE</span><span class="p">,</span>  <span class="c1">// date</span>
+    <span class="nx">IntlDateFormatter</span><span class="o">::</span><span class="na">SHORT</span><span class="p">,</span> <span class="c1">// time</span>
+    <span class="s2">&quot;en_US&quot;</span>
+<span class="p">);</span>
+<span class="c1">// This returns: &quot;6:44 PM&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<dl class="function">
+<dt>
+<tt class="descname">dateFormat</tt><big>(</big><em>mixed $date</em><span class="optional">[</span>, <em>int $dateType</em><span class="optional">[</span>, <em>int $timeType</em><span class="optional">[</span>, <em>string $locale</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>$date</strong> &#8211; The value to format. This may be a <tt class="docutils literal"><span class="pre">DateTime</span></tt> object, an integer representing a Unix timestamp value or an array in the format output by <tt class="docutils literal"><span class="pre">localtime()</span></tt>.</li>
+<li><strong>$dateType</strong> &#8211; (Optional) Date type to use (none, short, medium, long, full). This is one of the <a class="reference external" href="http://us.php.net/manual/en/class.intldateformatter.php#intl.intldateformatter-constants">IntlDateFormatter constants</a>. Defaults to <tt class="docutils literal"><span class="pre">IntlDateFormatter::NONE</span></tt>.</li>
+<li><strong>$timeType</strong> &#8211; (Optional) Time type to use (none, short, medium, long, full). This is one of the <a class="reference external" href="http://us.php.net/manual/en/class.intldateformatter.php#intl.intldateformatter-constants">IntlDateFormatter constants</a>. Defaults to <tt class="docutils literal"><span class="pre">IntlDateFormatter::NONE</span></tt>.</li>
+<li><strong>$locale</strong> &#8211; (Optional) Locale in which the date would be formatted (locale name, e.g. en_US). If unset, it will use the default locale (<tt class="docutils literal"><span class="pre">Locale::getDefault()</span></tt>)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p id="zend-i18n-view-helper-date-format-setter-usage"><strong>Public Methods</strong></p>
+<p>The <tt class="docutils literal"><span class="pre">$locale</span></tt> option can be set prior to formatting with the <tt class="docutils literal"><span class="pre">setLocale()</span></tt> method and will be applied each time
+the helper is used.</p>
+<p>By default, the system&#8217;s default timezone will be used when formatting. This overrides any timezone that may be set
+inside a DateTime object. To change the timezone when formatting, use the <tt class="docutils literal"><span class="pre">setTimezone</span></tt> method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Within your view</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">plugin</span><span class="p">(</span><span class="s2">&quot;dateFormat&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setTimezone</span><span class="p">(</span><span class="s2">&quot;America/New_York&quot;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setLocale</span><span class="p">(</span><span class="s2">&quot;en_US&quot;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dateFormat</span><span class="p">(</span><span class="k">new</span> <span class="nx">DateTime</span><span class="p">(),</span> <span class="nx">IntlDateFormatter</span><span class="o">::</span><span class="na">MEDIUM</span><span class="p">);</span>  <span class="c1">// &quot;Jul 2, 2012&quot;</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dateFormat</span><span class="p">(</span><span class="k">new</span> <span class="nx">DateTime</span><span class="p">(),</span> <span class="nx">IntlDateFormatter</span><span class="o">::</span><span class="na">SHORT</span><span class="p">);</span>   <span class="c1">// &quot;7/2/12&quot;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="numberformat-helper">
+<span id="zend-i18n-view-helper-number-format"></span><h2>NumberFormat Helper<a class="headerlink" href="#numberformat-helper" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">NumberFormat</span></tt> view helper can be used to simplify rendering of locale-specific number and percentage
+strings. It acts as a wrapper for the <tt class="docutils literal"><span class="pre">NumberFormatter</span></tt> class within the Internationalization extension (Intl).</p>
+<p id="zend-i18n-view-helper-number-format-usage"><strong>Basic Usage</strong></p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Within your view</span>
+
+<span class="c1">// Example of Decimal formatting:</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">numberFormat</span><span class="p">(</span>
+    <span class="mf">1234567.891234567890000</span><span class="p">,</span>
+    <span class="nx">NumberFormatter</span><span class="o">::</span><span class="na">DECIMAL</span><span class="p">,</span>
+    <span class="nx">NumberFormatter</span><span class="o">::</span><span class="na">TYPE_DEFAULT</span><span class="p">,</span>
+    <span class="s2">&quot;de_DE&quot;</span>
+<span class="p">);</span>
+<span class="c1">// This returns: &quot;1.234.567,891&quot;</span>
+
+<span class="c1">// Example of Percent formatting:</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">numberFormat</span><span class="p">(</span>
+    <span class="mf">0.80</span><span class="p">,</span>
+    <span class="nx">NumberFormatter</span><span class="o">::</span><span class="na">PERCENT</span><span class="p">,</span>
+    <span class="nx">NumberFormatter</span><span class="o">::</span><span class="na">TYPE_DEFAULT</span><span class="p">,</span>
+    <span class="s2">&quot;en_US&quot;</span>
+<span class="p">);</span>
+<span class="c1">// This returns: &quot;80%&quot;</span>
+
+<span class="c1">// Example of Scientific notation formatting:</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">numberFormat</span><span class="p">(</span>
+    <span class="mf">0.00123456789</span><span class="p">,</span>
+    <span class="nx">NumberFormatter</span><span class="o">::</span><span class="na">SCIENTIFIC</span><span class="p">,</span>
+    <span class="nx">NumberFormatter</span><span class="o">::</span><span class="na">TYPE_DEFAULT</span><span class="p">,</span>
+    <span class="s2">&quot;fr_FR&quot;</span>
+<span class="p">);</span>
+<span class="c1">// This returns: &quot;1,23456789E-3&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<dl class="function">
+<dt>
+<tt class="descname">numberFormat</tt><big>(</big><em>number $number</em><span class="optional">[</span>, <em>int $formatStyle</em><span class="optional">[</span>, <em>int $formatType</em><span class="optional">[</span>, <em>string $locale</em><span class="optional">]</span><span class="optional">]</span><span class="optional">]</span><big>)</big></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>$number</strong> &#8211; The numeric value.</li>
+<li><strong>$formatStyle</strong> &#8211; (Optional) Style of the formatting, one of the <a class="reference external" href="http://us.php.net/manual/en/class.numberformatter.php#intl.numberformatter-constants.unumberformatstyle">format style constants</a>. If unset, it will use <tt class="docutils literal"><span class="pre">NumberFormatter::DECIMAL</span></tt> as the default style.</li>
+<li><strong>$formatType</strong> &#8211; (Optional) The <a class="reference external" href="http://us.php.net/manual/en/class.numberformatter.php#intl.numberformatter-constants.types">formatting type</a> to use. If unset, it will use <tt class="docutils literal"><span class="pre">NumberFormatter::TYPE_DEFAULT</span></tt> as the default type.</li>
+<li><strong>$locale</strong> &#8211; (Optional) Locale in which the number would be formatted (locale name, e.g. en_US). If unset, it will use the default locale (<tt class="docutils literal"><span class="pre">Locale::getDefault()</span></tt>)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p id="zend-i18n-view-helper-number-format-setter-usage"><strong>Public Methods</strong></p>
+<p>The <tt class="docutils literal"><span class="pre">$formatStyle</span></tt>, <tt class="docutils literal"><span class="pre">$formatType</span></tt>, and <tt class="docutils literal"><span class="pre">$locale</span></tt> options can be set prior to formatting and will be applied
+each time the helper is used.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Within your view</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">plugin</span><span class="p">(</span><span class="s2">&quot;numberformat&quot;</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">setFormatStyle</span><span class="p">(</span><span class="nx">NumberFormatter</span><span class="o">::</span><span class="na">PERCENT</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">setFormatType</span><span class="p">(</span><span class="nx">NumberFormatter</span><span class="o">::</span><span class="na">TYPE_DOUBLE</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">setLocale</span><span class="p">(</span><span class="s2">&quot;en_US&quot;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">numberFormat</span><span class="p">(</span><span class="mf">0.56</span><span class="p">);</span>  <span class="c1">// &quot;56%&quot;</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">numberFormat</span><span class="p">(</span><span class="mf">0.90</span><span class="p">);</span>  <span class="c1">// &quot;90%&quot;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="translate-helper">
+<span id="zend-i18n-view-helper-translate"></span><h2>Translate Helper<a class="headerlink" href="#translate-helper" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Translate</span></tt> view helper can be used to translate content. It acts as a wrapper for the
+<tt class="docutils literal"><span class="pre">Zend\I18n\Translator\Translator</span></tt> class.</p>
+<p id="zend-i18n-view-helper-translate-setup"><strong>Setup</strong></p>
+<p>Before using the <tt class="docutils literal"><span class="pre">Translate</span></tt> view helper, you must have first created a <tt class="docutils literal"><span class="pre">Translator</span></tt> object and have attached
+it to the view helper. If you use the <tt class="docutils literal"><span class="pre">Zend\View\HelperPluginManager</span></tt> to invoke the view helper,
+this will be done automatically for you.</p>
+<p id="zend-i18n-view-helper-translate-usage"><strong>Basic Usage</strong></p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Within your view</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">translate</span><span class="p">(</span><span class="s2">&quot;Some translated text.&quot;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">translate</span><span class="p">(</span><span class="s2">&quot;Translated text from a custom text domain.&quot;</span><span class="p">,</span> <span class="s2">&quot;customDomain&quot;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nb">sprintf</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">translate</span><span class="p">(</span><span class="s2">&quot;The current time is %s.&quot;</span><span class="p">),</span> <span class="nv">$currentTime</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">translate</span><span class="p">(</span><span class="s2">&quot;Translate in a specific locale&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="s2">&quot;de_DE&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<dl class="function">
+<dt>
+<tt class="descname">translate</tt><big>(</big><em>string $message</em><span class="optional">[</span>, <em>string $textDomain</em><span class="optional">[</span>, <em>string $locale</em><span class="optional">]</span><span class="optional">]</span><big>)</big></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>$message</strong> &#8211; The message to be translated.</li>
+<li><strong>$textDomain</strong> &#8211; (Optional) The text domain where this translation lives. Defaults to the value &#8220;default&#8221;.</li>
+<li><strong>$locale</strong> &#8211; (Optional) Locale in which the message would be translated (locale name, e.g. en_US). If unset, it will use the default locale (<tt class="docutils literal"><span class="pre">Locale::getDefault()</span></tt>)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p><strong>Gettext</strong></p>
+<p>The <tt class="docutils literal"><span class="pre">xgettext</span></tt> utility can be used to compile *.po files from PHP source files containing the translate view helper.</p>
+<div class="highlight-bash"><div class="highlight"><pre>xgettext --language<span class="o">=</span>php --add-location --keyword<span class="o">=</span>translate my-view-file.phtml
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="http://en.wikipedia.org/wiki/Gettext">Gettext Wikipedia page</a> for more information.</p>
+<p id="zend-i18n-view-helper-translate-methods"><strong>Public Methods</strong></p>
+<dl class="docutils">
+<dt>Public methods for setting a <tt class="docutils literal"><span class="pre">Zend\I18n\Translator\Translator</span></tt> and a default text domain are inherited from</dt>
+<dd><a class="reference internal" href="#zend-i18n-view-helper-abstract-translator-helper-methods"><em>Zend\I18n\View\Helper\AbstractTranslatorHelper</em></a>.</dd>
+</dl>
+</div>
+<div class="section" id="translateplural-helper">
+<span id="zend-i18n-view-helper-translate-plural"></span><h2>TranslatePlural Helper<a class="headerlink" href="#translateplural-helper" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">TranslatePlural</span></tt> view helper can be used to translate words which take into account numeric meanings.
+English, for example, has a singular definition of &#8220;car&#8221;, for one car. And has the plural definition, &#8220;cars&#8221;,
+meaning zero &#8220;cars&#8221; or more than one car. Other languages like Russian or Polish have more plurals with different
+rules.</p>
+<p>The viewhelper acts as a wrapper for the <tt class="docutils literal"><span class="pre">Zend\I18n\Translator\Translator</span></tt> class.</p>
+<p id="zend-i18n-view-helper-translate-plural-setup"><strong>Setup</strong></p>
+<p>Before using the <tt class="docutils literal"><span class="pre">TranslatePlural</span></tt> view helper, you must have first created a <tt class="docutils literal"><span class="pre">Translator</span></tt> object and
+have attached it to the view helper. If you use the <tt class="docutils literal"><span class="pre">Zend\View\HelperPluginManager</span></tt> to invoke the view helper,
+this will be done automatically for you.</p>
+<p id="zend-i18n-view-helper-translate-plural-usage"><strong>Basic Usage</strong></p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Within your view</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">translatePlural</span><span class="p">(</span><span class="s2">&quot;car&quot;</span><span class="p">,</span> <span class="s2">&quot;cars&quot;</span><span class="p">,</span> <span class="nv">$num</span><span class="p">);</span>
+
+<span class="c1">// Use a custom domain</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">translatePlural</span><span class="p">(</span><span class="s2">&quot;monitor&quot;</span><span class="p">,</span> <span class="s2">&quot;monitors&quot;</span><span class="p">,</span> <span class="nv">$num</span><span class="p">,</span> <span class="s2">&quot;customDomain&quot;</span><span class="p">);</span>
+
+<span class="c1">// Change locale</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">translate</span><span class="p">(</span><span class="s2">&quot;locale&quot;</span><span class="p">,</span> <span class="s2">&quot;locales&quot;</span><span class="p">,</span> <span class="nv">$num</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span> <span class="s2">&quot;de_DE&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<dl class="function">
+<dt>
+<tt class="descname">translatePlural</tt><big>(</big><em>string $singular</em>, <em>string $plural</em>, <em>int $number</em><span class="optional">[</span>, <em>string $textDomain</em><span class="optional">[</span>, <em>string $locale</em><span class="optional">]</span><span class="optional">]</span><big>)</big></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>$singular</strong> &#8211; The singular message to be translated.</li>
+<li><strong>$plural</strong> &#8211; The plural message to be translated.</li>
+<li><strong>$number</strong> &#8211; The number to evaluate and determine which message to use.</li>
+<li><strong>$textDomain</strong> &#8211; (Optional) The text domain where this translation lives. Defaults to the value &#8220;default&#8221;.</li>
+<li><strong>$locale</strong> &#8211; (Optional) Locale in which the message would be translated (locale name, e.g. en_US). If unset, it will use the default locale (<tt class="docutils literal"><span class="pre">Locale::getDefault()</span></tt>)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p id="zend-i18n-view-helper-translate-plural-methods"><strong>Public Methods</strong></p>
+<dl class="docutils">
+<dt>Public methods for setting a <tt class="docutils literal"><span class="pre">Zend\I18n\Translator\Translator</span></tt> and a default text domain are inherited from</dt>
+<dd><a class="reference internal" href="#zend-i18n-view-helper-abstract-translator-helper-methods"><em>Zend\I18n\View\Helper\AbstractTranslatorHelper</em></a>.</dd>
+</dl>
+</div>
+<div class="section" id="abstract-translator-helper">
+<span id="zend-i18n-view-helper-abstract-translator-helper"></span><h2>Abstract Translator Helper<a class="headerlink" href="#abstract-translator-helper" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">AbstractTranslatorHelper</span></tt> view helper is used as a base abstract class for any helpers that need to
+translate content. It provides an implementation for the <tt class="docutils literal"><span class="pre">Zend\I18n\Translator\TranslatorAwareInterface</span></tt>
+which allows injecting a translator and setting a text domain.</p>
+<p id="zend-i18n-view-helper-abstract-translator-helper-methods"><strong>Public Methods</strong></p>
+<span class="target" id="zend-i18n-view-helper-abstract-translator-helper-methods-set-translator"></span><dl class="function">
+<dt>
+<tt class="descname">setTranslator</tt><big>(</big><em>Translator $translator</em><span class="optional">[</span>, <em>string $textDomain = null</em><span class="optional">]</span><big>)</big></dt>
+<dd><p>Sets <tt class="docutils literal"><span class="pre">Zend\I18n\Translator\Translator</span></tt> to use in helper. The <tt class="docutils literal"><span class="pre">$textDomain</span></tt> argument is optional.
+It is provided as a convenience for setting both the translator and textDomain at the same time.</p>
+</dd></dl>
+
+<span class="target" id="zend-i18n-view-helper-abstract-translator-helper-methods-get-translator"></span><dl class="function">
+<dt>
+<tt class="descname">getTranslator</tt><big>(</big><big>)</big></dt>
+<dd><p>Returns the <tt class="docutils literal"><span class="pre">Zend\I18n\Translator\Translator</span></tt> used in the helper.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><tt class="docutils literal"><span class="pre">Zend\I18n\Translator\Translator</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="zend-i18n-view-helper-abstract-translator-helper-methods-has-translator"></span><dl class="function">
+<dt>
+<tt class="descname">hasTranslator</tt><big>(</big><big>)</big></dt>
+<dd><p>Returns a true if a <tt class="docutils literal"><span class="pre">Zend\I18n\Translator\Translator</span></tt> is set in the helper, and false if otherwise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="zend-i18n-view-helper-abstract-translator-helper-methods-set-translator-enabled"></span><dl class="function">
+<dt>
+<tt class="descname">setTranslatorEnabled</tt><big>(</big><em>boolean $enabled</em><big>)</big></dt>
+<dd><p>Sets whether translations should be enabled or disabled.</p>
+</dd></dl>
+
+<span class="target" id="zend-i18n-view-helper-abstract-translator-helper-methods-is-translator-enabled"></span><dl class="function">
+<dt>
+<tt class="descname">isTranslatorEnabled</tt><big>(</big><big>)</big></dt>
+<dd><p>Returns true if translations are enabled, and false if disabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="zend-i18n-view-helper-abstract-translator-helper-methods-set-translator-text-domain"></span><dl class="function">
+<dt>
+<tt class="descname">setTranslatorTextDomain</tt><big>(</big><em>string $textDomain</em><big>)</big></dt>
+<dd><p>Set the translation text domain to use in helper when translating.</p>
+</dd></dl>
+
+<span class="target" id="zend-i18n-view-helper-abstract-translator-helper-methods-get-translator-text-domain"></span><dl class="function">
+<dt>
+<tt class="descname">getTranslatorTextDomain</tt><big>(</big><big>)</big></dt>
+<dd><p>Returns the translation text domain used in the helper.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">I18n View Helpers</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#currencyformat-helper">CurrencyFormat Helper</a></li>
+<li><a class="reference internal" href="#dateformat-helper">DateFormat Helper</a></li>
+<li><a class="reference internal" href="#numberformat-helper">NumberFormat Helper</a></li>
+<li><a class="reference internal" href="#translate-helper">Translate Helper</a></li>
+<li><a class="reference internal" href="#translateplural-helper">TranslatePlural Helper</a></li>
+<li><a class="reference internal" href="#abstract-translator-helper">Abstract Translator Helper</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.i18n.translating.html"
+                        title="previous chapter">Translating</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.i18n.filters.html"
+                        title="next chapter">I18n Filters</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.i18n.view.helpers.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.i18n.view.helpers.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.i18n.view.helpers.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: For edit the files you need stay logged with your <a href="http://www.github.com">GitHub account</a> first.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.i18n.filters.html" title="I18n Filters"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.i18n.translating.html" title="Translating"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.i18n.view.helpers.rst">
+                I18n View Helpers
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,487 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Building an Authorization System in Zend Framework &mdash; Zend Framework 2 2.0.0rc5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc5 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="building-an-authorization-system-in-zend-framework">
+<span id="learning-multiuser-authorization"></span><h1>Building an Authorization System in Zend Framework<a class="headerlink" href="#building-an-authorization-system-in-zend-framework" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction-to-authorization">
+<span id="learning-multiuser-authorization-intro"></span><h2>Introduction to Authorization<a class="headerlink" href="#introduction-to-authorization" title="Permalink to this headline">¶</a></h2>
+<p>After a user has been identified as being authentic, an application can go about its business of providing some
+useful and desirable resources to a consumer. In many cases, applications might contain different resource types,
+with some resources having stricter rules regarding access. This process of determining who has access to which
+resources is the process of &#8220;authorization&#8221;. Authorization in its simplest form is the composition of these
+elements:</p>
+<ul class="simple">
+<li>the identity whom wishes to be granted access</li>
+<li>the resource the identity is asking permission to consume</li>
+<li>and optionally, what the identity is privileged to do with the resource</li>
+</ul>
+<p>In Zend Framework, the <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl</span></tt> component handles the task of building a tree of roles, resources and
+privileges to manage and query authorization requests against.</p>
+</div>
+<div class="section" id="basic-usage-of-zendpermissionsacl">
+<span id="learning-multiuser-authorization-basic-usage"></span><h2>Basic Usage of ZendPermissionsAcl<a class="headerlink" href="#basic-usage-of-zendpermissionsacl" title="Permalink to this headline">¶</a></h2>
+<p>When using <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl</span></tt>, any models can serve as roles or resources by simply implementing the proper interface. To
+be used in a role capacity, the class must implement the <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Role\RoleInterface</span></tt>, which requires only
+<tt class="docutils literal"><span class="pre">getRoleId()</span></tt>. To be used in a resource capacity, a class must implement the <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Resource\ResourceInterface</span></tt>
+which similarly requires the class implement the <tt class="docutils literal"><span class="pre">getResourceId()</span></tt> method.</p>
+<p>Demonstrated below is a simple user model. This model can take part in our <em>ACL</em> system simply by implementing the
+<tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Role\RoleInterface</span></tt>. The method <tt class="docutils literal"><span class="pre">getRoleId()</span></tt> will return the id &#8220;guest&#8221; when an ID is not known, or it
+will return the role ID that was assigned to this actual user object. This value can effectively come from
+anywhere, a static definition or perhaps dynamically from the users database role itself.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Default_Model_User</span> <span class="k">implements</span> <span class="nx">Zend\Permissions\Acl\Role\RoleInterface</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$_aclRoleId</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getRoleId</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_aclRoleId</span> <span class="o">==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="s1">&#39;guest&#39;</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_aclRoleId</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>While the concept of a user as a role is pretty straight forward, your application might choose to have any other
+models in your system as a potential &#8220;resource&#8221; to be consumed in this <em>ACL</em> system. For simplicity, we&#8217;ll use the
+example of a blog post. Since the type of the resource is tied to the type of the object, this class will only
+return &#8216;blogPost&#8217; as the resource ID in this system. Naturally, this value can be dynamic if your system requires
+it to be so.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Default_Model_BlogPost</span> <span class="k">implements</span> <span class="nx">Zend\Permissions\Acl\Resource\ResourceInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getResourceId</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="s1">&#39;blogPost&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now that we have at least a role and a resource, we can go about defining the rules of the <em>ACL</em> system. These
+rules will be consulted when the system receives a query about what is possible given a certain role, resources,
+and optionally a privilege.</p>
+<p>Lets assume the following rules:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$acl</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Permissions\Acl\Acl</span><span class="p">();</span>
+
+<span class="c1">// setup the various roles in our system</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="s1">&#39;guest&#39;</span><span class="p">);</span>
+<span class="c1">// owner inherits all of the rules of guest</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="s1">&#39;owner&#39;</span><span class="p">,</span> <span class="s1">&#39;guest&#39;</span><span class="p">);</span>
+
+<span class="c1">// add the resources</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addResource</span><span class="p">(</span><span class="s1">&#39;blogPost&#39;</span><span class="p">);</span>
+
+<span class="c1">// add privileges to roles and resource combinations</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">allow</span><span class="p">(</span><span class="s1">&#39;guest&#39;</span><span class="p">,</span> <span class="s1">&#39;blogPost&#39;</span><span class="p">,</span> <span class="s1">&#39;view&#39;</span><span class="p">);</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">allow</span><span class="p">(</span><span class="s1">&#39;owner&#39;</span><span class="p">,</span> <span class="s1">&#39;blogPost&#39;</span><span class="p">,</span> <span class="s1">&#39;post&#39;</span><span class="p">);</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">allow</span><span class="p">(</span><span class="s1">&#39;owner&#39;</span><span class="p">,</span> <span class="s1">&#39;blogPost&#39;</span><span class="p">,</span> <span class="s1">&#39;publish&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above rules are quite simple: a guest role and an owner role exist; as does a blogPost type resource. Guests
+are allowed to view blog posts, and owners are allowed to post and publish blog posts. To query this system one
+might do any of the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// assume the user model is of type guest resource</span>
+<span class="nv">$guestUser</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Default_Model_User</span><span class="p">();</span>
+<span class="nv">$ownerUser</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Default_Model_Owner</span><span class="p">(</span><span class="s1">&#39;OwnersUsername&#39;</span><span class="p">);</span>
+
+<span class="nv">$post</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Default_Model_BlogPost</span><span class="p">();</span>
+
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="nv">$guestUser</span><span class="p">,</span> <span class="nv">$post</span><span class="p">,</span> <span class="s1">&#39;view&#39;</span><span class="p">);</span> <span class="c1">// true</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="nv">$ownerUser</span><span class="p">,</span> <span class="nv">$post</span><span class="p">,</span> <span class="s1">&#39;view&#39;</span><span class="p">);</span> <span class="c1">// true</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="nv">$guestUser</span><span class="p">,</span> <span class="nv">$post</span><span class="p">,</span> <span class="s1">&#39;post&#39;</span><span class="p">);</span> <span class="c1">// false</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="nv">$ownerUser</span><span class="p">,</span> <span class="nv">$post</span><span class="p">,</span> <span class="s1">&#39;post&#39;</span><span class="p">);</span> <span class="c1">// true</span>
+</pre></div>
+</td></tr></table></div>
+<p>As you can see, the above rules exercise whether owners and guests can view posts, which they can, or post new
+posts, which owners can and guests cannot. But as you might expect this type of system might not be as dynamic as
+we wish it to be. What if we want to ensure a specific owner actual owns a very specific blog post before allowing
+him to publish it? In other words, we want to ensure that only post owners have the ability to publish their own
+posts.</p>
+<p>This is where assertions come in. Assertions are methods that will be called out to when the static rule checking
+is simply not enough. When registering an assertion object this object will be consulted to determine, typically
+dynamically, if some roles has access to some resource, with some optional privlidge that can only be answered by
+the logic within the assertion. For this example, we&#8217;ll use the following assertion:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">OwnerCanPublishBlogPostAssertion</span> <span class="k">implements</span> <span class="nx">Zend\Permissions\Acl\Assert\AssertInterface</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * This assertion should receive the actual User and BlogPost objects.</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param Zend\Permissions\Acl $acl</span>
+<span class="sd">     * @param Zend\Permissions\Acl\Role\RoleInterface $user</span>
+<span class="sd">     * @param Zend\Permissions\Acl\Resource\ResourceInterface $blogPost</span>
+<span class="sd">     * @param $privilege</span>
+<span class="sd">     * @return bool</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">assert</span><span class="p">(</span><span class="nx">Zend\Permissions\Acl</span> <span class="nv">$acl</span><span class="p">,</span>
+                           <span class="nx">Zend\Permissions\Acl\Role\RoleInterface</span> <span class="nv">$user</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span>
+                           <span class="nx">Zend\Permissions\Acl\Resource\ResourceInterface</span> <span class="nv">$blogPost</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span>
+                           <span class="nv">$privilege</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$user</span> <span class="nx">instanceof</span> <span class="nx">Default_Model_User</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="nx">__CLASS__</span>
+                              <span class="o">.</span> <span class="s1">&#39;::&#39;</span>
+                              <span class="o">.</span> <span class="nx">__METHOD__</span>
+                              <span class="o">.</span> <span class="s1">&#39; expects the role to be&#39;</span>
+                              <span class="o">.</span> <span class="s1">&#39; an instance of User&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$blogPost</span> <span class="nx">instanceof</span> <span class="nx">Default_Model_BlogPost</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="nx">__CLASS__</span>
+                              <span class="o">.</span> <span class="s1">&#39;::&#39;</span>
+                              <span class="o">.</span> <span class="nx">__METHOD__</span>
+                              <span class="o">.</span> <span class="s1">&#39; expects the resource to be&#39;</span>
+                              <span class="o">.</span> <span class="s1">&#39; an instance of BlogPost&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="c1">// if role is publisher, he can always modify a post</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">getRoleId</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;publisher&#39;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">// check to ensure that everyone else is only modifying their own post</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">id</span> <span class="o">!=</span> <span class="k">null</span> <span class="o">&amp;&amp;</span> <span class="nv">$blogPost</span><span class="o">-&gt;</span><span class="na">ownerUserId</span> <span class="o">==</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>To hook this into our <em>ACL</em> system, we would do the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// replace this:</span>
+<span class="c1">//   $acl-&gt;allow(&#39;owner&#39;, &#39;blogPost&#39;, &#39;publish&#39;);</span>
+<span class="c1">// with this:</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">allow</span><span class="p">(</span><span class="s1">&#39;owner&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;blogPost&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;publish&#39;</span><span class="p">,</span>
+            <span class="k">new</span> <span class="nx">OwnerCanPublishBlogPostAssertion</span><span class="p">());</span>
+
+<span class="c1">// lets also add the role of a &quot;publisher&quot; who has access to everything</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">allow</span><span class="p">(</span><span class="s1">&#39;publisher&#39;</span><span class="p">,</span> <span class="s1">&#39;blogPost&#39;</span><span class="p">,</span> <span class="s1">&#39;publish&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now, anytime the <em>ACL</em> is consulted about whether or not an owner can publish a specific blog post, this assertion
+will be run. This assertion will ensure that unless the role type is &#8216;publisher&#8217; the owner role must be logically
+tied to the blog post in question. In this example, we check to see that the <tt class="docutils literal"><span class="pre">ownerUserId</span></tt> property of the blog
+post matches the id of the owner passed in.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Building an Authorization System in Zend Framework</a><ul>
+<li><a class="reference internal" href="#introduction-to-authorization">Introduction to Authorization</a></li>
+<li><a class="reference internal" href="#basic-usage-of-zendpermissionsacl">Basic Usage of ZendPermissionsAcl</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/multiuser.authorization.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/multiuser.authorization.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/multiuser.authorization.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: For edit the files you need stay logged with your <a href="http://www.github.com">GitHub account</a> first.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/multiuser.authorization.rst">
+                Building an Authorization System in Zend Framework
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

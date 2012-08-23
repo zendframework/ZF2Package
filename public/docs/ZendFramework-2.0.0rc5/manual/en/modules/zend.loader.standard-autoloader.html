@@ -1,0 +1,498 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The StandardAutoloader &mdash; Zend Framework 2 2.0.0rc5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc5 documentation" href="../index.html" />
+    <link rel="next" title="The Class Map Generator utility: bin/classmap_generator.php" href="zend.loader.classmap-generator.html" />
+    <link rel="prev" title="The ClassMapAutoloader" href="zend.loader.class-map-autoloader.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.loader.classmap-generator.html" title="The Class Map Generator utility: bin/classmap_generator.php"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.loader.class-map-autoloader.html" title="The ClassMapAutoloader"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-standardautoloader">
+<span id="zend-loader-standard-autoloader"></span><h1>The StandardAutoloader<a class="headerlink" href="#the-standardautoloader" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-loader-standard-autoloader-intro"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Loader\StandardAutoloader</span></tt> is designed as a <a class="reference external" href="https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md">PSR-0</a>-compliant autoloader. It assumes a 1:1 mapping of the
+namespace+classname to the filesystem, wherein namespace separators and underscores are translated to directory
+separators. A simple statement that illustrates how resolution works is as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filename</span> <span class="o">=</span> <span class="nb">str_replace</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;\\&#39;</span><span class="p">),</span> <span class="nx">DIRECTORY_SEPARATOR</span><span class="p">,</span> <span class="nv">$classname</span><span class="p">)</span>
+          <span class="o">.</span> <span class="s1">&#39;.php&#39;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Previous incarnations of PSR-0-compliant autoloaders in Zend Framework have relied upon the <tt class="docutils literal"><span class="pre">include_path</span></tt> for
+file lookups. This has led to a number of issues:</p>
+<ul class="simple">
+<li>Due to the use of <tt class="docutils literal"><span class="pre">include</span></tt>, if the file is not found, a warning is raised &#8211; even if another autoloader is
+capable of resolving the class later.</li>
+<li>Documenting how to setup the <tt class="docutils literal"><span class="pre">include_path</span></tt> has proven to be a difficult concept to convey.</li>
+<li>If multiple Zend Framework installations exist on the <tt class="docutils literal"><span class="pre">include_path</span></tt>, the first one on the path wins &#8211; even if
+that was not the one the developer intended.</li>
+</ul>
+<p>To solve these problems, the <tt class="docutils literal"><span class="pre">StandardAutoloader</span></tt> by default requires that you explicitly register namespace/path
+pairs (or vendor prefix/path pairs), and will only load a file if it exists within the given path. Multiple pairs
+may be provided.</p>
+<p>As a measure of last resort, you may also use the <tt class="docutils literal"><span class="pre">StandardAutoloader</span></tt> as a &#8220;fallback&#8221; autoloader &#8211; one that
+will look for classes of any namespace or vendor prefix on the <tt class="docutils literal"><span class="pre">include_path</span></tt>. This practice is not recommended,
+however, due to performance implications.</p>
+<p>Finally, as with all autoloaders in Zend Framework, the <tt class="docutils literal"><span class="pre">StandardAutoloader</span></tt> is capable of registering itself
+with PHP&#8217;s SPL autoloader registry.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Vocabulary: Namespaces vs. Vendor Prefixes</strong></p>
+<p>In terms of autloading, a &#8220;namespace&#8221; corresponds to PHP&#8217;s own definition of namespaces in PHP versions 5.3 and
+above.</p>
+<p>A &#8220;vendor prefix&#8221; refers to the practice, popularized in PHP versions prior to 5.3, of providing a
+pseudo-namespace in the form of underscore-separated words in class names. As an example, the class
+<tt class="docutils literal"><span class="pre">Phly_Couch_Document</span></tt> uses a vendor prefix of &#8220;Phly&#8221;, and a component prefix of &#8220;Phly_Couch&#8221; &#8211; but it is a
+class sitting in the global namespace within PHP 5.3.</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">StandardAutoloader</span></tt> is capable of loading either namespaced or vendor prefixed class names, but treats
+them separately when attempting to match them to an appropriate path.</p>
+</div>
+</div>
+<div class="section" id="quick-start">
+<span id="zend-loader-standard-autoloader-quick-start"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>Basic use of the <tt class="docutils literal"><span class="pre">StandardAutoloader</span></tt> requires simply registering namespace/path pairs. This can either be done
+at instantiation, or via explicit method calls after the object has been initialized. Calling <tt class="docutils literal"><span class="pre">register()</span></tt> will
+register the autoloader with the SPL autoloader registry.</p>
+<p>If the option key &#8216;autoregister_zf&#8217; is set to true then the class will register the &#8220;Zend&#8221; namespace to the
+directory above where its own classfile is located on the filesystem.</p>
+<p class="rubric" id="zend-loader-standard-autoloader-quick-start-example-manual-configuration">Manual Configuration</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// This example assumes ZF is on your include_path.</span>
+<span class="c1">// You could also load the autoloader class from a path relative to the</span>
+<span class="c1">// current script, or via an absolute path.</span>
+<span class="k">require_once</span> <span class="s1">&#39;Zend/Loader/StandardAutoloader.php&#39;</span><span class="p">;</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Loader\StandardAutoloader</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;autoregister_zf&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">));</span>
+
+<span class="c1">// Register the &quot;Phly&quot; namespace:</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">registerNamespace</span><span class="p">(</span><span class="s1">&#39;Phly&#39;</span><span class="p">,</span> <span class="nx">APPLICATION_PATH</span> <span class="o">.</span> <span class="s1">&#39;/../library/Phly&#39;</span><span class="p">);</span>
+
+<span class="c1">// Register the &quot;Scapi&quot; vendor prefix:</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">registerPrefix</span><span class="p">(</span><span class="s1">&#39;Scapi&#39;</span><span class="p">,</span> <span class="nx">APPLICATION_PATH</span> <span class="o">.</span> <span class="s1">&#39;/../library/Scapi&#39;</span><span class="p">);</span>
+
+<span class="c1">// Optionally, specify the autoloader as a &quot;fallback&quot; autoloader;</span>
+<span class="c1">// this is not recommended.</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">setFallbackAutoloader</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+
+<span class="c1">// Register with spl_autoload:</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">register</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-loader-standard-autoloader-quick-start-example-constructor-configuration">Configuration at Instantiation</p>
+<p>The <tt class="docutils literal"><span class="pre">StandardAutoloader</span></tt> may also be configured at instantiation. Please note:</p>
+<ul class="simple">
+<li>The argument passed may be either an array or a <tt class="docutils literal"><span class="pre">Traversable</span></tt> object (such as a <tt class="docutils literal"><span class="pre">Zend\Config</span></tt> object.</li>
+<li>The argument passed is also a valid argument for passing to the <tt class="docutils literal"><span class="pre">setOptions()</span></tt> method.</li>
+</ul>
+<p>The following is equivalent to the previous example.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">require_once</span> <span class="s1">&#39;Zend/Loader/StandardAutoloader.php&#39;</span><span class="p">;</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Loader\StandardAutoloader</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;autoregister_zf&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+    <span class="s1">&#39;namespaces&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;Phly&#39;</span> <span class="o">=&gt;</span> <span class="nx">APPLICATION_PATH</span> <span class="o">.</span> <span class="s1">&#39;/../library/Phly&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;prefixes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;Scapi&#39;</span> <span class="o">=&gt;</span> <span class="nx">APPLICATION_PATH</span> <span class="o">.</span> <span class="s1">&#39;/../library/Scapi&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;fallback_autoloader&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="c1">// Register with spl_autoload:</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">register</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="configuration-options">
+<span id="zend-loader-standard-autoloader-options"></span><h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">StandardAutoloader</span></tt> defines the following options.</p>
+<p class="rubric">StandardAutoloader Options</p>
+<dl class="docutils">
+<dt><strong>namespaces</strong></dt>
+<dd>An associative array of namespace/path pairs. The path should be an absolute path or path relative to the
+calling script, and contain only classes that live in that namespace (or its subnamespaces). By default, the
+&#8220;Zend&#8221; namespace is registered, pointing to the arent directory of the file defining the <tt class="docutils literal"><span class="pre">StandardAutoloader</span></tt>.</dd>
+<dt><strong>prefixes</strong></dt>
+<dd>An associative array of vendor prefix/path pairs. The path should be an absolute path or path relative to the
+calling script, and contain only classes that begin with the provided vendor prefix.</dd>
+<dt><strong>fallback_autoloader</strong></dt>
+<dd>A boolean value indicating whether or not this instance should act as a &#8220;fallback&#8221; autoloader (i.e., look for
+classes of any namespace or vendor prefix on the <tt class="docutils literal"><span class="pre">include_path</span></tt>). By default, <tt class="docutils literal"><span class="pre">false</span></tt>.</dd>
+<dt><strong>autoregister_zf</strong></dt>
+<dd>An boolean value indicating that the class should register the &#8220;Zend&#8221; namespace to the directory above where its
+own classfile is located on the filesystem.</dd>
+</dl>
+</div>
+<div class="section" id="available-methods">
+<span id="zend-loader-standard-autoloader-methods"></span><h2>Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="zend-loader-standard-autoloader-methods-constructor">
+<dt>__construct</dt>
+<dd><p class="first">Initialize a new instance of the object
+<tt class="docutils literal"><span class="pre">__construct($options</span> <span class="pre">=</span> <span class="pre">null)</span></tt></p>
+<p class="last"><strong>Constructor</strong>
+Takes an optional <tt class="docutils literal"><span class="pre">$options</span></tt> argument. This argument may be an associative array or <tt class="docutils literal"><span class="pre">Traversable</span></tt> object. If
+not null, the argument is passed to <a class="reference internal" href="#zend-loader-standard-autoloader-methods-set-options"><em>setOptions()</em></a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-standard-autoloader-methods-set-options">
+<dt>setOptions</dt>
+<dd><p class="first">Set object state based on provided options.
+<tt class="docutils literal"><span class="pre">setOptions($options)</span></tt></p>
+<p><strong>setOptions()</strong>
+Takes an argument of either an associative array or <tt class="docutils literal"><span class="pre">Traversable</span></tt> object. Recognized keys are detailed under
+:ref:` &lt;zend.loader.standard-autoloader.options&gt;`, with the following behaviors:</p>
+<ul class="last simple">
+<li>The <tt class="docutils literal"><span class="pre">namespaces</span></tt> value will be passed to <a class="reference internal" href="#zend-loader-standard-autoloader-methods-register-namespaces"><em>registerNamespaces()</em></a>.</li>
+<li>The <tt class="docutils literal"><span class="pre">prefixes</span></tt> value will be passed to <a class="reference internal" href="#zend-loader-standard-autoloader-methods-register-prefixes"><em>registerPrefixes()</em></a>.</li>
+<li>The <tt class="docutils literal"><span class="pre">fallback_autoloader</span></tt> value will be passed to <a class="reference internal" href="#zend-loader-standard-autoloader-methods-set-fallback-autoloader"><em>setFallbackAutoloader()</em></a>.</li>
+</ul>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-standard-autoloader-methods-set-fallback-autoloader">
+<dt>setFallbackAutoloader</dt>
+<dd><p class="first">Enable/disable fallback autoloader status
+<tt class="docutils literal"><span class="pre">setFallbackAutoloader($flag)</span></tt></p>
+<p class="last"><strong>setFallbackAutoloader()</strong>
+Takes a boolean flag indicating whether or not to act as a fallback autoloader when registered with the SPL
+autoloader.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-standard-autoloader-methods-is-fallback-autoloader">
+<dt>isFallbackAutoloader</dt>
+<dd><p class="first">Query fallback autoloader status
+<tt class="docutils literal"><span class="pre">isFallbackAutoloader()</span></tt></p>
+<p class="last"><strong>isFallbackAutoloader()</strong>
+Indicates whether or not this instance is flagged as a fallback autoloader.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-standard-autoloader-methods-register-namespace">
+<dt>registerNamespace</dt>
+<dd><p class="first">Register a namespace with the autoloader
+<tt class="docutils literal"><span class="pre">registerNamespace($namespace,</span> <span class="pre">$directory)</span></tt></p>
+<p class="last"><strong>registerNamespace()</strong>
+Register a namespace with the autoloader, pointing it to a specific directory on the filesystem for class
+resolution. For classes matching that initial namespace, the autoloader will then perform lookups within that
+directory.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-standard-autoloader-methods-register-namespaces">
+<dt>registerNamespaces</dt>
+<dd><p class="first">Register multiple namespaces with the autoloader
+<tt class="docutils literal"><span class="pre">registerNamespaces($namespaces)</span></tt></p>
+<p class="last"><strong>registerNamespaces()</strong>
+Accepts either an array or <tt class="docutils literal"><span class="pre">Traversable</span></tt> object. It will then iterate through the argument, and pass each item
+to <a class="reference internal" href="#zend-loader-standard-autoloader-methods-register-namespace"><em>registerNamespace()</em></a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-standard-autoloader-methods-register-prefix">
+<dt>registerPrefix</dt>
+<dd><p class="first">Register a vendor prefix with the autoloader.
+<tt class="docutils literal"><span class="pre">registerPrefix($prefix,</span> <span class="pre">$directory)</span></tt></p>
+<p class="last"><strong>registerPrefix()</strong>
+Register a vendor prefix with the autoloader, pointing it to a specific directory on the filesystem for class
+resolution. For classes matching that initial vendor prefix, the autoloader will then perform lookups within
+that directory.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-standard-autoloader-methods-register-prefixes">
+<dt>registerPrefixes</dt>
+<dd><p class="first">Register many vendor prefixes with the autoloader
+<tt class="docutils literal"><span class="pre">registerPrefixes($prefixes)</span></tt></p>
+<p class="last"><strong>registerPrefixes()</strong>
+Accepts either an array or <tt class="docutils literal"><span class="pre">Traversable</span></tt> object. It will then iterate through the argument, and pass each item
+to <a class="reference internal" href="#zend-loader-standard-autoloader-methods-register-prefix"><em>registerPrefix()</em></a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-standard-autoloader-methods-autoload">
+<dt>autoload</dt>
+<dd><p class="first">Attempt to load a class.
+<tt class="docutils literal"><span class="pre">autoload($class)</span></tt></p>
+<p class="last"><strong>autoload()</strong>
+Attempts to load the class specified. Returns a boolean <tt class="docutils literal"><span class="pre">false</span></tt> on failure, or a string indicating the class
+loaded on success.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-standard-autoloader-methods-register">
+<dt>register</dt>
+<dd><p class="first">Register with spl_autoload.
+<tt class="docutils literal"><span class="pre">register()</span></tt></p>
+<p class="last"><strong>register()</strong>
+Registers the <tt class="docutils literal"><span class="pre">autoload()</span></tt> method of the current instance with <tt class="docutils literal"><span class="pre">spl_autoload_register()</span></tt>.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<span id="zend-loader-standard-autoloader-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Please review the <a class="reference internal" href="#zend-loader-standard-autoloader-quick-start"><em>examples in the quick start</em></a> for usage.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The StandardAutoloader</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#available-methods">Available Methods</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.loader.class-map-autoloader.html"
+                        title="previous chapter">The ClassMapAutoloader</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.loader.classmap-generator.html"
+                        title="next chapter">The Class Map Generator utility: bin/classmap_generator.php</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.loader.standard-autoloader.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.loader.standard-autoloader.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.loader.standard-autoloader.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: For edit the files you need stay logged with your <a href="http://www.github.com">GitHub account</a> first.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.loader.classmap-generator.html" title="The Class Map Generator utility: bin/classmap_generator.php"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.loader.class-map-autoloader.html" title="The ClassMapAutoloader"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.loader.standard-autoloader.rst">
+                The StandardAutoloader
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

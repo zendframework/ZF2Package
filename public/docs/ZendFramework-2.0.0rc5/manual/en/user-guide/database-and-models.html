@@ -1,0 +1,590 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Database and models &mdash; Zend Framework 2 2.0.0rc5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc5 documentation" href="../index.html" />
+    <link rel="next" title="Styling and Translations" href="styling-and-translations.html" />
+    <link rel="prev" title="Routing and controllers" href="routing-and-controllers.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="styling-and-translations.html" title="Styling and Translations"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="routing-and-controllers.html" title="Routing and controllers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="database-and-models">
+<span id="user-guide-database-and-models"></span><h1>Database and models<a class="headerlink" href="#database-and-models" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="the-database">
+<h2>The database<a class="headerlink" href="#the-database" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have the <tt class="docutils literal"><span class="pre">Album</span></tt> module set up with controller action methods and
+view scripts, it is time to look at the model section of our application.
+Remember that the model is the part that deals with the application’s core
+purpose (the so-called “business rules”) and, in our case, deals with the
+database. We will make use of the Zend Framework class
+<tt class="docutils literal"><span class="pre">Zend\Db\TableGateway\TableGateway</span></tt> which is used to find, insert, update and
+delete rows from a database table.</p>
+<p>We are going to use MySQL, via PHP’s PDO driver, so create a database called
+<tt class="docutils literal"><span class="pre">zf2tutorial</span></tt>, and run these SQL statements to create the album table with some
+data in it.</p>
+<div class="highlight-sql"><div class="highlight"><pre><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">album</span> <span class="p">(</span>
+  <span class="n">id</span> <span class="nb">int</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="n">auto_increment</span><span class="p">,</span>
+  <span class="n">artist</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+  <span class="n">title</span> <span class="nb">varchar</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+  <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="p">(</span><span class="n">id</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">album</span> <span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+    <span class="k">VALUES</span>  <span class="p">(</span><span class="s1">&#39;The  Military  Wives&#39;</span><span class="p">,</span>  <span class="s1">&#39;In  My  Dreams&#39;</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">album</span> <span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+    <span class="k">VALUES</span>  <span class="p">(</span><span class="s1">&#39;Adele&#39;</span><span class="p">,</span>  <span class="s1">&#39;21&#39;</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">album</span> <span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+    <span class="k">VALUES</span>  <span class="p">(</span><span class="s1">&#39;Bruce  Springsteen&#39;</span><span class="p">,</span>  <span class="s1">&#39;Wrecking Ball (Deluxe)&#39;</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">album</span> <span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+    <span class="k">VALUES</span>  <span class="p">(</span><span class="s1">&#39;Lana  Del  Rey&#39;</span><span class="p">,</span>  <span class="s1">&#39;Born  To  Die&#39;</span><span class="p">);</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">album</span> <span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+    <span class="k">VALUES</span>  <span class="p">(</span><span class="s1">&#39;Gotye&#39;</span><span class="p">,</span>  <span class="s1">&#39;Making  Mirrors&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>(The test data chosen happens to be the Bestsellers on Amazon UK at the time of
+writing!)</p>
+<p>We now have some data in a database and can write a very simple model for it.</p>
+</div>
+<div class="section" id="the-model-files">
+<h2>The model files<a class="headerlink" href="#the-model-files" title="Permalink to this headline">¶</a></h2>
+<p>Zend Framework does not provide a <tt class="docutils literal"><span class="pre">Zend\Model</span></tt> component as the model is your
+business logic and it’s up to you to decide how you want it to work. There are
+many components that you can use for this depending on your needs. One approach
+is to have model classes represent each entity in your application and then
+use mapper objects that load and save entities to the database. Another is to
+use an ORM like Doctrine or Propel.</p>
+<p>For this tutorial, we are going to create a very simple model by creating an
+<tt class="docutils literal"><span class="pre">AlbumTable</span></tt> class that extends <tt class="docutils literal"><span class="pre">Zend\Db\TableGateway\TableGateway</span></tt> where
+each album object is an <tt class="docutils literal"><span class="pre">Album</span></tt> object (known as an <em>entity</em>). This is an
+implementation of the Table Data Gateway design pattern to allow for interfacing
+with data in a database table. Be aware though that the Table Data Gateway
+pattern can become limiting in larger systems. There is also a temptation to put
+database access code into controller action methods as these are exposed by
+<tt class="docutils literal"><span class="pre">Zend\Db\TableGateway\AbstractTableGateway</span></tt>. <em>Don’t do this</em>!</p>
+<p>Let’s start with our <tt class="docutils literal"><span class="pre">Album</span></tt> entity class within the <tt class="docutils literal"><span class="pre">Model</span></tt> directory:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// module/Album/src/Album/Model/Album.php:</span>
+<span class="k">namespace</span> <span class="nx">Album\Model</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Album</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$id</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$artist</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$title</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">exchangeArray</span><span class="p">(</span><span class="nv">$data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span>     <span class="o">=</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span> <span class="o">?</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">:</span> <span class="k">null</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">artist</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]))</span> <span class="o">?</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]</span> <span class="o">:</span> <span class="k">null</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">title</span>  <span class="o">=</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]))</span> <span class="o">?</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span> <span class="o">:</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Our <tt class="docutils literal"><span class="pre">Album</span></tt> entity object is a simple PHP class. In order to work with
+<tt class="docutils literal"><span class="pre">Zend\Db</span></tt>’s <tt class="docutils literal"><span class="pre">AbstractTableGateway</span></tt> class, we need to implement the
+<tt class="docutils literal"><span class="pre">exchangeArray()</span></tt> method. This method simply copies the data from the passed
+in array to our entity’s properties. We will add an input filter for use with
+our form later.</p>
+<p>Next, we extend <tt class="docutils literal"><span class="pre">Zend\Db\TableGateway\AbstractTableGateway</span></tt> and create our own
+<tt class="docutils literal"><span class="pre">AlbumTable</span></tt> class in the module’s <tt class="docutils literal"><span class="pre">Model</span></tt> directory like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// module/Album/src/Album/Model/AlbumTable.php:</span>
+<span class="k">namespace</span> <span class="nx">Album\Model</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Db\Adapter\Adapter</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Db\ResultSet\ResultSet</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Db\TableGateway\AbstractTableGateway</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AlbumTable</span> <span class="k">extends</span> <span class="nx">AbstractTableGateway</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$table</span> <span class="o">=</span><span class="s1">&#39;album&#39;</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">Adapter</span> <span class="nv">$adapter</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">adapter</span> <span class="o">=</span> <span class="nv">$adapter</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">resultSetPrototype</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ResultSet</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">resultSetPrototype</span><span class="o">-&gt;</span><span class="na">setArrayObjectPrototype</span><span class="p">(</span><span class="k">new</span> <span class="nx">Album</span><span class="p">());</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">initialize</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">fetchAll</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$resultSet</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">select</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nv">$resultSet</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getAlbum</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$id</span>  <span class="o">=</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span> <span class="nv">$id</span><span class="p">;</span>
+        <span class="nv">$rowset</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">select</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="nv">$id</span><span class="p">));</span>
+        <span class="nv">$row</span> <span class="o">=</span> <span class="nv">$rowset</span><span class="o">-&gt;</span><span class="na">current</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$row</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">\Exception</span><span class="p">(</span><span class="s2">&quot;Could not find row </span><span class="si">$id</span><span class="s2">&quot;</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$row</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">saveAlbum</span><span class="p">(</span><span class="nx">Album</span> <span class="nv">$album</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$data</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;artist&#39;</span> <span class="o">=&gt;</span> <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">artist</span><span class="p">,</span>
+            <span class="s1">&#39;title&#39;</span>  <span class="o">=&gt;</span> <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">title</span><span class="p">,</span>
+        <span class="p">);</span>
+        <span class="nv">$id</span> <span class="o">=</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$id</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">insert</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getAlbum</span><span class="p">(</span><span class="nv">$id</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">(</span><span class="nv">$data</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="nv">$id</span><span class="p">));</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="nx">\Exception</span><span class="p">(</span><span class="s1">&#39;Form id does not exist&#39;</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">deleteAlbum</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="nv">$id</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There’s a lot going on here. Firstly, we set the protected property <tt class="docutils literal"><span class="pre">$table</span></tt>
+to the name of the database table, ‘album’ in this case. We then write a
+constructor that takes a database adapter as its only parameter and assigns it
+to the adapter property of our class. We then need to tell the table gateway’s
+result set that whenever it creates a new row object, it should use an <tt class="docutils literal"><span class="pre">Album</span></tt>
+object to do so. The <tt class="docutils literal"><span class="pre">TableGateway</span></tt> classes use the prototype pattern for
+creation of result sets and entities. This means that instead of instantiating
+when required, the system clones a previously instantiated object. See
+<a class="reference external" href="http://ralphschindler.com/2012/03/09/php-constructor-best-practices-and-the-prototype-pattern">PHP Constructor Best Practices and the Prototype Pattern</a>
+for more details.</p>
+<p>We then create some helper methods that our application will use to interface
+with the database table.  <tt class="docutils literal"><span class="pre">fetchAll()</span></tt> retrieves all albums rows from the
+database as a <tt class="docutils literal"><span class="pre">ResultSet</span></tt>, <tt class="docutils literal"><span class="pre">getAlbum()</span></tt> retrieves a single row as an
+<tt class="docutils literal"><span class="pre">Album</span></tt> object, <tt class="docutils literal"><span class="pre">saveAlbum()</span></tt> either creates a new row in the database or
+updates a row that already exists and <tt class="docutils literal"><span class="pre">deleteAlbum()</span></tt> removes the row
+completely. The code for each of these methods is, hopefully, self-explanatory.</p>
+</div>
+<div class="section" id="using-servicemanager-to-configure-the-database-credentials-and-inject-into-the-controller">
+<h2>Using ServiceManager to configure the database credentials and inject into the controller<a class="headerlink" href="#using-servicemanager-to-configure-the-database-credentials-and-inject-into-the-controller" title="Permalink to this headline">¶</a></h2>
+<p>In order to always use the same instance of our <tt class="docutils literal"><span class="pre">AlbumTable</span></tt>, we will use the
+<tt class="docutils literal"><span class="pre">ServiceManager</span></tt> to define how to create one. This is most easily done in the
+Module class where we create a method called <tt class="docutils literal"><span class="pre">getServiceConfig()</span></tt> which is
+automatically called by the <tt class="docutils literal"><span class="pre">ModuleManager</span></tt> and applied to the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>.
+We’ll then be able to retrieve it in our controller when we need it.</p>
+<p>To configure the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>, we can either supply the name of the class
+to be instantiated or a factory (closure or callback) that instantiates the
+object when the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> needs it. We start by implementing
+<tt class="docutils literal"><span class="pre">getServiceConfig()</span></tt> to provide a factory that creates an <tt class="docutils literal"><span class="pre">AlbumTable</span></tt>. Add
+this method to the bottom of the <tt class="docutils literal"><span class="pre">Module</span></tt> class.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// module/Album/Module.php:</span>
+<span class="k">namespace</span> <span class="nx">Album</span><span class="p">;</span>
+
+<span class="c1">// Add this import statement:</span>
+<span class="k">use</span> <span class="nx">Album\Model\AlbumTable</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Module</span>
+<span class="p">{</span>
+    <span class="c1">// getAutoloaderConfig() and getConfig() methods here</span>
+
+    <span class="c1">// Add this method:</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getServiceConfig</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;factories&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;Album\Model\AlbumTable&#39;</span> <span class="o">=&gt;</span>  <span class="k">function</span><span class="p">(</span><span class="nv">$sm</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nv">$dbAdapter</span> <span class="o">=</span> <span class="nv">$sm</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;Zend\Db\Adapter\Adapter&#39;</span><span class="p">);</span>
+                    <span class="nv">$table</span>     <span class="o">=</span> <span class="k">new</span> <span class="nx">AlbumTable</span><span class="p">(</span><span class="nv">$dbAdapter</span><span class="p">);</span>
+                    <span class="k">return</span> <span class="nv">$table</span><span class="p">;</span>
+                <span class="p">},</span>
+            <span class="p">),</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This method returns an array of <tt class="docutils literal"><span class="pre">factories</span></tt> that are all merged together by
+the <tt class="docutils literal"><span class="pre">ModuleManager</span></tt> before passing to the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>. We also need to
+configure the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> so that it knows how to get a
+<tt class="docutils literal"><span class="pre">Zend\Db\Adapter\Adapter</span></tt>. This is done using a factory called
+<tt class="docutils literal"><span class="pre">Zend\Db\Adapter\AdapterServiceFactory</span></tt> which we can configure within the
+merged config system. Zend Framework 2’s <tt class="docutils literal"><span class="pre">ModuleManager</span></tt> merges all the
+configuration from each module’s <tt class="docutils literal"><span class="pre">module.config.php</span></tt> file and then merges in
+the files in <tt class="docutils literal"><span class="pre">config/autoload</span></tt> (<tt class="docutils literal"><span class="pre">*.global.php</span></tt> and then <tt class="docutils literal"><span class="pre">*.local.php</span></tt>
+files). We’ll add our database configuration information to <tt class="docutils literal"><span class="pre">global.php</span></tt> which
+you should commit to your version control system.You can use <tt class="docutils literal"><span class="pre">local.php</span></tt>
+(outside of the VCS) to store the credentials for your database if you want to.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// config/autoload/global.php:</span>
+<span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;db&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;driver&#39;</span>         <span class="o">=&gt;</span> <span class="s1">&#39;Pdo&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;dsn&#39;</span>            <span class="o">=&gt;</span> <span class="s1">&#39;mysql:dbname=zf2tutorial;host=localhost&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;driver_options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="nx">PDO</span><span class="o">::</span><span class="na">MYSQL_ATTR_INIT_COMMAND</span> <span class="o">=&gt;</span> <span class="s1">&#39;SET NAMES \&#39;UTF8\&#39;&#39;</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;service_manager&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;factories&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;Zend\Db\Adapter\Adapter&#39;</span>
+                    <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Db\Adapter\AdapterServiceFactory&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>You should put your database credentials in <tt class="docutils literal"><span class="pre">config/autoloader/local.php</span></tt> so
+that they are not in the git repository (as <tt class="docutils literal"><span class="pre">local.php</span></tt> is ignored):</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// config.autoload/local.php:</span>
+<span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;db&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;YOUR USERNAME HERE&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;YOUR PASSWORD HERE&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>Now that the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> can create an <tt class="docutils literal"><span class="pre">AlbumTable</span></tt> instance for us, we
+can add a method to the controller to retrieve it. Add <tt class="docutils literal"><span class="pre">getAlbumTable()</span></tt> to
+the <tt class="docutils literal"><span class="pre">AlbumController</span></tt> class:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// module/Album/src/Album/Controller/AlbumController.php:</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getAlbumTable</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">albumTable</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$sm</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getServiceLocator</span><span class="p">();</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">albumTable</span> <span class="o">=</span> <span class="nv">$sm</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;Album\Model\AlbumTable&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">albumTable</span><span class="p">;</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>You should also add:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">protected</span> <span class="nv">$albumTable</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>to the top of the class.</p>
+<p>We can now call <tt class="docutils literal"><span class="pre">getAlbumTable()</span></tt> from within our controller whenever we need
+to interact with our model. Let’s start with a list of albums when the <tt class="docutils literal"><span class="pre">index</span></tt>
+action is called.</p>
+</div>
+<div class="section" id="listing-albums">
+<h2>Listing albums<a class="headerlink" href="#listing-albums" title="Permalink to this headline">¶</a></h2>
+<p>In order to list the albums, we need to retrieve them from the model and pass
+them to the view. To do this, we fill in <tt class="docutils literal"><span class="pre">indexAction()</span></tt> within
+<tt class="docutils literal"><span class="pre">AlbumController</span></tt>.  Update the <tt class="docutils literal"><span class="pre">AlbumController</span></tt>’s <tt class="docutils literal"><span class="pre">indexAction()</span></tt> like
+this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="nx">module</span><span class="o">/</span><span class="nx">Album</span><span class="o">/</span><span class="nx">src</span><span class="o">/</span><span class="nx">Album</span><span class="o">/</span><span class="nx">Controller</span><span class="o">/</span><span class="nx">AlbumController</span><span class="o">.</span><span class="nx">php</span><span class="o">:</span>
+<span class="c1">// ...</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">indexAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;albums&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getAlbumTable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">(),</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+<span class="c1">// ...</span>
+</pre></div>
+</div>
+<p>With Zend Framework 2, in order to set variables in the view, we return a
+<tt class="docutils literal"><span class="pre">ViewModel</span></tt> instance where the first parameter of the constructor is an array
+from the action containing data we need. These are then automatically passed to
+the view script. The <tt class="docutils literal"><span class="pre">ViewModel</span></tt> object also allows us to change the view
+script that is used, but the default is to use <tt class="docutils literal"><span class="pre">{controller</span> <span class="pre">name}/{action</span>
+<span class="pre">name}</span></tt>. We can now fill in the <tt class="docutils literal"><span class="pre">index.phtml</span></tt> view script:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">// module/Album/view/album/album/index.phtml:</span>
+
+<span class="nv">$title</span> <span class="o">=</span> <span class="s1">&#39;My albums&#39;</span><span class="p">;</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headTitle</span><span class="p">(</span><span class="nv">$title</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;h1&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escapeHtml</span><span class="p">(</span><span class="nv">$title</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x">&lt;/h1&gt;</span>
+
+<span class="x">&lt;p&gt;&lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;action&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;add&#39;</span><span class="p">));</span><span class="cp">?&gt;</span><span class="x">&quot;&gt;Add new album&lt;/a&gt;&lt;/p&gt;</span>
+
+<span class="x">&lt;table class=&quot;table&quot;&gt;</span>
+<span class="x">&lt;tr&gt;</span>
+<span class="x">    &lt;th&gt;Title&lt;/th&gt;</span>
+<span class="x">    &lt;th&gt;Artist&lt;/th&gt;</span>
+<span class="x">    &lt;th&gt;&amp;nbsp;&lt;/th&gt;</span>
+<span class="x">&lt;/tr&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">foreach</span><span class="p">(</span><span class="nv">$albums</span> <span class="k">as</span> <span class="nv">$album</span><span class="p">)</span> <span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;tr&gt;</span>
+<span class="x">    &lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escapeHtml</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">title</span><span class="p">);</span><span class="cp">?&gt;</span><span class="x">&lt;/td&gt;</span>
+<span class="x">    &lt;td&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escapeHtml</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">artist</span><span class="p">);</span><span class="cp">?&gt;</span><span class="x">&lt;/td&gt;    &lt;td&gt;</span>
+<span class="x">        &lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">,</span>
+            <span class="k">array</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;edit&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">));</span><span class="cp">?&gt;</span><span class="x">&quot;&gt;Edit&lt;/a&gt;</span>
+<span class="x">        &lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">,</span>
+            <span class="k">array</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;delete&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">));</span><span class="cp">?&gt;</span><span class="x">&quot;&gt;Delete&lt;/a&gt;</span>
+<span class="x">    &lt;/td&gt;</span>
+<span class="x">&lt;/tr&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endforeach</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/table&gt;</span>
+</pre></div>
+</div>
+<p>The first thing we do is to set the title for the page (used in the layout) and
+also set the title for the <tt class="docutils literal"><span class="pre">&lt;head&gt;</span></tt> section using the <tt class="docutils literal"><span class="pre">headTitle()</span></tt> view
+helper which will display in the browser’s title bar. We then create a link to
+add a new album.</p>
+<p>The <tt class="docutils literal"><span class="pre">url()</span></tt> view helper is provided by Zend Framework 2 and is used to create
+the links we need. The first parameter to <tt class="docutils literal"><span class="pre">url()</span></tt> is the route name we wish to use
+for construction of the URL, and the the second parameter is an array of all the
+variables to fit into the placeholders to use. In this case we use our ‘album’
+route which is set up to accept two placeholder variables: <tt class="docutils literal"><span class="pre">action</span></tt> and <tt class="docutils literal"><span class="pre">id</span></tt>.</p>
+<p>We iterate over the <tt class="docutils literal"><span class="pre">$albums</span></tt> that we assigned from the controller action. The
+Zend Framework 2 view system automatically ensures that these variables are
+extracted into the scope of the view script, so that we don’t have to worry
+about prefixing them with <tt class="docutils literal"><span class="pre">$this-&gt;</span></tt> as we used to have to do with Zend
+Framework 1; however you can do so if you wish.</p>
+<p>We then create a table to display each album’s title and artist, and provide
+links to allow for editing and deleting the record. A standard <tt class="docutils literal"><span class="pre">foreach:</span></tt> loop
+is used to iterate over the list of albums, and we use the alternate form using
+a colon and <tt class="docutils literal"><span class="pre">endforeach;</span></tt> as it is easier to scan than to try and match up
+braces. Again, the <tt class="docutils literal"><span class="pre">url()</span></tt> view helper is used to create the edit and delete
+links.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We always use the <tt class="docutils literal"><span class="pre">escapeHtml()</span></tt> view helper to help protect
+ourselves from XSS vulnerabilities.</p>
+</div>
+<p>If you open <a class="reference external" href="http://zf2-tutorial.localhost/album">http://zf2-tutorial.localhost/album</a> you should see this:</p>
+<img alt="../_images/user-guide.database-and-models.album-list.png" src="../_images/user-guide.database-and-models.album-list.png" style="width: 940px;" />
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Database and models</a><ul>
+<li><a class="reference internal" href="#the-database">The database</a></li>
+<li><a class="reference internal" href="#the-model-files">The model files</a></li>
+<li><a class="reference internal" href="#using-servicemanager-to-configure-the-database-credentials-and-inject-into-the-controller">Using ServiceManager to configure the database credentials and inject into the controller</a></li>
+<li><a class="reference internal" href="#listing-albums">Listing albums</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="routing-and-controllers.html"
+                        title="previous chapter">Routing and controllers</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="styling-and-translations.html"
+                        title="next chapter">Styling and Translations</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/user-guide/database-and-models.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/user-guide/database-and-models.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/user-guide/database-and-models.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: For edit the files you need stay logged with your <a href="http://www.github.com">GitHub account</a> first.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="styling-and-translations.html" title="Styling and Translations"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="routing-and-controllers.html" title="Routing and controllers"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/user-guide/database-and-models.rst">
+                Database and models
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

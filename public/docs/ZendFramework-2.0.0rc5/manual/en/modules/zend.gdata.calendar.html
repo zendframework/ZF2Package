@@ -1,0 +1,1025 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Google Calendar &mdash; Zend Framework 2 2.0.0rc5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc5 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-google-calendar">
+<span id="zend-gdata-calendar"></span><h1>Using Google Calendar<a class="headerlink" href="#using-google-calendar" title="Permalink to this headline">¶</a></h1>
+<p>You can use the <tt class="docutils literal"><span class="pre">Zend_Gdata_Calendar</span></tt> class to view, create, update, and delete events in the online Google
+Calendar service.</p>
+<p>See <a class="reference external" href="http://code.google.com/apis/calendar/overview.html">http://code.google.com/apis/calendar/overview.html</a> for more information about the Google Calendar <em>API</em>.</p>
+<div class="section" id="connecting-to-the-calendar-service">
+<span id="zend-gdata-calendar-connecting"></span><h2>Connecting To The Calendar Service<a class="headerlink" href="#connecting-to-the-calendar-service" title="Permalink to this headline">¶</a></h2>
+<p>The Google Calendar <em>API</em>, like all GData <em>API</em>s, is based off of the Atom Publishing Protocol (APP), an <em>XML</em>
+based format for managing web-based resources. Traffic between a client and the Google Calendar servers occurs over
+<em>HTTP</em> and allows for both authenticated and unauthenticated connections.</p>
+<p>Before any transactions can occur, this connection needs to be made. Creating a connection to the calendar servers
+involves two steps: creating an <em>HTTP</em> client and binding a <tt class="docutils literal"><span class="pre">Zend_Gdata_Calendar</span></tt> service instance to that
+client.</p>
+<div class="section" id="authentication">
+<span id="zend-gdata-calendar-connecting-authentication"></span><h3>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h3>
+<p>The Google Calendar <em>API</em> allows access to both public and private calendar feeds. Public feeds do not require
+authentication, but are read-only and offer reduced functionality. Private feeds offers the most complete
+functionality but requires an authenticated connection to the calendar servers. There are three authentication
+schemes that are supported by Google Calendar:</p>
+<ul class="simple">
+<li><strong>ClientAuth</strong> provides direct username/password authentication to the calendar servers. Since this scheme
+requires that users provide your application with their password, this authentication is only recommended when
+other authentication schemes are insufficient.</li>
+<li><strong>AuthSub</strong> allows authentication to the calendar servers via a Google proxy server. This provides the same level
+of convenience as ClientAuth but without the security risk, making this an ideal choice for web-based
+applications.</li>
+<li><strong>MagicCookie</strong> allows authentication based on a semi-random <em>URL</em> available from within the Google Calendar
+interface. This is the simplest authentication scheme to implement, but requires that users manually retrieve
+their secure <em>URL</em> before they can authenticate, doesn&#8217;t provide access to calendar lists, and is limited to
+read-only access.</li>
+</ul>
+<p>The <tt class="docutils literal"><span class="pre">Zend_Gdata</span></tt> library provides support for all three authentication schemes. The rest of this chapter will
+assume that you are familiar the authentication schemes available and how to create an appropriate authenticated
+connection. For more information, please see section the <a class="reference internal" href="zend.gdata.introduction.html#zend-gdata-introduction-authentication"><em>Authentication section</em></a> of this manual or the <a class="reference external" href="http://code.google.com/apis/gdata/auth.html">Authentication Overview in the Google Data API
+Developer&#8217;s Guide</a>.</p>
+</div>
+<div class="section" id="creating-a-service-instance">
+<span id="zend-gdata-calendar-connecting-service"></span><h3>Creating A Service Instance<a class="headerlink" href="#creating-a-service-instance" title="Permalink to this headline">¶</a></h3>
+<p>In order to interact with Google Calendar, this library provides the <tt class="docutils literal"><span class="pre">Zend_Gdata_Calendar</span></tt> service class. This
+class provides a common interface to the Google Data and Atom Publishing Protocol models and assists in marshaling
+requests to and from the calendar servers.</p>
+<p>Once deciding on an authentication scheme, the next step is to create an instance of <tt class="docutils literal"><span class="pre">Zend_Gdata_Calendar</span></tt>. The
+class constructor takes an instance of <tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> as a single argument. This provides an interface for
+AuthSub and ClientAuth authentication, as both of these require creation of a special authenticated <em>HTTP</em> client.
+If no arguments are provided, an unauthenticated instance of <tt class="docutils literal"><span class="pre">Zend_Http_Client</span></tt> will be automatically created.</p>
+<p>The example below shows how to create a Calendar service class using ClientAuth authentication:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Parameters for ClientAuth authentication</span>
+<span class="nv">$service</span> <span class="o">=</span> <span class="nx">Zend_Gdata_Calendar</span><span class="o">::</span><span class="na">AUTH_SERVICE_NAME</span><span class="p">;</span>
+<span class="nv">$user</span> <span class="o">=</span> <span class="s2">&quot;sample.user@gmail.com&quot;</span><span class="p">;</span>
+<span class="nv">$pass</span> <span class="o">=</span> <span class="s2">&quot;pa$$w0rd&quot;</span><span class="p">;</span>
+
+<span class="c1">// Create an authenticated HTTP client</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="nx">Zend_Gdata_ClientLogin</span><span class="o">::</span><span class="na">getHttpClient</span><span class="p">(</span><span class="nv">$user</span><span class="p">,</span> <span class="nv">$pass</span><span class="p">,</span> <span class="nv">$service</span><span class="p">);</span>
+
+<span class="c1">// Create an instance of the Calendar service</span>
+<span class="nv">$service</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_Calendar</span><span class="p">(</span><span class="nv">$client</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>A Calendar service using AuthSub can be created in a similar, though slightly more lengthy fashion:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85</pre></div></td><td class="code"><div class="highlight"><pre><span class="cm">/*</span>
+<span class="cm"> * Retrieve the current URL so that the AuthSub server knows where to</span>
+<span class="cm"> * redirect the user after authentication is complete.</span>
+<span class="cm"> */</span>
+<span class="k">function</span> <span class="nf">getCurrentUrl</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">global</span> <span class="nv">$_SERVER</span><span class="p">;</span>
+
+    <span class="c1">// Filter php_self to avoid a security vulnerability.</span>
+    <span class="nv">$php_request_uri</span> <span class="o">=</span>
+        <span class="nb">htmlentities</span><span class="p">(</span><span class="nx">substr</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_URI&#39;</span><span class="p">],</span>
+                            <span class="mi">0</span><span class="p">,</span>
+                            <span class="nb">strcspn</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_URI&#39;</span><span class="p">],</span> <span class="s2">&quot;</span><span class="se">\n\r</span><span class="s2">&quot;</span><span class="p">)),</span>
+                            <span class="nx">ENT_QUOTES</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTPS&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+        <span class="nx">strtolower</span><span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTPS&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;on&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$protocol</span> <span class="o">=</span> <span class="s1">&#39;https://&#39;</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nv">$protocol</span> <span class="o">=</span> <span class="s1">&#39;http://&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="nv">$host</span> <span class="o">=</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_HOST&#39;</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_PORT&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="o">&amp;&amp;</span>
+        <span class="p">((</span><span class="nv">$protocol</span> <span class="o">==</span> <span class="s1">&#39;http://&#39;</span> <span class="o">&amp;&amp;</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_PORT&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;80&#39;</span><span class="p">)</span> <span class="o">||</span>
+        <span class="p">(</span><span class="nv">$protocol</span> <span class="o">==</span> <span class="s1">&#39;https://&#39;</span> <span class="o">&amp;&amp;</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_PORT&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;443&#39;</span><span class="p">)))</span> <span class="p">{</span>
+        <span class="nv">$port</span> <span class="o">=</span> <span class="s1">&#39;:&#39;</span> <span class="o">.</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;HTTP_PORT&#39;</span><span class="p">];</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nv">$port</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nv">$protocol</span> <span class="o">.</span> <span class="nv">$host</span> <span class="o">.</span> <span class="nv">$port</span> <span class="o">.</span> <span class="nv">$php_request_uri</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Obtain an AuthSub authenticated HTTP client, redirecting the user</span>
+<span class="sd"> * to the AuthSub server to login if necessary.</span>
+<span class="sd"> */</span>
+<span class="k">function</span> <span class="nf">getAuthSubHttpClient</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">global</span> <span class="nv">$_SESSION</span><span class="p">,</span> <span class="nv">$_GET</span><span class="p">;</span>
+
+    <span class="c1">// if there is no AuthSub session or one-time token waiting for us,</span>
+    <span class="c1">// redirect the user to the AuthSub server to get one.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;sessionToken&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;token&#39;</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="c1">// Parameters to give to AuthSub server</span>
+        <span class="nv">$next</span> <span class="o">=</span> <span class="nx">getCurrentUrl</span><span class="p">();</span>
+        <span class="nv">$scope</span> <span class="o">=</span> <span class="s2">&quot;http://www.google.com/calendar/feeds/&quot;</span><span class="p">;</span>
+        <span class="nv">$secure</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+        <span class="nv">$session</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+
+        <span class="c1">// Redirect the user to the AuthSub server to sign in</span>
+
+        <span class="nv">$authSubUrl</span> <span class="o">=</span> <span class="nx">Zend_Gdata_AuthSub</span><span class="o">::</span><span class="na">getAuthSubTokenUri</span><span class="p">(</span><span class="nv">$next</span><span class="p">,</span>
+                                                             <span class="nv">$scope</span><span class="p">,</span>
+                                                             <span class="nv">$secure</span><span class="p">,</span>
+                                                             <span class="nv">$session</span><span class="p">);</span>
+         <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;HTTP/1.0 307 Temporary redirect&quot;</span><span class="p">);</span>
+
+         <span class="nx">header</span><span class="p">(</span><span class="s2">&quot;Location: &quot;</span> <span class="o">.</span> <span class="nv">$authSubUrl</span><span class="p">);</span>
+
+         <span class="k">exit</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Convert an AuthSub one-time token into a session token if needed</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;sessionToken&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;token&#39;</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;sessionToken&#39;</span><span class="p">]</span> <span class="o">=</span>
+            <span class="nx">Zend_Gdata_AuthSub</span><span class="o">::</span><span class="na">getAuthSubSessionToken</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;token&#39;</span><span class="p">]);</span>
+    <span class="p">}</span>
+
+    <span class="c1">// At this point we are authenticated via AuthSub and can obtain an</span>
+    <span class="c1">// authenticated HTTP client instance</span>
+
+    <span class="c1">// Create an authenticated HTTP client</span>
+    <span class="nv">$client</span> <span class="o">=</span> <span class="nx">Zend_Gdata_AuthSub</span><span class="o">::</span><span class="na">getHttpClient</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;sessionToken&#39;</span><span class="p">]);</span>
+    <span class="k">return</span> <span class="nv">$client</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// -&gt; Script execution begins here &lt;-</span>
+
+<span class="c1">// Make sure that the user has a valid session, so we can record the</span>
+<span class="c1">// AuthSub session token once it is available.</span>
+<span class="nb">session_start</span><span class="p">();</span>
+
+<span class="c1">// Create an instance of the Calendar service, redirecting the user</span>
+<span class="c1">// to the AuthSub server if necessary.</span>
+<span class="nv">$service</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_Calendar</span><span class="p">(</span><span class="nx">getAuthSubHttpClient</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>Finally, an unauthenticated server can be created for use with either public feeds or MagicCookie authentication:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create an instance of the Calendar service using an unauthenticated</span>
+<span class="c1">// HTTP client</span>
+
+<span class="nv">$service</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_Calendar</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that MagicCookie authentication is not supplied with the <em>HTTP</em> connection, but is instead specified along
+with the desired visibility when submitting queries. See the section on retrieving events below for an example.</p>
+</div>
+</div>
+<div class="section" id="retrieving-a-calendar-list">
+<span id="zend-gdata-calendar-retrieval"></span><h2>Retrieving A Calendar List<a class="headerlink" href="#retrieving-a-calendar-list" title="Permalink to this headline">¶</a></h2>
+<p>The calendar service supports retrieving a list of calendars for the authenticated user. This is the same list of
+calendars which are displayed in the Google Calendar UI, except those marked as &#8220;<strong>hidden</strong>&#8221; are also available.</p>
+<p>The calendar list is always private and must be accessed over an authenticated connection. It is not possible to
+retrieve another user&#8217;s calendar list and it cannot be accessed using MagicCookie authentication. Attempting to
+access a calendar list without holding appropriate credentials will fail and result in a 401 (Authentication
+Required) status code.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$service</span> <span class="o">=</span> <span class="nx">Zend_Gdata_Calendar</span><span class="o">::</span><span class="na">AUTH_SERVICE_NAME</span><span class="p">;</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="nx">Zend_Gdata_ClientLogin</span><span class="o">::</span><span class="na">getHttpClient</span><span class="p">(</span><span class="nv">$user</span><span class="p">,</span> <span class="nv">$pass</span><span class="p">,</span> <span class="nv">$service</span><span class="p">);</span>
+<span class="nv">$service</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_Calendar</span><span class="p">(</span><span class="nv">$client</span><span class="p">);</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$listFeed</span><span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">getCalendarListFeed</span><span class="p">();</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend_Gdata_App_Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Error: &quot;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Calling <tt class="docutils literal"><span class="pre">getCalendarListFeed()</span></tt> creates a new instance of <tt class="docutils literal"><span class="pre">Zend_Gdata_Calendar_ListFeed</span></tt> containing each
+available calendar as an instance of <tt class="docutils literal"><span class="pre">Zend_Gdata_Calendar_ListEntry</span></tt>. After retrieving the feed, you can use the
+iterator and accessors contained within the feed to inspect the enclosed calendars.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">echo</span> <span class="s2">&quot;&lt;h1&gt;Calendar List Feed&lt;/h1&gt;&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s2">&quot;&lt;ul&gt;&quot;</span><span class="p">;</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$listFeed</span> <span class="k">as</span> <span class="nv">$calendar</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;&lt;li&gt;&quot;</span> <span class="o">.</span> <span class="nv">$calendar</span><span class="o">-&gt;</span><span class="na">title</span> <span class="o">.</span>
+         <span class="s2">&quot; (Event Feed: &quot;</span> <span class="o">.</span> <span class="nv">$calendar</span><span class="o">-&gt;</span><span class="na">id</span> <span class="o">.</span> <span class="s2">&quot;)&lt;/li&gt;&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">echo</span> <span class="s2">&quot;&lt;/ul&gt;&quot;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-events">
+<span id="zend-gdata-event-retrieval"></span><h2>Retrieving Events<a class="headerlink" href="#retrieving-events" title="Permalink to this headline">¶</a></h2>
+<p>Like the list of calendars, events are also retrieved using the <tt class="docutils literal"><span class="pre">Zend_Gdata_Calendar</span></tt> service class. The event
+list returned is of type <tt class="docutils literal"><span class="pre">Zend_Gdata_Calendar_EventFeed</span></tt> and contains each event as an instance of
+<tt class="docutils literal"><span class="pre">Zend_Gdata_Calendar_EventEntry</span></tt>. As before, the iterator and accessors contained within the event feed instance
+allow inspection of individual events.</p>
+<div class="section" id="queries">
+<span id="zend-gdata-event-retrieval-queries"></span><h3>Queries<a class="headerlink" href="#queries" title="Permalink to this headline">¶</a></h3>
+<p>When retrieving events using the Calendar <em>API</em>, specially constructed query <em>URL</em>s are used to describe what
+events should be returned. The <tt class="docutils literal"><span class="pre">Zend_Gdata_Calendar_EventQuery</span></tt> class simplifies this task by automatically
+constructing a query <em>URL</em> based on provided parameters. A full list of these parameters is available at the
+<a class="reference external" href="http://code.google.com/apis/gdata/reference.html#Queries">Queries section of the Google Data APIs Protocol Reference</a>. However, there are three parameters that are worth
+special attention:</p>
+<ul class="simple">
+<li><strong>User</strong> is used to specify the user whose calendar is being searched for, and is specified as an email address.
+If no user is provided, &#8220;default&#8221; will be used instead to indicate the currently authenticated user (if
+authenticated).</li>
+<li><strong>Visibility</strong> specifies whether a users public or private calendar should be searched. If using an
+unauthenticated session and no MagicCookie is available, only the public feed will be available.</li>
+<li><strong>Projection</strong> specifies how much data should be returned by the server and in what format. In most cases you
+will want to use the &#8220;full&#8221; projection. Also available is the &#8220;basic&#8221; projection, which places most meta-data
+into each event&#8217;s content field as human readable text, and the &#8220;composite&#8221; projection which includes complete
+text for any comments alongside each event. The &#8220;composite&#8221; view is often much larger than the &#8220;full&#8221; view.</li>
+</ul>
+</div>
+<div class="section" id="retrieving-events-in-order-of-start-time">
+<span id="zend-gdata-event-retrieval-start-time"></span><h3>Retrieving Events In Order Of Start Time<a class="headerlink" href="#retrieving-events-in-order-of-start-time" title="Permalink to this headline">¶</a></h3>
+<p>The example below illustrates the use of the <tt class="docutils literal"><span class="pre">Zend_Gdata_Query</span></tt> class and specifies the private visibility feed,
+which requires that an authenticated connection is available to the calendar servers. If a MagicCookie is being
+used for authentication, the visibility should be instead set to &#8220;<strong>private-magicCookieValue</strong>&#8221;, where
+magicCookieValue is the random string obtained when viewing the private <em>XML</em> address in the Google Calendar UI.
+Events are requested chronologically by start time and only events occurring in the future are returned.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newEventQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setUser</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">);</span>
+<span class="c1">// Set to $query-&gt;setVisibility(&#39;private-magicCookieValue&#39;) if using</span>
+<span class="c1">// MagicCookie auth</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setVisibility</span><span class="p">(</span><span class="s1">&#39;private&#39;</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setProjection</span><span class="p">(</span><span class="s1">&#39;full&#39;</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setOrderby</span><span class="p">(</span><span class="s1">&#39;starttime&#39;</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setFutureevents</span><span class="p">(</span><span class="s1">&#39;true&#39;</span><span class="p">);</span>
+
+<span class="c1">// Retrieve the event list from the calendar server</span>
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$eventFeed</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">getCalendarEventFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend_Gdata_App_Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Error: &quot;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// Iterate through the list of events, outputting them as an HTML list</span>
+<span class="k">echo</span> <span class="s2">&quot;&lt;ul&gt;&quot;</span><span class="p">;</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$eventFeed</span> <span class="k">as</span> <span class="nv">$event</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;&lt;li&gt;&quot;</span> <span class="o">.</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">title</span> <span class="o">.</span> <span class="s2">&quot; (Event ID: &quot;</span> <span class="o">.</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">id</span> <span class="o">.</span> <span class="s2">&quot;)&lt;/li&gt;&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">echo</span> <span class="s2">&quot;&lt;/ul&gt;&quot;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Additional properties such as ID, author, when, event status, visibility, web content, and content, among others
+are available within <tt class="docutils literal"><span class="pre">Zend_Gdata_Calendar_EventEntry</span></tt>. Refer to the <a class="reference external" href="http://framework.zend.com/apidoc/core/">Zend Framework API Documentation</a> and the
+<a class="reference external" href="http://code.google.com/apis/gdata/reference.html">Calendar Protocol Reference</a> for a complete list.</p>
+</div>
+<div class="section" id="retrieving-events-in-a-specified-date-range">
+<span id="zend-gdata-event-retrieval-date-range"></span><h3>Retrieving Events In A Specified Date Range<a class="headerlink" href="#retrieving-events-in-a-specified-date-range" title="Permalink to this headline">¶</a></h3>
+<p>To print out all events within a certain range, for example from December 1, 2006 through December 15, 2007, add
+the following two lines to the previous sample. Take care to remove &#8220;<tt class="docutils literal"><span class="pre">$query-&gt;setFutureevents('true')</span></tt>&#8221;, since
+<tt class="docutils literal"><span class="pre">futureevents</span></tt> will override <tt class="docutils literal"><span class="pre">startMin</span></tt> and <tt class="docutils literal"><span class="pre">startMax</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setStartMin</span><span class="p">(</span><span class="s1">&#39;2006-12-01&#39;</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setStartMax</span><span class="p">(</span><span class="s1">&#39;2006-12-16&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that <tt class="docutils literal"><span class="pre">startMin</span></tt> is inclusive whereas <tt class="docutils literal"><span class="pre">startMax</span></tt> is exclusive. As a result, only events through 2006-12-15
+23:59:59 will be returned.</p>
+</div>
+<div class="section" id="retrieving-events-by-fulltext-query">
+<span id="zend-gdata-event-retrieval-fulltext"></span><h3>Retrieving Events By Fulltext Query<a class="headerlink" href="#retrieving-events-by-fulltext-query" title="Permalink to this headline">¶</a></h3>
+<p>To print out all events which contain a specific word, for example &#8220;dogfood&#8221;, use the <tt class="docutils literal"><span class="pre">setQuery()</span></tt> method when
+creating the query.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setQuery</span><span class="p">(</span><span class="s2">&quot;dogfood&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-individual-events">
+<span id="zend-gdata-event-retrieval-individual"></span><h3>Retrieving Individual Events<a class="headerlink" href="#retrieving-individual-events" title="Permalink to this headline">¶</a></h3>
+<p>Individual events can be retrieved by specifying their event ID as part of the query. Instead of calling
+<tt class="docutils literal"><span class="pre">getCalendarEventFeed()</span></tt>, <tt class="docutils literal"><span class="pre">getCalendarEventEntry()</span></tt> should be called instead.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newEventQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setUser</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setVisibility</span><span class="p">(</span><span class="s1">&#39;private&#39;</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setProjection</span><span class="p">(</span><span class="s1">&#39;full&#39;</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setEvent</span><span class="p">(</span><span class="nv">$eventId</span><span class="p">);</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$event</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">getCalendarEventEntry</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend_Gdata_App_Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Error: &quot;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>In a similar fashion, if the event <em>URL</em> is known, it can be passed directly into <tt class="docutils literal"><span class="pre">getCalendarEntry()</span></tt> to
+retrieve a specific event. In this case, no query object is required since the event <em>URL</em> contains all the
+necessary information to retrieve the event.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$eventURL</span> <span class="o">=</span> <span class="s2">&quot;http://www.google.com/calendar/feeds/default/private&quot;</span>
+          <span class="o">.</span> <span class="s2">&quot;/full/g829on5sq4ag12se91d10uumko&quot;</span><span class="p">;</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$event</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">getCalendarEventEntry</span><span class="p">(</span><span class="nv">$eventURL</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend_Gdata_App_Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Error: &quot;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="creating-events">
+<span id="zend-gdata-calendar-creating-events"></span><h2>Creating Events<a class="headerlink" href="#creating-events" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="creating-single-occurrence-events">
+<span id="zend-gdata-calendar-creating-events-single"></span><h3>Creating Single-Occurrence Events<a class="headerlink" href="#creating-single-occurrence-events" title="Permalink to this headline">¶</a></h3>
+<p>Events are added to a calendar by creating an instance of <tt class="docutils literal"><span class="pre">Zend_Gdata_EventEntry</span></tt> and populating it with the
+appropriate data. The calendar service instance (<tt class="docutils literal"><span class="pre">Zend_Gdata_Calendar</span></tt>) is then used to used to transparently
+covert the event into <em>XML</em> and POST it to the calendar server. Creating events requires either an AuthSub or
+ClientAuth authenticated connection to the calendar server.</p>
+<p>At a minimum, the following attributes should be set:</p>
+<ul class="simple">
+<li><strong>Title</strong> provides the headline that will appear above the event within the Google Calendar UI.</li>
+<li><strong>When</strong> indicates the duration of the event and, optionally, any reminders that are associated with it. See the
+next section for more information on this attribute.</li>
+</ul>
+<p>Other useful attributes that may optionally set include:</p>
+<ul class="simple">
+<li><strong>Author</strong> provides information about the user who created the event.</li>
+<li><strong>Content</strong> provides additional information about the event which appears when the event details are requested
+from within Google Calendar.</li>
+<li><strong>EventStatus</strong> indicates whether the event is confirmed, tentative, or canceled.</li>
+<li><strong>Hidden</strong> removes the event from the Google Calendar UI.</li>
+<li><strong>Transparency</strong> indicates whether the event should be consume time on the user&#8217;s free/busy list.</li>
+<li><strong>WebContent</strong> allows links to external content to be provided within an event.</li>
+<li><strong>Where</strong> indicates the location of the event.</li>
+<li><strong>Visibility</strong> allows the event to be hidden from the public event lists.</li>
+</ul>
+<p>For a complete list of event attributes, refer to the <a class="reference external" href="http://framework.zend.com/apidoc/core/">Zend Framework API Documentation</a> and the <a class="reference external" href="http://code.google.com/apis/gdata/reference.html">Calendar
+Protocol Reference</a>. Attributes that can contain multiple values, such as where, are implemented as arrays and
+need to be created accordingly. Be aware that all of these attributes require objects as parameters. Trying instead
+to populate them using strings or primitives will result in errors during conversion to <em>XML</em>.</p>
+<p>Once the event has been populated, it can be uploaded to the calendar server by passing it as an argument to the
+calendar service&#8217;s <tt class="docutils literal"><span class="pre">insertEvent()</span></tt> function.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create a new entry using the calendar service&#39;s magic factory method</span>
+<span class="nv">$event</span><span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newEventEntry</span><span class="p">();</span>
+
+<span class="c1">// Populate the event with the desired information</span>
+<span class="c1">// Note that each attribute is crated as an instance of a matching class</span>
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">title</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newTitle</span><span class="p">(</span><span class="s2">&quot;My Event&quot;</span><span class="p">);</span>
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">where</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newWhere</span><span class="p">(</span><span class="s2">&quot;Mountain View, California&quot;</span><span class="p">));</span>
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">content</span> <span class="o">=</span>
+    <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newContent</span><span class="p">(</span><span class="s2">&quot; This is my awesome event. RSVP required.&quot;</span><span class="p">);</span>
+
+<span class="c1">// Set the date using RFC 3339 format.</span>
+<span class="nv">$startDate</span> <span class="o">=</span> <span class="s2">&quot;2008-01-20&quot;</span><span class="p">;</span>
+<span class="nv">$startTime</span> <span class="o">=</span> <span class="s2">&quot;14:00&quot;</span><span class="p">;</span>
+<span class="nv">$endDate</span> <span class="o">=</span> <span class="s2">&quot;2008-01-20&quot;</span><span class="p">;</span>
+<span class="nv">$endTime</span> <span class="o">=</span> <span class="s2">&quot;16:00&quot;</span><span class="p">;</span>
+<span class="nv">$tzOffset</span> <span class="o">=</span> <span class="s2">&quot;-08&quot;</span><span class="p">;</span>
+
+<span class="nv">$when</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newWhen</span><span class="p">();</span>
+<span class="nv">$when</span><span class="o">-&gt;</span><span class="na">startTime</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{</span><span class="nv">$startDate</span><span class="si">}</span><span class="s2">T</span><span class="si">{</span><span class="nv">$startTime</span><span class="si">}</span><span class="s2">:00.000</span><span class="si">{</span><span class="nv">$tzOffset</span><span class="si">}</span><span class="s2">:00&quot;</span><span class="p">;</span>
+<span class="nv">$when</span><span class="o">-&gt;</span><span class="na">endTime</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{</span><span class="nv">$endDate</span><span class="si">}</span><span class="s2">T</span><span class="si">{</span><span class="nv">$endTime</span><span class="si">}</span><span class="s2">:00.000</span><span class="si">{</span><span class="nv">$tzOffset</span><span class="si">}</span><span class="s2">:00&quot;</span><span class="p">;</span>
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">when</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="nv">$when</span><span class="p">);</span>
+
+<span class="c1">// Upload the event to the calendar server</span>
+<span class="c1">// A copy of the event as it is recorded on the server is returned</span>
+<span class="nv">$newEvent</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">insertEvent</span><span class="p">(</span><span class="nv">$event</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="event-schedules-and-reminders">
+<span id="zend-gdata-calendar-creating-events-schedulers-reminders"></span><h3>Event Schedules and Reminders<a class="headerlink" href="#event-schedules-and-reminders" title="Permalink to this headline">¶</a></h3>
+<p>An event&#8217;s starting time and duration are determined by the value of its <tt class="docutils literal"><span class="pre">when</span></tt> property, which contains the
+properties <tt class="docutils literal"><span class="pre">startTime</span></tt>, <tt class="docutils literal"><span class="pre">endTime</span></tt>, and <tt class="docutils literal"><span class="pre">valueString</span></tt>. <strong>StartTime</strong> and <strong>EndTime</strong> control the duration of
+the event, while the <tt class="docutils literal"><span class="pre">valueString</span></tt> property is currently unused.</p>
+<p>All-day events can be scheduled by specifying only the date omitting the time when setting <tt class="docutils literal"><span class="pre">startTime</span></tt> and
+<tt class="docutils literal"><span class="pre">endTime</span></tt>. Likewise, zero-duration events can be specified by omitting the <tt class="docutils literal"><span class="pre">endTime</span></tt>. In all cases, date and
+time values should be provided in <a class="reference external" href="http://www.ietf.org/rfc/rfc3339.txt">RFC3339</a> format.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Schedule the event to occur on December 05, 2007 at 2 PM PST (UTC-8)</span>
+<span class="c1">// with a duration of one hour.</span>
+<span class="nv">$when</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newWhen</span><span class="p">();</span>
+<span class="nv">$when</span><span class="o">-&gt;</span><span class="na">startTime</span> <span class="o">=</span> <span class="s2">&quot;2007-12-05T14:00:00-08:00&quot;</span><span class="p">;</span>
+<span class="nv">$when</span><span class="o">-&gt;</span><span class="na">endTime</span><span class="o">=</span><span class="s2">&quot;2007-12-05T15:00:00:00-08:00&quot;</span><span class="p">;</span>
+
+<span class="c1">// Apply the when property to an event</span>
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">when</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="nv">$when</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">when</span></tt> attribute also controls when reminders are sent to a user. Reminders are stored in an array and each
+event may have up to find reminders associated with it.</p>
+<p>For a <strong>reminder</strong> to be valid, it needs to have two attributes set: <tt class="docutils literal"><span class="pre">method</span></tt> and a time. <strong>Method</strong> can accept
+one of the following strings: &#8220;alert&#8221;, &#8220;email&#8221;, or &#8220;sms&#8221;. The time should be entered as an integer and can be set
+with either the property <tt class="docutils literal"><span class="pre">minutes</span></tt>, <tt class="docutils literal"><span class="pre">hours</span></tt>, <tt class="docutils literal"><span class="pre">days</span></tt>, or <tt class="docutils literal"><span class="pre">absoluteTime</span></tt>. However, a valid request may only
+have one of these attributes set. If a mixed time is desired, convert to the most precise unit available. For
+example, 1 hour and 30 minutes should be entered as 90 minutes.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create a new reminder object. It should be set to send an email</span>
+<span class="c1">// to the user 10 minutes beforehand.</span>
+<span class="nv">$reminder</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newReminder</span><span class="p">();</span>
+<span class="nv">$reminder</span><span class="o">-&gt;</span><span class="na">method</span> <span class="o">=</span> <span class="s2">&quot;email&quot;</span><span class="p">;</span>
+<span class="nv">$reminder</span><span class="o">-&gt;</span><span class="na">minutes</span> <span class="o">=</span> <span class="s2">&quot;10&quot;</span><span class="p">;</span>
+
+<span class="c1">// Apply the reminder to an existing event&#39;s when property</span>
+<span class="nv">$when</span> <span class="o">=</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">when</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="nv">$when</span><span class="o">-&gt;</span><span class="na">reminders</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="nv">$reminder</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="creating-recurring-events">
+<span id="zend-gdata-calendar-creating-events-recurring"></span><h3>Creating Recurring Events<a class="headerlink" href="#creating-recurring-events" title="Permalink to this headline">¶</a></h3>
+<p>Recurring events are created the same way as single-occurrence events, except a recurrence attribute should be
+provided instead of a where attribute. The recurrence attribute should hold a string describing the event&#8217;s
+recurrence pattern using properties defined in the iCalendar standard (<a class="reference external" href="http://www.ietf.org/rfc/rfc2445.txt">RFC 2445</a>).</p>
+<p>Exceptions to the recurrence pattern will usually be specified by a distinct <tt class="docutils literal"><span class="pre">recurrenceException</span></tt> attribute.
+However, the iCalendar standard provides a secondary format for defining recurrences, and the possibility that
+either may be used must be accounted for.</p>
+<p>Due to the complexity of parsing recurrence patterns, further information on this them is outside the scope of this
+document. However, more information can be found in the <a class="reference external" href="http://code.google.com/apis/gdata/elements.html#gdRecurrence">Common Elements section of the Google Data APIs Developer
+Guide</a>, as well as in <em>RFC</em> 2445.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre> <span class="c1">// Create a new entry using the calendar service&#39;s magic factory method</span>
+<span class="nv">$event</span><span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newEventEntry</span><span class="p">();</span>
+
+<span class="c1">// Populate the event with the desired information</span>
+<span class="c1">// Note that each attribute is crated as an instance of a matching class</span>
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">title</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newTitle</span><span class="p">(</span><span class="s2">&quot;My Recurring Event&quot;</span><span class="p">);</span>
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">where</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newWhere</span><span class="p">(</span><span class="s2">&quot;Palo Alto, California&quot;</span><span class="p">));</span>
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">content</span> <span class="o">=</span>
+    <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newContent</span><span class="p">(</span><span class="s1">&#39; This is my other awesome event, &#39;</span> <span class="o">.</span>
+                         <span class="s1">&#39; occurring all-day every Tuesday from &#39;</span> <span class="o">.</span>
+                         <span class="s1">&#39;2007-05-01 until 207-09-04. No RSVP required.&#39;</span><span class="p">);</span>
+
+<span class="c1">// Set the duration and frequency by specifying a recurrence pattern.</span>
+
+<span class="nv">$recurrence</span> <span class="o">=</span> <span class="s2">&quot;DTSTART;VALUE=DATE:20070501</span><span class="se">\r\n</span><span class="s2">&quot;</span> <span class="o">.</span>
+        <span class="s2">&quot;DTEND;VALUE=DATE:20070502</span><span class="se">\r\n</span><span class="s2">&quot;</span> <span class="o">.</span>
+        <span class="s2">&quot;RRULE:FREQ=WEEKLY;BYDAY=Tu;UNTIL=20070904</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">;</span>
+
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">recurrence</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newRecurrence</span><span class="p">(</span><span class="nv">$recurrence</span><span class="p">);</span>
+
+<span class="c1">// Upload the event to the calendar server</span>
+<span class="c1">// A copy of the event as it is recorded on the server is returned</span>
+<span class="nv">$newEvent</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">insertEvent</span><span class="p">(</span><span class="nv">$event</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="using-quickadd">
+<span id="zend-gdata-calendar-creating-events-quickadd"></span><h3>Using QuickAdd<a class="headerlink" href="#using-quickadd" title="Permalink to this headline">¶</a></h3>
+<p>QuickAdd is a feature which allows events to be created using free-form text entry. For example, the string &#8220;Dinner
+at Joe&#8217;s Diner on Thursday&#8221; would create an event with the title &#8220;Dinner&#8221;, location &#8220;Joe&#8217;s Diner&#8221;, and date
+&#8220;Thursday&#8221;. To take advantage of QuickAdd, create a new <tt class="docutils literal"><span class="pre">QuickAdd</span></tt> property set to <tt class="docutils literal"><span class="pre">TRUE</span></tt> and store the
+freeform text as a <tt class="docutils literal"><span class="pre">content</span></tt> property.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create a new entry using the calendar service&#39;s magic factory method</span>
+<span class="nv">$event</span><span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newEventEntry</span><span class="p">();</span>
+
+<span class="c1">// Populate the event with the desired information</span>
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">content</span><span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newContent</span><span class="p">(</span><span class="s2">&quot;Dinner at Joe&#39;s Diner on Thursday&quot;</span><span class="p">);</span>
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">quickAdd</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newQuickAdd</span><span class="p">(</span><span class="s2">&quot;true&quot;</span><span class="p">);</span>
+
+<span class="c1">// Upload the event to the calendar server</span>
+<span class="c1">// A copy of the event as it is recorded on the server is returned</span>
+<span class="nv">$newEvent</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">insertEvent</span><span class="p">(</span><span class="nv">$event</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="modifying-events">
+<span id="zend-gdata-calendar-modifying-events"></span><h2>Modifying Events<a class="headerlink" href="#modifying-events" title="Permalink to this headline">¶</a></h2>
+<p>Once an instance of an event has been obtained, the event&#8217;s attributes can be locally modified in the same way as
+when creating an event. Once all modifications are complete, calling the event&#8217;s <tt class="docutils literal"><span class="pre">save()</span></tt> method will upload the
+changes to the calendar server and return a copy of the event as it was created on the server.</p>
+<p>In the event another user has modified the event since the local copy was retrieved, <tt class="docutils literal"><span class="pre">save()</span></tt> will fail and the
+server will return a 409 (Conflict) status code. To resolve this a fresh copy of the event must be retrieved from
+the server before attempting to resubmit any modifications.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Get the first event in the user&#39;s event list</span>
+<span class="nv">$event</span> <span class="o">=</span> <span class="nv">$eventFeed</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+
+<span class="c1">// Change the title to a new value</span>
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">title</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">newTitle</span><span class="p">(</span><span class="s2">&quot;Woof!&quot;</span><span class="p">);</span>
+
+<span class="c1">// Upload the changes to the server</span>
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend_Gdata_App_Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Error: &quot;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="deleting-events">
+<span id="zend-gdata-calendar-deleting-events"></span><h2>Deleting Events<a class="headerlink" href="#deleting-events" title="Permalink to this headline">¶</a></h2>
+<p>Calendar events can be deleted either by calling the calendar service&#8217;s <tt class="docutils literal"><span class="pre">delete()</span></tt> method and providing the edit
+<em>URL</em> of an event or by calling an existing event&#8217;s own <tt class="docutils literal"><span class="pre">delete()</span></tt> method.</p>
+<p>In either case, the deleted event will still show up on a user&#8217;s private event feed if an <tt class="docutils literal"><span class="pre">updateMin</span></tt> query
+parameter is provided. Deleted events can be distinguished from regular events because they will have their
+<tt class="docutils literal"><span class="pre">eventStatus</span></tt> property set to &#8220;<a class="reference external" href="http://schemas.google.com/g/2005#event.canceled">http://schemas.google.com/g/2005#event.canceled</a>&#8221;.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Option 1: Events can be deleted directly</span>
+<span class="nv">$event</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Option 2: Events can be deleted supplying the edit URL of the event</span>
+<span class="c1">// to the calendar service, if known</span>
+<span class="nv">$service</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">(</span><span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getEditLink</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">href</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="accessing-event-comments">
+<span id="zend-gdata-calendar-comments"></span><h2>Accessing Event Comments<a class="headerlink" href="#accessing-event-comments" title="Permalink to this headline">¶</a></h2>
+<p>When using the full event view, comments are not directly stored within an entry. Instead, each event contains a
+<em>URL</em> to its associated comment feed which must be manually requested.</p>
+<p>Working with comments is fundamentally similar to working with events, with the only significant difference being
+that a different feed and event class should be used and that the additional meta-data for events such as where and
+when does not exist for comments. Specifically, the comment&#8217;s author is stored in the <tt class="docutils literal"><span class="pre">author</span></tt> property, and the
+comment text is stored in the <tt class="docutils literal"><span class="pre">content</span></tt> property.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Extract the comment URL from the first event in a user&#39;s feed list</span>
+<span class="nv">$event</span> <span class="o">=</span> <span class="nv">$eventFeed</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+<span class="nv">$commentUrl</span> <span class="o">=</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">comments</span><span class="o">-&gt;</span><span class="na">feedLink</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">;</span>
+
+<span class="c1">// Retrieve the comment list for the event</span>
+<span class="k">try</span> <span class="p">{</span>
+<span class="nv">$commentFeed</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">getFeed</span><span class="p">(</span><span class="nv">$commentUrl</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend_Gdata_App_Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Error: &quot;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// Output each comment as an HTML list</span>
+<span class="k">echo</span> <span class="s2">&quot;&lt;ul&gt;&quot;</span><span class="p">;</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$commentFeed</span> <span class="k">as</span> <span class="nv">$comment</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;&lt;li&gt;&lt;em&gt;Comment By: &quot;</span> <span class="o">.</span> <span class="nv">$comment</span><span class="o">-&gt;</span><span class="na">author</span><span class="o">-&gt;</span><span class="na">name</span> <span class="s2">&quot;&lt;/em&gt;&lt;br/&gt;&quot;</span> <span class="o">.</span>
+         <span class="nv">$comment</span><span class="o">-&gt;</span><span class="na">content</span> <span class="o">.</span> <span class="s2">&quot;&lt;/li&gt;&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">echo</span> <span class="s2">&quot;&lt;/ul&gt;&quot;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using Google Calendar</a><ul>
+<li><a class="reference internal" href="#connecting-to-the-calendar-service">Connecting To The Calendar Service</a><ul>
+<li><a class="reference internal" href="#authentication">Authentication</a></li>
+<li><a class="reference internal" href="#creating-a-service-instance">Creating A Service Instance</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#retrieving-a-calendar-list">Retrieving A Calendar List</a></li>
+<li><a class="reference internal" href="#retrieving-events">Retrieving Events</a><ul>
+<li><a class="reference internal" href="#queries">Queries</a></li>
+<li><a class="reference internal" href="#retrieving-events-in-order-of-start-time">Retrieving Events In Order Of Start Time</a></li>
+<li><a class="reference internal" href="#retrieving-events-in-a-specified-date-range">Retrieving Events In A Specified Date Range</a></li>
+<li><a class="reference internal" href="#retrieving-events-by-fulltext-query">Retrieving Events By Fulltext Query</a></li>
+<li><a class="reference internal" href="#retrieving-individual-events">Retrieving Individual Events</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-events">Creating Events</a><ul>
+<li><a class="reference internal" href="#creating-single-occurrence-events">Creating Single-Occurrence Events</a></li>
+<li><a class="reference internal" href="#event-schedules-and-reminders">Event Schedules and Reminders</a></li>
+<li><a class="reference internal" href="#creating-recurring-events">Creating Recurring Events</a></li>
+<li><a class="reference internal" href="#using-quickadd">Using QuickAdd</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#modifying-events">Modifying Events</a></li>
+<li><a class="reference internal" href="#deleting-events">Deleting Events</a></li>
+<li><a class="reference internal" href="#accessing-event-comments">Accessing Event Comments</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.gdata.calendar.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.gdata.calendar.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.gdata.calendar.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: For edit the files you need stay logged with your <a href="http://www.github.com">GitHub account</a> first.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.gdata.calendar.rst">
+                Using Google Calendar
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

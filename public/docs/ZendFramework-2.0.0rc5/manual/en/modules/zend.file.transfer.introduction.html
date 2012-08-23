@@ -1,0 +1,595 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend_File_Transfer &mdash; Zend Framework 2 2.0.0rc5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc5 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-file-transfer">
+<span id="zend-file-transfer-introduction"></span><h1>Zend_File_Transfer<a class="headerlink" href="#zend-file-transfer" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> provides extensive support for file uploads and downloads. It comes with built-in validators
+for files plus functionality to change files with filters. Protocol adapters allow <tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> to expose
+the same <em>API</em> for transport protocols like <em>HTTP</em>, FTP, WEBDAV and more.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Limitation</strong></p>
+<p class="last">The current implementation of <tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> is limited to <em>HTTP</em> Post Uploads. Other adapters
+supporting downloads and other protocols will be added in future releases. Unimplemented methods will throw an
+exception. For now, you should use <tt class="docutils literal"><span class="pre">Zend_File_Transfer_Adapter_Http</span></tt> directly. As soon as there are multiple
+adapters available you can use a common interface.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Forms</strong></p>
+<p class="last">When you are using <tt class="docutils literal"><span class="pre">Zend_Form</span></tt> you should use the <em>API</em>s provided by <tt class="docutils literal"><span class="pre">Zend_Form</span></tt> and not
+<tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> directly. The file transfer support in <tt class="docutils literal"><span class="pre">Zend_Form</span></tt> is implemented with
+<tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt>, so the information in this chapter may be useful for advanced users of <tt class="docutils literal"><span class="pre">Zend_Form</span></tt>.</p>
+</div>
+<p>The usage of <tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> is relatively simple. It consists of two parts. The <em>HTTP</em> form does the
+upload, while the <tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> handles the uploaded files. See the following example:</p>
+<p class="rubric" id="zend-file-transfer-introduction-example">Simple Form for Uploading Files</p>
+<p>This example illustrates basic file uploading. The first part is the file form. In our example there is one file to
+upload.</p>
+<div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nt">&lt;form</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">action=</span><span class="s">&quot;/file/upload&quot;</span> <span class="na">method=</span><span class="s">&quot;POST&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;MAX_FILE_SIZE&quot;</span> <span class="na">value=</span><span class="s">&quot;100000&quot;</span> <span class="nt">/&gt;</span>
+        Choose a file to upload: <span class="nt">&lt;input</span> <span class="na">name=</span><span class="s">&quot;uploadedfile&quot;</span> <span class="na">type=</span><span class="s">&quot;file&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;br</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Upload File&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>For convenience, you can use <em class="xref std std-ref">Zend_Form_Element_File</em> instead of building
+the <em>HTML</em> manually.</p>
+<p>The next step is to create the receiver of the upload. In our example the receiver is located at <tt class="docutils literal"><span class="pre">/file/upload</span></tt>.
+So next we will create the &#8216;file&#8217; controller and the <tt class="docutils literal"><span class="pre">upload()</span></tt> action.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer_Adapter_Http</span><span class="p">();</span>
+
+<span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">setDestination</span><span class="p">(</span><span class="s1">&#39;C:\temp&#39;</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">receive</span><span class="p">())</span> <span class="p">{</span>
+    <span class="nv">$messages</span> <span class="o">=</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">();</span>
+    <span class="k">echo</span> <span class="nb">implode</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nv">$messages</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This code listing demonstrates the simplest usage of <tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt>. A local destination is set with the
+<tt class="docutils literal"><span class="pre">setDestination()</span></tt> method, then the <tt class="docutils literal"><span class="pre">receive()</span></tt> method is called. if there are any upload errors, an error will
+be returned.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Attention</strong></p>
+<p class="last">This example is suitable only for demonstrating the basic <em>API</em> of <tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt>. You should <strong>never</strong>
+use this code listing in a production environment, because severe security issues may be introduced. You should
+always use validators to increase security.</p>
+</div>
+<div class="section" id="supported-adapters-for-zend-file-transfer">
+<span id="zend-file-transfer-introduction-adapters"></span><h2>Supported Adapters for Zend_File_Transfer<a class="headerlink" href="#supported-adapters-for-zend-file-transfer" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> is designed to support a variety of adapters and transfer directions. With
+<tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> you can upload, download and even forward (upload one adapter and download with another
+adapter at the same time) files.</p>
+</div>
+<div class="section" id="options-for-zend-file-transfer">
+<span id="zend-file-transfer-introduction-options"></span><h2>Options for Zend_File_Transfer<a class="headerlink" href="#options-for-zend-file-transfer" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> and its adapters support different options. You can set all options either by passing them
+to the constructor or by calling <tt class="docutils literal"><span class="pre">setOptions($options)</span></tt>. <tt class="docutils literal"><span class="pre">getOptions()</span></tt> will return the options that are
+currently set. The following is a list of all supported options.</p>
+<ul class="simple">
+<li><strong>ignoreNoFile</strong>: If this option is set to <tt class="docutils literal"><span class="pre">TRUE</span></tt>, all validators will ignore files that have not been uploaded
+by the form. The default value is <tt class="docutils literal"><span class="pre">FALSE</span></tt> which results in an error if no files were specified.</li>
+</ul>
+</div>
+<div class="section" id="checking-files">
+<span id="zend-file-transfer-introduction-checking"></span><h2>Checking Files<a class="headerlink" href="#checking-files" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> has several methods that check for various states of the specified file. These are useful if
+you must process files after they have been uploaded. These methods include:</p>
+<ul class="simple">
+<li><strong>isValid($files = null)</strong>: This method will check if the given files are valid, based on the validators that are
+attached to the files. If no files are specified, all files will be checked. You can call <tt class="docutils literal"><span class="pre">isValid()</span></tt> before
+calling <tt class="docutils literal"><span class="pre">receive()</span></tt>; in this case, <tt class="docutils literal"><span class="pre">receive()</span></tt> will not call <tt class="docutils literal"><span class="pre">isValid()</span></tt> internally again when receiving
+the file.</li>
+<li><strong>isUploaded($files = null)</strong>: This method will check if the specified files have been uploaded by the user. This
+is useful when you have defined one or more optional files. When no files are specified, all files will be
+checked.</li>
+<li><strong>isReceived($files = null)</strong>: This method will check if the given files have already been received. When no
+files are specified, all files will be checked.</li>
+</ul>
+<p class="rubric" id="zend-file-transfer-introduction-checking-example">Checking Files</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer</span><span class="p">();</span>
+
+<span class="c1">// Returns all known internal file information</span>
+<span class="nv">$files</span> <span class="o">=</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">getFileInfo</span><span class="p">();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$files</span> <span class="k">as</span> <span class="nv">$file</span> <span class="o">=&gt;</span> <span class="nv">$info</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// file uploaded ?</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">isUploaded</span><span class="p">(</span><span class="nv">$file</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">print</span> <span class="s2">&quot;Why havn&#39;t you uploaded the file ?&quot;</span><span class="p">;</span>
+        <span class="k">continue</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// validators are ok ?</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="nv">$file</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">print</span> <span class="s2">&quot;Sorry but </span><span class="si">$file</span><span class="s2"> is not what we wanted&quot;</span><span class="p">;</span>
+        <span class="k">continue</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">receive</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="additional-file-informations">
+<span id="zend-file-transfer-introduction-informations"></span><h2>Additional File Informations<a class="headerlink" href="#additional-file-informations" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> can return additional information on files. The following methods are available:</p>
+<ul class="simple">
+<li><strong>getFileName($file = null, $path = true)</strong>: This method will return the real file name of a transferred file.</li>
+<li><strong>getFileInfo($file = null)</strong>: This method will return all internal information for the given file.</li>
+<li><strong>getFileSize($file = null)</strong>: This method will return the real filesize for the given file.</li>
+<li><strong>getHash($hash = &#8216;crc32&#8217;, $files = null)</strong>: This method returns a hash of the content of a given transferred
+file.</li>
+<li><strong>getMimeType($files = null)</strong>: This method returns the mimetype of a given transferred file.</li>
+</ul>
+<p><tt class="docutils literal"><span class="pre">getFileName()</span></tt> accepts the name of the element as first parameter. If no name is given, all known filenames will
+be returned in an array. If the file is a multifile, you will also get an array. If there is only a single file a
+string will be returned.</p>
+<p>By default file names will be returned with the complete path. If you only need the file name without path, you can
+set the second parameter, <tt class="docutils literal"><span class="pre">$path</span></tt>, which will truncate the file path when set to <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+<p class="rubric" id="zend-file-transfer-introduction-informations-example1">Getting the Filename</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer</span><span class="p">();</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">receive</span><span class="p">();</span>
+
+<span class="c1">// Returns the file names from all files</span>
+<span class="nv">$names</span> <span class="o">=</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">();</span>
+
+<span class="c1">// Returns the file names from the &#39;foo&#39; form element</span>
+<span class="nv">$names</span> <span class="o">=</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">getFileName</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that the file name can change after you receive the file, because all filters will be applied once the file
+is received. So you should always call <tt class="docutils literal"><span class="pre">getFileName()</span></tt> after the files have been received.</p>
+</div>
+<p><tt class="docutils literal"><span class="pre">getFileSize()</span></tt> returns per default the real filesize in SI notation which means you will get <strong>2kB</strong> instead of
+<strong>2048</strong>. If you need only the plain size set the <tt class="docutils literal"><span class="pre">useByteString</span></tt> option to <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+<p class="rubric" id="zend-file-transfer-introduction-informations-example-getfilesize">Getting the size of a file</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer</span><span class="p">();</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">receive</span><span class="p">();</span>
+
+<span class="c1">// Returns the sizes from all files as array if more than one file was uploaded</span>
+<span class="nv">$size</span> <span class="o">=</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">getFileSize</span><span class="p">();</span>
+
+<span class="c1">// Switches of the SI notation to return plain numbers</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">setOption</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;useByteString&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">));</span>
+<span class="nv">$size</span> <span class="o">=</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">getFileSize</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Client given filesize</strong></p>
+<p class="last">Note that the filesize which is given by the client is not seen as save input. Therefor the real size of the
+file will be detected and returned instead of the filesize sent by the client.</p>
+</div>
+<p><tt class="docutils literal"><span class="pre">getHash()</span></tt> accepts the name of a hash algorithm as first parameter. For a list of known algorithms refer to
+<a class="reference external" href="http://php.net/hash_algos">PHP&#8217;s hash_algos method</a>. If you don&#8217;t specify an algorithm, the <strong>crc32</strong> algorithm will be used by default.</p>
+<p class="rubric" id="zend-file-transfer-introduction-informations-example2">Getting the hash of a file</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer</span><span class="p">();</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">receive</span><span class="p">();</span>
+
+<span class="c1">// Returns the hashes from all files as array if more than one file was uploaded</span>
+<span class="nv">$hash</span> <span class="o">=</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">getHash</span><span class="p">(</span><span class="s1">&#39;md5&#39;</span><span class="p">);</span>
+
+<span class="c1">// Returns the hash for the &#39;foo&#39; form element</span>
+<span class="nv">$names</span> <span class="o">=</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">getHash</span><span class="p">(</span><span class="s1">&#39;crc32&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Return value</strong></p>
+<p class="last">Note that if the given file or form name contains more than one file, the returned value will be an array.</p>
+</div>
+<p><tt class="docutils literal"><span class="pre">getMimeType()</span></tt> returns the mimetype of a file. If more than one file was uploaded it returns an array, otherwise
+a string.</p>
+<p class="rubric" id="zend-file-transfer-introduction-informations-getmimetype">Getting the mimetype of a file</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer</span><span class="p">();</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">receive</span><span class="p">();</span>
+
+<span class="nv">$mime</span> <span class="o">=</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">getMimeType</span><span class="p">();</span>
+
+<span class="c1">// Returns the mimetype for the &#39;foo&#39; form element</span>
+<span class="nv">$names</span> <span class="o">=</span> <span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">getMimeType</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Client given mimetype</strong></p>
+<p class="last">Note that the mimetype which is given by the client is not seen as save input. Therefor the real mimetype of the
+file will be detected and returned instead of the mimetype sent by the client.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p><strong>Possible exception</strong></p>
+<p class="last">Note that this method uses the fileinfo extension if it is available. If this extension can not be found, it
+uses the mimemagic extension. When no extension was found it raises an exception.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p><strong>Original data within $_FILES</strong></p>
+<p>Due to security reasons also the original data within $_FILES will be overridden as soon as
+<tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> is initiated. When you want to omit this behaviour and have the original data simply set
+the <tt class="docutils literal"><span class="pre">detectInfos</span></tt> option to <tt class="docutils literal"><span class="pre">FALSE</span></tt> at initiation.</p>
+<p class="last">This option will have no effect after you initiated <tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="progress-for-file-uploads">
+<span id="zend-file-transfer-introduction-uploadprogress"></span><h2>Progress for file uploads<a class="headerlink" href="#progress-for-file-uploads" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> can give you the actual state of a fileupload in progress. To use this feature you need
+either the <em>APC</em> extension which is provided with most default <em>PHP</em> installations, or the <tt class="docutils literal"><span class="pre">UploadProgress</span></tt>
+extension. Both extensions are detected and used automatically. To be able to get the progress you need to meet
+some prerequisites.</p>
+<p>First, you need to have either <em>APC</em> or <tt class="docutils literal"><span class="pre">UploadProgress</span></tt> to be enabled. Note that you can disable this feature of
+<em>APC</em> within your <tt class="docutils literal"><span class="pre">php.ini</span></tt>.</p>
+<p>Second, you need to have the proper hidden fields added in the form which sends the files. When you use
+<tt class="docutils literal"><span class="pre">Zend_Form_Element_File</span></tt> this hidden fields are automatically added by <tt class="docutils literal"><span class="pre">Zend_Form</span></tt>.</p>
+<p>When the above two points are provided then you are able to get the actual progress of the file upload by using the
+<tt class="docutils literal"><span class="pre">getProgress()</span></tt> method. Actually there are 2 official ways to handle this.</p>
+<div class="section" id="using-a-progressbar-adapter">
+<span id="zend-file-transfer-introduction-uploadprogress-progressadapter"></span><h3>Using a progressbar adapter<a class="headerlink" href="#using-a-progressbar-adapter" title="Permalink to this headline">¶</a></h3>
+<p>You can use the convinient <strong>Zend_ProgressBar</strong> to get the actual progress and can display it in a simple manner to
+your user.</p>
+<p>To archive this, you have to add the wished <strong>Zend_ProgressBar_Adapter</strong> to <tt class="docutils literal"><span class="pre">getProgress()</span></tt> when you are calling
+it the first time. For details about the right adapter to use, look into the chapter <a class="reference internal" href="zend.progress-bar.html#zend-progressbar-adapters"><em>Zend_ProgressBar
+Standard Adapters</em></a>.</p>
+<p class="rubric" id="zend-file-transfer-introduction-uploadprogress-progressadapter-example1">Using the progressbar adapter to retrieve the actual state</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_ProgressBar_Adapter_Console</span><span class="p">();</span>
+<span class="nv">$upload</span>  <span class="o">=</span> <span class="nx">Zend_File_Transfer_Adapter_Http</span><span class="o">::</span><span class="na">getProgress</span><span class="p">(</span><span class="nv">$adapter</span><span class="p">);</span>
+
+<span class="nv">$upload</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="nv">$upload</span><span class="p">[</span><span class="s1">&#39;done&#39;</span><span class="p">])</span> <span class="p">{</span>
+    <span class="nv">$upload</span> <span class="o">=</span> <span class="nx">Zend_File_Transfer_Adapter_Http</span><span class="o">:</span><span class="nx">getProgress</span><span class="p">(</span><span class="nv">$upload</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The complete handling is done by <tt class="docutils literal"><span class="pre">getProgress()</span></tt> for you in the background.</p>
+</div>
+<div class="section" id="using-getprogress-manually">
+<span id="zend-file-transfer-introduction-uploadprogress-manually"></span><h3>Using getProgress() manually<a class="headerlink" href="#using-getprogress-manually" title="Permalink to this headline">¶</a></h3>
+<p>You can also work manually with <tt class="docutils literal"><span class="pre">getProgress()</span></tt> without the usage of <tt class="docutils literal"><span class="pre">Zend_ProgressBar</span></tt>.</p>
+<p>Call <tt class="docutils literal"><span class="pre">getProgress()</span></tt> without settings. It will return you an array with several keys. They differ according to
+the used <em>PHP</em> extension. But the following keys are given independently of the extension:</p>
+<ul class="simple">
+<li><strong>id</strong>: The ID of this upload. This ID identifies the upload within the extension. You can set it to the value of
+the hidden key which identified the upload when initially calling <tt class="docutils literal"><span class="pre">getProgress()</span></tt>. Per default it is set to
+<strong>progress_key</strong>. You must not change the ID afterwards.</li>
+<li><strong>total</strong>: The total filesize of the uploaded files in bytes as integer.</li>
+<li><strong>current</strong>: The current uploaded filesize in bytes as integer.</li>
+<li><strong>rate</strong>: The average upload speed in bytes per second as integer.</li>
+<li><strong>done</strong>: Returns <tt class="docutils literal"><span class="pre">TRUE</span></tt> when the upload is finished and <tt class="docutils literal"><span class="pre">FALSE</span></tt> otherwise.</li>
+<li><strong>message</strong>: The actual message. Either the progress as text in the form <strong>10kB / 200kB</strong>, or a helpful message
+in the case of a problem. Problems could be, that there is no upload in progress, that there was a failure while
+retrieving the data for the progress, or that the upload has been canceled.</li>
+<li><strong>progress</strong>: This optional key takes a instance of <tt class="docutils literal"><span class="pre">Zend_ProgressBar_Adapter</span></tt> or <tt class="docutils literal"><span class="pre">Zend_ProgressBar</span></tt> and
+allows to get the actual upload state within a progressbar.</li>
+<li><strong>session</strong>: This optional key takes the name of a session namespace which will be used within
+<tt class="docutils literal"><span class="pre">Zend_ProgressBar</span></tt>. When this key is not given it defaults to <tt class="docutils literal"><span class="pre">Zend_File_Transfer_Adapter_Http_ProgressBar</span></tt>.</li>
+</ul>
+<p>All other returned keys are provided directly from the extensions and will not be checked.</p>
+<p>The following example shows a possible manual usage:</p>
+<p class="rubric" id="zend-file-transfer-introduction-uploadprogress-manually-example1">Manual usage of the file progress</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span>  <span class="o">=</span> <span class="nx">Zend_File_Transfer_Adapter_Http</span><span class="o">::</span><span class="na">getProgress</span><span class="p">();</span>
+
+<span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="nv">$upload</span><span class="p">[</span><span class="s1">&#39;done&#39;</span><span class="p">])</span> <span class="p">{</span>
+    <span class="nv">$upload</span> <span class="o">=</span> <span class="nx">Zend_File_Transfer_Adapter_Http</span><span class="o">:</span><span class="nx">getProgress</span><span class="p">(</span><span class="nv">$upload</span><span class="p">);</span>
+    <span class="k">print</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Actual progress:&quot;</span><span class="o">.</span><span class="nv">$upload</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">];</span>
+    <span class="c1">// do whatever you need</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Knowing the file to get the progress from</strong></p>
+<p class="last">The above example works when your upload identified is set to &#8216;progress_key&#8217;. When you are using another
+identifier within your form you must give the used identifier as first parameter to <tt class="docutils literal"><span class="pre">getProgress()</span></tt> on the
+initial call.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend_File_Transfer</a><ul>
+<li><a class="reference internal" href="#supported-adapters-for-zend-file-transfer">Supported Adapters for Zend_File_Transfer</a></li>
+<li><a class="reference internal" href="#options-for-zend-file-transfer">Options for Zend_File_Transfer</a></li>
+<li><a class="reference internal" href="#checking-files">Checking Files</a></li>
+<li><a class="reference internal" href="#additional-file-informations">Additional File Informations</a></li>
+<li><a class="reference internal" href="#progress-for-file-uploads">Progress for file uploads</a><ul>
+<li><a class="reference internal" href="#using-a-progressbar-adapter">Using a progressbar adapter</a></li>
+<li><a class="reference internal" href="#using-getprogress-manually">Using getProgress() manually</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.file.transfer.introduction.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.file.transfer.introduction.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.file.transfer.introduction.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: For edit the files you need stay logged with your <a href="http://www.github.com">GitHub account</a> first.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.file.transfer.introduction.rst">
+                Zend_File_Transfer
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

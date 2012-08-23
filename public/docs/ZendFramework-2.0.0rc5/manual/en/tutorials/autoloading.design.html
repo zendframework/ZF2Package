@@ -1,0 +1,271 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Goals and Design &mdash; Zend Framework 2 2.0.0rc5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc5 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="goals-and-design">
+<span id="learning-autoloading-design"></span><h1>Goals and Design<a class="headerlink" href="#goals-and-design" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="class-naming-conventions">
+<span id="learning-autoloading-design-naming"></span><h2>Class Naming Conventions<a class="headerlink" href="#class-naming-conventions" title="Permalink to this headline">¶</a></h2>
+<p>To understand autoloading in Zend Framework, first you need to understand the relationship between class names and
+class files.</p>
+<p>Zend Framework has borrowed an idea from <a class="reference external" href="http://pear.php.net/">PEAR</a>, whereby class names have a 1:1 relationship with the filesystem.
+Simply put, the underscore character (&#8220;_&#8221;) is replaced by a directory separator in order to resolve the path to
+the file, and then the suffix &#8220;<tt class="docutils literal"><span class="pre">.php</span></tt>&#8221; is added. For example, the class &#8220;<tt class="docutils literal"><span class="pre">Foo_Bar_Baz</span></tt>&#8221; would correspond to
+&#8220;<tt class="docutils literal"><span class="pre">Foo/Bar/Baz.php</span></tt>&#8221; on the filesystem. The assumption is also that the classes may be resolved via <em>PHP</em>&#8216;s
+<tt class="docutils literal"><span class="pre">include_path</span></tt> setting, which allows both <tt class="docutils literal"><span class="pre">include()</span></tt> and <tt class="docutils literal"><span class="pre">require()</span></tt> to find the filename via a relative
+path lookup on the <tt class="docutils literal"><span class="pre">include_path</span></tt>.</p>
+<p>Additionally, per <em>PEAR</em> as well as the <a class="reference external" href="http://php.net/userlandnaming.tips">PHP project</a>, we use and recommend using a vendor or project prefix for
+your code. What this means is that all classes you write will share a common class prefix; for example, all code in
+Zend Framework has the prefix &#8220;Zend_&#8221;. This naming convention helps prevent naming collisions. Within Zend
+Framework, we often refer to this as the &#8220;namespace&#8221; prefix; be careful not to confuse it with <em>PHP</em>&#8216;s native
+namespace implementation.</p>
+<p>Zend Framework follows these simple rules internally, and our coding standards encourage that you do so as well for
+all library code.</p>
+</div>
+<div class="section" id="autoloader-conventions-and-design">
+<span id="learning-autoloading-design-autoloader"></span><h2>Autoloader Conventions and Design<a class="headerlink" href="#autoloader-conventions-and-design" title="Permalink to this headline">¶</a></h2>
+<p>Zend Framework&#8217;s autoloading support, provided primarily via <tt class="docutils literal"><span class="pre">Zend_Loader_Autoloader</span></tt>, has the following goals
+and design elements:</p>
+<ul class="simple">
+<li><strong>Provide namespace matching</strong>. If the class namespace prefix is not in a list of registered namespaces, return
+<tt class="docutils literal"><span class="pre">FALSE</span></tt> immediately. This allows for more optimistic matching, as well as fallback to other autoloaders.</li>
+<li><strong>Allow the autoloader to act as a fallback autoloader</strong>. In the case where a team may be widely distributed, or
+using an undetermined set of namespace prefixes, the autoloader should still be configurable such that it will
+attempt to match any namespace prefix. It will be noted, however, that this practice is not recommended, as it
+can lead to unnecessary lookups.</li>
+<li><strong>Allow toggling error suppression</strong>. We feel &#8211; and the greater <em>PHP</em> community does as well &#8211; that error
+suppression is a bad idea. It&#8217;s expensive, and it masks very real application problems. So, by default, it should
+be off. However, if a developer <strong>insists</strong> that it be on, we allow toggling it on.</li>
+<li><strong>Allow specifying custom callbacks for autoloading</strong>. Some developers don&#8217;t want to use
+<tt class="docutils literal"><span class="pre">Zend_Loader::loadClass()</span></tt> for autoloading, but still want to make use of Zend Framework&#8217;s mechanisms.
+<tt class="docutils literal"><span class="pre">Zend_Loader_Autoloader</span></tt> allows specyfing an alternate callback for autoloading.</li>
+<li><strong>Allow manipulation of the SPL autoload callback chain</strong>. The purpose of this is to allow specifying additional
+autoloaders &#8211; for instance, resource loaders for classes that don&#8217;t have a 1:1 mapping to the filesystem &#8211; to
+be registered before or after the primary Zend Framework autoloader.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Goals and Design</a><ul>
+<li><a class="reference internal" href="#class-naming-conventions">Class Naming Conventions</a></li>
+<li><a class="reference internal" href="#autoloader-conventions-and-design">Autoloader Conventions and Design</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/autoloading.design.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/autoloading.design.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/autoloading.design.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: For edit the files you need stay logged with your <a href="http://www.github.com">GitHub account</a> first.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/autoloading.design.rst">
+                Goals and Design
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

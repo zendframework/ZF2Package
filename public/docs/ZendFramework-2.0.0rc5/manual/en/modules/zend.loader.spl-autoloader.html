@@ -1,0 +1,419 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The SplAutoloader Interface &mdash; Zend Framework 2 2.0.0rc5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc5 documentation" href="../index.html" />
+    <link rel="next" title="The ClassMapAutoloader" href="zend.loader.class-map-autoloader.html" />
+    <link rel="prev" title="The PluginClassLocator interface" href="zend.loader.plugin-class-locator.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.loader.class-map-autoloader.html" title="The ClassMapAutoloader"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.loader.plugin-class-locator.html" title="The PluginClassLocator interface"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-splautoloader-interface">
+<span id="zend-loader-spl-autoloader"></span><h1>The SplAutoloader Interface<a class="headerlink" href="#the-splautoloader-interface" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-loader-spl-autoloader-intro"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>While any valid PHP callback may be registered with <tt class="docutils literal"><span class="pre">spl_autoload_register()</span></tt>, Zend Framework autoloaders often
+provide more flexibility by being stateful and allowing configuration. To provide a common interface, Zend
+Framework provides the <tt class="docutils literal"><span class="pre">SplAutoloader</span></tt> interface.</p>
+<p>Objects implementing this interface provide a standard mechanism for configuration, a method that may be invoked to
+attempt to load a class, and a method for registering with the SPL autoloading mechanism.</p>
+</div>
+<div class="section" id="quick-start">
+<span id="zend-loader-spl-autoloader-quick-start"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>To create your own autoloading mechanism, simply create a class implementing the <tt class="docutils literal"><span class="pre">SplAutoloader</span></tt> interface (you
+may review the methods defined in the <a class="reference internal" href="#zend-loader-spl-autoloader-methods"><em>Methods section</em></a>). As a simple
+example, consider the following autoloader, which will look for a class file named after the class within a list of
+registered directories.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Custom</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Loader\SplAutoloader</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">ModifiedIncludePathAutoloader</span> <span class="k">implements</span> <span class="nx">SplAutoloader</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$paths</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$options</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">null</span> <span class="o">!==</span> <span class="nv">$options</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setOptions</span><span class="p">(</span><span class="nv">$options</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setOptions</span><span class="p">(</span><span class="nv">$options</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">is_array</span><span class="p">(</span><span class="nv">$options</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="nv">$options</span> <span class="nx">instanceof</span> <span class="nx">\Traversable</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">\InvalidArgumentException</span><span class="p">();</span>
+        <span class="p">}</span>
+
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$options</span> <span class="k">as</span> <span class="nv">$path</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$path</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">paths</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">paths</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$path</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">autoload</span><span class="p">(</span><span class="nv">$classname</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$filename</span> <span class="o">=</span> <span class="nv">$classname</span> <span class="o">.</span> <span class="s1">&#39;.php&#39;</span><span class="p">;</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">paths</span> <span class="k">as</span> <span class="nv">$path</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$test</span> <span class="o">=</span> <span class="nv">$path</span> <span class="o">.</span> <span class="nx">DIRECTORY_SEPARATOR</span> <span class="o">.</span> <span class="nv">$filename</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$test</span><span class="p">))</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="k">include</span><span class="p">(</span><span class="nv">$test</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">register</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nb">spl_autoload_register</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;autoload&#39;</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="configuration-options">
+<span id="zend-loader-spl-autoloader-options"></span><h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>This component defines no configuration options, as it is an interface.</p>
+</div>
+<div class="section" id="available-methods">
+<span id="zend-loader-spl-autoloader-methods"></span><h2>Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="zend-loader-spl-autoloader-methods-constructor">
+<dt>__construct</dt>
+<dd><p class="first">Initialize and configure an autoloader
+<tt class="docutils literal"><span class="pre">__construct($options</span> <span class="pre">=</span> <span class="pre">null)</span></tt></p>
+<p class="last"><strong>Constructor</strong>
+Autoloader constructors should optionally receive configuration options. Typically, if received, these will be
+passed to the <tt class="docutils literal"><span class="pre">setOptions()</span></tt> method to process.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-spl-autoloader-methods-set-options">
+<dt>setOptions</dt>
+<dd><p class="first">Configure the autoloader state
+<tt class="docutils literal"><span class="pre">setOptions($options)</span></tt></p>
+<p class="last"><strong>setOptions()</strong>
+Used to configure the autoloader. Typically, it should expect either an array or a <tt class="docutils literal"><span class="pre">Traversable</span></tt> object,
+though validation of the options is left to implementation. Additionally, it is recommended that the method
+return the autoloader instance in order to implement a fluent interface.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-spl-autoloader-methods-autoload">
+<dt>autoload</dt>
+<dd><p class="first">Attempt to resolve a class name to the file defining it
+<tt class="docutils literal"><span class="pre">autoload($classname)</span></tt></p>
+<p class="last"><strong>autoload()</strong>
+This method should be used to resolve a class name to the file defining it. When a positive match is found,
+return the class name; otherwise, return a boolean false.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-spl-autoloader-methods-register">
+<dt>register</dt>
+<dd><p class="first">Register the autoloader with the SPL autoloader
+<tt class="docutils literal"><span class="pre">register()</span></tt></p>
+<p><strong>register()</strong>
+Should be used to register the autoloader instance with <tt class="docutils literal"><span class="pre">spl_autoload_register()</span></tt>. Invariably, the method
+should look like the following:</p>
+<div class="last highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">register</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nb">spl_autoload_register</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;autoload&#39;</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<span id="zend-loader-spl-autoloader-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Please see the <a class="reference internal" href="#zend-loader-spl-autoloader-quick-start"><em>Quick Start</em></a> for a complete example.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The SplAutoloader Interface</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#available-methods">Available Methods</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.loader.plugin-class-locator.html"
+                        title="previous chapter">The PluginClassLocator interface</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.loader.class-map-autoloader.html"
+                        title="next chapter">The ClassMapAutoloader</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.loader.spl-autoloader.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.loader.spl-autoloader.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.loader.spl-autoloader.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: For edit the files you need stay logged with your <a href="http://www.github.com">GitHub account</a> first.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.loader.class-map-autoloader.html" title="The ClassMapAutoloader"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.loader.plugin-class-locator.html" title="The PluginClassLocator interface"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.loader.spl-autoloader.rst">
+                The SplAutoloader Interface
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
