@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend Framework 1.5 &mdash; Zend Framework 2 2.0.0rc6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc6 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-framework-1-5">
+<span id="migration-15"></span><h1>Zend Framework 1.5<a class="headerlink" href="#zend-framework-1-5" title="Permalink to this headline">¶</a></h1>
+<p>When upgrading from a previous release to Zend Framework 1.5 or higher you should note the following migration
+notes.</p>
+<div class="section" id="zend-controller">
+<span id="migration-15-zend-controller"></span><h2>Zend_Controller<a class="headerlink" href="#zend-controller" title="Permalink to this headline">¶</a></h2>
+<p>Though most basic functionality remains the same, and all documented functionality remains the same, there is one
+particular <strong>undocumented</strong>&#8220;feature&#8221; that has changed.</p>
+<p>When writing <em>URL</em>s, the documented way to write camelCased action names is to use a word separator; these are
+&#8216;.&#8217; or &#8216;-&#8216; by default, but may be configured in the dispatcher. The dispatcher internally lowercases the action
+name, and uses these word separators to re-assemble the action method using camelCasing. However, because <em>PHP</em>
+functions are not case sensitive, you <strong>could</strong> still write <em>URL</em>s using camelCasing, and the dispatcher would
+resolve these to the same location. For example, &#8216;camel-cased&#8217; would become &#8216;camelCasedAction&#8217; by the dispatcher,
+whereas &#8216;camelCased&#8217; would become &#8216;camelcasedAction&#8217;; however, due to the case insensitivity of <em>PHP</em>, both will
+execute the same method.</p>
+<p>This causes issues with the ViewRenderer when resolving view scripts. The canonical, documented way is that all
+word separators are converted to dashes, and the words lowercased. This creates a semantic tie between the actions
+and view scripts, and the normalization ensures that the scripts can be found. However, if the action &#8216;camelCased&#8217;
+is called and actually resolves, the word separator is no longer present, and the ViewRenderer attempts to resolve
+to a different location &#8211;<tt class="docutils literal"><span class="pre">camelcased.phtml</span></tt> instead of <tt class="docutils literal"><span class="pre">camel-cased.phtml</span></tt>.</p>
+<p>Some developers relied on this &#8220;feature&#8221;, which was never intended. Several changes in the 1.5.0 tree, however,
+made it so that the ViewRenderer no longer resolves these paths; the semantic tie is now enforced. First among
+these, the dispatcher now enforces case sensitivity in action names. What this means is that referring to your
+actions on the url using camelCasing will no longer resolve to the same method as using word separators (i.e.,
+&#8216;camel-casing&#8217;). This leads to the ViewRenderer now only honoring the word-separated actions when resolving view
+scripts.</p>
+<p>If you find that you were relying on this &#8220;feature&#8221;, you have several options:</p>
+<ul>
+<li><p class="first">Best option: rename your view scripts. Pros: forward compatibility. Cons: if you have many view scripts that
+relied on the former, unintended behavior, you will have a lot of renaming to do.</p>
+</li>
+<li><p class="first">Second best option: The ViewRenderer now delegates view script resolution to <tt class="docutils literal"><span class="pre">Zend_Filter_Inflector</span></tt>; you can
+modify the rules of the inflector to no longer separate the words of an action with a dash:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$viewRenderer</span> <span class="o">=</span>
+    <span class="nx">Zend_Controller_Action_HelperBroker</span><span class="o">::</span><span class="na">getStaticHelper</span><span class="p">(</span><span class="s1">&#39;viewRenderer&#39;</span><span class="p">);</span>
+<span class="nv">$inflector</span> <span class="o">=</span> <span class="nv">$viewRenderer</span><span class="o">-&gt;</span><span class="na">getInflector</span><span class="p">();</span>
+<span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">setFilterRule</span><span class="p">(</span><span class="s1">&#39;:action&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">Zend_Filter_PregReplace</span><span class="p">(</span>
+        <span class="s1">&#39;#[^a-z0-9&#39;</span> <span class="o">.</span> <span class="nb">preg_quote</span><span class="p">(</span><span class="nx">DIRECTORY_SEPARATOR</span><span class="p">,</span> <span class="s1">&#39;#&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;]+#i&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;StringToLower&#39;</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above code will modify the inflector to no longer separate the words with dash; you may also want to remove
+the &#8216;StringToLower&#8217; filter if you <strong>do</strong> want the actual view script names camelCased as well.</p>
+<p>If renaming your view scripts would be too tedious or time consuming, this is your best option until you can find
+the time to do so.</p>
+</li>
+<li><p class="first">Least desirable option: You can force the dispatcher to dispatch camelCased action names with a new front
+controller flag, <tt class="docutils literal"><span class="pre">useCaseSensitiveActions</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$front</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;useCaseSensitiveActions&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will allow you to use camelCasing on the url and still have it resolve to the same action as when you use
+word separators. However, this will mean that the original issues will cascade on through; you will likely need
+to use the second option above in addition to this for things to work at all reliably.</p>
+<p>Note, also, that usage of this flag will raise a notice that this usage is deprecated.</p>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend Framework 1.5</a><ul>
+<li><a class="reference internal" href="#zend-controller">Zend_Controller</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/ref/migration.15.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/ref/migration.15.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/ref/migration.15.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/ref/migration.15.rst">
+                Zend Framework 1.5
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

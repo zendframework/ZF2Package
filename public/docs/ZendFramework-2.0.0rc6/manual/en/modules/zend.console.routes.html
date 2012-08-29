@@ -1,0 +1,806 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Console routes and routing &mdash; Zend Framework 2 2.0.0rc6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc6 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="console-routes-and-routing">
+<span id="zend-console-routes"></span><h1>Console routes and routing<a class="headerlink" href="#console-routes-and-routing" title="Permalink to this headline">¶</a></h1>
+<p>Zend Framework 2 has <a class="reference internal" href="zend.console.introduction.html"><em>native MVC integration with console</em></a>,
+which means that command line arguments are read and used to determine the appropriate
+<a class="reference internal" href="zend.mvc.controllers.html"><em>action controller</em></a> and action method that will handle the request. Actions can
+perform any numer of task prior to returning a result, that will be displayed to the user in his console window.</p>
+<p>There are several routes you can use with Console. All of them are defined in <tt class="docutils literal"><span class="pre">Zend\Mvc\Router\Console\*</span></tt> classes.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">Routes are used to handle real commands, but they are not used to create help messages (usage information).
+When a zf2 application is run in console for the first time (without arguments) it can
+<a class="reference internal" href="zend.console.modules.html"><em>display usage information</em></a> that is provided by modules. To learn more about
+providing usage information, please read this chapter: <a class="reference internal" href="zend.console.modules.html"><em>Console-aware modules</em></a>.</p>
+</div>
+<div class="section" id="router-configuration">
+<h2>Router configuration<a class="headerlink" href="#router-configuration" title="Permalink to this headline">¶</a></h2>
+<p>All Console Routes are automatically read from the following configuration location:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// This can sit inside of modules/Application/config/module.config.php or any other module&#39;s config.</span>
+<span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;router&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;routes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="c1">// HTTP routes are here</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+
+<span class="hll">    <span class="s1">&#39;console&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class="hll">        <span class="s1">&#39;router&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class="hll">            <span class="s1">&#39;routes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class="hll">                <span class="c1">// Console routes go here</span>
+</span><span class="hll">            <span class="p">)</span>
+</span><span class="hll">        <span class="p">)</span>
+</span><span class="hll">    <span class="p">),</span>
+</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>Console Routes will only be processed when the application is run inside console (terminal) window. They have no
+effect in web (http) request and will be ignored. It is possible to define only HTTP routes (only web application) or
+only Console routes (which means we want a console-only application which will refuse to run in a browser).</p>
+<p>A single route can be described with the following array:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// inside config.console.router.routes:</span>
+<span class="c1">// [...]</span>
+<span class="s1">&#39;my-first-route&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;type&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;simple&#39;</span>       <span class="c1">// &lt;- simple route is created by default, we can skip that</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;foo bar&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Index&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;password&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>We have created a <tt class="docutils literal"><span class="pre">simple</span></tt> console route with a name <tt class="docutils literal"><span class="pre">my-first-route</span></tt>. It expects two parameters:
+<tt class="docutils literal"><span class="pre">foo</span></tt> and <tt class="docutils literal"><span class="pre">bar</span></tt>. If user puts these in a console, <tt class="docutils literal"><span class="pre">Application\IndexController::passwordAction()</span></tt> action will be
+invoked.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">You can read more about how <a class="reference internal" href="zend.mvc.routing.html"><em>ZF2 routing works in this chapter</em></a>.</p>
+</div>
+</div>
+<div class="section" id="basic-route">
+<span id="id1"></span><h2>Basic route<a class="headerlink" href="#basic-route" title="Permalink to this headline">¶</a></h2>
+<p>This is the default route type for console. It recognizes the following types of parameters:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#literal-params"><em>Literal parameters</em></a> (i.e. <tt class="docutils literal"><span class="pre">create</span> <span class="pre">object</span> <span class="pre">(external|internal)</span></tt>)</li>
+<li><a class="reference internal" href="#literal-flags"><em>Literal flags</em></a> (i.e. <tt class="docutils literal"><span class="pre">--verbose</span> <span class="pre">--direct</span> <span class="pre">[-d]</span> <span class="pre">[-a]</span></tt>)</li>
+<li><a class="reference internal" href="#value-positional"><em>Positional value parameters</em></a> (i.e. <tt class="docutils literal"><span class="pre">create</span> <span class="pre">&lt;modelName&gt;</span> <span class="pre">[&lt;destination&gt;]</span></tt>)</li>
+<li><a class="reference internal" href="#value-flags"><em>Value flags</em></a> (i.e. <tt class="docutils literal"><span class="pre">--name=NAME</span> <span class="pre">[--method=METHOD]</span></tt>)</li>
+</ul>
+<div class="section" id="literal-parameters">
+<span id="literal-params"></span><h3>Literal parameters<a class="headerlink" href="#literal-parameters" title="Permalink to this headline">¶</a></h3>
+<p>These parameters are expected to appear on the command line exactly the way they are spelled in the route. For example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;show-users&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;show users&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;show&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>This route will <strong>only</strong> match for the following command line</p>
+<div class="highlight-bash"><div class="highlight"><pre>&gt; zf show users
+</pre></div>
+</div>
+<p>It expects <strong>mandatory literal parameters</strong> <tt class="docutils literal"><span class="pre">show</span> <span class="pre">users</span></tt>. It will not match if there are any more params,
+or if one of the words
+is missing. The order of words is also enforced.</p>
+<p>We can also provide <strong>optional literal parameters</strong>, for example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;show-users&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;show [all] users&#39;</span><span class="p">,</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;show&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now this route will match for both of these commands:</p>
+<div class="highlight-bash"><div class="highlight"><pre>&gt; zf show users
+&gt; zf show all users
+</pre></div>
+</div>
+<p>We can also provide <strong>parameter alternative</strong>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;show-users&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;show [all|deleted|locked|admin] users&#39;</span><span class="p">,</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;show&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>This route will match both without and with second parameter being one of the words, which enables us to capture
+commands such:</p>
+<div class="highlight-bash"><div class="highlight"><pre>&gt; zf show users
+&gt; zf show locked users
+&gt; zf show admin users
+etc.
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Whitespaces in route definition are ignored. If you separate your parameters with more spaces,
+or separate alternatives and pipe characters with spaces, it won&#8217;t matter for the parser. The above route
+definition is equivalent to: <tt class="docutils literal"><span class="pre">show</span> <span class="pre">[</span>&nbsp; <span class="pre">all</span> <span class="pre">|</span> <span class="pre">deleted</span> <span class="pre">|</span> <span class="pre">locked</span> <span class="pre">|</span> <span class="pre">admin</span>&nbsp; <span class="pre">]</span>&nbsp;&nbsp; <span class="pre">users</span></tt></p>
+</div>
+</div>
+<div class="section" id="literal-flags">
+<span id="id2"></span><h3>Literal flags<a class="headerlink" href="#literal-flags" title="Permalink to this headline">¶</a></h3>
+<p>Flags are a common concept for console tools. You can define any number of optional and mandatory flags. The order of
+flags is ignored. The can be defined in any order and the user can provide them in any other order.</p>
+<p>Let&#8217;s create a route with <strong>optional long flags</strong></p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;check-users&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;check users [--verbose] [--fast] [--thorough]&#39;</span><span class="p">,</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;check&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>This route will match for commands like:</p>
+<div class="highlight-bash"><div class="highlight"><pre>&gt; zf check users
+&gt; zf check users --fast
+&gt; zf check users --verbose --thorough
+&gt; zf check users --thorough --fast
+</pre></div>
+</div>
+<p>We can also define one or more <strong>mandatory long flags</strong> and group them as an alternative:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;check-users&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;check users (--suspicious|--expired) [--verbose] [--fast] [--thorough]&#39;</span><span class="p">,</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;check&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>This route will <strong>only match</strong> if we provide either <tt class="docutils literal"><span class="pre">--suspicious</span></tt> or <tt class="docutils literal"><span class="pre">--expired</span></tt> flag, i.e.:</p>
+<div class="highlight-bash"><div class="highlight"><pre>&gt; zf check users --expired
+&gt; zf check users --expired --fast
+&gt; zf check users --verbose --thorough --suspicious
+</pre></div>
+</div>
+<p>We can also use <strong>short flags</strong> in our routes and group them with long flags for convenience, for example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;check-users&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;check users [--verbose|-v] [--fast|-f] [--thorough|-t]&#39;</span><span class="p">,</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;check&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now we can use short versions of our flags:</p>
+<div class="highlight-bash"><div class="highlight"><pre>&gt; zf check users -f
+&gt; zf check users -v --thorough
+&gt; zf check users -t -f -v
+</pre></div>
+</div>
+</div>
+<div class="section" id="positional-value-parameters">
+<span id="value-positional"></span><h3>Positional value parameters<a class="headerlink" href="#positional-value-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Value parameters capture any text-based input and come in two forms - positional and flags.</p>
+<dl class="docutils">
+<dt><strong>Positional value parameters</strong> are expected to appear in an exact position on the command line. Let&#8217;s take a look at</dt>
+<dd>the following route definition:</dd>
+</dl>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;delete-user&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;delete user &lt;userEmail&gt;&#39;</span><span class="p">,</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;delete&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>This route will match for commands like:</p>
+<div class="highlight-bash"><div class="highlight"><pre>&gt; zf delete user john@acme.org
+&gt; zf delete user betty@acme.org
+</pre></div>
+</div>
+<p>We can access the email value by calling <tt class="docutils literal"><span class="pre">$this-&gt;getRequest()-&gt;getParam('userEmail')</span></tt> inside of our controller
+action (you can <a class="reference internal" href="#reading-values"><em>read more about accessing values here</em></a>)</p>
+<p>We can also define <strong>optional positional value parameters</strong> by adding square brackets:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;delete-user&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;delete user [&lt;userEmail&gt;]&#39;</span><span class="p">,</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;delete&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>In this case, <tt class="docutils literal"><span class="pre">userEmail</span></tt> parameter will not be required for the route to match. If it is not provided,
+<tt class="docutils literal"><span class="pre">userEmail</span></tt> parameter will not be set.</p>
+<p>We can define any number of positional value parameters, for example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;create-user&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;create user &lt;firstName&gt; &lt;lastName&gt; &lt;email&gt; &lt;position&gt;&#39;</span><span class="p">,</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;create&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>This allows us to capture commands such as:</p>
+<div class="highlight-bash"><div class="highlight"><pre>&gt; zf create user Johnny Bravo john@acme.org Entertainer
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Command line arguments on all systems must be properly escaped, otherwise they will not be passed to our
+application correctly. For example, to create a user with two names and a complex position description,
+we could write something like this:</p>
+<div class="last highlight-bash"><div class="highlight"><pre>&gt; zf create user <span class="s2">&quot;Johnan Tom&quot;</span> Bravo john@acme.org <span class="s2">&quot;Head of the Entertainment Department&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="value-flag-parameters">
+<span id="value-flags"></span><h3>Value flag parameters<a class="headerlink" href="#value-flag-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Positional value parameters are only matched if they appear in the exact order as described in the route. If we do
+not want to enforce the order of parameters, we can define <strong>value flags</strong>.</p>
+<p><strong>Value flags</strong> can be defined and matched in any order. They can digest text-based values, for example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;find-user&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;find user [--id=] [--firstName=] [--lastName=] [--email=] [--position=] &#39;</span><span class="p">,</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;find&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>This route will match for any of the following routes:</p>
+<div class="highlight-bash"><div class="highlight"><pre>&gt; zf find user
+&gt; zf find user --id 29110
+&gt; zf find user --id<span class="o">=</span>29110
+&gt; zf find user --firstName<span class="o">=</span>Johny --lastName<span class="o">=</span>Bravo
+&gt; zf find user --lastName Bravo --firstName Johny
+&gt; zf find user --position<span class="o">=</span>Executive --firstName<span class="o">=</span>Bob
+&gt; zf find user --position <span class="s2">&quot;Head of the Entertainment Department&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The order of flags is irrelevant for the parser.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The parser understands values that are provided after equal symbol (=) and separated by a space. Values without
+whitespaces can be provided after = symbol or after a space. Values with one more whitespaces however, must be
+properly quoted and written after a space.</p>
+</div>
+<p>In previous example, all value flags are optional. It is also possible to define <strong>mandatory value flags</strong>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;rename-user&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;rename user --id= [--firstName=] [--lastName=]&#39;</span><span class="p">,</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;rename&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">--id</span></tt> parameter <strong>is required</strong> for this route to match. The following commands will work with this route:</p>
+<div class="highlight-bash"><div class="highlight"><pre>&gt; zf rename user --id 123
+&gt; zf rename user --id 123 --firstName Jonathan
+&gt; zf rename user --id<span class="o">=</span>123 --lastName<span class="o">=</span>Bravo
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="catchall-route">
+<span id="reading-values"></span><h2>Catchall route<a class="headerlink" href="#catchall-route" title="Permalink to this headline">¶</a></h2>
+<p>This special route will catch all console requests, regardless of the parameters provided.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;default-route&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;type&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;catchall&#39;</span><span class="p">,</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Index&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;consoledefault&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This route type is rarely used. You could use it as a last console route, to display usage information. Before
+you do so, read about the <a class="reference internal" href="zend.console.modules.html"><em>preferred way of displaying console usage information</em></a>.
+It is the recommended way and will guarantee proper inter-operation with other modules in your application.</p>
+</div>
+</div>
+<div class="section" id="console-routes-cheat-sheet">
+<h2>Console routes cheat-sheet<a class="headerlink" href="#console-routes-cheat-sheet" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="21%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Param type</th>
+<th class="head">Example route definition</th>
+<th class="head">Explanation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td colspan="3"><strong>Literal params</strong></td>
+</tr>
+<tr class="row-odd"><td>Literal</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">bar</span></tt></td>
+<td>&#8220;foo&#8221; followed by &#8220;bar&#8221;</td>
+</tr>
+<tr class="row-even"><td>Literal alternative</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">(bar|baz)</span></tt></td>
+<td>&#8220;foo&#8221; followed by &#8220;bar&#8221; or &#8220;baz&#8221;</td>
+</tr>
+<tr class="row-odd"><td>Literal, optional</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">[bar]</span></tt></td>
+<td>&#8220;foo&#8221;, optional &#8220;bar&#8221;</td>
+</tr>
+<tr class="row-even"><td>Literal, optional alternative</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">[bar|baz]</span></tt></td>
+<td>&#8220;foo&#8221;, optional &#8220;bar&#8221; or &#8220;baz&#8221;</td>
+</tr>
+<tr class="row-odd"><td colspan="3"><strong>Flags</strong></td>
+</tr>
+<tr class="row-even"><td>Flag long</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">--bar</span></tt></td>
+<td>&#8220;foo&#8221; as first parameter, &#8220;&#8211;bar&#8221; flag before or after</td>
+</tr>
+<tr class="row-odd"><td>Flag long, optional</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">[--bar]</span></tt></td>
+<td>&#8220;foo&#8221; as first parameter, optional &#8220;&#8211;bar&#8221; flag before or after</td>
+</tr>
+<tr class="row-even"><td>Flag long, optional, alternative</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">[--bar|--baz]</span></tt></td>
+<td>&#8220;foo&#8221; as first parameter, optional &#8220;&#8211;bar&#8221; or &#8220;&#8211;baz&#8221;, before or after</td>
+</tr>
+<tr class="row-odd"><td>Flag short</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">-b</span></tt></td>
+<td>&#8220;foo&#8221; as first parameter, &#8220;-b&#8221; flag before or after</td>
+</tr>
+<tr class="row-even"><td>Flag short, optional</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">[-b]</span></tt></td>
+<td>&#8220;foo&#8221; as first parameter, optional &#8220;-b&#8221; flag before or after</td>
+</tr>
+<tr class="row-odd"><td>Flag short, optional, alternative</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">[-b|-z]</span></tt></td>
+<td>&#8220;foo&#8221; as first parameter, optional &#8220;-b&#8221; or &#8220;-z&#8221;, before or after</td>
+</tr>
+<tr class="row-even"><td>Flag long/short alternative</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">[--bar|-b]</span></tt></td>
+<td>&#8220;foo&#8221; as first parameter, optional &#8220;&#8211;bar&#8221; or &#8220;-b&#8221; before or after</td>
+</tr>
+<tr class="row-odd"><td colspan="3"><strong>Value parameters</strong></td>
+</tr>
+<tr class="row-even"><td>Value positional param</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">&lt;bar&gt;</span></tt></td>
+<td>&#8220;foo&#8221; followed by any text (stored as &#8220;bar&#8221; param)</td>
+</tr>
+<tr class="row-odd"><td>Value positional param, optional</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">[&lt;bar&gt;]</span></tt></td>
+<td>&#8220;foo&#8221;, optionally followed by any text (stored as &#8220;bar&#8221; param)</td>
+</tr>
+<tr class="row-even"><td>Value Flag</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">--bar=</span></tt></td>
+<td>&#8220;foo&#8221; as first parameter, &#8220;&#8211;bar&#8221; with a value, before or after</td>
+</tr>
+<tr class="row-odd"><td>Value Flag, optional</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">[--bar=]</span></tt></td>
+<td>&#8220;foo&#8221; as first parameter, optionally &#8220;&#8211;bar&#8221; with a value, before or after</td>
+</tr>
+<tr class="row-even"><td colspan="3"><strong>Parameter groups</strong></td>
+</tr>
+<tr class="row-odd"><td>Literal params group</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">(bar|baz):myParam</span></tt></td>
+<td>&#8220;foo&#8221; followed by &#8220;bar&#8221; or &#8220;baz&#8221; (stored as &#8220;myParam&#8221; param)</td>
+</tr>
+<tr class="row-even"><td>Literal optional params group</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">[bar|baz]:myParam</span></tt></td>
+<td>&#8220;foo&#8221; followed by optional &#8220;bar&#8221; or &#8220;baz&#8221; (stored as &#8220;myParam&#8221; param)</td>
+</tr>
+<tr class="row-odd"><td>Long flags group</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">(--bar|--baz):myParam</span></tt></td>
+<td>&#8220;foo&#8221;, &#8220;bar&#8221; or &#8220;baz&#8221; flag before or after (stored as &#8220;myParam&#8221; param)</td>
+</tr>
+<tr class="row-even"><td>Long optional flags group</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">[--bar|--baz]:myParam</span></tt></td>
+<td>&#8220;foo&#8221;, optional &#8220;bar&#8221; or &#8220;baz&#8221; flag before or after (as &#8220;myParam&#8221; param)</td>
+</tr>
+<tr class="row-odd"><td>Short flags group</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">(-b|-z):myParam</span></tt></td>
+<td>&#8220;foo&#8221;, &#8220;-b&#8221; or &#8220;-z&#8221; flag before or after (stored as &#8220;myParam&#8221; param)</td>
+</tr>
+<tr class="row-even"><td>Short optional flags group</td>
+<td><tt class="docutils literal"><span class="pre">foo</span> <span class="pre">[-b|-z]:myParam</span></tt></td>
+<td>&#8220;foo&#8221;, optional &#8220;-b&#8221; or &#8220;-z&#8221; flag before or after (stored as &#8220;myParam&#8221; param)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Console routes and routing</a><ul>
+<li><a class="reference internal" href="#router-configuration">Router configuration</a></li>
+<li><a class="reference internal" href="#basic-route">Basic route</a><ul>
+<li><a class="reference internal" href="#literal-parameters">Literal parameters</a></li>
+<li><a class="reference internal" href="#literal-flags">Literal flags</a></li>
+<li><a class="reference internal" href="#positional-value-parameters">Positional value parameters</a></li>
+<li><a class="reference internal" href="#value-flag-parameters">Value flag parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#catchall-route">Catchall route</a></li>
+<li><a class="reference internal" href="#console-routes-cheat-sheet">Console routes cheat-sheet</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.console.routes.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.console.routes.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.console.routes.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.console.routes.rst">
+                Console routes and routing
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

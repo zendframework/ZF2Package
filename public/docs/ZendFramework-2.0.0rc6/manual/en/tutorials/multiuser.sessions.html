@@ -1,0 +1,331 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Managing User Sessions In ZF &mdash; Zend Framework 2 2.0.0rc6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc6 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="managing-user-sessions-in-zf">
+<span id="learning-multiuser-sessions"></span><h1>Managing User Sessions In ZF<a class="headerlink" href="#managing-user-sessions-in-zf" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction-to-sessions">
+<span id="learning-multiuser-sessions-intro"></span><h2>Introduction to Sessions<a class="headerlink" href="#introduction-to-sessions" title="Permalink to this headline">¶</a></h2>
+<p>The success of the web is deeply rooted in the protocol that drives the web: <em>HTTP</em>. <em>HTTP</em> over TCP is by its very
+nature stateless, which means that inherently the web is also stateless. While this very aspect is one of the
+dominating factors for why the web has become such a popular medium, it also causes an interesting problem for
+developers that want to use the web as an application platform.</p>
+<p>The act of interacting with a web application is typically defined by the sum of all requests sent to a web server.
+Since there can be many consumers being served simultaneously, the application must decide which requests belong to
+which consumer. These requests are typically known as a &#8220;session&#8221;.</p>
+<p>In <em>PHP</em>, the session problem is solved by the session extension which utilizes some state tracking, typically
+cookies, and some form of local storage which is exposed via the $_SESSION superglobal. In Zend Framework, the
+component <tt class="docutils literal"><span class="pre">Zend_Session</span></tt> adds value to the <em>PHP</em> session extension making it easier to use and depend on inside
+object-oriented applications.</p>
+</div>
+<div class="section" id="basic-usage-of-zend-session">
+<span id="learning-multiuser-sessions-basic-usage"></span><h2>Basic Usage of Zend_Session<a class="headerlink" href="#basic-usage-of-zend-session" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend_Session</span></tt> component is both a session manager as well as an <em>API</em> for storing data into a session object
+for long-term persistence. The <tt class="docutils literal"><span class="pre">Zend_Session</span></tt> <em>API</em> is for managing the options and behavior of a session, like
+options, starting and stopping a session, whereas <tt class="docutils literal"><span class="pre">Zend_Session_Namespace</span></tt> is the actual object used to store
+data.</p>
+<p>While its generally good practice to start a session inside a bootstrap process, this is generally not necessary as
+all sessions will be automatically started upon the first creation of a <tt class="docutils literal"><span class="pre">Zend_Session_Namespace</span></tt> object.</p>
+<p><tt class="docutils literal"><span class="pre">Zend_Application</span></tt> is capable of configuring <tt class="docutils literal"><span class="pre">Zend_Session</span></tt> for you as part of the
+<tt class="docutils literal"><span class="pre">Zend_Application_Resource</span></tt> system. To use this, assuming your project uses <tt class="docutils literal"><span class="pre">Zend_Application</span></tt> to bootstrap,
+you would add the following code to your application.ini file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">resources</span><span class="o">.</span><span class="nx">session</span><span class="o">.</span><span class="nx">save_path</span> <span class="o">=</span> <span class="nx">APPLICATION_PATH</span> <span class="s2">&quot;/../data/session&quot;</span>
+<span class="nx">resources</span><span class="o">.</span><span class="nx">session</span><span class="o">.</span><span class="nx">use_only_cookies</span> <span class="o">=</span> <span class="k">true</span>
+<span class="nx">resources</span><span class="o">.</span><span class="nx">session</span><span class="o">.</span><span class="nx">remember_me_seconds</span> <span class="o">=</span> <span class="mi">864000</span>
+</pre></div>
+</td></tr></table></div>
+<p>As you can see, the options passed in are the same options that you&#8217;d expect to find in the ext/session extension
+in <em>PHP</em>. Those options setup the path to the session files where data will be stored within the project. Since
+<em>INI</em> files can additionally use constants, the above will use the APPLICATION_PATH constant and relatively point
+to a data session directory.</p>
+<p>Most Zend Framework components that use sessions need nothing more to use <tt class="docutils literal"><span class="pre">Zend_Session</span></tt>. At this point, you an
+either use a component that consumes <tt class="docutils literal"><span class="pre">Zend_Session</span></tt>, or start storing your own data inside a session with
+<tt class="docutils literal"><span class="pre">Zend_Session_Namespace</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">Zend_Session_Namespace</span></tt> is a simple class that proxies data via an easy to use <em>API</em> into the <tt class="docutils literal"><span class="pre">Zend_Session</span></tt>
+managed $_SESSION superglobal. The reason it is called <tt class="docutils literal"><span class="pre">Zend_Session_Namespace</span></tt> is that it effectively namespaces
+the data inside $_SESSION, thus allowing multiple components and objects to safely store and retrieve data. In the
+following code, we&#8217;ll explore how to build a simple session incrementing counter, starting at 1000 and resetting
+itself after 1999.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$mysession</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Session_Namespace</span><span class="p">(</span><span class="s1">&#39;mysession&#39;</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$mysession</span><span class="o">-&gt;</span><span class="na">counter</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$mysession</span><span class="o">-&gt;</span><span class="na">counter</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nv">$mysession</span><span class="o">-&gt;</span><span class="na">counter</span><span class="o">++</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$mysession</span><span class="o">-&gt;</span><span class="na">counter</span> <span class="o">&gt;</span> <span class="mi">1999</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">unset</span><span class="p">(</span><span class="nv">$mysession</span><span class="o">-&gt;</span><span class="na">counter</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>As you can see above, the session namespace object uses the magic __get, __set, __isset, and __unset to allow
+you to seamlessly and fluently interact with the session. The information stored in the above example is stored at
+$_SESSION[&#8216;mysession&#8217;][&#8216;counter&#8217;].</p>
+</div>
+<div class="section" id="advanced-usage-of-zend-session">
+<span id="learning-multiuser-sessions-advanced-usage"></span><h2>Advanced Usage of Zend_Session<a class="headerlink" href="#advanced-usage-of-zend-session" title="Permalink to this headline">¶</a></h2>
+<p>Additionally, if you wanted to use the DbTable save handler for <tt class="docutils literal"><span class="pre">Zend_Session</span></tt>, you&#8217;d add the following code to
+your application.ini:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">resources</span><span class="o">.</span><span class="nx">session</span><span class="o">.</span><span class="nx">saveHandler</span><span class="o">.</span><span class="k">class</span> <span class="err">= &quot;</span><span class="nc">Zend_Session_SaveHandler_DbTable</span><span class="s2">&quot;</span>
+<span class="s2">resources.session.saveHandler.options.name = &quot;</span><span class="nx">session</span><span class="s2">&quot;</span>
+<span class="s2">resources.session.saveHandler.options.primary.session_id = &quot;</span><span class="nb">session_id</span><span class="s2">&quot;</span>
+<span class="s2">resources.session.saveHandler.options.primary.save_path = &quot;</span><span class="nx">save_path</span><span class="s2">&quot;</span>
+<span class="s2">resources.session.saveHandler.options.primary.name = &quot;</span><span class="nx">name</span><span class="s2">&quot;</span>
+<span class="s2">resources.session.saveHandler.options.primaryAssignment.sessionId = &quot;</span><span class="nx">sessionId</span><span class="s2">&quot;</span>
+<span class="s2">resources.session.saveHandler.options.primaryAssignment.sessionSavePath = &quot;</span><span class="nx">sessionSavePath</span><span class="s2">&quot;</span>
+<span class="s2">resources.session.saveHandler.options.primaryAssignment.sessionName = &quot;</span><span class="nx">sessionName</span><span class="s2">&quot;</span>
+<span class="s2">resources.session.saveHandler.options.modifiedColumn = &quot;</span><span class="nx">modified</span><span class="s2">&quot;</span>
+<span class="s2">resources.session.saveHandler.options.dataColumn = &quot;</span><span class="nx">session_data</span><span class="s2">&quot;</span>
+<span class="s2">resources.session.saveHandler.options.lifetimeColumn = &quot;</span><span class="nx">lifetime</span><span class="s2">&quot;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Managing User Sessions In ZF</a><ul>
+<li><a class="reference internal" href="#introduction-to-sessions">Introduction to Sessions</a></li>
+<li><a class="reference internal" href="#basic-usage-of-zend-session">Basic Usage of Zend_Session</a></li>
+<li><a class="reference internal" href="#advanced-usage-of-zend-session">Advanced Usage of Zend_Session</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/multiuser.sessions.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/multiuser.sessions.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/multiuser.sessions.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/multiuser.sessions.rst">
+                Managing User Sessions In ZF
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

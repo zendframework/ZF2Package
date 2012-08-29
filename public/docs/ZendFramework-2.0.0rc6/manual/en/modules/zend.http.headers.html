@@ -1,0 +1,631 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Http\Headers And The Various Header Classes &mdash; Zend Framework 2 2.0.0rc6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc6 documentation" href="../index.html" />
+    <link rel="next" title="Zend_Http_Cookie and Zend_Http_CookieJar" href="zend.http.cookie.handling.html" />
+    <link rel="prev" title="Zend\Http\Response" href="zend.http.response.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.http.cookie.handling.html" title="Zend_Http_Cookie and Zend_Http_CookieJar"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.http.response.html" title="Zend\Http\Response"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-http-headers-and-the-various-header-classes">
+<span id="zend-http-headers"></span><h1>Zend\Http\Headers And The Various Header Classes<a class="headerlink" href="#zend-http-headers-and-the-various-header-classes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-http-headers-intro"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Http\Headers</span></tt> class is a container for HTTP headers. It is typically accessed as part of a
+<tt class="docutils literal"><span class="pre">Zend\Http\Request</span></tt> or <tt class="docutils literal"><span class="pre">Zend\Http\Response</span></tt> <tt class="docutils literal"><span class="pre">header()</span></tt> call. The Headers container will lazily load actual
+Header objects as to reduce the overhead of header specific parsing.</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Http\Header\*</span></tt> classes are the domain specific implementations for the various types of Headers that
+one might encounter during the typical HTTP request. If a header of unknown type is encountered, it will be
+implemented as a <tt class="docutils literal"><span class="pre">Zend\Http\Header\GenericHeader</span></tt> instance. See the below table for a list of the various HTTP
+headers and the API that is specific to each header type.</p>
+</div>
+<div class="section" id="quick-start">
+<span id="zend-http-headers-quick-start"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>The quickest way to get started interacting with header objects is by getting an already populated Headers
+container from a request or response object.</p>
+</div>
+<div class="section" id="configuration-options">
+<span id="zend-http-headers-options"></span><h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>None currently available.</p>
+</div>
+<div class="section" id="available-methods">
+<span id="zend-http-headers-methods"></span><h2>Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="zend-http-headers-methods-from-string">
+<dt><strong>Headers::fromString</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">Headers::fromString(string</span> <span class="pre">$string)</span></tt></p>
+<p>Populates headers from string representation</p>
+<p>Parses a string for headers, and aggregates them, in order, in the current instance, primarily as strings until
+they are needed (they will be lazy loaded).</p>
+<p class="last">Returns <tt class="docutils literal"><span class="pre">Zend\Http\Headers</span></tt></p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-set-plugin-class-loader">
+<dt><strong>setPluginClassLoader</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setPluginClassLoader(Zend\Loader\PluginClassLocator</span> <span class="pre">$pluginClassLoader)</span></tt></p>
+<p>Set an alternate implementation for the plugin class loader</p>
+<p class="last">Returns <tt class="docutils literal"><span class="pre">Zend\Http\Headers</span></tt></p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-get-plugin-class-loader">
+<dt><strong>getPluginClassLoader</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getPluginClassLoader()</span></tt></p>
+<p>Return an instance of a <tt class="docutils literal"><span class="pre">Zend\Loader\PluginClassLocator</span></tt>, lazyload and inject map if necessary.</p>
+<p class="last">Returns <tt class="docutils literal"><span class="pre">Zend\Loader\PluginClassLocator</span></tt></p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-add-headers">
+<dt><strong>addHeaders</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">addHeaders(array|Traversable</span> <span class="pre">$headers)</span></tt></p>
+<p>Add many headers at once</p>
+<p>Expects an array (or <tt class="docutils literal"><span class="pre">Traversable</span></tt> object) of type/value pairs.</p>
+<p class="last">Returns <tt class="docutils literal"><span class="pre">Zend\Http\Headers</span></tt></p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-add-header-line">
+<dt><strong>addHeaders</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">addHeaderLine(string</span> <span class="pre">$headerFieldNameOrLine,</span> <span class="pre">string</span> <span class="pre">$fieldValue)</span></tt></p>
+<p>Add a raw header line, either in name =&gt; value, or as a single string &#8216;name: value&#8217;</p>
+<p>This method allows for lazy-loading in that the parsing and instantiation of Header object will be delayed until
+they are retrieved by either <tt class="docutils literal"><span class="pre">get()</span></tt> or <tt class="docutils literal"><span class="pre">current()</span></tt>.</p>
+<p class="last">Returns <tt class="docutils literal"><span class="pre">Zend\Http\Headers</span></tt></p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-add-header">
+<dt><strong>addHeader</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">addHeader(Zend\Http\Header\HeaderInterface</span> <span class="pre">$header)</span></tt></p>
+<p>Add a Header to this container, for raw values see <tt class="docutils literal"><span class="pre">addHeaderLine()</span></tt> and <tt class="docutils literal"><span class="pre">addHeaders()</span></tt>.</p>
+<p class="last">Returns <tt class="docutils literal"><span class="pre">Zend\Http\Headers</span></tt></p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-remove-header">
+<dt><strong>removeHeader</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">removeHeader(Zend\Http\Header\HeaderInterface</span> <span class="pre">$header)</span></tt></p>
+<p>Remove a Header from the container</p>
+<p class="last">Returns bool</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-clear-headers">
+<dt><strong>clearHeaders</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">clearHeaders()</span></tt></p>
+<p>Clear all headers</p>
+<p>Removes all headers from queue</p>
+<p class="last">Returns <tt class="docutils literal"><span class="pre">Zend\Http\Headers</span></tt></p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-get">
+<dt><strong>get</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">get(string</span> <span class="pre">$name)</span></tt></p>
+<p>Get all headers of a certain name/type</p>
+<p class="last">Returns false| <tt class="docutils literal"><span class="pre">Zend\Http\Header\HeaderInterface</span></tt>| <tt class="docutils literal"><span class="pre">ArrayIterator</span></tt></p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-has">
+<dt><strong>has</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">has(string</span> <span class="pre">$name)</span></tt></p>
+<p>Test for existence of a type of header</p>
+<p class="last">Returns bool</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-next">
+<dt><strong>next</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">next()</span></tt></p>
+<p>Advance the pointer for this object as an interator</p>
+<p class="last">Returns void</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-key">
+<dt><strong>key</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">key()</span></tt></p>
+<p>Return the current key for this object as an interator</p>
+<p class="last">Returns mixed</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-valid">
+<dt><strong>valid</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">valid()</span></tt></p>
+<p>Is this iterator still valid?</p>
+<p class="last">Returns bool</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-rewind">
+<dt><strong>rewind</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">rewind()</span></tt></p>
+<p>Reset the internal pointer for this object as an iterator</p>
+<p class="last">Returns void</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-current">
+<dt><strong>current</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">current()</span></tt></p>
+<p>Return the current value for this iterator, lazy loading it if need be</p>
+<p class="last">Returns <tt class="docutils literal"><span class="pre">Zend\Http\Header\HeaderInterface</span></tt></p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-count">
+<dt><strong>count</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">count()</span></tt></p>
+<p>Return the number of headers in this container. If all headers have not been parsed, actual count could increase
+if MultipleHeader objects exist in the Request/Response. If you need an exact count, iterate.</p>
+<p class="last">Returns int</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-to-string">
+<dt><strong>toString</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">toString()</span></tt></p>
+<p>Render all headers at once</p>
+<p>This method handles the normal iteration of headers; it is up to the concrete classes to prepend with the
+appropriate status/request line.</p>
+<p class="last">Returns string</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-to-array">
+<dt><strong>toArray</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">toArray()</span></tt></p>
+<p>Return the headers container as an array</p>
+<p class="last">Returns array</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-headers-methods-force-loading">
+<dt><strong>forceLoading</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">forceLoading()</span></tt></p>
+<p>By calling this, it will force parsing and loading of all headers, after this <tt class="docutils literal"><span class="pre">count()</span></tt> will be accurate</p>
+<p class="last">Returns bool</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<span id="zend-http-headers-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="zend-http-header-base-methods">
+<span id="zend-http-headers-header-description"></span><h2>Zend\Http\Header\* Base Methods<a class="headerlink" href="#zend-http-header-base-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="zend-http-header-generic-header-methods-from-string">
+<dt><strong>fromString</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">fromString(string</span> <span class="pre">$headerLine)</span></tt></p>
+<p>Factory to generate a header object from a string</p>
+<p class="last">Returns <tt class="docutils literal"><span class="pre">Zend\Http\Header\GenericHeader</span></tt></p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-header-generic-header-methods-get-field-name">
+<dt><strong>getFieldName</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getFieldName()</span></tt></p>
+<p>Retrieve header field name</p>
+<p class="last">Returns string</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-header-generic-header-methods-get-field-value">
+<dt><strong>getFieldValue</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getFieldValue()</span></tt></p>
+<p>Retrieve header field value</p>
+<p class="last">Returns string</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-header-generic-header-methods-to-string">
+<dt><strong>toString</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">toString()</span></tt></p>
+<p>Cast to string as a well formed HTTP header line</p>
+<p>Returns in form of &#8220;NAME: VALUE\r\n&#8221;</p>
+<p class="last">Returns string</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="list-of-http-header-types">
+<span id="zend-http-header-types-list"></span><h2>List of Http Header Types<a class="headerlink" href="#list-of-http-header-types" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils">
+<caption>Zend\Http\Header\* Classes</caption>
+<colgroup>
+<col width="4%" />
+<col width="96%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Class Name</th>
+<th class="head">Additional Methods</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Accept</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>AcceptCharset</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>AcceptEncoding</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>AcceptLanguage</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>AcceptRanges</td>
+<td>getRangeUnit() / setRangeUnit() - The range unit of the accept ranges header</td>
+</tr>
+<tr class="row-odd"><td>Age</td>
+<td>getDeltaSeconds() / setDeltaSeconds() - The age in delta seconds</td>
+</tr>
+<tr class="row-even"><td>Allow</td>
+<td>getAllowedMethods() / setAllowedMethods() - An array of allowed methods</td>
+</tr>
+<tr class="row-odd"><td>AuthenticationInfo</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>Authorization</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>CacheControl</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>Connection</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>ContentDisposition</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>ContentEncoding</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>ContentLanguage</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>ContentLength</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>ContentLocation</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>ContentMD5</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>ContentRange</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>ContentType</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>Cookie</td>
+<td>Extends \ArrayObjectsetEncodeValue() / getEncodeValue() - Whether or not to encode values</td>
+</tr>
+<tr class="row-even"><td>Date</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>Etag</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>Expect</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>Expires</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>From</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>Host</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>IfMatch</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>IfModifiedSince</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>IfNoneMatch</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>IfRange</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>IfUnmodifiedSince</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>KeepAlive</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>LastModified</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>Location</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>MaxForwards</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>Pragma</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>ProxyAuthenticate</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>ProxyAuthorization</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>Range</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>Referer</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>Refresh</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>RetryAfter</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>Server</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>SetCookie</td>
+<td>getName() / setName() - The cookies namegetValue() / setValue() - The cookie valuegetDomain() / setDomain() - The domain the cookie applies togetExpires() / setExpires() - The time frame the cookie is valid for, null is a session cookiegetPath() / setPath() - The uri path the cookie is bound toisSecure() / setSecure() - Whether the cookies contains the Secure flagisHttponly() / setHttponly() - Whether the cookies can be accessed via HTTP only</td>
+</tr>
+<tr class="row-even"><td>TE</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>Trailer</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>TransferEncoding</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>Upgrade</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>UserAgent</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>Vary</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>Via</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>Warning</td>
+<td>N/A</td>
+</tr>
+<tr class="row-even"><td>WWWAuthenticate</td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Http\Headers And The Various Header Classes</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#available-methods">Available Methods</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+<li><a class="reference internal" href="#zend-http-header-base-methods">Zend\Http\Header\* Base Methods</a></li>
+<li><a class="reference internal" href="#list-of-http-header-types">List of Http Header Types</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.http.response.html"
+                        title="previous chapter">Zend\Http\Response</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.http.cookie.handling.html"
+                        title="next chapter">Zend_Http_Cookie and Zend_Http_CookieJar</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.http.headers.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.http.headers.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.http.headers.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.http.cookie.handling.html" title="Zend_Http_Cookie and Zend_Http_CookieJar"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.http.response.html" title="Zend\Http\Response"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.http.headers.rst">
+                Zend\Http\Headers And The Various Header Classes
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,2296 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Navigation Helpers &mdash; Zend Framework 2 2.0.0rc6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc6 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="navigation-helpers">
+<span id="zend-view-helpers-initial-navigation"></span><h1>Navigation Helpers<a class="headerlink" href="#navigation-helpers" title="Permalink to this headline">¶</a></h1>
+<p>The navigation helpers are used for rendering navigational elements from <a class="reference internal" href="zend.navigation.containers.html#zend-navigation-containers"><em>Zend_Navigation_Container</em></a> instances.</p>
+<p>There are 5 built-in helpers:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#zend-view-helpers-initial-navigation-breadcrumbs"><em>Breadcrumbs</em></a>, used for rendering the path to the
+currently active page.</li>
+<li><a class="reference internal" href="#zend-view-helpers-initial-navigation-links"><em>Links</em></a>, used for rendering navigational head links (e.g.
+<tt class="docutils literal"><span class="pre">&lt;link</span> <span class="pre">rel=&quot;next&quot;</span> <span class="pre">href=&quot;...&quot;</span> <span class="pre">/&gt;</span></tt>)</li>
+<li><a class="reference internal" href="#zend-view-helpers-initial-navigation-menu"><em>Menu</em></a>, used for rendering menus.</li>
+<li><a class="reference internal" href="#zend-view-helpers-initial-navigation-sitemap"><em>Sitemap</em></a>, used for rendering sitemaps conforming to the
+<a class="reference external" href="http://www.sitemaps.org/protocol.php">Sitemaps XML format</a>.</li>
+<li><a class="reference internal" href="#zend-view-helpers-initial-navigation-navigation"><em>Navigation</em></a>, used for proxying calls to other
+navigational helpers.</li>
+</ul>
+<p>All built-in helpers extend <tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_HelperAbstract</span></tt>, which adds integration with <a class="reference internal" href="../index.html#zend-permissions-acl"><em>ACL</em></a> and <a class="reference internal" href="zend.i18n.translating.html#zend-i18n-translating"><em>translation</em></a>. The abstract class implements the interface
+<tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Helper</span></tt>, which defines the following methods:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">getContainer()</span></tt> and <tt class="docutils literal"><span class="pre">setContainer()</span></tt> gets and sets the navigation container the helper should operate on by
+default, and <tt class="docutils literal"><span class="pre">hasContainer()</span></tt> checks if the helper has container registered.</li>
+<li><tt class="docutils literal"><span class="pre">getTranslator()</span></tt> and <tt class="docutils literal"><span class="pre">setTranslator()</span></tt> gets and sets the translator used for translating labels and titles.
+<tt class="docutils literal"><span class="pre">getUseTranslator()</span></tt> and <tt class="docutils literal"><span class="pre">setUseTranslator()</span></tt> controls whether the translator should be enabled. The method
+<tt class="docutils literal"><span class="pre">hasTranslator()</span></tt> checks if the helper has a translator registered.</li>
+<li><tt class="docutils literal"><span class="pre">getAcl()</span></tt>, <tt class="docutils literal"><span class="pre">setAcl()</span></tt>, <tt class="docutils literal"><span class="pre">getRole()</span></tt> and <tt class="docutils literal"><span class="pre">setRole()</span></tt>, gets and sets <em>ACL</em> (<tt class="docutils literal"><span class="pre">Zend\Permissions\Acl</span></tt>) instance and role
+(<tt class="docutils literal"><span class="pre">String</span></tt> or <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Role\RoleInterface</span></tt>) used for filtering out pages when rendering. <tt class="docutils literal"><span class="pre">getUseAcl()</span></tt> and
+<tt class="docutils literal"><span class="pre">setUseAcl()</span></tt> controls whether <em>ACL</em> should be enabled. The methods <tt class="docutils literal"><span class="pre">hasAcl()</span></tt> and <tt class="docutils literal"><span class="pre">hasRole()</span></tt> checks if
+the helper has an <em>ACL</em> instance or a role registered.</li>
+<li><tt class="docutils literal"><span class="pre">__toString()</span></tt>, magic method to ensure that helpers can be rendered by echoing the helper instance directly.</li>
+<li><tt class="docutils literal"><span class="pre">render()</span></tt>, must be implemented by concrete helpers to do the actual rendering.</li>
+</ul>
+<p>In addition to the method stubs from the interface, the abstract class also implements the following methods:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">getIndent()</span></tt> and <tt class="docutils literal"><span class="pre">setIndent()</span></tt> gets and sets indentation. The setter accepts a <tt class="docutils literal"><span class="pre">String</span></tt> or an <tt class="docutils literal"><span class="pre">Integer</span></tt>.
+In the case of an <tt class="docutils literal"><span class="pre">Integer</span></tt>, the helper will use the given number of spaces for indentation. I.e.,
+<tt class="docutils literal"><span class="pre">setIndent(4)</span></tt> means 4 initial spaces of indentation. Indentation can be specified for all helpers except the
+Sitemap helper.</li>
+<li><tt class="docutils literal"><span class="pre">getMinDepth()</span></tt> and <tt class="docutils literal"><span class="pre">setMinDepth()</span></tt> gets and sets the minimum depth a page must have to be included by the
+helper. Setting <tt class="docutils literal"><span class="pre">NULL</span></tt> means no minimum depth.</li>
+<li><tt class="docutils literal"><span class="pre">getMaxDepth()</span></tt> and <tt class="docutils literal"><span class="pre">setMaxDepth()</span></tt> gets and sets the maximum depth a page can have to be included by the
+helper. Setting <tt class="docutils literal"><span class="pre">NULL</span></tt> means no maximum depth.</li>
+<li><tt class="docutils literal"><span class="pre">getRenderInvisible()</span></tt> and <tt class="docutils literal"><span class="pre">setRenderInvisible()</span></tt> gets and sets whether to render items that have been marked
+as invisible or not.</li>
+<li><tt class="docutils literal"><span class="pre">__call()</span></tt> is used for proxying calls to the container registered in the helper, which means you can call
+methods on a helper as if it was a container. See <a class="reference internal" href="#zend-view-helpers-initial-navigation-proxy-example"><em>example</em></a> below.</li>
+<li><tt class="docutils literal"><span class="pre">findActive($container,</span> <span class="pre">$minDepth,</span> <span class="pre">$maxDepth)</span></tt> is used for finding the deepest active page in the given
+container. If depths are not given, the method will use the values retrieved from <tt class="docutils literal"><span class="pre">getMinDepth()</span></tt> and
+<tt class="docutils literal"><span class="pre">getMaxDepth()</span></tt>. The deepest active page must be between <tt class="docutils literal"><span class="pre">$minDepth</span></tt> and <tt class="docutils literal"><span class="pre">$maxDepth</span></tt> inclusively. Returns
+an array containing a reference to the found page instance and the depth at which the page was found.</li>
+<li><tt class="docutils literal"><span class="pre">htmlify()</span></tt> renders an <strong>&#8216;a&#8217;</strong> <em>HTML</em> element from a <tt class="docutils literal"><span class="pre">Zend_Navigation_Page</span></tt> instance.</li>
+<li><tt class="docutils literal"><span class="pre">accept()</span></tt> is used for determining if a page should be accepted when iterating containers. This method checks
+for page visibility and verifies that the helper&#8217;s role is allowed access to the page&#8217;s resource and privilege.</li>
+<li>The static method <tt class="docutils literal"><span class="pre">setDefaultAcl()</span></tt> is used for setting a default <em>ACL</em> object that will be used by helpers.</li>
+<li>The static method <tt class="docutils literal"><span class="pre">setDefaultRole()</span></tt> is used for setting a default <em>ACL</em> that will be used by helpers</li>
+</ul>
+<p>If a navigation container is not explicitly set in a helper using <tt class="docutils literal"><span class="pre">$helper-&gt;setContainer($nav)</span></tt>, the helper will
+look for a container instance with the key <tt class="docutils literal"><span class="pre">Zend_Navigation</span></tt> in <em class="xref std std-ref">the registry</em>. If a
+container is not explicitly set or found in the registry, the helper will create an empty <tt class="docutils literal"><span class="pre">Zend_Navigation</span></tt>
+container when calling <tt class="docutils literal"><span class="pre">$helper-&gt;getContainer()</span></tt>.</p>
+<p class="rubric" id="zend-view-helpers-initial-navigation-proxy-example">Proxying calls to the navigation container</p>
+<p>Navigation view helpers use the magic method <tt class="docutils literal"><span class="pre">__call()</span></tt> to proxy method calls to the navigation container that is
+registered in the view helper.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">addPage</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;uri&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;New page&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>The call above will add a page to the container in the <tt class="docutils literal"><span class="pre">Navigation</span></tt> helper.</p>
+<div class="section" id="translation-of-labels-and-titles">
+<span id="zend-view-helpers-initial-navigation-i18n"></span><h2>Translation of labels and titles<a class="headerlink" href="#translation-of-labels-and-titles" title="Permalink to this headline">¶</a></h2>
+<p>The navigation helpers support translation of page labels and titles. You can set a translator of type
+<tt class="docutils literal"><span class="pre">Zend\I18n\Translator</span></tt> in the helper using <tt class="docutils literal"><span class="pre">$helper-&gt;setTranslator($translator)</span></tt>.</p>
+<p>If you want to disable translation, use <tt class="docutils literal"><span class="pre">$helper-&gt;setUseTranslator(false)</span></tt>.</p>
+<p>The <a class="reference internal" href="#zend-view-helpers-initial-navigation-navigation"><em>proxy helper</em></a> will inject its own translator to the
+helper it proxies to if the proxied helper doesn&#8217;t already have a translator.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There is no translation in the sitemap helper, since there are no page labels or titles involved in an <em>XML</em>
+sitemap.</p>
+</div>
+</div>
+<div class="section" id="integration-with-acl">
+<span id="zend-view-helpers-initial-navigation-acl"></span><h2>Integration with ACL<a class="headerlink" href="#integration-with-acl" title="Permalink to this headline">¶</a></h2>
+<p>All navigational view helpers support <em>ACL</em> inherently from the class
+<tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_HelperAbstract</span></tt>. A <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl</span></tt> object can be assigned to a helper instance with
+<em>$helper-&gt;setAcl($acl)</em>, and role with <em>$helper-&gt;setRole(&#8216;member&#8217;)</em> or <em>$helper-&gt;setRole(new
+ZendPermissionsAclRoleGenericRole(&#8216;member&#8217;))</em>. If <em>ACL</em> is used in the helper, the role in the helper must be allowed by the <em>ACL</em> to
+access a page&#8217;s <em>resource</em> and/or have the page&#8217;s <em>privilege</em> for the page to be included when rendering.</p>
+<p>If a page is not accepted by <em>ACL</em>, any descendant page will also be excluded from rendering.</p>
+<p>The <a class="reference internal" href="#zend-view-helpers-initial-navigation-navigation"><em>proxy helper</em></a> will inject its own <em>ACL</em> and role to the
+helper it proxies to if the proxied helper doesn&#8217;t already have any.</p>
+<p>The examples below all show how <em>ACL</em> affects rendering.</p>
+</div>
+<div class="section" id="navigation-setup-used-in-examples">
+<span id="zend-view-helpers-initial-navigation-setup"></span><h2>Navigation setup used in examples<a class="headerlink" href="#navigation-setup-used-in-examples" title="Permalink to this headline">¶</a></h2>
+<p>This example shows the setup of a navigation container for a fictional software company.</p>
+<p>Notes on the setup:</p>
+<ul class="simple">
+<li>The domain for the site is <em>www.example.com</em>.</li>
+<li>Interesting page properties are marked with a comment.</li>
+<li>Unless otherwise is stated in other examples, the user is requesting the <em>URL</em>
+<em>http://www.example.com/products/server/faq/</em>, which translates to the page labeled <tt class="docutils literal"><span class="pre">FAQ</span></tt> under <em>Foo Server</em>.</li>
+<li>The assumed <em>ACL</em> and router setup is shown below the container setup.</li>
+</ul>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171</pre></div></td><td class="code"><div class="highlight"><pre><span class="cm">/*</span>
+<span class="cm"> * Navigation container (config/array)</span>
+
+<span class="cm"> * Each element in the array will be passed to</span>
+<span class="cm"> * Zend_Navigation_Page::factory() when constructing</span>
+<span class="cm"> * the navigation container below.</span>
+<span class="cm"> */</span>
+<span class="nv">$pages</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Home&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;title&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Go Home&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;default&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;order&#39;</span>      <span class="o">=&gt;</span> <span class="o">-</span><span class="mi">100</span> <span class="c1">// make sure home is the first page</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Special offer this week only!&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;store&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;offer&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;amazing&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;visible&#39;</span>    <span class="o">=&gt;</span> <span class="k">false</span> <span class="c1">// not visible</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Products&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pages&#39;</span>      <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Foo Server&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;server&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;pages&#39;</span>      <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;FAQ&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;server&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;faq&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;rel&#39;</span>        <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                            <span class="s1">&#39;canonical&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://www.example.com/?page=faq&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;alternate&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                                <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;server&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;faq&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;params&#39;</span>     <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;format&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;xml&#39;</span><span class="p">)</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="p">),</span>
+                    <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Editions&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;server&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;editions&#39;</span>
+                    <span class="p">),</span>
+                    <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;System Requirements&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;server&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;requirements&#39;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Foo Studio&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;studio&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;pages&#39;</span>      <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Customer Stories&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;products&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;studio&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;customers&#39;</span>
+                    <span class="p">),</span>
+                    <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Support&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;prodcts&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;studio&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;support&#39;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Company&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;title&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;About us&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;company&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;about&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pages&#39;</span>      <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Investor Relations&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;company&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;about&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;investors&#39;</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;News&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;class&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;rss&#39;</span><span class="p">,</span> <span class="c1">// class</span>
+                <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;company&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;news&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;pages&#39;</span>      <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Press Releases&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;company&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;news&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;press&#39;</span>
+                    <span class="p">),</span>
+                    <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Archive&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;route&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;archive&#39;</span><span class="p">,</span> <span class="c1">// route</span>
+                        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;company&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;news&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;archive&#39;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Community&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;community&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pages&#39;</span>      <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;My Account&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;community&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;account&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;resource&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;mvc:community.account&#39;</span> <span class="c1">// resource</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Forums&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;http://forums.example.com/&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;class&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;external&#39;</span> <span class="c1">// class</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Administration&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;admin&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;resource&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;mvc:admin&#39;</span><span class="p">,</span> <span class="c1">// resource</span>
+        <span class="s1">&#39;pages&#39;</span>      <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Write new article&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;admin&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;post&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;aciton&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;write&#39;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// Create container from array</span>
+<span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Navigation</span><span class="p">(</span><span class="nv">$pages</span><span class="p">);</span>
+
+<span class="c1">// Store the container in the proxy helper:</span>
+<span class="nv">$view</span><span class="o">-&gt;</span><span class="na">getHelper</span><span class="p">(</span><span class="s1">&#39;navigation&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setContainer</span><span class="p">(</span><span class="nv">$container</span><span class="p">);</span>
+
+<span class="c1">// ...or simply:</span>
+<span class="nv">$view</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">(</span><span class="nv">$container</span><span class="p">);</span>
+
+<span class="c1">// ...or store it in the reigstry:</span>
+<span class="nx">Zend_Registry</span><span class="o">::</span><span class="na">set</span><span class="p">(</span><span class="s1">&#39;Zend_Navigation&#39;</span><span class="p">,</span> <span class="nv">$container</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>In addition to the container above, the following setup is assumed:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Setup router (default routes and &#39;archive&#39; route):</span>
+<span class="nv">$front</span> <span class="o">=</span> <span class="nx">Zend_Controller_Front</span><span class="o">::</span><span class="na">getInstance</span><span class="p">();</span>
+<span class="nv">$router</span> <span class="o">=</span> <span class="nv">$front</span><span class="o">-&gt;</span><span class="na">getRouter</span><span class="p">();</span>
+<span class="nv">$router</span><span class="o">-&gt;</span><span class="na">addDefaultRoutes</span><span class="p">();</span>
+<span class="nv">$router</span><span class="o">-&gt;</span><span class="na">addRoute</span><span class="p">(</span>
+    <span class="s1">&#39;archive&#39;</span><span class="p">,</span>
+    <span class="k">new</span> <span class="nx">Zend_Controller_Router_Route</span><span class="p">(</span>
+        <span class="s1">&#39;/archive/:year&#39;</span><span class="p">,</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;company&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;news&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;archive&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;year&#39;</span>       <span class="o">=&gt;</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span><span class="s1">&#39;year&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;\d+&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// Setup ACL:</span>
+<span class="nv">$acl</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Permissions\Acl\Acl</span><span class="p">();</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Permissions\Acl\Role\GenericRole</span><span class="p">(</span><span class="s1">&#39;member&#39;</span><span class="p">));</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Permissions\Acl\Role\GenericRole</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">));</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Permissions\Acl\Resource\GenericResource</span><span class="p">(</span><span class="s1">&#39;mvc:admin&#39;</span><span class="p">));</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Permissions\Acl\Resource\GenericResource</span><span class="p">(</span><span class="s1">&#39;mvc:community.account&#39;</span><span class="p">));</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">allow</span><span class="p">(</span><span class="s1">&#39;member&#39;</span><span class="p">,</span> <span class="s1">&#39;mvc:community.account&#39;</span><span class="p">);</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">allow</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">);</span>
+
+<span class="c1">// Store ACL and role in the proxy helper:</span>
+<span class="nv">$view</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setAcl</span><span class="p">(</span><span class="nv">$acl</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setRole</span><span class="p">(</span><span class="s1">&#39;member&#39;</span><span class="p">);</span>
+
+<span class="c1">// ...or set default ACL and role statically:</span>
+<span class="nx">Zend_View_Helper_Navigation_HelperAbstract</span><span class="o">::</span><span class="na">setDefaultAcl</span><span class="p">(</span><span class="nv">$acl</span><span class="p">);</span>
+<span class="nx">Zend_View_Helper_Navigation_HelperAbstract</span><span class="o">::</span><span class="na">setDefaultRole</span><span class="p">(</span><span class="s1">&#39;member&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="breadcrumbs-helper">
+<span id="zend-view-helpers-initial-navigation-breadcrumbs"></span><h2>Breadcrumbs Helper<a class="headerlink" href="#breadcrumbs-helper" title="Permalink to this headline">¶</a></h2>
+<p>Breadcrumbs are used for indicating where in a sitemap a user is currently browsing, and are typically rendered
+like this: &#8220;You are here: Home &gt; Products &gt; FantasticProduct 1.0&#8221;. The breadcrumbs helper follows the guidelines
+from <a class="reference external" href="http://developer.yahoo.com/ypatterns/pattern.php?pattern=breadcrumbs">Breadcrumbs Pattern - Yahoo! Design Pattern Library</a>, and allows simple customization (minimum/maximum
+depth, indentation, separator, and whether the last element should be linked), or rendering using a partial view
+script.</p>
+<p>The Breadcrumbs helper works like this; it finds the deepest active page in a navigation container, and renders an
+upwards path to the root. For <em>MVC</em> pages, the &#8220;activeness&#8221; of a page is determined by inspecting the request
+object, as stated in the section on <a class="reference internal" href="zend.navigation.pages.mvc.html#zend-navigation-pages-mvc"><em>Zend_Navigation_Page_Mvc</em></a>.</p>
+<p>The helper sets the <em>minDepth</em> property to 1 by default, meaning breadcrumbs will not be rendered if the deepest
+active page is a root page. If <em>maxDepth</em> is specified, the helper will stop rendering when at the specified depth
+(e.g. stop at level 2 even if the deepest active page is on level 3).</p>
+<p>Methods in the breadcrumbs helper:</p>
+<ul class="simple">
+<li><em>{get|set}Separator()</em> gets/sets separator string that is used between breadcrumbs. Defualt is <em>&#8216; &amp;gt; &#8216;</em>.</li>
+<li><em>{get|set}LinkLast()</em> gets/sets whether the last breadcrumb should be rendered as an anchor or not. Default is
+<tt class="docutils literal"><span class="pre">FALSE</span></tt>.</li>
+<li><em>{get|set}Partial()</em> gets/sets a partial view script that should be used for rendering breadcrumbs. If a partial
+view script is set, the helper&#8217;s <tt class="docutils literal"><span class="pre">render()</span></tt> method will use the <tt class="docutils literal"><span class="pre">renderPartial()</span></tt> method. If no partial is
+set, the <tt class="docutils literal"><span class="pre">renderStraight()</span></tt> method is used. The helper expects the partial to be a <tt class="docutils literal"><span class="pre">String</span></tt> or an <tt class="docutils literal"><span class="pre">Array</span></tt>
+with two elements. If the partial is a <tt class="docutils literal"><span class="pre">String</span></tt>, it denotes the name of the partial script to use. If it is an
+<tt class="docutils literal"><span class="pre">Array</span></tt>, the first element will be used as the name of the partial view script, and the second element is the
+module where the script is found.</li>
+<li><tt class="docutils literal"><span class="pre">renderStraight()</span></tt> is the default render method.</li>
+<li><tt class="docutils literal"><span class="pre">renderPartial()</span></tt> is used for rendering using a partial view script.</li>
+</ul>
+<p class="rubric" id="zend-view-helpers-initial-navigation-breadcrumbs-example1">Rendering breadcrumbs</p>
+<p>This example shows how to render breadcrumbs with default settings.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">In</span> <span class="nx">a</span> <span class="nx">view</span> <span class="nx">script</span> <span class="k">or</span> <span class="nx">layout</span><span class="o">:</span>
+<span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">breadcrumbs</span><span class="p">();</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">The two calls above take advantage of the magic __toString() method,</span>
+<span class="x">and are equivalent to:</span>
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">breadcrumbs</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">();</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Output:</span>
+<span class="x">&lt;a href=&quot;/products&quot;&gt;Products&lt;/a&gt; &gt; &lt;a href=&quot;/products/server&quot;&gt;Foo Server&lt;/a&gt; &gt; FAQ</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-breadcrumbs-example2">Specifying indentation</p>
+<p>This example shows how to render breadcrumbs with initial indentation.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Rendering</span> <span class="nx">with</span> <span class="mi">8</span> <span class="nx">spaces</span> <span class="nx">indentation</span><span class="o">:</span>
+<span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">breadcrumbs</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setIndent</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span><span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Output:</span>
+<span class="x">        &lt;a href=&quot;/products&quot;&gt;Products&lt;/a&gt; &gt; &lt;a href=&quot;/products/server&quot;&gt;Foo Server&lt;/a&gt; &gt; FAQ</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-breadcrumbs-example3">Customize breadcrumbs output</p>
+<p>This example shows how to customze breadcrumbs output by specifying various options.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">In</span> <span class="nx">a</span> <span class="nx">view</span> <span class="nx">script</span> <span class="k">or</span> <span class="nx">layout</span><span class="o">:</span>
+
+<span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">breadcrumbs</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">setLinkLast</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>                   <span class="c1">// link last page</span>
+          <span class="o">-&gt;</span><span class="na">setMaxDepth</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>                      <span class="c1">// stop at level 1</span>
+          <span class="o">-&gt;</span><span class="na">setSeparator</span><span class="p">(</span><span class="s1">&#39; ▶&#39;</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">);</span> <span class="c1">// cool separator with newline</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Output:</span>
+<span class="x">&lt;a href=&quot;/products&quot;&gt;Products&lt;/a&gt; ▶</span>
+<span class="x">&lt;a href=&quot;/products/server&quot;&gt;Foo Server&lt;/a&gt;</span>
+
+<span class="x">/////////////////////////////////////////////////////</span>
+
+<span class="x">Setting minimum depth required to render breadcrumbs:</span>
+
+<span class="cp">&lt;?php</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">breadcrumbs</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setMinDepth</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">breadcrumbs</span><span class="p">();</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Output:</span>
+<span class="x">Nothing, because the deepest active page is not at level 10 or deeper.</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-breadcrumbs-example4">Rendering breadcrumbs using a partial view script</p>
+<p>This example shows how to render customized breadcrumbs using a partial vew script. By calling <tt class="docutils literal"><span class="pre">setPartial()</span></tt>,
+you can specify a partial view script that will be used when calling <tt class="docutils literal"><span class="pre">render()</span></tt>. When a partial is specified, the
+<tt class="docutils literal"><span class="pre">renderPartial()</span></tt> method will be called. This method will find the deepest active page and pass an array of pages
+that leads to the active page to the partial view script.</p>
+<p>In a layout:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$partial</span> <span class="o">=</span> <span class="p">;</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">breadcrumbs</span><span class="p">()</span>
+                        <span class="o">-&gt;</span><span class="na">setPartial</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;breadcrumbs.phtml&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>Contents of <em>application/modules/default/views/breadcrumbs.phtml</em>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">echo</span> <span class="nb">implode</span><span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="p">,</span> <span class="nb">array_map</span><span class="p">(</span>
+        <span class="nb">create_function</span><span class="p">(</span><span class="s1">&#39;$a&#39;</span><span class="p">,</span> <span class="s1">&#39;return $a-&gt;getLabel();&#39;</span><span class="p">),</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">pages</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>Output:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Products</span><span class="p">,</span> <span class="nx">Foo</span> <span class="nx">Server</span><span class="p">,</span> <span class="nx">FAQ</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="links-helper">
+<span id="zend-view-helpers-initial-navigation-links"></span><h2>Links Helper<a class="headerlink" href="#links-helper" title="Permalink to this headline">¶</a></h2>
+<p>The links helper is used for rendering <em>HTML</em> <tt class="docutils literal"><span class="pre">LINK</span></tt> elements. Links are used for describing document
+relationships of the currently active page. Read more about links and link types at <a class="reference external" href="http://www.w3.org/TR/html4/struct/links.html#h-12.3">Document relationships: the
+LINK element (HTML4 W3C Rec.)</a> and <a class="reference external" href="http://www.w3.org/TR/html4/types.html#h-6.12">Link types (HTML4 W3C Rec.)</a> in the <em>HTML</em>4 W3C Recommendation.</p>
+<p>There are two types of relations; forward and reverse, indicated by the keyords <em>&#8216;rel&#8217;</em> and <em>&#8216;rev&#8217;</em>. Most methods
+in the helper will take a <tt class="docutils literal"><span class="pre">$rel</span></tt> param, which must be either <em>&#8216;rel&#8217;</em> or <em>&#8216;rev&#8217;</em>. Most methods also take a
+<tt class="docutils literal"><span class="pre">$type</span></tt> param, which is used for specifying the link type (e.g. alternate, start, next, prev, chapter, etc).</p>
+<p>Relationships can be added to page objects manually, or found by traversing the container registered in the helper.
+The method <tt class="docutils literal"><span class="pre">findRelation($page,</span> <span class="pre">$rel,</span> <span class="pre">$type)</span></tt> will first try to find the given <tt class="docutils literal"><span class="pre">$rel</span></tt> of <tt class="docutils literal"><span class="pre">$type</span></tt> from the
+<tt class="docutils literal"><span class="pre">$page</span></tt> by calling <em>$page-&gt;findRel($type)</em> or <em>$page-&gt;findRel($type)</em>. If the <tt class="docutils literal"><span class="pre">$page</span></tt> has a relation that can
+be converted to a page instance, that relation will be used. If the <tt class="docutils literal"><span class="pre">$page</span></tt> instance doesn&#8217;t have the specified
+<tt class="docutils literal"><span class="pre">$type</span></tt>, the helper will look for a method in the helper named <em>search$rel$type</em> (e.g. <tt class="docutils literal"><span class="pre">searchRelNext()</span></tt> or
+<tt class="docutils literal"><span class="pre">searchRevAlternate()</span></tt>). If such a method exists, it will be used for determining the <tt class="docutils literal"><span class="pre">$page</span></tt>&#8216;s relation by
+traversing the container.</p>
+<p>Not all relations can be determined by traversing the container. These are the relations that will be found by
+searching:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">searchRelStart()</span></tt>, forward &#8216;start&#8217; relation: the first page in the container.</li>
+<li><tt class="docutils literal"><span class="pre">searchRelNext()</span></tt>, forward &#8216;next&#8217; relation; finds the next page in the container, i.e. the page after the
+active page.</li>
+<li><tt class="docutils literal"><span class="pre">searchRelPrev()</span></tt>, forward &#8216;prev&#8217; relation; finds the previous page, i.e. the page before the active page.</li>
+<li><tt class="docutils literal"><span class="pre">searchRelChapter()</span></tt>, forward &#8216;chapter&#8217; relations; finds all pages on level 0 except the &#8216;start&#8217; relation or
+the active page if it&#8217;s on level 0.</li>
+<li><tt class="docutils literal"><span class="pre">searchRelSection()</span></tt>, forward &#8216;section&#8217; relations; finds all child pages of the active page if the active page
+is on level 0 (a &#8216;chapter&#8217;).</li>
+<li><tt class="docutils literal"><span class="pre">searchRelSubsection()</span></tt>, forward &#8216;subsection&#8217; relations; finds all child pages of the active page if the active
+pages is on level 1 (a &#8216;section&#8217;).</li>
+<li><tt class="docutils literal"><span class="pre">searchRevSection()</span></tt>, reverse &#8216;section&#8217; relation; finds the parent of the active page if the active page is on
+level 1 (a &#8216;section&#8217;).</li>
+<li><tt class="docutils literal"><span class="pre">searchRevSubsection()</span></tt>, reverse &#8216;subsection&#8217; relation; finds the parent of the active page if the active page
+is on level 2 (a &#8216;subsection&#8217;).</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When looking for relations in the page instance (<em>$page-&gt;getRel($type)</em> or <em>$page-&gt;getRev($type)</em>), the helper
+accepts the values of type <tt class="docutils literal"><span class="pre">String</span></tt>, <tt class="docutils literal"><span class="pre">Array</span></tt>, <tt class="docutils literal"><span class="pre">Zend_Config</span></tt>, or <tt class="docutils literal"><span class="pre">Zend_Navigation_Page</span></tt>. If a string is
+found, it will be converted to a <tt class="docutils literal"><span class="pre">Zend_Navigation_Page_Uri</span></tt>. If an array or a config is found, it will be
+converted to one or several page instances. If the first key of the array/config is numeric, it will be
+considered to contain several pages, and each element will be passed to the <a class="reference internal" href="zend.navigation.pages.factory.html#zend-navigation-pages-factory"><em>page factory</em></a>. If the first key is not numeric, the array/config will be passed to the page
+factory directly, and a single page will be returned.</p>
+</div>
+<p>The helper also supports magic methods for finding relations. E.g. to find forward alternate relations, call
+<em>$helper-&gt;findRelAlternate($page)</em>, and to find reverse section relations, call <em>$helper-&gt;findRevSection($page)</em>.
+Those calls correspond to <em>$helper-&gt;findRelation($page, &#8216;rel&#8217;, &#8216;alternate&#8217;);</em> and <em>$helper-&gt;findRelation($page,
+&#8216;rev&#8217;, &#8216;section&#8217;);</em> respectively.</p>
+<p>To customize which relations should be rendered, the helper uses a render flag. The render flag is an integer
+value, and will be used in a <a class="reference external" href="http://php.net/manual/en/language.operators.bitwise.php">bitwse and (&amp;) operation</a> against the helper&#8217;s render constants to determine if the
+relation that belongs to the render constant should be rendered.</p>
+<p>See the <a class="reference internal" href="#zend-view-helpers-initial-navigation-links-example3"><em>example below</em></a> for more information.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_ALTERNATE</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_STYLESHEET</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_START</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_NEXT</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_PREV</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_CONTENTS</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_INDEX</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_GLOSSARY</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_COPYRIGHT</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_CHAPTER</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_SECTION</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_SUBSECTION</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_APPENDIX</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_HELP</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_BOOKMARK</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_CUSTOM</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Link::RENDER_ALL</span></tt></li>
+</ul>
+<p>The constants from <tt class="docutils literal"><span class="pre">RENDER_ALTERNATE</span></tt> to <tt class="docutils literal"><span class="pre">RENDER_BOOKMARK</span></tt> denote standard <em>HTML</em> link types. <tt class="docutils literal"><span class="pre">RENDER_CUSTOM</span></tt>
+denotes non-standard relations that specified in pages. <tt class="docutils literal"><span class="pre">RENDER_ALL</span></tt> denotes standard and non-standard relations.</p>
+<p>Methods in the links helper:</p>
+<ul class="simple">
+<li><em>{get|set}RenderFlag()</em> gets/sets the render flag. Default is <tt class="docutils literal"><span class="pre">RENDER_ALL</span></tt>. See examples below on how to set
+the render flag.</li>
+<li><tt class="docutils literal"><span class="pre">findAllRelations()</span></tt> finds all relations of all types for a given page.</li>
+<li><tt class="docutils literal"><span class="pre">findRelation()</span></tt> finds all relations of a given type from a given page.</li>
+<li><em>searchRel{Start|Next|Prev|Chapter|Section|Subsection}()</em> traverses a container to find forward relations to the
+start page, the next page, the previous page, chapters, sections, and subsections.</li>
+<li><em>searchRev{Section|Subsection}()</em> traverses a container to find reverse relations to sections or subsections.</li>
+<li><tt class="docutils literal"><span class="pre">renderLink()</span></tt> renders a single <em>link</em> element.</li>
+</ul>
+<p class="rubric" id="zend-view-helpers-initial-navigation-links-example1">Specify relations in pages</p>
+<p>This example shows how to specify relations in pages.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Navigation</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Relations using strings&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;rel&#39;</span>   <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;alternate&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://www.example.org/&#39;</span>
+        <span class="p">),</span>
+        <span class="s1">&#39;rev&#39;</span>   <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;alternate&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://www.example.net/&#39;</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Relations using arrays&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;rel&#39;</span>   <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;alternate&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Example.org&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;http://www.example.org/&#39;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Relations using configs&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;rel&#39;</span>   <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;alternate&#39;</span> <span class="o">=&gt;</span> <span class="k">new</span> <span class="nx">Zend_Config</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Example.org&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;http://www.example.org/&#39;</span>
+            <span class="p">))</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Relations using pages instance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;rel&#39;</span>   <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;alternate&#39;</span> <span class="o">=&gt;</span> <span class="nx">Zend_Navigation_Page</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Example.org&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;http://www.example.org/&#39;</span>
+            <span class="p">))</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-links-example2">Default rendering of links</p>
+<p>This example shows how to render a menu from a container registered/found in the view helper.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">In</span> <span class="nx">a</span> <span class="nx">view</span> <span class="nx">script</span> <span class="k">or</span> <span class="nx">layout</span><span class="o">:</span>
+<span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">view</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">links</span><span class="p">();</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Output:</span>
+<span class="x">&lt;link rel=&quot;alternate&quot; href=&quot;/products/server/faq/format/xml&quot;&gt;</span>
+<span class="x">&lt;link rel=&quot;start&quot; href=&quot;/&quot; title=&quot;Home&quot;&gt;</span>
+<span class="x">&lt;link rel=&quot;next&quot; href=&quot;/products/server/editions&quot; title=&quot;Editions&quot;&gt;</span>
+<span class="x">&lt;link rel=&quot;prev&quot; href=&quot;/products/server&quot; title=&quot;Foo Server&quot;&gt;</span>
+<span class="x">&lt;link rel=&quot;chapter&quot; href=&quot;/products&quot; title=&quot;Products&quot;&gt;</span>
+<span class="x">&lt;link rel=&quot;chapter&quot; href=&quot;/company/about&quot; title=&quot;Company&quot;&gt;</span>
+<span class="x">&lt;link rel=&quot;chapter&quot; href=&quot;/community&quot; title=&quot;Community&quot;&gt;</span>
+<span class="x">&lt;link rel=&quot;canonical&quot; href=&quot;http://www.example.com/?page=server-faq&quot;&gt;</span>
+<span class="x">&lt;link rev=&quot;subsection&quot; href=&quot;/products/server&quot; title=&quot;Foo Server&quot;&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-links-example3">Specify which relations to render</p>
+<p>This example shows how to specify which relations to find and render.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Render</span> <span class="nx">only</span> <span class="nx">start</span><span class="p">,</span> <span class="nb">next</span><span class="p">,</span> <span class="k">and</span> <span class="nb">prev</span><span class="o">:</span>
+<span class="nv">$helper</span><span class="o">-&gt;</span><span class="na">setRenderFlag</span><span class="p">(</span><span class="nx">Zend_View_Helper_Navigation_Links</span><span class="o">::</span><span class="na">RENDER_START</span> <span class="o">|</span>
+                       <span class="nx">Zend_View_Helper_Navigation_Links</span><span class="o">::</span><span class="na">RENDER_NEXT</span> <span class="o">|</span>
+                       <span class="nx">Zend_View_Helper_Navigation_Links</span><span class="o">::</span><span class="na">RENDER_PREV</span><span class="p">);</span>
+
+<span class="nx">Output</span><span class="o">:</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;start&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Home&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;next&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/products/server/editions&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Editions&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;prev&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/products/server&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Foo Server&quot;</span><span class="o">&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Render</span> <span class="nx">only</span> <span class="nx">native</span> <span class="nb">link</span> <span class="nx">types</span><span class="o">:</span>
+<span class="nv">$helper</span><span class="o">-&gt;</span><span class="na">setRenderFlag</span><span class="p">(</span><span class="nx">Zend_View_Helper_Navigation_Links</span><span class="o">::</span><span class="na">RENDER_ALL</span> <span class="o">^</span>
+                       <span class="nx">Zend_View_Helper_Navigation_Links</span><span class="o">::</span><span class="na">RENDER_CUSTOM</span><span class="p">);</span>
+
+<span class="nx">Output</span><span class="o">:</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;alternate&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/products/server/faq/format/xml&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;start&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Home&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;next&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/products/server/editions&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Editions&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;prev&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/products/server&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Foo Server&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;chapter&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/products&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Products&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;chapter&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/company/about&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Company&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;chapter&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/community&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Community&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rev</span><span class="o">=</span><span class="s2">&quot;subsection&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/products/server&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Foo Server&quot;</span><span class="o">&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Render</span> <span class="nx">all</span> <span class="nx">but</span> <span class="nx">chapter</span><span class="o">:</span>
+<span class="nv">$helper</span><span class="o">-&gt;</span><span class="na">setRenderFlag</span><span class="p">(</span><span class="nx">Zend_View_Helper_Navigation_Links</span><span class="o">::</span><span class="na">RENDER_ALL</span> <span class="o">^</span>
+                       <span class="nx">Zend_View_Helper_Navigation_Links</span><span class="o">::</span><span class="na">RENDER_CHAPTER</span><span class="p">);</span>
+
+<span class="nx">Output</span><span class="o">:</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;alternate&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/products/server/faq/format/xml&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;start&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Home&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;next&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/products/server/editions&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Editions&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;prev&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/products/server&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Foo Server&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rel</span><span class="o">=</span><span class="s2">&quot;canonical&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;http://www.example.com/?page=server-faq&quot;</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nb">link</span> <span class="nx">rev</span><span class="o">=</span><span class="s2">&quot;subsection&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/products/server&quot;</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Foo Server&quot;</span><span class="o">&gt;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="menu-helper">
+<span id="zend-view-helpers-initial-navigation-menu"></span><h2>Menu Helper<a class="headerlink" href="#menu-helper" title="Permalink to this headline">¶</a></h2>
+<p>The Menu helper is used for rendering menus from navigation containers. By default, the menu will be rendered using
+<em>HTML</em> <em>UL</em> and <em>LI</em> tags, but the helper also allows using a partial view script.</p>
+<p>Methods in the Menu helper:</p>
+<ul>
+<li><p class="first"><em>{get|set}UlClass()</em> gets/sets the <em>CSS</em> class used in <tt class="docutils literal"><span class="pre">renderMenu()</span></tt>.</p>
+</li>
+<li><p class="first"><em>{get|set}OnlyActiveBranch()</em> gets/sets a flag specifying whether only the active branch of a container should be
+rendered.</p>
+</li>
+<li><p class="first"><em>{get|set}RenderParents()</em> gets/sets a flag specifying whether parents should be rendered when only rendering
+active branch of a container. If set to <tt class="docutils literal"><span class="pre">FALSE</span></tt>, only the deepest active menu will be rendered.</p>
+</li>
+<li><p class="first"><em>{get|set}Partial()</em> gets/sets a partial view script that should be used for rendering menu. If a partial view
+script is set, the helper&#8217;s <tt class="docutils literal"><span class="pre">render()</span></tt> method will use the <tt class="docutils literal"><span class="pre">renderPartial()</span></tt> method. If no partial is set,
+the <tt class="docutils literal"><span class="pre">renderMenu()</span></tt> method is used. The helper expects the partial to be a <tt class="docutils literal"><span class="pre">String</span></tt> or an <tt class="docutils literal"><span class="pre">Array</span></tt> with two
+elements. If the partial is a <tt class="docutils literal"><span class="pre">String</span></tt>, it denotes the name of the partial script to use. If it is an
+<tt class="docutils literal"><span class="pre">Array</span></tt>, the first element will be used as the name of the partial view script, and the second element is the
+module where the script is found.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">htmlify()</span></tt> overrides the method from the abstract class to return <em>span</em> elements if the page has no <em>href</em>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">renderMenu($container</span> <span class="pre">=</span> <span class="pre">null,</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array())</span></tt> is the default render method, and will render a container
+as a <em>HTML</em> <em>UL</em> list.</p>
+<p>If <tt class="docutils literal"><span class="pre">$container</span></tt> is not given, the container registered in the helper will be rendered.</p>
+<p><tt class="docutils literal"><span class="pre">$options</span></tt> is used for overriding options specified temporarily without rsetting the values in the helper
+instance. It is an associative array where each key corresponds to an option in the helper.</p>
+<p>Recognized options:</p>
+<ul class="simple">
+<li><em>indent</em>; indentation. Expects a <tt class="docutils literal"><span class="pre">String</span></tt> or an <em>int</em> value.</li>
+<li><em>minDepth</em>; minimum depth. Expcects an <em>int</em> or <tt class="docutils literal"><span class="pre">NULL</span></tt> (no minimum depth).</li>
+<li><em>maxDepth</em>; maximum depth. Expcects an <em>int</em> or <tt class="docutils literal"><span class="pre">NULL</span></tt> (no maximum depth).</li>
+<li><em>ulClass</em>; <em>CSS</em> class for <em>ul</em> element. Expects a <tt class="docutils literal"><span class="pre">String</span></tt>.</li>
+<li><em>onlyActiveBranch</em>; whether only active branch should be rendered. Expects a <tt class="docutils literal"><span class="pre">Boolean</span></tt> value.</li>
+<li><em>renderParents</em>; whether parents should be rendered if only rendering active branch. Expects a <tt class="docutils literal"><span class="pre">Boolean</span></tt>
+value.</li>
+</ul>
+<p>If an option is not given, the value set in the helper will be used.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">renderPartial()</span></tt> is used for rendering the menu using a partial view script.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">renderSubMenu()</span></tt> renders the deepest menu level of a container&#8217;s active branch.</p>
+</li>
+</ul>
+<p class="rubric" id="zend-view-helpers-initial-navigation-menu-example1">Rendering a menu</p>
+<p>This example shows how to render a menu from a container registered/found in the view helper. Notice how pages are
+filtered out based on visibility and <em>ACL</em>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">In</span> <span class="nx">a</span> <span class="nx">view</span> <span class="nx">script</span> <span class="k">or</span> <span class="nx">layout</span><span class="o">:</span>
+<span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">()</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Or simply:</span>
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Output:</span>
+<span class="x">&lt;ul class=&quot;navigation&quot;&gt;</span>
+<span class="x">    &lt;li&gt;</span>
+<span class="x">        &lt;a title=&quot;Go Home&quot; href=&quot;/&quot;&gt;Home&lt;/a&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">    &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">        &lt;a href=&quot;/products&quot;&gt;Products&lt;/a&gt;</span>
+<span class="x">        &lt;ul&gt;</span>
+<span class="x">            &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/server&quot;&gt;Foo Server&lt;/a&gt;</span>
+<span class="x">                &lt;ul&gt;</span>
+<span class="x">                    &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">                        &lt;a href=&quot;/products/server/faq&quot;&gt;FAQ&lt;/a&gt;</span>
+<span class="x">                    &lt;/li&gt;</span>
+<span class="x">                    &lt;li&gt;</span>
+<span class="x">                        &lt;a href=&quot;/products/server/editions&quot;&gt;Editions&lt;/a&gt;</span>
+<span class="x">                    &lt;/li&gt;</span>
+<span class="x">                    &lt;li&gt;</span>
+<span class="x">                        &lt;a href=&quot;/products/server/requirements&quot;&gt;System Requirements&lt;/a&gt;</span>
+<span class="x">                    &lt;/li&gt;</span>
+<span class="x">                &lt;/ul&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/studio&quot;&gt;Foo Studio&lt;/a&gt;</span>
+<span class="x">                &lt;ul&gt;</span>
+<span class="x">                    &lt;li&gt;</span>
+<span class="x">                        &lt;a href=&quot;/products/studio/customers&quot;&gt;Customer Stories&lt;/a&gt;</span>
+<span class="x">                    &lt;/li&gt;</span>
+<span class="x">                    &lt;li&gt;</span>
+<span class="x">                        &lt;a href=&quot;/prodcts/studio/support&quot;&gt;Support&lt;/a&gt;</span>
+<span class="x">                    &lt;/li&gt;</span>
+<span class="x">                &lt;/ul&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">        &lt;/ul&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">    &lt;li&gt;</span>
+<span class="x">        &lt;a title=&quot;About us&quot; href=&quot;/company/about&quot;&gt;Company&lt;/a&gt;</span>
+<span class="x">        &lt;ul&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/company/about/investors&quot;&gt;Investor Relations&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a class=&quot;rss&quot; href=&quot;/company/news&quot;&gt;News&lt;/a&gt;</span>
+<span class="x">                &lt;ul&gt;</span>
+<span class="x">                    &lt;li&gt;</span>
+<span class="x">                        &lt;a href=&quot;/company/news/press&quot;&gt;Press Releases&lt;/a&gt;</span>
+<span class="x">                    &lt;/li&gt;</span>
+<span class="x">                    &lt;li&gt;</span>
+<span class="x">                        &lt;a href=&quot;/archive&quot;&gt;Archive&lt;/a&gt;</span>
+<span class="x">                    &lt;/li&gt;</span>
+<span class="x">                &lt;/ul&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">        &lt;/ul&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">    &lt;li&gt;</span>
+<span class="x">        &lt;a href=&quot;/community&quot;&gt;Community&lt;/a&gt;</span>
+<span class="x">        &lt;ul&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/community/account&quot;&gt;My Account&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a class=&quot;external&quot; href=&quot;http://forums.example.com/&quot;&gt;Forums&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">        &lt;/ul&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">&lt;/ul&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-menu-example2">Calling renderMenu() directly</p>
+<p>This example shows how to render a menu that is not registered in the view helper by calling the <tt class="docutils literal"><span class="pre">renderMenu()</span></tt>
+directly and specifying a few options.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">// render only the &#39;Community&#39; menu</span>
+<span class="nv">$community</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">findOneByLabel</span><span class="p">(</span><span class="s1">&#39;Community&#39;</span><span class="p">);</span>
+<span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;indent&#39;</span>  <span class="o">=&gt;</span> <span class="mi">16</span><span class="p">,</span>
+    <span class="s1">&#39;ulClass&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;community&#39;</span>
+<span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">renderMenu</span><span class="p">(</span><span class="nv">$community</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">Output:</span>
+<span class="x">                &lt;ul class=&quot;community&quot;&gt;</span>
+<span class="x">                    &lt;li&gt;</span>
+<span class="x">                        &lt;a href=&quot;/community/account&quot;&gt;My Account&lt;/a&gt;</span>
+<span class="x">                    &lt;/li&gt;</span>
+<span class="x">                    &lt;li&gt;</span>
+<span class="x">                        &lt;a class=&quot;external&quot; href=&quot;http://forums.example.com/&quot;&gt;Forums&lt;/a&gt;</span>
+<span class="x">                    &lt;/li&gt;</span>
+<span class="x">                &lt;/ul&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-menu-example3">Rendering the deepest active menu</p>
+<p>This example shows how the <tt class="docutils literal"><span class="pre">renderSubMenu()</span></tt> will render the deepest sub menu of the active branch.</p>
+<p>Calling <tt class="docutils literal"><span class="pre">renderSubMenu($container,</span> <span class="pre">$ulClass,</span> <span class="pre">$indent)</span></tt> is equivalent to calling <tt class="docutils literal"><span class="pre">renderMenu($container,</span>
+<span class="pre">$options)</span></tt> with the following options:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;ulClass&#39;</span>          <span class="o">=&gt;</span> <span class="nv">$ulClass</span><span class="p">,</span>
+    <span class="s1">&#39;indent&#39;</span>           <span class="o">=&gt;</span> <span class="nv">$indent</span><span class="p">,</span>
+    <span class="s1">&#39;minDepth&#39;</span>         <span class="o">=&gt;</span> <span class="k">null</span><span class="p">,</span>
+    <span class="s1">&#39;maxDepth&#39;</span>         <span class="o">=&gt;</span> <span class="k">null</span><span class="p">,</span>
+    <span class="s1">&#39;onlyActiveBranch&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+    <span class="s1">&#39;renderParents&#39;</span>    <span class="o">=&gt;</span> <span class="k">false</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">renderSubMenu</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="s1">&#39;sidebar&#39;</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">The output will be the same if &#39;FAQ&#39; or &#39;Foo Server&#39; is active:</span>
+<span class="x">    &lt;ul class=&quot;sidebar&quot;&gt;</span>
+<span class="x">        &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">            &lt;a href=&quot;/products/server/faq&quot;&gt;FAQ&lt;/a&gt;</span>
+<span class="x">        &lt;/li&gt;</span>
+<span class="x">        &lt;li&gt;</span>
+<span class="x">            &lt;a href=&quot;/products/server/editions&quot;&gt;Editions&lt;/a&gt;</span>
+<span class="x">        &lt;/li&gt;</span>
+<span class="x">        &lt;li&gt;</span>
+<span class="x">            &lt;a href=&quot;/products/server/requirements&quot;&gt;System Requirements&lt;/a&gt;</span>
+<span class="x">        &lt;/li&gt;</span>
+<span class="x">    &lt;/ul&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-menu-example4">Rendering a menu with maximum depth</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">setMaxDepth</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Output:</span>
+<span class="x">&lt;ul class=&quot;navigation&quot;&gt;</span>
+<span class="x">    &lt;li&gt;</span>
+<span class="x">        &lt;a title=&quot;Go Home&quot; href=&quot;/&quot;&gt;Home&lt;/a&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">    &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">        &lt;a href=&quot;/products&quot;&gt;Products&lt;/a&gt;</span>
+<span class="x">        &lt;ul&gt;</span>
+<span class="x">            &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/server&quot;&gt;Foo Server&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/studio&quot;&gt;Foo Studio&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">        &lt;/ul&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">    &lt;li&gt;</span>
+<span class="x">        &lt;a title=&quot;About us&quot; href=&quot;/company/about&quot;&gt;Company&lt;/a&gt;</span>
+<span class="x">        &lt;ul&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/company/about/investors&quot;&gt;Investor Relations&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a class=&quot;rss&quot; href=&quot;/company/news&quot;&gt;News&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">        &lt;/ul&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">    &lt;li&gt;</span>
+<span class="x">        &lt;a href=&quot;/community&quot;&gt;Community&lt;/a&gt;</span>
+<span class="x">        &lt;ul&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/community/account&quot;&gt;My Account&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a class=&quot;external&quot; href=&quot;http://forums.example.com/&quot;&gt;Forums&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">        &lt;/ul&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">&lt;/ul&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-menu-example5">Rendering a menu with minimum depth</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">setMinDepth</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Output:</span>
+<span class="x">&lt;ul class=&quot;navigation&quot;&gt;</span>
+<span class="x">    &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">        &lt;a href=&quot;/products/server&quot;&gt;Foo Server&lt;/a&gt;</span>
+<span class="x">        &lt;ul&gt;</span>
+<span class="x">            &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/server/faq&quot;&gt;FAQ&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/server/editions&quot;&gt;Editions&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/server/requirements&quot;&gt;System Requirements&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">        &lt;/ul&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">    &lt;li&gt;</span>
+<span class="x">        &lt;a href=&quot;/products/studio&quot;&gt;Foo Studio&lt;/a&gt;</span>
+<span class="x">        &lt;ul&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/studio/customers&quot;&gt;Customer Stories&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/prodcts/studio/support&quot;&gt;Support&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">        &lt;/ul&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">    &lt;li&gt;</span>
+<span class="x">        &lt;a href=&quot;/company/about/investors&quot;&gt;Investor Relations&lt;/a&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">    &lt;li&gt;</span>
+<span class="x">        &lt;a class=&quot;rss&quot; href=&quot;/company/news&quot;&gt;News&lt;/a&gt;</span>
+<span class="x">        &lt;ul&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/company/news/press&quot;&gt;Press Releases&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/archive&quot;&gt;Archive&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">        &lt;/ul&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">    &lt;li&gt;</span>
+<span class="x">        &lt;a href=&quot;/community/account&quot;&gt;My Account&lt;/a&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">    &lt;li&gt;</span>
+<span class="x">        &lt;a class=&quot;external&quot; href=&quot;http://forums.example.com/&quot;&gt;Forums&lt;/a&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">&lt;/ul&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-menu-example6">Rendering only the active branch of a menu</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">setOnlyActiveBranch</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Output:</span>
+<span class="x">&lt;ul class=&quot;navigation&quot;&gt;</span>
+<span class="x">    &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">        &lt;a href=&quot;/products&quot;&gt;Products&lt;/a&gt;</span>
+<span class="x">        &lt;ul&gt;</span>
+<span class="x">            &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/server&quot;&gt;Foo Server&lt;/a&gt;</span>
+<span class="x">                &lt;ul&gt;</span>
+<span class="x">                    &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">                        &lt;a href=&quot;/products/server/faq&quot;&gt;FAQ&lt;/a&gt;</span>
+<span class="x">                    &lt;/li&gt;</span>
+<span class="x">                    &lt;li&gt;</span>
+<span class="x">                        &lt;a href=&quot;/products/server/editions&quot;&gt;Editions&lt;/a&gt;</span>
+<span class="x">                    &lt;/li&gt;</span>
+<span class="x">                    &lt;li&gt;</span>
+<span class="x">                        &lt;a href=&quot;/products/server/requirements&quot;&gt;System Requirements&lt;/a&gt;</span>
+<span class="x">                    &lt;/li&gt;</span>
+<span class="x">                &lt;/ul&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">        &lt;/ul&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">&lt;/ul&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-menu-example7">Rendering only the active branch of a menu with minimum depth</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">setOnlyActiveBranch</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+          <span class="o">-&gt;</span><span class="na">setMinDepth</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Output:</span>
+<span class="x">&lt;ul class=&quot;navigation&quot;&gt;</span>
+<span class="x">    &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">        &lt;a href=&quot;/products/server&quot;&gt;Foo Server&lt;/a&gt;</span>
+<span class="x">        &lt;ul&gt;</span>
+<span class="x">            &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/server/faq&quot;&gt;FAQ&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/server/editions&quot;&gt;Editions&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/server/requirements&quot;&gt;System Requirements&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">        &lt;/ul&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">&lt;/ul&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-menu-example8">Rendering only the active branch of a menu with maximum depth</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">setOnlyActiveBranch</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+          <span class="o">-&gt;</span><span class="na">setMaxDepth</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Output:</span>
+<span class="x">&lt;ul class=&quot;navigation&quot;&gt;</span>
+<span class="x">    &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">        &lt;a href=&quot;/products&quot;&gt;Products&lt;/a&gt;</span>
+<span class="x">        &lt;ul&gt;</span>
+<span class="x">            &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/server&quot;&gt;Foo Server&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">            &lt;li&gt;</span>
+<span class="x">                &lt;a href=&quot;/products/studio&quot;&gt;Foo Studio&lt;/a&gt;</span>
+<span class="x">            &lt;/li&gt;</span>
+<span class="x">        &lt;/ul&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">&lt;/ul&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-menu-example9">Rendering only the active branch of a menu with maximum depth and no parents</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">setOnlyActiveBranch</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+          <span class="o">-&gt;</span><span class="na">setRenderParents</span><span class="p">(</span><span class="k">false</span><span class="p">)</span>
+          <span class="o">-&gt;</span><span class="na">setMaxDepth</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">Output:</span>
+<span class="x">&lt;ul class=&quot;navigation&quot;&gt;</span>
+<span class="x">    &lt;li class=&quot;active&quot;&gt;</span>
+<span class="x">        &lt;a href=&quot;/products/server&quot;&gt;Foo Server&lt;/a&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">    &lt;li&gt;</span>
+<span class="x">        &lt;a href=&quot;/products/studio&quot;&gt;Foo Studio&lt;/a&gt;</span>
+<span class="x">    &lt;/li&gt;</span>
+<span class="x">&lt;/ul&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-navigation-menu-example10">Rendering a custom menu using a partial view script</p>
+<p>This example shows how to render a custom menu using a partial vew script. By calling <tt class="docutils literal"><span class="pre">setPartial()</span></tt>, you can
+specify a partial view script that will be used when calling <tt class="docutils literal"><span class="pre">render()</span></tt>. When a partial is specified, the
+<tt class="docutils literal"><span class="pre">renderPartial()</span></tt> method will be called. This method will assign the container to the view with the key
+<em>container</em>.</p>
+<p>In a layout:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$partial</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;menu.phtml&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">);</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setPartial</span><span class="p">(</span><span class="nv">$partial</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>In application/modules/default/views/menu.phtml:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">container</span> <span class="k">as</span> <span class="nv">$page</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">menu</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">htmlify</span><span class="p">(</span><span class="nv">$page</span><span class="p">),</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Output:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;</span><span class="nx">a</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;Go Home&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="o">&gt;</span><span class="nx">Home</span><span class="o">&lt;/</span><span class="nx">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nx">a</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/products&quot;</span><span class="o">&gt;</span><span class="nx">Products</span><span class="o">&lt;/</span><span class="nx">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nx">a</span> <span class="nx">title</span><span class="o">=</span><span class="s2">&quot;About us&quot;</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/company/about&quot;</span><span class="o">&gt;</span><span class="nx">Company</span><span class="o">&lt;/</span><span class="nx">a</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nx">a</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;/community&quot;</span><span class="o">&gt;</span><span class="nx">Community</span><span class="o">&lt;/</span><span class="nx">a</span><span class="o">&gt;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="sitemap-helper">
+<span id="zend-view-helpers-initial-navigation-sitemap"></span><h2>Sitemap Helper<a class="headerlink" href="#sitemap-helper" title="Permalink to this headline">¶</a></h2>
+<p>The Sitemap helper is used for generating <em>XML</em> sitemaps, as defined by the <a class="reference external" href="http://www.sitemaps.org/protocol.php">Sitemaps XML format</a>. Read more about
+<a class="reference external" href="http://en.wikipedia.org/wiki/Sitemaps">Sitemaps on Wikpedia</a>.</p>
+<p>By default, the sitemap helper uses <a class="reference internal" href="zend.validator.sitemap.html#zend-validator-sitemap"><em>sitemap validators</em></a> to validate each element
+that is rendered. This can be disabled by calling <em>$helper-&gt;setUseSitemapValidators(false)</em>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you disable sitemap validators, the custom properties (see table) are not validated at all.</p>
+</div>
+<p>The sitemap helper also supports <a class="reference external" href="http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">Sitemap XSD Schema</a> validation of the generated sitemap. This is disabled by
+default, since it will require a request to the Schema file. It can be enabled with
+<em>$helper-&gt;setUseSchemaValidation(true)</em>.</p>
+<table border="1" class="docutils" id="zend-view-helpers-initial-navigation-sitemap-elements">
+<caption>Sitemap XML elements</caption>
+<colgroup>
+<col width="3%" />
+<col width="98%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Element</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>loc</td>
+<td>Absolute URL to page. An absolute URL will be generated by the helper.</td>
+</tr>
+<tr class="row-odd"><td>lastmod</td>
+<td>The date of last modification of the file, in W3C Datetime format. This time portion can be omitted if desired, and only use YYYY-MM-DD. The helper will try to retrieve the lastmod value from the page&#8217;s custom property lastmod if it is set in the page. If the value is not a valid date, it is ignored.</td>
+</tr>
+<tr class="row-even"><td>changefreq</td>
+<td>How frequently the page is likely to change. This value provides general information to search engines and may not correlate exactly to how often they crawl the page. Valid values are: alwayshourlydailyweeklymonthlyyearlynever The helper will try to retrieve the changefreq value from the page&#8217;s custom property changefreq if it is set in the page. If the value is not valid, it is ignored.</td>
+</tr>
+<tr class="row-odd"><td>priority</td>
+<td>The priority of this URL relative to other URLs on your site. Valid values range from 0.0 to 1.0. The helper will try to retrieve the priority value from the page&#8217;s custom property priority if it is set in the page. If the value is not valid, it is ignored.</td>
+</tr>
+</tbody>
+</table>
+<p>Methods in the sitemap helper:</p>
+<ul class="simple">
+<li><em>{get|set}FormatOutput()</em> gets/sets a flag indicating whether <em>XML</em> output should be formatted. This corresponds
+to the <em>formatOutput</em> property of the native <tt class="docutils literal"><span class="pre">DOMDocument</span></tt> class. Read more at <a class="reference external" href="http://php.net/domdocument">PHP: DOMDocument - Manual</a>.
+Default is <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</li>
+<li><em>{get|set}UseXmlDeclaration()</em> gets/sets a flag indicating whether the <em>XML</em> declaration should be included when
+rendering. Default is <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</li>
+<li><em>{get|set}UseSitemapValidators()</em> gets/sets a flag indicating whether sitemap validators should be used when
+generating the DOM sitemap. Default is <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</li>
+<li><em>{get|set}UseSchemaValidation()</em> gets/sets a flag indicating whether the helper should use <em>XML</em> Schema
+validation when generating the DOM sitemap. Default is <tt class="docutils literal"><span class="pre">FALSE</span></tt>. If <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</li>
+<li><em>{get|set}ServerUrl()</em> gets/sets server <em>URL</em> that will be prepended to non-absolute <em>URL</em>s in the <tt class="docutils literal"><span class="pre">url()</span></tt>
+method. If no server <em>URL</em> is specified, it will be determined by the helper.</li>
+<li><tt class="docutils literal"><span class="pre">url()</span></tt> is used to generate absolute <em>URL</em>s to pages.</li>
+<li><tt class="docutils literal"><span class="pre">getDomSitemap()</span></tt> generates a DOMDocument from a given container.</li>
+</ul>
+<p class="rubric" id="zend-view-helpers-initial-navigation-sitemap-example">Rendering an XML sitemap</p>
+<p>This example shows how to render an <em>XML</em> sitemap based on the setup we did further up.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// In a view script or layout:</span>
+
+<span class="c1">// format output</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span>
+      <span class="o">-&gt;</span><span class="na">sitemap</span><span class="p">()</span>
+      <span class="o">-&gt;</span><span class="na">setFormatOutput</span><span class="p">(</span><span class="k">true</span><span class="p">);</span> <span class="c1">// default is false</span>
+
+<span class="c1">// other possible methods:</span>
+<span class="c1">// -&gt;setUseXmlDeclaration(false); // default is true</span>
+<span class="c1">// -&gt;setServerUrl(&#39;http://my.otherhost.com&#39;);</span>
+<span class="c1">// default is to detect automatically</span>
+
+<span class="c1">// print sitemap</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">sitemap</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>Notice how pages that are invisible or pages with <em>ACL</em> roles incompatible with the view helper are filtered out:</p>
+<div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54</pre></div></td><td class="code"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;urlset</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.sitemaps.org/schemas/sitemap/0.9&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/server<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/server/faq<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/server/editions<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/server/requirements<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/studio<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/studio/customers<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/prodcts/studio/support<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/company/about<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/company/about/investors<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/company/news<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/company/news/press<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/archive<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/community<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/community/account<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://forums.example.com/<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+<span class="nt">&lt;/urlset&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Render the sitemap using no <em>ACL</em> role (should filter out /community/account):</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">sitemap</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">setFormatOutput</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+          <span class="o">-&gt;</span><span class="na">setRole</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51</pre></div></td><td class="code"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;urlset</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.sitemaps.org/schemas/sitemap/0.9&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/server<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/server/faq<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/server/editions<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/server/requirements<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/studio<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/studio/customers<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/prodcts/studio/support<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/company/about<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/company/about/investors<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/company/news<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/company/news/press<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/archive<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/community<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://forums.example.com/<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+<span class="nt">&lt;/urlset&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Render the sitemap using a maximum depth of 1.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">navigation</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">sitemap</span><span class="p">()</span>
+          <span class="o">-&gt;</span><span class="na">setFormatOutput</span><span class="p">(</span><span class="k">true</span><span class="p">)</span>
+          <span class="o">-&gt;</span><span class="na">setMaxDepth</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</pre></div></td><td class="code"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;urlset</span> <span class="na">xmlns=</span><span class="s">&quot;http://www.sitemaps.org/schemas/sitemap/0.9&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/server<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/products/studio<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/company/about<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/company/about/investors<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/company/news<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/community<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://www.example.com/community/account<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+  <span class="nt">&lt;url&gt;</span>
+    <span class="nt">&lt;loc&gt;</span>http://forums.example.com/<span class="nt">&lt;/loc&gt;</span>
+  <span class="nt">&lt;/url&gt;</span>
+<span class="nt">&lt;/urlset&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>UTF-8 encoding used by default</strong></p>
+<p>By default, Zend Framework uses <em>UTF-8</em> as its default encoding, and, specific to this case, <tt class="docutils literal"><span class="pre">Zend_View</span></tt> does
+as well. Character encoding can be set differently on the view object itself using the <tt class="docutils literal"><span class="pre">setEncoding()</span></tt> method
+(or the the <tt class="docutils literal"><span class="pre">encoding</span></tt> instantiation parameter). However, since <tt class="docutils literal"><span class="pre">Zend_View_Interface</span></tt> does not define
+accessors for encoding, it&#8217;s possible that if you are using a custom view implementation with the Dojo view
+helper, you will not have a <tt class="docutils literal"><span class="pre">getEncoding()</span></tt> method, which is what the view helper uses internally for
+determining the character set in which to encode.</p>
+<p class="last">If you do not want to utilize <em>UTF-8</em> in such a situation, you will need to implement a <tt class="docutils literal"><span class="pre">getEncoding()</span></tt> method
+in your custom view implementation.</p>
+</div>
+</div>
+<div class="section" id="navigation-helper">
+<span id="zend-view-helpers-initial-navigation-navigation"></span><h2>Navigation Helper<a class="headerlink" href="#navigation-helper" title="Permalink to this headline">¶</a></h2>
+<p>The Navigation helper is a proxy helper that relays calls to other navigational helpers. It can be considered an
+entry point to all navigation-related view tasks. The aforementioned navigational helpers are in the namespace
+<tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation</span></tt>, and would thus require the path <em>Zend/View/Helper/Navigation</em> to be added as a
+helper path to the view. With the proxy helper residing in the <tt class="docutils literal"><span class="pre">Zend_View_Helper</span></tt> namespace, it will always be
+available, without the need to add any helper paths to the view.</p>
+<p>The Navigation helper finds other helpers that implement the <tt class="docutils literal"><span class="pre">Zend_View_Helper_Navigation_Helper</span></tt> interface,
+which means custom view helpers can also be proxied. This would, however, require that the custom helper path is
+added to the view.</p>
+<p>When proxying to other helpers, the Navigation helper can inject its container, <em>ACL</em>/role, and translator. This
+means that you won&#8217;t have to explicitly set all three in all navigational helpers, nor resort to injecting by means
+of <tt class="docutils literal"><span class="pre">Zend_Registry</span></tt> or static methods.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">findHelper()</span></tt> finds the given helper, verifies that it is a navigational helper, and injects container,
+<em>ACL</em>/role and translator.</li>
+<li><em>{get|set}InjectContainer()</em> gets/sets a flag indicating whether the container should be injected to proxied
+helpers. Default is <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</li>
+<li><em>{get|set}InjectAcl()</em> gets/sets a flag indicating whether the <em>ACL</em>/role should be injected to proxied helpers.
+Default is <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</li>
+<li><em>{get|set}InjectTranslator()</em> gets/sets a flag indicating whether the translator should be injected to proxied
+helpers. Default is <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</li>
+<li><em>{get|set}DefaultProxy()</em> gets/sets the default proxy. Default is <em>&#8216;menu&#8217;</em>.</li>
+<li><tt class="docutils literal"><span class="pre">render()</span></tt> proxies to the render method of the default proxy.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Navigation Helpers</a><ul>
+<li><a class="reference internal" href="#translation-of-labels-and-titles">Translation of labels and titles</a></li>
+<li><a class="reference internal" href="#integration-with-acl">Integration with ACL</a></li>
+<li><a class="reference internal" href="#navigation-setup-used-in-examples">Navigation setup used in examples</a></li>
+<li><a class="reference internal" href="#breadcrumbs-helper">Breadcrumbs Helper</a></li>
+<li><a class="reference internal" href="#links-helper">Links Helper</a></li>
+<li><a class="reference internal" href="#menu-helper">Menu Helper</a></li>
+<li><a class="reference internal" href="#sitemap-helper">Sitemap Helper</a></li>
+<li><a class="reference internal" href="#navigation-helper">Navigation Helper</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.view.helpers.navigation.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.view.helpers.navigation.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.view.helpers.navigation.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.view.helpers.navigation.rst">
+                Navigation Helpers
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
