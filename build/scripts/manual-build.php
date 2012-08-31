@@ -14,7 +14,7 @@ list($package_name, $package_release) = preg_split('#-#', $package_name_full);
 
 script_run_command('rm -Rf ' . ROOT . '/packages/manual/' . $package_name_full . '/');
 mkdir(ROOT . '/packages/manual/' . $package_name_full);
-script_run_command('cp -R ' .  $package_source . '/ ' . ROOT . '/packages/manual/' . $package_name_full . '/');
+script_run_command('cp -R ' .  $package_source . '/* ' . ROOT . '/packages/manual/' . $package_name_full . '/');
 
 chdir(ROOT . '/packages/manual/' . $package_name_full . '/docs');
 script_run_command('make html');
