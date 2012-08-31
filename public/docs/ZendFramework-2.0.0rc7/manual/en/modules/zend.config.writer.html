@@ -1,0 +1,580 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Config\Writer &mdash; Zend Framework 2 2.0.0rc7 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc7 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Config\Processor" href="zend.config.processor.html" />
+    <link rel="prev" title="Zend\Config\Reader" href="zend.config.reader.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.config.processor.html" title="Zend\Config\Processor"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.config.reader.html" title="Zend\Config\Reader"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-config-writer">
+<span id="id1"></span><h1>Zend\Config\Writer<a class="headerlink" href="#zend-config-writer" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Config\Writer</span></tt> gives you the ability to write config files out of array, <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> and any
+Traversable object. The <tt class="docutils literal"><span class="pre">Zend\Config\Writer</span></tt> is an interface that defines two methods: <tt class="docutils literal"><span class="pre">toFile()</span></tt> and
+<tt class="docutils literal"><span class="pre">toString()</span></tt>. We have five specific writers that implement this interface:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Config\Writer\Ini</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Config\Writer\Xml</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Config\Writer\PhpArray</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Config\Writer\Json</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Config\Writer\Yaml</span></tt></li>
+</ul>
+<div class="section" id="zend-config-writer-ini">
+<span id="id2"></span><h2>Zend\Config\Writer\Ini<a class="headerlink" href="#zend-config-writer-ini" title="Permalink to this headline">¶</a></h2>
+<p>The <em>INI</em> writer has two modes for rendering with regard to sections. By default the top-level configuration is
+always written into section names. By calling <tt class="docutils literal"><span class="pre">$writer-&gt;setRenderWithoutSectionsFlags(true);</span></tt> all options are
+written into the global namespace of the <em>INI</em> file and no sections are applied.</p>
+<p>As an addition <tt class="docutils literal"><span class="pre">Zend\Config\Writer\Ini</span></tt> has an additional option parameter <strong>nestSeparator</strong>, which defines with
+which character the single nodes are separated. The default is a single dot, like it is accepted by
+<tt class="docutils literal"><span class="pre">Zend\Config\Reader\Ini</span></tt> by default.</p>
+<p>When modifying or creating a <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object, there are some things to know. To create or modify a
+value, you simply say set the parameter of the <tt class="docutils literal"><span class="pre">Config</span></tt> object via the parameter accessor (<strong>-&gt;</strong>). To create a
+section in the root or to create a branch, you just create a new array (&#8220;<tt class="docutils literal"><span class="pre">$config-&gt;branch</span> <span class="pre">=</span> <span class="pre">array();</span></tt>&#8221;).</p>
+<p class="rubric" id="zend-config-writer-ini-example">Using Zend\Config\Writer\Ini</p>
+<p>This example illustrates the basic use of <tt class="docutils literal"><span class="pre">Zend\Config\Writer\Ini</span></tt> to create a new config file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create the config object</span>
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Config</span><span class="p">(</span><span class="k">array</span><span class="p">(),</span> <span class="k">true</span><span class="p">);</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">webhost</span> <span class="o">=</span> <span class="s1">&#39;www.example.com&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">host</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">=</span> <span class="s1">&#39;production&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">password</span> <span class="o">=</span> <span class="s1">&#39;secret&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">dbname</span> <span class="o">=</span> <span class="s1">&#39;dbproduction&#39;</span><span class="p">;</span>
+
+<span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Writer\Ini</span><span class="p">();</span>
+<span class="k">echo</span> <span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">toString</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The result of this code is an INI string contains the following values:</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">[production]</span>
+<span class="na">webhost</span> <span class="o">=</span> <span class="s">&quot;www.example.com&quot;</span>
+<span class="na">database.params.host</span> <span class="o">=</span> <span class="s">&quot;localhost&quot;</span>
+<span class="na">database.params.username</span> <span class="o">=</span> <span class="s">&quot;production&quot;</span>
+<span class="na">database.params.password</span> <span class="o">=</span> <span class="s">&quot;secret&quot;</span>
+<span class="na">database.params.dbname</span> <span class="o">=</span> <span class="s">&quot;dbproduction&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can use the method <tt class="docutils literal"><span class="pre">toFile()</span></tt> to store the INI data in a file.</p>
+</div>
+<div class="section" id="zend-config-writer-xml">
+<span id="id3"></span><h2>Zend\Config\Writer\Xml<a class="headerlink" href="#zend-config-writer-xml" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Config\Writer\Xml</span></tt>can be used to generate an XML string or file starting from a
+<tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object.</p>
+<p class="rubric" id="zend-config-writer-xml-example">Using Zend\Config\Writer\Ini</p>
+<p>This example illustrates the basic use of <tt class="docutils literal"><span class="pre">Zend\Config\Writer\Xml</span></tt> to create a new config file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create the config object</span>
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Config</span><span class="p">(</span><span class="k">array</span><span class="p">(),</span> <span class="k">true</span><span class="p">);</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">webhost</span> <span class="o">=</span> <span class="s1">&#39;www.example.com&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">host</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">=</span> <span class="s1">&#39;production&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">password</span> <span class="o">=</span> <span class="s1">&#39;secret&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">dbname</span> <span class="o">=</span> <span class="s1">&#39;dbproduction&#39;</span><span class="p">;</span>
+
+<span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Writer\Xml</span><span class="p">();</span>
+<span class="k">echo</span> <span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">toString</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The result of this code is an XML string contains the following data:</p>
+<div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;zend-config&gt;</span>
+    <span class="nt">&lt;production&gt;</span>
+        <span class="nt">&lt;webhost&gt;</span>www.example.com<span class="nt">&lt;/webhost&gt;</span>
+        <span class="nt">&lt;database&gt;</span>
+            <span class="nt">&lt;params&gt;</span>
+                <span class="nt">&lt;host&gt;</span>localhost<span class="nt">&lt;/host&gt;</span>
+                <span class="nt">&lt;username&gt;</span>production<span class="nt">&lt;/username&gt;</span>
+                <span class="nt">&lt;password&gt;</span>secret<span class="nt">&lt;/password&gt;</span>
+                <span class="nt">&lt;dbname&gt;</span>dbproduction<span class="nt">&lt;/dbname&gt;</span>
+            <span class="nt">&lt;/params&gt;</span>
+        <span class="nt">&lt;/database&gt;</span>
+    <span class="nt">&lt;/production&gt;</span>
+<span class="nt">&lt;/zend-config&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can use the method <tt class="docutils literal"><span class="pre">toFile()</span></tt> to store the XML data in a file.</p>
+</div>
+<div class="section" id="zend-config-writer-phparray">
+<span id="id4"></span><h2>Zend\Config\Writer\PhpArray<a class="headerlink" href="#zend-config-writer-phparray" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Config\Writer\PhpArray</span></tt>can be used to generate a PHP code that returns an array representation of an
+<tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object.</p>
+<p class="rubric" id="zend-config-writer-phparray-example">Using Zend\Config\Writer\PhpArray</p>
+<p>This example illustrates the basic use of <tt class="docutils literal"><span class="pre">Zend\Config\Writer\PhpArray</span></tt> to create a new config file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create the config object</span>
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Config</span><span class="p">(</span><span class="k">array</span><span class="p">(),</span> <span class="k">true</span><span class="p">);</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">webhost</span> <span class="o">=</span> <span class="s1">&#39;www.example.com&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">host</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">=</span> <span class="s1">&#39;production&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">password</span> <span class="o">=</span> <span class="s1">&#39;secret&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">dbname</span> <span class="o">=</span> <span class="s1">&#39;dbproduction&#39;</span><span class="p">;</span>
+
+<span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Writer\PhpArray</span><span class="p">();</span>
+<span class="k">echo</span> <span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">toString</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The result of this code is a PHP script that returns an array as follow:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">return</span> <span class="k">array</span> <span class="p">(</span>
+  <span class="s1">&#39;production&#39;</span> <span class="o">=&gt;</span>
+  <span class="k">array</span> <span class="p">(</span>
+    <span class="s1">&#39;webhost&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;www.example.com&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;database&#39;</span> <span class="o">=&gt;</span>
+    <span class="k">array</span> <span class="p">(</span>
+      <span class="s1">&#39;params&#39;</span> <span class="o">=&gt;</span>
+      <span class="k">array</span> <span class="p">(</span>
+        <span class="s1">&#39;host&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;production&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;secret&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;dbname&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;dbproduction&#39;</span><span class="p">,</span>
+      <span class="p">),</span>
+    <span class="p">),</span>
+  <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can use the method <tt class="docutils literal"><span class="pre">toFile()</span></tt> to store the PHP script in a file.</p>
+</div>
+<div class="section" id="zend-config-writer-json">
+<span id="id5"></span><h2>Zend\Config\Writer\Json<a class="headerlink" href="#zend-config-writer-json" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Config\Writer\Json</span></tt>can be used to generate a PHP code that returns the JSON representation of a
+<tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object.</p>
+<p class="rubric" id="zend-config-writer-json-example">Using Zend\Config\Writer\Json</p>
+<p>This example illustrates the basic use of <tt class="docutils literal"><span class="pre">Zend\Config\Writer\Json</span></tt> to create a new config file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create the config object</span>
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Config</span><span class="p">(</span><span class="k">array</span><span class="p">(),</span> <span class="k">true</span><span class="p">);</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">webhost</span> <span class="o">=</span> <span class="s1">&#39;www.example.com&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">host</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">=</span> <span class="s1">&#39;production&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">password</span> <span class="o">=</span> <span class="s1">&#39;secret&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">dbname</span> <span class="o">=</span> <span class="s1">&#39;dbproduction&#39;</span><span class="p">;</span>
+
+<span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Writer\Json</span><span class="p">();</span>
+<span class="k">echo</span> <span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">toString</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The result of this code is a JSON string contains the following values:</p>
+<div class="highlight-json"><pre>{ "webhost"  : "www.example.com",
+  "database" : {
+    "params"  : {
+      "host"     : "localhost",
+      "username" : "production",
+      "password" : "secret",
+      "dbname"   : "dbproduction"
+    }
+  }
+}</pre>
+</div>
+<p>You can use the method <tt class="docutils literal"><span class="pre">toFile()</span></tt> to store the JSON data in a file.</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Config\Writer\Json</span></tt> class uses the <tt class="docutils literal"><span class="pre">Zend\Json\Json</span></tt> component to convert the data in a JSON format.</p>
+</div>
+<div class="section" id="zend-config-writer-yaml">
+<span id="id6"></span><h2>Zend\Config\Writer\Yaml<a class="headerlink" href="#zend-config-writer-yaml" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Config\Writer\Yaml</span></tt>can be used to generate a PHP code that returns the YAML representation of a
+<tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object. In order to use the YAML writer we need to pass a callback to an external PHP
+library or use the <a class="reference external" href="http://www.php.net/manual/en/book.yaml.php">Yaml PECL extension</a>.</p>
+<p class="rubric" id="zend-config-writer-yaml-example">Using Zend\Config\Writer\Yaml</p>
+<p>This example illustrates the basic use of <tt class="docutils literal"><span class="pre">Zend\Config\Writer\Yaml</span></tt> to create a new config file using the Yaml
+PECL extension:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create the config object</span>
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Config</span><span class="p">(</span><span class="k">array</span><span class="p">(),</span> <span class="k">true</span><span class="p">);</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">webhost</span> <span class="o">=</span> <span class="s1">&#39;www.example.com&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">host</span> <span class="o">=</span> <span class="s1">&#39;localhost&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">=</span> <span class="s1">&#39;production&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">password</span> <span class="o">=</span> <span class="s1">&#39;secret&#39;</span><span class="p">;</span>
+<span class="nv">$config</span><span class="o">-&gt;</span><span class="na">production</span><span class="o">-&gt;</span><span class="na">database</span><span class="o">-&gt;</span><span class="na">params</span><span class="o">-&gt;</span><span class="na">dbname</span> <span class="o">=</span> <span class="s1">&#39;dbproduction&#39;</span><span class="p">;</span>
+
+<span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Writer\Yaml</span><span class="p">();</span>
+<span class="k">echo</span> <span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">toString</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The result of this code is a YAML string contains the following values:</p>
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="l-Scalar-Plain">webhost</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">www.example.com</span>
+<span class="l-Scalar-Plain">database</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">params</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">host</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">localhost</span>
+      <span class="l-Scalar-Plain">username</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">production</span>
+      <span class="l-Scalar-Plain">password</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">secret</span>
+      <span class="l-Scalar-Plain">dbname</span><span class="p-Indicator">:</span>   <span class="l-Scalar-Plain">dbproduction</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can use the method <tt class="docutils literal"><span class="pre">toFile()</span></tt> to store the YAML data in a file.</p>
+<p>If you want to use an external YAML writer library you have to pass the callback function in the constructor of the
+class. For instance, if you want to use the <a class="reference external" href="http://code.google.com/p/spyc/">Spyc</a> library:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// include the Spyc library</span>
+<span class="k">require_once</span> <span class="p">(</span><span class="s1">&#39;path/to/spyc.php&#39;</span><span class="p">);</span>
+
+<span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Writer\Yaml</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;Spyc&#39;</span><span class="p">,</span><span class="s1">&#39;YAMLDump&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$writer</span><span class="o">-&gt;</span><span class="na">toString</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Config\Writer</a><ul>
+<li><a class="reference internal" href="#zend-config-writer-ini">Zend\Config\Writer\Ini</a></li>
+<li><a class="reference internal" href="#zend-config-writer-xml">Zend\Config\Writer\Xml</a></li>
+<li><a class="reference internal" href="#zend-config-writer-phparray">Zend\Config\Writer\PhpArray</a></li>
+<li><a class="reference internal" href="#zend-config-writer-json">Zend\Config\Writer\Json</a></li>
+<li><a class="reference internal" href="#zend-config-writer-yaml">Zend\Config\Writer\Yaml</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.config.reader.html"
+                        title="previous chapter">Zend\Config\Reader</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.config.processor.html"
+                        title="next chapter">Zend\Config\Processor</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.config.writer.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.config.writer.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.config.writer.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.config.processor.html" title="Zend\Config\Processor"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.config.reader.html" title="Zend\Config\Reader"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.config.writer.rst">
+                Zend\Config\Writer
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

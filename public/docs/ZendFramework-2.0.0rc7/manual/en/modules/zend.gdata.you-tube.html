@@ -1,0 +1,800 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using the YouTube Data API &mdash; Zend Framework 2 2.0.0rc7 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc7 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-the-youtube-data-api">
+<span id="zend-gdata-youtube"></span><h1>Using the YouTube Data API<a class="headerlink" href="#using-the-youtube-data-api" title="Permalink to this headline">¶</a></h1>
+<p>The YouTube Data <em>API</em> offers read and write access to YouTube&#8217;s content. Users can perform unauthenticated
+requests to Google Data feeds to retrieve feeds of popular videos, comments, public information about YouTube user
+profiles, user playlists, favorites, subscriptions and so on.</p>
+<p>For more information on the YouTube Data <em>API</em>, please refer to the official <a class="reference external" href="http://code.google.com/apis/youtube/developers_guide_php.html">PHP Developer&#8217;s Guide</a> on
+code.google.com.</p>
+<div class="section" id="authentication">
+<span id="zend-gdata-youtube-authentication"></span><h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
+<p>The YouTube Data <em>API</em> allows read-only access to public data, which does not require authentication. For any write
+requests, a user needs to authenticate either using ClientLogin or AuthSub authentication. Please refer to the
+<a class="reference external" href="http://code.google.com/apis/youtube/developers_guide_php.html#Authentication">Authentication section in the PHP Developer&#8217;s Guide</a> for more detail.</p>
+</div>
+<div class="section" id="developer-keys-and-client-id">
+<span id="zend-gdata-youtube-developer-key"></span><h2>Developer Keys and Client ID<a class="headerlink" href="#developer-keys-and-client-id" title="Permalink to this headline">¶</a></h2>
+<p>A developer key identifies the YouTube developer that is submitting an <em>API</em> request. A client ID identifies your
+application for logging and debugging purposes. Please visit <a class="reference external" href="http://code.google.com/apis/youtube/dashboard/">http://code.google.com/apis/youtube/dashboard/</a> to
+obtain a developer key and client ID. The example below demonstrates how to pass the developer key and client ID to
+the <a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube.html">Zend_Gdata_YouTube</a> service object.</p>
+<p class="rubric" id="zend-gdata-youtube-developer-key-example">Passing a Developer Key and ClientID to Zend_Gdata_YouTube</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">(</span><span class="nv">$httpClient</span><span class="p">,</span>
+                             <span class="nv">$applicationId</span><span class="p">,</span>
+                             <span class="nv">$clientId</span><span class="p">,</span>
+                             <span class="nv">$developerKey</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-public-video-feeds">
+<span id="zend-gdata-youtube-videos"></span><h2>Retrieving public video feeds<a class="headerlink" href="#retrieving-public-video-feeds" title="Permalink to this headline">¶</a></h2>
+<p>The YouTube Data <em>API</em> provides numerous feeds that return a list of videos, such as standard feeds, related
+videos, video responses, user&#8217;s uploads, and user&#8217;s favorites. For example, the user&#8217;s uploads feed returns all
+videos uploaded by a specific user. See the <a class="reference external" href="http://code.google.com/apis/youtube/reference.html#Video_Feeds">YouTube API reference guide</a> for a detailed list of available feeds.</p>
+<div class="section" id="searching-for-videos-by-metadata">
+<span id="zend-gdata-youtube-videos-searching"></span><h3>Searching for videos by metadata<a class="headerlink" href="#searching-for-videos-by-metadata" title="Permalink to this headline">¶</a></h3>
+<p>You can retrieve a list of videos that match specified search criteria, using the YouTubeQuery class. The following
+query looks for videos which contain the word &#8220;cat&#8221; in their metadata, starting with the 10th video and displaying
+20 videos per page, ordered by the view count.</p>
+<p class="rubric" id="zend-gdata-youtube-videos-searching-example">Searching for videos</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">newVideoQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">videoQuery</span> <span class="o">=</span> <span class="s1">&#39;cat&#39;</span><span class="p">;</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">startIndex</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">maxResults</span> <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">orderBy</span> <span class="o">=</span> <span class="s1">&#39;viewCount&#39;</span><span class="p">;</span>
+
+<span class="k">echo</span> <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">queryUrl</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="nv">$videoFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getVideoFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$videoFeed</span> <span class="k">as</span> <span class="nv">$videoEntry</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;---------VIDEO----------</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="s2">&quot;Title: &quot;</span> <span class="o">.</span> <span class="nv">$videoEntry</span><span class="o">-&gt;</span><span class="na">getVideoTitle</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Description:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="nv">$videoEntry</span><span class="o">-&gt;</span><span class="na">getVideoDescription</span><span class="p">();</span>
+    <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>For more details on the different query parameters, please refer to the <a class="reference external" href="http://code.google.com/apis/youtube/reference.html#Searching_for_videos">Reference Guide</a>. The available helper
+functions in <a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoQuery.html">Zend_Gdata_YouTube_VideoQuery</a> for each of these parameters are described in more detail in the <a class="reference external" href="http://code.google.com/apis/youtube/developers_guide_php.html">PHP
+Developer&#8217;s Guide</a>.</p>
+</div>
+<div class="section" id="searching-for-videos-by-categories-and-tags-keywords">
+<span id="zend-gdata-youtube-videos-searchingcategories"></span><h3>Searching for videos by categories and tags/keywords<a class="headerlink" href="#searching-for-videos-by-categories-and-tags-keywords" title="Permalink to this headline">¶</a></h3>
+<p>Searching for videos in specific categories is done by generating a <a class="reference external" href="http://code.google.com/apis/youtube/reference.html#Category_search">specially formatted URL</a>. For example, to
+search for comedy videos which contain the keyword dog:</p>
+<p class="rubric" id="zend-gdata-youtube-videos-searchingcategories-example">Searching for videos in specific categories</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">newVideoQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">category</span> <span class="o">=</span> <span class="s1">&#39;Comedy/dog&#39;</span><span class="p">;</span>
+
+<span class="k">echo</span> <span class="nv">$query</span><span class="o">-&gt;</span><span class="na">queryUrl</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="nv">$videoFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getVideoFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-standard-feeds">
+<span id="zend-gdata-youtube-videos-standard"></span><h3>Retrieving standard feeds<a class="headerlink" href="#retrieving-standard-feeds" title="Permalink to this headline">¶</a></h3>
+<p>The YouTube Data <em>API</em> has a number of <a class="reference external" href="http://code.google.com/apis/youtube/reference.html#Standard_feeds">standard feeds</a>. These standard feeds can be retrieved as
+<a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoFeed.html">Zend_Gdata_YouTube_VideoFeed</a> objects using the specified <em>URL</em>s, using the predefined constants within the
+<a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube.html">Zend_Gdata_YouTube</a> class (Zend_Gdata_YouTube::STANDARD_TOP_RATED_URI for example) or using the predefined helper
+methods (see code listing below).</p>
+<p>To retrieve the top rated videos using the helper method:</p>
+<p class="rubric" id="zend-gdata-youtube-videos-standard-example-1">Retrieving a standard video feed</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$videoFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getTopRatedVideoFeed</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>There are also query parameters to specify the time period over which the standard feed is computed.</p>
+<p>For example, to retrieve the top rated videos for today:</p>
+<p class="rubric" id="zend-gdata-youtube-videos-standard-example-2">Using a Zend_Gdata_YouTube_VideoQuery to Retrieve Videos</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">newVideoQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setTime</span><span class="p">(</span><span class="s1">&#39;today&#39;</span><span class="p">);</span>
+<span class="nv">$videoFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getTopRatedVideoFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Alternatively, you could just retrieve the feed using the <em>URL</em>:</p>
+<p class="rubric" id="zend-gdata-youtube-videos-standard-example-3">Retrieving a video feed by URL</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$url</span> <span class="o">=</span> <span class="s1">&#39;http://gdata.youtube.com/feeds/standardfeeds/top_rated?time=today&#39;</span>
+<span class="nv">$videoFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getVideoFeed</span><span class="p">(</span><span class="nv">$url</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-videos-uploaded-by-a-user">
+<span id="zend-gdata-youtube-videos-user"></span><h3>Retrieving videos uploaded by a user<a class="headerlink" href="#retrieving-videos-uploaded-by-a-user" title="Permalink to this headline">¶</a></h3>
+<p>You can retrieve a list of videos uploaded by a particular user using a simple helper method. This example
+retrieves videos uploaded by the user &#8216;liz&#8217;.</p>
+<p class="rubric" id="zend-gdata-youtube-videos-user-example">Retrieving videos uploaded by a specific user</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$videoFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getUserUploads</span><span class="p">(</span><span class="s1">&#39;liz&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-videos-favorited-by-a-user">
+<span id="zend-gdata-youtube-videos-favorites"></span><h3>Retrieving videos favorited by a user<a class="headerlink" href="#retrieving-videos-favorited-by-a-user" title="Permalink to this headline">¶</a></h3>
+<p>You can retrieve a list of a user&#8217;s favorite videos using a simple helper method. This example retrieves videos
+favorited by the user &#8216;liz&#8217;.</p>
+<p class="rubric" id="zend-gdata-youtube-videos-favorites-example">Retrieving a user&#8217;s favorite videos</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$videoFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getUserFavorites</span><span class="p">(</span><span class="s1">&#39;liz&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-video-responses-for-a-video">
+<span id="zend-gdata-youtube-videos-responses"></span><h3>Retrieving video responses for a video<a class="headerlink" href="#retrieving-video-responses-for-a-video" title="Permalink to this headline">¶</a></h3>
+<p>You can retrieve a list of a video&#8217;s video responses using a simple helper method. This example retrieves video
+response for a video with the ID &#8216;abc123813abc&#8217;.</p>
+<p class="rubric" id="zend-gdata-youtube-videos-responses-example">Retrieving a feed of video responses</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$videoFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getVideoResponseFeed</span><span class="p">(</span><span class="s1">&#39;abc123813abc&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="retrieving-video-comments">
+<span id="zend-gdata-youtube-comments"></span><h2>Retrieving video comments<a class="headerlink" href="#retrieving-video-comments" title="Permalink to this headline">¶</a></h2>
+<p>The comments for each YouTube video can be retrieved in several ways. To retrieve the comments for the video with
+the ID &#8216;abc123813abc&#8217;, use the following code:</p>
+<p class="rubric" id="zend-gdata-youtube-videos-comments-example-1">Retrieving a feed of video comments from a video ID</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$commentFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getVideoCommentFeed</span><span class="p">(</span><span class="s1">&#39;abc123813abc&#39;</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$commentFeed</span> <span class="k">as</span> <span class="nv">$commentEntry</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$commentEntry</span><span class="o">-&gt;</span><span class="na">title</span><span class="o">-&gt;</span><span class="na">text</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="nv">$commentEntry</span><span class="o">-&gt;</span><span class="na">content</span><span class="o">-&gt;</span><span class="na">text</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Comments can also be retrieved for a video if you have a copy of the <a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a> object:</p>
+<p class="rubric" id="zend-gdata-youtube-videos-comments-example-2">Retrieving a Feed of Video Comments from a Zend_Gdata_YouTube_VideoEntry</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$videoEntry</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getVideoEntry</span><span class="p">(</span><span class="s1">&#39;abc123813abc&#39;</span><span class="p">);</span>
+<span class="c1">// we don&#39;t know the video ID in this example, but we do have the URL</span>
+<span class="nv">$commentFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getVideoCommentFeed</span><span class="p">(</span><span class="k">null</span><span class="p">,</span>
+                                        <span class="nv">$videoEntry</span><span class="o">-&gt;</span><span class="na">comments</span><span class="o">-&gt;</span><span class="na">href</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-playlist-feeds">
+<span id="zend-gdata-youtube-playlists"></span><h2>Retrieving playlist feeds<a class="headerlink" href="#retrieving-playlist-feeds" title="Permalink to this headline">¶</a></h2>
+<p>The YouTube Data <em>API</em> provides information about users, including profiles, playlists, subscriptions, and more.</p>
+<div class="section" id="retrieving-the-playlists-of-a-user">
+<span id="zend-gdata-youtube-playlists-user"></span><h3>Retrieving the playlists of a user<a class="headerlink" href="#retrieving-the-playlists-of-a-user" title="Permalink to this headline">¶</a></h3>
+<p>The library provides a helper method to retrieve the playlists associated with a given user. To retrieve the
+playlists for the user &#8216;liz&#8217;:</p>
+<p class="rubric" id="zend-gdata-youtube-playlists-user-example">Retrieving the playlists of a user</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$playlistListFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getPlaylistListFeed</span><span class="p">(</span><span class="s1">&#39;liz&#39;</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$playlistListFeed</span> <span class="k">as</span> <span class="nv">$playlistEntry</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$playlistEntry</span><span class="o">-&gt;</span><span class="na">title</span><span class="o">-&gt;</span><span class="na">text</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="nv">$playlistEntry</span><span class="o">-&gt;</span><span class="na">description</span><span class="o">-&gt;</span><span class="na">text</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="nv">$playlistEntry</span><span class="o">-&gt;</span><span class="na">getPlaylistVideoFeedUrl</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-a-specific-playlist">
+<span id="zend-gdata-youtube-playlists-special"></span><h3>Retrieving a specific playlist<a class="headerlink" href="#retrieving-a-specific-playlist" title="Permalink to this headline">¶</a></h3>
+<p>The library provides a helper method to retrieve the videos associated with a given playlist. To retrieve the
+playlists for a specific playlist entry:</p>
+<p class="rubric" id="zend-gdata-youtube-playlists-special-example">Retrieving a specific playlist</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feedUrl</span> <span class="o">=</span> <span class="nv">$playlistEntry</span><span class="o">-&gt;</span><span class="na">getPlaylistVideoFeedUrl</span><span class="p">();</span>
+<span class="nv">$playlistVideoFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getPlaylistVideoFeed</span><span class="p">(</span><span class="nv">$feedUrl</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="retrieving-a-list-of-a-user-s-subscriptions">
+<span id="zend-gdata-youtube-subscriptions"></span><h2>Retrieving a list of a user&#8217;s subscriptions<a class="headerlink" href="#retrieving-a-list-of-a-user-s-subscriptions" title="Permalink to this headline">¶</a></h2>
+<p>A user can have several types of subscriptions: channel subscription, tag subscription, or favorites subscription.
+A <a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_SubscriptionEntry.html">Zend_Gdata_YouTube_SubscriptionEntry</a> is used to represent individual subscriptions.</p>
+<p>To retrieve all subscriptions for the user &#8216;liz&#8217;:</p>
+<p class="rubric" id="zend-gdata-youtube-subscriptions-example">Retrieving all subscriptions for a user</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$subscriptionFeed</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getSubscriptionFeed</span><span class="p">(</span><span class="s1">&#39;liz&#39;</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$subscriptionFeed</span> <span class="k">as</span> <span class="nv">$subscriptionEntry</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$subscriptionEntry</span><span class="o">-&gt;</span><span class="na">title</span><span class="o">-&gt;</span><span class="na">text</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-a-user-s-profile">
+<span id="zend-gdata-youtube-profile"></span><h2>Retrieving a user&#8217;s profile<a class="headerlink" href="#retrieving-a-user-s-profile" title="Permalink to this headline">¶</a></h2>
+<p>You can retrieve the public profile information for any YouTube user. To retrieve the profile for the user &#8216;liz&#8217;:</p>
+<p class="rubric" id="zend-gdata-youtube-profile-example">Retrieving a user&#8217;s profile</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">();</span>
+<span class="nv">$userProfile</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getUserProfile</span><span class="p">(</span><span class="s1">&#39;liz&#39;</span><span class="p">);</span>
+<span class="k">echo</span> <span class="s2">&quot;username: &quot;</span> <span class="o">.</span> <span class="nv">$userProfile</span><span class="o">-&gt;</span><span class="na">username</span><span class="o">-&gt;</span><span class="na">text</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s2">&quot;age: &quot;</span> <span class="o">.</span> <span class="nv">$userProfile</span><span class="o">-&gt;</span><span class="na">age</span><span class="o">-&gt;</span><span class="na">text</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s2">&quot;hometown: &quot;</span> <span class="o">.</span> <span class="nv">$userProfile</span><span class="o">-&gt;</span><span class="na">hometown</span><span class="o">-&gt;</span><span class="na">text</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="uploading-videos-to-youtube">
+<span id="zend-gdata-youtube-uploads"></span><h2>Uploading Videos to YouTube<a class="headerlink" href="#uploading-videos-to-youtube" title="Permalink to this headline">¶</a></h2>
+<p>Please make sure to review the diagrams in the <a class="reference external" href="http://code.google.com/apis/youtube/developers_guide_protocol.html#Process_Flows_for_Uploading_Videos">protocol guide</a> on code.google.com for a high-level overview of
+the upload process. Uploading videos can be done in one of two ways: either by uploading the video directly or by
+sending just the video meta-data and having a user upload the video through an <em>HTML</em> form.</p>
+<p>In order to upload a video directly, you must first construct a new <a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a> object and
+specify some required meta-data. The following example shows uploading the Quicktime video &#8220;mytestmovie.mov&#8221; to
+YouTube with the following properties:</p>
+<table border="1" class="docutils" id="zend-gdata-youtube-uploads-metadata">
+<caption>Metadata used in the code-sample below</caption>
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Title</td>
+<td>My Test Movie</td>
+</tr>
+<tr class="row-odd"><td>Category</td>
+<td>Autos</td>
+</tr>
+<tr class="row-even"><td>Keywords</td>
+<td>cars, funny</td>
+</tr>
+<tr class="row-odd"><td>Description</td>
+<td>My description</td>
+</tr>
+<tr class="row-even"><td>Filename</td>
+<td>mytestmovie.mov</td>
+</tr>
+<tr class="row-odd"><td>File MIME type</td>
+<td>video/quicktime</td>
+</tr>
+<tr class="row-even"><td>Video private?</td>
+<td>FALSE</td>
+</tr>
+<tr class="row-odd"><td>Video location</td>
+<td>37, -122 (lat, long)</td>
+</tr>
+<tr class="row-even"><td>Developer Tags</td>
+<td>mydevelopertag, anotherdevelopertag</td>
+</tr>
+</tbody>
+</table>
+<p>The code below creates a blank <a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a> to be uploaded. A <a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_App_MediaFileSource.html">Zend_Gdata_App_MediaFileSource</a>
+object is then used to hold the actual video file. Under the hood, the <a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_Extension_MediaGroup.html">Zend_Gdata_YouTube_Extension_MediaGroup</a>
+object is used to hold all of the video&#8217;s meta-data. Our helper methods detailed below allow you to just set the
+video meta-data without having to worry about the media group object. The $uploadUrl is the location where the new
+entry gets posted to. This can be specified either with the $userName of the currently authenticated user, or,
+alternatively, you can simply use the string &#8216;default&#8217; to refer to the currently authenticated user.</p>
+<p class="rubric" id="zend-gdata-youtube-uploads-example">Uploading a video</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">(</span><span class="nv">$httpClient</span><span class="p">);</span>
+<span class="nv">$myVideoEntry</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube_VideoEntry</span><span class="p">();</span>
+
+<span class="nv">$filesource</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">newMediaFileSource</span><span class="p">(</span><span class="s1">&#39;mytestmovie.mov&#39;</span><span class="p">);</span>
+<span class="nv">$filesource</span><span class="o">-&gt;</span><span class="na">setContentType</span><span class="p">(</span><span class="s1">&#39;video/quicktime&#39;</span><span class="p">);</span>
+<span class="nv">$filesource</span><span class="o">-&gt;</span><span class="na">setSlug</span><span class="p">(</span><span class="s1">&#39;mytestmovie.mov&#39;</span><span class="p">);</span>
+
+<span class="nv">$myVideoEntry</span><span class="o">-&gt;</span><span class="na">setMediaSource</span><span class="p">(</span><span class="nv">$filesource</span><span class="p">);</span>
+
+<span class="nv">$myVideoEntry</span><span class="o">-&gt;</span><span class="na">setVideoTitle</span><span class="p">(</span><span class="s1">&#39;My Test Movie&#39;</span><span class="p">);</span>
+<span class="nv">$myVideoEntry</span><span class="o">-&gt;</span><span class="na">setVideoDescription</span><span class="p">(</span><span class="s1">&#39;My Test Movie&#39;</span><span class="p">);</span>
+<span class="c1">// Note that category must be a valid YouTube category !</span>
+<span class="nv">$myVideoEntry</span><span class="o">-&gt;</span><span class="na">setVideoCategory</span><span class="p">(</span><span class="s1">&#39;Comedy&#39;</span><span class="p">);</span>
+
+<span class="c1">// Set keywords, note that this must be a comma separated string</span>
+<span class="c1">// and that each keyword cannot contain whitespace</span>
+<span class="nv">$myVideoEntry</span><span class="o">-&gt;</span><span class="na">SetVideoTags</span><span class="p">(</span><span class="s1">&#39;cars, funny&#39;</span><span class="p">);</span>
+
+<span class="c1">// Optionally set some developer tags</span>
+<span class="nv">$myVideoEntry</span><span class="o">-&gt;</span><span class="na">setVideoDeveloperTags</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;mydevelopertag&#39;</span><span class="p">,</span>
+                                           <span class="s1">&#39;anotherdevelopertag&#39;</span><span class="p">));</span>
+
+<span class="c1">// Optionally set the video&#39;s location</span>
+<span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">registerPackage</span><span class="p">(</span><span class="s1">&#39;Zend_Gdata_Geo&#39;</span><span class="p">);</span>
+<span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">registerPackage</span><span class="p">(</span><span class="s1">&#39;Zend_Gdata_Geo_Extension&#39;</span><span class="p">);</span>
+<span class="nv">$where</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">newGeoRssWhere</span><span class="p">();</span>
+<span class="nv">$position</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">newGmlPos</span><span class="p">(</span><span class="s1">&#39;37.0 -122.0&#39;</span><span class="p">);</span>
+<span class="nv">$where</span><span class="o">-&gt;</span><span class="na">point</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">newGmlPoint</span><span class="p">(</span><span class="nv">$position</span><span class="p">);</span>
+<span class="nv">$myVideoEntry</span><span class="o">-&gt;</span><span class="na">setWhere</span><span class="p">(</span><span class="nv">$where</span><span class="p">);</span>
+
+<span class="c1">// Upload URI for the currently authenticated user</span>
+<span class="nv">$uploadUrl</span> <span class="o">=</span>
+    <span class="s1">&#39;http://uploads.gdata.youtube.com/feeds/users/default/uploads&#39;</span><span class="p">;</span>
+
+<span class="c1">// Try to upload the video, catching a Zend_Gdata_App_HttpException</span>
+<span class="c1">// if availableor just a regular Zend_Gdata_App_Exception</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$newEntry</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">insertEntry</span><span class="p">(</span><span class="nv">$myVideoEntry</span><span class="p">,</span>
+                                 <span class="nv">$uploadUrl</span><span class="p">,</span>
+                                 <span class="s1">&#39;Zend_Gdata_YouTube_VideoEntry&#39;</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend_Gdata_App_HttpException</span> <span class="nv">$httpException</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$httpException</span><span class="o">-&gt;</span><span class="na">getRawResponseBody</span><span class="p">();</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend_Gdata_App_Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>To upload a video as private, simply use: $myVideoEntry-&gt;setVideoPrivate(); prior to performing the upload.
+$videoEntry-&gt;isVideoPrivate() can be used to check whether a video entry is private or not.</p>
+</div>
+<div class="section" id="browser-based-upload">
+<span id="zend-gdata-youtube-uploads-browser"></span><h2>Browser-based upload<a class="headerlink" href="#browser-based-upload" title="Permalink to this headline">¶</a></h2>
+<p>Browser-based uploading is performed almost identically to direct uploading, except that you do not attach a
+<a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_App_MediaFileSource.html">Zend_Gdata_App_MediaFileSource</a> object to the <a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a> you are constructing. Instead you
+simply submit all of your video&#8217;s meta-data to receive back a token element which can be used to construct an
+<em>HTML</em> upload form.</p>
+<p class="rubric" id="zend-gdata-youtube-uploads-browser-example-1">Browser-based upload</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$yt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube</span><span class="p">(</span><span class="nv">$httpClient</span><span class="p">);</span>
+
+<span class="nv">$myVideoEntry</span><span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Gdata_YouTube_VideoEntry</span><span class="p">();</span>
+<span class="nv">$myVideoEntry</span><span class="o">-&gt;</span><span class="na">setVideoTitle</span><span class="p">(</span><span class="s1">&#39;My Test Movie&#39;</span><span class="p">);</span>
+<span class="nv">$myVideoEntry</span><span class="o">-&gt;</span><span class="na">setVideoDescription</span><span class="p">(</span><span class="s1">&#39;My Test Movie&#39;</span><span class="p">);</span>
+
+<span class="c1">// Note that category must be a valid YouTube category</span>
+<span class="nv">$myVideoEntry</span><span class="o">-&gt;</span><span class="na">setVideoCategory</span><span class="p">(</span><span class="s1">&#39;Comedy&#39;</span><span class="p">);</span>
+<span class="nv">$myVideoEntry</span><span class="o">-&gt;</span><span class="na">SetVideoTags</span><span class="p">(</span><span class="s1">&#39;cars, funny&#39;</span><span class="p">);</span>
+
+<span class="nv">$tokenHandlerUrl</span> <span class="o">=</span> <span class="s1">&#39;http://gdata.youtube.com/action/GetUploadToken&#39;</span><span class="p">;</span>
+<span class="nv">$tokenArray</span> <span class="o">=</span> <span class="nv">$yt</span><span class="o">-&gt;</span><span class="na">getFormUploadToken</span><span class="p">(</span><span class="nv">$myVideoEntry</span><span class="p">,</span> <span class="nv">$tokenHandlerUrl</span><span class="p">);</span>
+<span class="nv">$tokenValue</span> <span class="o">=</span> <span class="nv">$tokenArray</span><span class="p">[</span><span class="s1">&#39;token&#39;</span><span class="p">];</span>
+<span class="nv">$postUrl</span> <span class="o">=</span> <span class="nv">$tokenArray</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">];</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above code prints out a link and a token that is used to construct an <em>HTML</em> form to display in the user&#8217;s
+browser. A simple example form is shown below with $tokenValue representing the content of the returned token
+element, as shown being retrieved from $myVideoEntry above. In order for the user to be redirected to your website
+after submitting the form, make sure to append a $nextUrl parameter to the $postUrl above, which functions in the
+same way as the $next parameter of an AuthSub link. The only difference is that here, instead of a single-use
+token, a status and an id variable are returned in the <em>URL</em>.</p>
+<p class="rubric" id="zend-gdata-youtube-uploads-browser-example-2">Browser-based upload: Creating the HTML form</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// place to redirect user after upload</span>
+<span class="nv">$nextUrl</span> <span class="o">=</span> <span class="s1">&#39;http://mysite.com/youtube_uploads&#39;</span><span class="p">;</span>
+
+<span class="nv">$form</span> <span class="o">=</span> <span class="s1">&#39;&lt;form action=&quot;&#39;</span><span class="o">.</span> <span class="nv">$postUrl</span> <span class="o">.</span><span class="s1">&#39;?nexturl=&#39;</span><span class="o">.</span> <span class="nv">$nextUrl</span> <span class="o">.</span>
+        <span class="s1">&#39;&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot;&gt;&#39;</span><span class="o">.</span>
+        <span class="s1">&#39;&lt;input name=&quot;file&quot; type=&quot;file&quot;/&gt;&#39;</span><span class="o">.</span>
+        <span class="s1">&#39;&lt;input name=&quot;token&quot; type=&quot;hidden&quot; value=&quot;&#39;</span><span class="o">.</span> <span class="nv">$tokenValue</span> <span class="o">.</span><span class="s1">&#39;&quot;/&gt;&#39;</span><span class="o">.</span>
+        <span class="s1">&#39;&lt;input value=&quot;Upload Video File&quot; type=&quot;submit&quot; /&gt;&#39;</span><span class="o">.</span>
+        <span class="s1">&#39;&lt;/form&gt;&#39;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="checking-upload-status">
+<span id="zend-gdata-youtube-uploads-status"></span><h2>Checking upload status<a class="headerlink" href="#checking-upload-status" title="Permalink to this headline">¶</a></h2>
+<p>After uploading a video, it will immediately be visible in an authenticated user&#8217;s uploads feed. However, it will
+not be public on the site until it has been processed. Videos that have been rejected or failed to upload
+successfully will also only be in the authenticated user&#8217;s uploads feed. The following code checks the status of a
+<a class="reference external" href="http://framework.zend.com/apidoc/core/Zend_Gdata/Zend_Gdata_YouTube_VideoEntry.html">Zend_Gdata_YouTube_VideoEntry</a> to see if it is not live yet or if it has been rejected.</p>
+<p class="rubric" id="zend-gdata-youtube-uploads-status-example">Checking video upload status</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$control</span> <span class="o">=</span> <span class="nv">$videoEntry</span><span class="o">-&gt;</span><span class="na">getControl</span><span class="p">();</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend_Gdata_App_Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$control</span> <span class="nx">instanceof</span> <span class="nx">Zend_Gdata_App_Extension_Control</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$control</span><span class="o">-&gt;</span><span class="na">getDraft</span><span class="p">()</span> <span class="o">!=</span> <span class="k">null</span> <span class="o">&amp;&amp;</span>
+        <span class="nv">$control</span><span class="o">-&gt;</span><span class="na">getDraft</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getText</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$state</span> <span class="o">=</span> <span class="nv">$videoEntry</span><span class="o">-&gt;</span><span class="na">getVideoState</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$state</span> <span class="nx">instanceof</span> <span class="nx">Zend_Gdata_YouTube_Extension_State</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">print</span> <span class="s1">&#39;Upload status: &#39;</span>
+                  <span class="o">.</span> <span class="nv">$state</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span>
+                  <span class="o">.</span><span class="s1">&#39; &#39;</span><span class="o">.</span> <span class="nv">$state</span><span class="o">-&gt;</span><span class="na">getText</span><span class="p">();</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">print</span> <span class="s1">&#39;Not able to retrieve the video status information&#39;</span>
+                  <span class="o">.</span><span class="s1">&#39; yet. &#39;</span> <span class="o">.</span> <span class="s2">&quot;Please try again shortly.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="other-functions">
+<span id="zend-gdata-youtube-other"></span><h2>Other Functions<a class="headerlink" href="#other-functions" title="Permalink to this headline">¶</a></h2>
+<p>In addition to the functionality described above, the YouTube <em>API</em> contains many other functions that allow you to
+modify video meta-data, delete video entries and use the full range of community features on the site. Some of the
+community features that can be modified through the <em>API</em> include: ratings, comments, playlists, subscriptions,
+user profiles, contacts and messages.</p>
+<p>Please refer to the full documentation available in the <a class="reference external" href="http://code.google.com/apis/youtube/developers_guide_php.html">PHP Developer&#8217;s Guide</a> on code.google.com.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using the YouTube Data API</a><ul>
+<li><a class="reference internal" href="#authentication">Authentication</a></li>
+<li><a class="reference internal" href="#developer-keys-and-client-id">Developer Keys and Client ID</a></li>
+<li><a class="reference internal" href="#retrieving-public-video-feeds">Retrieving public video feeds</a><ul>
+<li><a class="reference internal" href="#searching-for-videos-by-metadata">Searching for videos by metadata</a></li>
+<li><a class="reference internal" href="#searching-for-videos-by-categories-and-tags-keywords">Searching for videos by categories and tags/keywords</a></li>
+<li><a class="reference internal" href="#retrieving-standard-feeds">Retrieving standard feeds</a></li>
+<li><a class="reference internal" href="#retrieving-videos-uploaded-by-a-user">Retrieving videos uploaded by a user</a></li>
+<li><a class="reference internal" href="#retrieving-videos-favorited-by-a-user">Retrieving videos favorited by a user</a></li>
+<li><a class="reference internal" href="#retrieving-video-responses-for-a-video">Retrieving video responses for a video</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#retrieving-video-comments">Retrieving video comments</a></li>
+<li><a class="reference internal" href="#retrieving-playlist-feeds">Retrieving playlist feeds</a><ul>
+<li><a class="reference internal" href="#retrieving-the-playlists-of-a-user">Retrieving the playlists of a user</a></li>
+<li><a class="reference internal" href="#retrieving-a-specific-playlist">Retrieving a specific playlist</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#retrieving-a-list-of-a-user-s-subscriptions">Retrieving a list of a user&#8217;s subscriptions</a></li>
+<li><a class="reference internal" href="#retrieving-a-user-s-profile">Retrieving a user&#8217;s profile</a></li>
+<li><a class="reference internal" href="#uploading-videos-to-youtube">Uploading Videos to YouTube</a></li>
+<li><a class="reference internal" href="#browser-based-upload">Browser-based upload</a></li>
+<li><a class="reference internal" href="#checking-upload-status">Checking upload status</a></li>
+<li><a class="reference internal" href="#other-functions">Other Functions</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.gdata.you-tube.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.gdata.you-tube.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.gdata.you-tube.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.gdata.you-tube.rst">
+                Using the YouTube Data API
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

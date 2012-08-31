@@ -1,0 +1,611 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Zend Framework 2 2.0.0rc7 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0rc7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0rc7 documentation" href="../index.html" />
+    <link rel="next" title="Refining Access Controls" href="zend.permissions.acl.refining.html" />
+    <link rel="prev" title="Advanced usage" href="zend.paginator.advanced.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.permissions.acl.refining.html" title="Refining Access Controls"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.paginator.advanced.html" title="Advanced usage"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<span id="zend-permissions-acl-introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl</span></tt> component provides a lightweight and flexible access control list (<em>ACL</em>) implementation for
+privileges management. In general, an application may utilize such <em>ACL</em>&#8216;s to control access to certain protected
+objects by other requesting objects.</p>
+<p>For the purposes of this documentation:</p>
+<ul class="simple">
+<li>a <strong>resource</strong> is an object to which access is controlled.</li>
+<li>a <strong>role</strong> is an object that may request access to a Resource.</li>
+</ul>
+<p>Put simply, <strong>roles request access to resources</strong>. For example, if a parking attendant requests access to a car,
+then the parking attendant is the requesting role, and the car is the resource, since access to the car may not be
+granted to everyone.</p>
+<p>Through the specification and use of an <em>ACL</em>, an application may control how roles are granted access to
+resources.</p>
+<div class="section" id="resources">
+<span id="zend-permissions-acl-introduction-resources"></span><h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<p>Creating a resource using <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> is very simple. A resource interface
+<tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Resource\ResourceInterface</span></tt> is provided to facilitate creating resources in an application. A class
+need only implement this interface, which consists of a single method, <tt class="docutils literal"><span class="pre">getResourceId()</span></tt>, for <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> to
+recognize the object as a resource. Additionally, <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Resource\GenericResource</span></tt> is provided as a basic
+resource implementation for developers to extend as needed.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> provides a tree structure to which multiple resources can be added. Since resources are stored in
+such a tree structure, they can be organized from the general (toward the tree root) to the specific (toward the
+tree leaves). Queries on a specific resource will automatically search the resource&#8217;s hierarchy for rules assigned
+to ancestor resources, allowing for simple inheritance of rules. For example, if a default rule is to be applied to
+each building in a city, one would simply assign the rule to the city, instead of assigning the same rule to each
+building. Some buildings may require exceptions to such a rule, however, and this can be achieved in
+<tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> by assigning such exception rules to each building that requires such an exception. A resource may
+inherit from only one parent resource, though this parent resource can have its own parent resource, etc.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> also supports privileges on resources (e.g., &#8220;create&#8221;, &#8220;read&#8221;, &#8220;update&#8221;, &#8220;delete&#8221;), so the
+developer can assign rules that affect all privileges or specific privileges on one or more resources.</p>
+</div>
+<div class="section" id="roles">
+<span id="zend-permissions-acl-introduction-roles"></span><h2>Roles<a class="headerlink" href="#roles" title="Permalink to this headline">¶</a></h2>
+<p>As with resources, creating a role is also very simple. All roles must implement <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Role\RoleInterface</span></tt>.
+This interface consists of a single method, <tt class="docutils literal"><span class="pre">getRoleId()</span></tt>, Additionally, <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Role\GenericRole</span></tt> is
+provided by the <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl</span></tt> component as a basic role implementation for developers to extend as needed.</p>
+<p>In <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt>, a role may inherit from one or more roles. This is to support inheritance of rules among
+roles. For example, a user role, such as &#8220;sally&#8221;, may belong to one or more parent roles, such as &#8220;editor&#8221; and
+&#8220;administrator&#8221;. The developer can assign rules to &#8220;editor&#8221; and &#8220;administrator&#8221; separately, and &#8220;sally&#8221; would
+inherit such rules from both, without having to assign rules directly to &#8220;sally&#8221;.</p>
+<p>Though the ability to inherit from multiple roles is very useful, multiple inheritance also introduces some degree
+of complexity. The following example illustrates the ambiguity condition and how <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> solves it.</p>
+<p class="rubric" id="zend-permissions-acl-introduction-roles-example-multiple-inheritance">Multiple Inheritance among Roles</p>
+<p>The following code defines three base roles - &#8220;guest&#8221;, &#8220;member&#8221;, and &#8220;admin&#8221; - from which other roles may inherit.
+Then, a role identified by &#8220;someUser&#8221; is established and inherits from the three other roles. The order in which
+these roles appear in the <tt class="docutils literal"><span class="pre">$parents</span></tt> array is important. When necessary, <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> searches for access
+rules defined not only for the queried role (herein, &#8220;someUser&#8221;), but also upon the roles from which the queried
+role inherits (herein, &#8220;guest&#8221;, &#8220;member&#8221;, and &#8220;admin&#8221;):</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Permissions\Acl\Acl</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Permissions\Acl\Role\GenericRole</span> <span class="k">as</span> <span class="nx">Role</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Permissions\Acl\Resource\GenericResource</span> <span class="k">as</span> <span class="nx">Resource</span><span class="p">;</span>
+
+<span class="nv">$acl</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Acl</span><span class="p">();</span>
+
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="k">new</span> <span class="nx">Role</span><span class="p">(</span><span class="s1">&#39;guest&#39;</span><span class="p">))</span>
+    <span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="k">new</span> <span class="nx">Role</span><span class="p">(</span><span class="s1">&#39;member&#39;</span><span class="p">))</span>
+    <span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="k">new</span> <span class="nx">Role</span><span class="p">(</span><span class="s1">&#39;admin&#39;</span><span class="p">));</span>
+
+<span class="nv">$parents</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;guest&#39;</span><span class="p">,</span> <span class="s1">&#39;member&#39;</span><span class="p">,</span> <span class="s1">&#39;admin&#39;</span><span class="p">);</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="k">new</span> <span class="nx">Role</span><span class="p">(</span><span class="s1">&#39;someUser&#39;</span><span class="p">),</span> <span class="nv">$parents</span><span class="p">);</span>
+
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addResource</span><span class="p">(</span><span class="k">new</span> <span class="nx">Resource</span><span class="p">(</span><span class="s1">&#39;someResource&#39;</span><span class="p">));</span>
+
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">deny</span><span class="p">(</span><span class="s1">&#39;guest&#39;</span><span class="p">,</span> <span class="s1">&#39;someResource&#39;</span><span class="p">);</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">allow</span><span class="p">(</span><span class="s1">&#39;member&#39;</span><span class="p">,</span> <span class="s1">&#39;someResource&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="s1">&#39;someUser&#39;</span><span class="p">,</span> <span class="s1">&#39;someResource&#39;</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39;allowed&#39;</span> <span class="o">:</span> <span class="s1">&#39;denied&#39;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Since there is no rule specifically defined for the &#8220;someUser&#8221; role and &#8220;someResource&#8221;, <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> must
+search for rules that may be defined for roles that &#8220;someUser&#8221; inherits. First, the &#8220;admin&#8221; role is visited, and
+there is no access rule defined for it. Next, the &#8220;member&#8221; role is visited, and <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> finds that there
+is a rule specifying that &#8220;member&#8221; is allowed access to &#8220;someResource&#8221;.</p>
+<p>If <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> were to continue examining the rules defined for other parent roles, however, it would find
+that &#8220;guest&#8221; is denied access to &#8220;someResource&#8221;. This fact introduces an ambiguity because now &#8220;someUser&#8221; is both
+denied and allowed access to &#8220;someResource&#8221;, by reason of having inherited conflicting rules from different parent
+roles.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> resolves this ambiguity by completing a query when it finds the first rule that is directly
+applicable to the query. In this case, since the &#8220;member&#8221; role is examined before the &#8220;guest&#8221; role, the example
+code would print &#8220;allowed&#8221;.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When specifying multiple parents for a role, keep in mind that the last parent listed is the first one searched
+for rules applicable to an authorization query.</p>
+</div>
+</div>
+<div class="section" id="creating-the-access-control-list">
+<span id="zend-permissions-acl-introduction-creating"></span><h2>Creating the Access Control List<a class="headerlink" href="#creating-the-access-control-list" title="Permalink to this headline">¶</a></h2>
+<p>An Access Control List (<em>ACL</em>) can represent any set of physical or virtual objects that you wish. For the purposes
+of demonstration, however, we will create a basic Content Management System (<em>CMS</em>) <em>ACL</em> that maintains several
+tiers of groups over a wide variety of areas. To create a new <em>ACL</em> object, we instantiate the <em>ACL</em> with no
+parameters:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Permissions\Acl\Acl</span><span class="p">;</span>
+<span class="nv">$acl</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Acl</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Until a developer specifies an &#8220;allow&#8221; rule, <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> denies access to every privilege upon every
+resource by every role.</p>
+</div>
+</div>
+<div class="section" id="registering-roles">
+<span id="zend-permissions-acl-introduction-role-registry"></span><h2>Registering Roles<a class="headerlink" href="#registering-roles" title="Permalink to this headline">¶</a></h2>
+<p><em>CMS</em>&#8216;s will nearly always require a hierarchy of permissions to determine the authoring capabilities of its users.
+There may be a &#8216;Guest&#8217; group to allow limited access for demonstrations, a &#8216;Staff&#8217; group for the majority of <em>CMS</em>
+users who perform most of the day-to-day operations, an &#8216;Editor&#8217; group for those responsible for publishing,
+reviewing, archiving and deleting content, and finally an &#8216;Administrator&#8217; group whose tasks may include all of
+those of the other groups as well as maintenance of sensitive information, user management, back-end configuration
+data, backup and export. This set of permissions can be represented in a role registry, allowing each group to
+inherit privileges from &#8216;parent&#8217; groups, as well as providing distinct privileges for their unique group only. The
+permissions may be expressed as follows:</p>
+<table border="1" class="docutils" id="zend-permissions-acl-introduction-role-registry-table-example-cms-access-controls">
+<caption>Access Controls for an Example CMS</caption>
+<colgroup>
+<col width="21%" />
+<col width="39%" />
+<col width="39%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Unique Permissions</th>
+<th class="head">Inherit Permissions From</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Guest</td>
+<td>View</td>
+<td>N/A</td>
+</tr>
+<tr class="row-odd"><td>Staff</td>
+<td>Edit, Submit, Revise</td>
+<td>Guest</td>
+</tr>
+<tr class="row-even"><td>Editor</td>
+<td>Publish, Archive, Delete</td>
+<td>Staff</td>
+</tr>
+<tr class="row-odd"><td>Administrator</td>
+<td>(Granted all access)</td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+<p>For this example, <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Role\GenericRole</span></tt> is used, but any object that implements
+<tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Role\RoleInterface</span></tt> is acceptable. These groups can be added to the role registry as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Permissions\Acl\Acl</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Permissions\Acl\Role\GenericRole</span> <span class="k">as</span> <span class="nx">Role</span><span class="p">;</span>
+
+<span class="nv">$acl</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Acl</span><span class="p">();</span>
+
+<span class="c1">// Add groups to the Role registry using Zend\Permissions\Acl\Role\GenericRole</span>
+<span class="c1">// Guest does not inherit access controls</span>
+<span class="nv">$roleGuest</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Role</span><span class="p">(</span><span class="s1">&#39;guest&#39;</span><span class="p">);</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="nv">$roleGuest</span><span class="p">);</span>
+
+<span class="c1">// Staff inherits from guest</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="k">new</span> <span class="nx">Role</span><span class="p">(</span><span class="s1">&#39;staff&#39;</span><span class="p">),</span> <span class="nv">$roleGuest</span><span class="p">);</span>
+
+<span class="cm">/*</span>
+<span class="cm">Alternatively, the above could be written:</span>
+<span class="cm">$acl-&gt;addRole(new Role(&#39;staff&#39;), &#39;guest&#39;);</span>
+<span class="cm">*/</span>
+
+<span class="c1">// Editor inherits from staff</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="k">new</span> <span class="nx">Role</span><span class="p">(</span><span class="s1">&#39;editor&#39;</span><span class="p">),</span> <span class="s1">&#39;staff&#39;</span><span class="p">);</span>
+
+<span class="c1">// Administrator does not inherit access controls</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="k">new</span> <span class="nx">Role</span><span class="p">(</span><span class="s1">&#39;administrator&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="defining-access-controls">
+<span id="zend-permissions-acl-introduction-defining"></span><h2>Defining Access Controls<a class="headerlink" href="#defining-access-controls" title="Permalink to this headline">¶</a></h2>
+<p>Now that the <em>ACL</em> contains the relevant roles, rules can be established that define how resources may be accessed
+by roles. You may have noticed that we have not defined any particular resources for this example, which is
+simplified to illustrate that the rules apply to all resources. <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> provides an implementation whereby
+rules need only be assigned from general to specific, minimizing the number of rules needed, because resources and
+roles inherit rules that are defined upon their ancestors.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In general, <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl\Acl</span></tt> obeys a given rule if and only if a more specific rule does not apply.</p>
+</div>
+<p>Consequently, we can define a reasonably complex set of rules with a minimum amount of code. To apply the base
+permissions as defined above:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Permissions\Acl\Acl</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Permissions\Acl\Role\GenericRole</span> <span class="k">as</span> <span class="nx">Role</span><span class="p">;</span>
+
+<span class="nv">$acl</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Acl</span><span class="p">();</span>
+
+<span class="nv">$roleGuest</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Role</span><span class="p">(</span><span class="s1">&#39;guest&#39;</span><span class="p">);</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="nv">$roleGuest</span><span class="p">);</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="k">new</span> <span class="nx">Role</span><span class="p">(</span><span class="s1">&#39;staff&#39;</span><span class="p">),</span> <span class="nv">$roleGuest</span><span class="p">);</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="k">new</span> <span class="nx">Role</span><span class="p">(</span><span class="s1">&#39;editor&#39;</span><span class="p">),</span> <span class="s1">&#39;staff&#39;</span><span class="p">);</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">addRole</span><span class="p">(</span><span class="k">new</span> <span class="nx">Role</span><span class="p">(</span><span class="s1">&#39;administrator&#39;</span><span class="p">));</span>
+
+<span class="c1">// Guest may only view content</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">allow</span><span class="p">(</span><span class="nv">$roleGuest</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">&#39;view&#39;</span><span class="p">);</span>
+
+<span class="cm">/*</span>
+<span class="cm">Alternatively, the above could be written:</span>
+<span class="cm">$acl-&gt;allow(&#39;guest&#39;, null, &#39;view&#39;);</span>
+<span class="cm">//*/</span>
+
+<span class="c1">// Staff inherits view privilege from guest, but also needs additional</span>
+<span class="c1">// privileges</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">allow</span><span class="p">(</span><span class="s1">&#39;staff&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;edit&#39;</span><span class="p">,</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span> <span class="s1">&#39;revise&#39;</span><span class="p">));</span>
+
+<span class="c1">// Editor inherits view, edit, submit, and revise privileges from</span>
+<span class="c1">// staff, but also needs additional privileges</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">allow</span><span class="p">(</span><span class="s1">&#39;editor&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;publish&#39;</span><span class="p">,</span> <span class="s1">&#39;archive&#39;</span><span class="p">,</span> <span class="s1">&#39;delete&#39;</span><span class="p">));</span>
+
+<span class="c1">// Administrator inherits nothing, but is allowed all privileges</span>
+<span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">allow</span><span class="p">(</span><span class="s1">&#39;administrator&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">NULL</span></tt> values in the above <tt class="docutils literal"><span class="pre">allow()</span></tt> calls are used to indicate that the allow rules apply to all
+resources.</p>
+</div>
+<div class="section" id="querying-an-acl">
+<span id="zend-permissions-acl-introduction-querying"></span><h2>Querying an ACL<a class="headerlink" href="#querying-an-acl" title="Permalink to this headline">¶</a></h2>
+<p>We now have a flexible <em>ACL</em> that can be used to determine whether requesters have permission to perform functions
+throughout the web application. Performing queries is quite simple using the <tt class="docutils literal"><span class="pre">isAllowed()</span></tt> method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">echo</span> <span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="s1">&#39;guest&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">&#39;view&#39;</span><span class="p">)</span> <span class="o">?</span>
+     <span class="s2">&quot;allowed&quot;</span> <span class="o">:</span> <span class="s2">&quot;denied&quot;</span><span class="p">;</span>
+<span class="c1">// allowed</span>
+
+<span class="k">echo</span> <span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="s1">&#39;staff&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">&#39;publish&#39;</span><span class="p">)</span> <span class="o">?</span>
+     <span class="s2">&quot;allowed&quot;</span> <span class="o">:</span> <span class="s2">&quot;denied&quot;</span><span class="p">;</span>
+<span class="c1">// denied</span>
+
+<span class="k">echo</span> <span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="s1">&#39;staff&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">&#39;revise&#39;</span><span class="p">)</span> <span class="o">?</span>
+     <span class="s2">&quot;allowed&quot;</span> <span class="o">:</span> <span class="s2">&quot;denied&quot;</span><span class="p">;</span>
+<span class="c1">// allowed</span>
+
+<span class="k">echo</span> <span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="s1">&#39;editor&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">&#39;view&#39;</span><span class="p">)</span> <span class="o">?</span>
+     <span class="s2">&quot;allowed&quot;</span> <span class="o">:</span> <span class="s2">&quot;denied&quot;</span><span class="p">;</span>
+<span class="c1">// allowed because of inheritance from guest</span>
+
+<span class="k">echo</span> <span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="s1">&#39;editor&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">&#39;update&#39;</span><span class="p">)</span> <span class="o">?</span>
+     <span class="s2">&quot;allowed&quot;</span> <span class="o">:</span> <span class="s2">&quot;denied&quot;</span><span class="p">;</span>
+<span class="c1">// denied because no allow rule for &#39;update&#39;</span>
+
+<span class="k">echo</span> <span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="s1">&#39;administrator&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">&#39;view&#39;</span><span class="p">)</span> <span class="o">?</span>
+     <span class="s2">&quot;allowed&quot;</span> <span class="o">:</span> <span class="s2">&quot;denied&quot;</span><span class="p">;</span>
+<span class="c1">// allowed because administrator is allowed all privileges</span>
+
+<span class="k">echo</span> <span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="s1">&#39;administrator&#39;</span><span class="p">)</span> <span class="o">?</span>
+     <span class="s2">&quot;allowed&quot;</span> <span class="o">:</span> <span class="s2">&quot;denied&quot;</span><span class="p">;</span>
+<span class="c1">// allowed because administrator is allowed all privileges</span>
+
+<span class="k">echo</span> <span class="nv">$acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="s1">&#39;administrator&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">&#39;update&#39;</span><span class="p">)</span> <span class="o">?</span>
+     <span class="s2">&quot;allowed&quot;</span> <span class="o">:</span> <span class="s2">&quot;denied&quot;</span><span class="p">;</span>
+<span class="c1">// allowed because administrator is allowed all privileges</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#resources">Resources</a></li>
+<li><a class="reference internal" href="#roles">Roles</a></li>
+<li><a class="reference internal" href="#creating-the-access-control-list">Creating the Access Control List</a></li>
+<li><a class="reference internal" href="#registering-roles">Registering Roles</a></li>
+<li><a class="reference internal" href="#defining-access-controls">Defining Access Controls</a></li>
+<li><a class="reference internal" href="#querying-an-acl">Querying an ACL</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.paginator.advanced.html"
+                        title="previous chapter">Advanced usage</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.permissions.acl.refining.html"
+                        title="next chapter">Refining Access Controls</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.permissions.acl.intro.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.permissions.acl.intro.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.permissions.acl.intro.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.permissions.acl.refining.html" title="Refining Access Controls"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.paginator.advanced.html" title="Advanced usage"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0rc7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.permissions.acl.intro.rst">
+                Introduction
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
