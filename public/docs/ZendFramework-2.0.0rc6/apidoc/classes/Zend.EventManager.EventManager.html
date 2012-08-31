@@ -140,7 +140,7 @@ SharedEventManagerInterface.</p></p>
 </div>
 <a name="attach" id="attach"></a><div class="element clickable method public attach" data-toggle="collapse" data-target=".attach .collapse">
 <h2>Attach a listener to an event</h2>
-<pre>attach(string | array | <a href="../classes/Zend.EventManager.ListenerAggregateInterface.html">\Zend\EventManager\ListenerAggregateInterface</a> $event, callback | int $callback, int $priority) : <a href="../classes/Zend.Stdlib.CallbackHandler.html">\Zend\Stdlib\CallbackHandler</a> | mixed</pre>
+<pre>attach(string | array | <a href="../classes/Zend.EventManager.ListenerAggregateInterface.html">\Zend\EventManager\ListenerAggregateInterface</a> $event, \Zend\EventManager\callable | int $callback, int $priority) : <a href="../classes/Zend.Stdlib.CallbackHandler.html">\Zend\Stdlib\CallbackHandler</a> | mixed</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <p class="long_description"><p>The first argument is the event, and the next argument describes a
@@ -160,11 +160,11 @@ be triggered for every event.</p></p>
 </div>
 <div class="subelement argument">
 <h4>$callback</h4>
-<code>callbackint</code><p>If string $event provided, expects PHP callback; for a ListenerAggregateInterface $event, this will be the priority</p>
+<code>\Zend\EventManager\callableint</code><p>If string $event provided, expects PHP callback; for a ListenerAggregateInterface $event, this will be the priority</p>
 </div>
 <div class="subelement argument">
 <h4>$priority</h4>
-<code>int</code><p>If provided, the priority at which to register the callback</p></div>
+<code>int</code><p>If provided, the priority at which to register the callable</p></div>
 <h3>Exceptions</h3>
 <table class="table table-bordered"><tr>
 <th><code><a href="../classes/Zend.EventManager.Exception.InvalidArgumentException.html">\Zend\EventManager\Exception\InvalidArgumentException</a></code></th>
@@ -172,7 +172,7 @@ be triggered for every event.</p></p>
 </tr></table>
 <h3>Returns</h3>
 <div class="subelement response">
-<code><a href="../classes/Zend.Stdlib.CallbackHandler.html">\Zend\Stdlib\CallbackHandler</a></code><code>mixed</code>CallbackHandler if attaching callback (to allow later unsubscribe); mixed if attaching aggregate</div>
+<code><a href="../classes/Zend.Stdlib.CallbackHandler.html">\Zend\Stdlib\CallbackHandler</a></code><code>mixed</code>CallbackHandler if attaching callable (to allow later unsubscribe); mixed if attaching aggregate</div>
 </div></div>
 </div>
 <a name="attachAggregate" id="attachAggregate"></a><div class="element clickable method public attachAggregate" data-toggle="collapse" data-target=".attachAggregate .collapse">
@@ -363,7 +363,7 @@ passed to trigger() or triggerUntil().</p></p>
 </div>
 <a name="trigger" id="trigger"></a><div class="element clickable method public trigger" data-toggle="collapse" data-target=".trigger .collapse">
 <h2>Trigger all listeners for a given event</h2>
-<pre>trigger(string $event, string | object $target, array | \ArrayAccess $argv, null | callback $callback) : <a href="../classes/Zend.EventManager.ResponseCollection.html">\Zend\EventManager\ResponseCollection</a></pre>
+<pre>trigger(string $event, string | object $target, array | \ArrayAccess $argv, null | \Zend\EventManager\callable $callback) : <a href="../classes/Zend.EventManager.ResponseCollection.html">\Zend\EventManager\ResponseCollection</a></pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <p class="long_description"><p>Can emulate triggerUntil() if the last argument provided is a callback.</p></p>
@@ -381,7 +381,7 @@ passed to trigger() or triggerUntil().</p></p>
 <code>array\ArrayAccess</code><p>Array of arguments; typically, should be associative</p></div>
 <div class="subelement argument">
 <h4>$callback</h4>
-<code>nullcallback</code>
+<code>null\Zend\EventManager\callable</code>
 </div>
 <h3>Exceptions</h3>
 <table class="table table-bordered"><tr>
@@ -396,7 +396,7 @@ passed to trigger() or triggerUntil().</p></p>
 <a name="triggerUntil" id="triggerUntil"></a><div class="element clickable method public triggerUntil" data-toggle="collapse" data-target=".triggerUntil .collapse">
 <h2>Trigger listeners until return value of one causes a callback to
 evaluate to true</h2>
-<pre>triggerUntil(string $event, string | object $target, array | \ArrayAccess $argv, \Zend\EventManager\Callable $callback) : <a href="../classes/Zend.EventManager.ResponseCollection.html">\Zend\EventManager\ResponseCollection</a></pre>
+<pre>triggerUntil(string $event, string | object $target, array | \ArrayAccess $argv, \Zend\EventManager\callable $callback) : <a href="../classes/Zend.EventManager.ResponseCollection.html">\Zend\EventManager\ResponseCollection</a></pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <p class="long_description"><p>Triggers listeners until the provided callback evaluates the return
@@ -415,12 +415,12 @@ value of one as true, or until all listeners have been executed.</p></p>
 <code>array\ArrayAccess</code><p>Array of arguments; typically, should be associative</p></div>
 <div class="subelement argument">
 <h4>$callback</h4>
-<code>\Zend\EventManager\Callable</code>
+<code>\Zend\EventManager\callable</code>
 </div>
 <h3>Exceptions</h3>
 <table class="table table-bordered"><tr>
 <th><code><a href="../classes/Zend.EventManager.Exception.InvalidCallbackException.html">\Zend\EventManager\Exception\InvalidCallbackException</a></code></th>
-<td>if invalid callback provided</td>
+<td>if invalid callable provided</td>
 </tr></table>
 <h3>Returns</h3>
 <div class="subelement response"><code><a href="../classes/Zend.EventManager.ResponseCollection.html">\Zend\EventManager\ResponseCollection</a></code></div>
@@ -467,7 +467,7 @@ identifiers registered by this instance</h2>
 </div>
 <a name="triggerListeners" id="triggerListeners"></a><div class="element clickable method protected triggerListeners" data-toggle="collapse" data-target=".triggerListeners .collapse">
 <h2>Trigger listeners</h2>
-<pre>triggerListeners(string $event, \Zend\EventManager\EventInterface $e, null | callback $callback) : <a href="../classes/Zend.EventManager.ResponseCollection.html">\Zend\EventManager\ResponseCollection</a></pre>
+<pre>triggerListeners(string $event, \Zend\EventManager\EventInterface $e, null | \Zend\EventManager\callable $callback) : <a href="../classes/Zend.EventManager.ResponseCollection.html">\Zend\EventManager\ResponseCollection</a></pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <p class="long_description"><p>Actual functionality for triggering listeners, to which both trigger() and triggerUntil()
@@ -482,7 +482,7 @@ delegate.</p></p>
 </div>
 <div class="subelement argument">
 <h4>$callback</h4>
-<code>nullcallback</code>
+<code>null\Zend\EventManager\callable</code>
 </div>
 <h3>Returns</h3>
 <div class="subelement response"><code><a href="../classes/Zend.EventManager.ResponseCollection.html">\Zend\EventManager\ResponseCollection</a></code></div>
@@ -521,7 +521,7 @@ delegate.</p></p>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a8</a> and<br>
-            generated on 2012-08-29T11:40:14-05:00.<br></footer></div>
+            generated on 2012-08-31T15:48:00-05:00.<br></footer></div>
 </div>
 </body>
 </html>
