@@ -9,6 +9,10 @@ Copy ``build/build-config.php.dist`` to ``build/build-config.php``. Edit
 the top of the build. (If you want to control what is actually built, you can
 comment out various parts of this file.)
 
+First things first: make sure you have a clean working environment:
+
+    php build/build-clean.php
+
 Now run:
 
     php build/build.php
