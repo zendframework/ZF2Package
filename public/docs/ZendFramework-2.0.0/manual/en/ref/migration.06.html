@@ -1,0 +1,407 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend Framework 0.6 &mdash; Zend Framework 2 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-framework-0-6">
+<span id="migration-06"></span><h1>Zend Framework 0.6<a class="headerlink" href="#zend-framework-0-6" title="Permalink to this headline">¶</a></h1>
+<p>When upgrading from a previous release to Zend Framework 0.6 or higher you should note the following migration
+notes.</p>
+<div class="section" id="zend-controller">
+<span id="migration-06-zend-controller"></span><h2>Zend_Controller<a class="headerlink" href="#zend-controller" title="Permalink to this headline">¶</a></h2>
+<p>The most basic usage of the <em>MVC</em> components has not changed; you can still do each of the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Zend_Controller_Front</span><span class="o">::</span><span class="na">run</span><span class="p">(</span><span class="s1">&#39;/path/to/controllers&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="cm">/* -- create a router -- */</span>
+<span class="nv">$router</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Controller_RewriteRouter</span><span class="p">();</span>
+<span class="nv">$router</span><span class="o">-&gt;</span><span class="na">addRoute</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;user/:username&#39;</span><span class="p">,</span>
+                  <span class="k">array</span><span class="p">(</span><span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;info&#39;</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="cm">/* -- set it in a controller -- */</span>
+<span class="nv">$ctrl</span> <span class="o">=</span> <span class="nx">Zend_Controller_Front</span><span class="o">::</span><span class="na">getInstance</span><span class="p">();</span>
+<span class="nv">$ctrl</span><span class="o">-&gt;</span><span class="na">setRouter</span><span class="p">(</span><span class="nv">$router</span><span class="p">);</span>
+
+<span class="cm">/* -- set controller directory and dispatch -- */</span>
+<span class="nv">$ctrl</span><span class="o">-&gt;</span><span class="na">setControllerDirectory</span><span class="p">(</span><span class="s1">&#39;/path/to/controllers&#39;</span><span class="p">);</span>
+<span class="nv">$ctrl</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>We encourage use of the Response object to aggregate content and headers. This will allow for more flexible output
+format switching (for instance, <em>JSON</em> or <em>XML</em> instead of <em>XHTML</em>) in your applications. By default,
+<tt class="docutils literal"><span class="pre">dispatch()</span></tt> will render the response, sending both headers and rendering any content. You may also have the
+front controller return the response using <tt class="docutils literal"><span class="pre">returnResponse()</span></tt>, and then render the response using your own logic.
+A future version of the front controller may enforce use of the response object via output buffering.</p>
+<p>There are many additional features that extend the existing <em>API</em>, and these are noted in the documentation.</p>
+<p>The main changes you will need to be aware of will be found when subclassing the various components. Key amongst
+these are:</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Zend_Controller_Front::dispatch()</span></tt> by default traps exceptions in the response object, and does not render
+them, in order to prevent sensitive system information from being rendered. You can override this in several
+ways:</p>
+<ul>
+<li><p class="first">Set <tt class="docutils literal"><span class="pre">throwExceptions()</span></tt> in the front controller:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$front</span><span class="o">-&gt;</span><span class="na">throwExceptions</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first">Set <tt class="docutils literal"><span class="pre">renderExceptions()</span></tt> in the response object:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$response</span><span class="o">-&gt;</span><span class="na">renderExceptions</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+<span class="nv">$front</span><span class="o">-&gt;</span><span class="na">setResponse</span><span class="p">(</span><span class="nv">$response</span><span class="p">);</span>
+<span class="nv">$front</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">();</span>
+
+<span class="c1">// or:</span>
+<span class="nv">$front</span><span class="o">-&gt;</span><span class="na">returnResponse</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$front</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">();</span>
+<span class="nv">$response</span><span class="o">-&gt;</span><span class="na">renderExceptions</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$response</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Zend_Controller_Dispatcher_Interface::dispatch()</span></tt> now accepts and returns a <em class="xref std std-ref">The Request Object</em> instead of a dispatcher token.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Zend_Controller_Router_Interface::route()</span></tt> now accepts and returns a <em class="xref std std-ref">The Request Object</em> instead of a dispatcher token.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Zend_Controller_Action</span></tt> changes include:</p>
+<ul>
+<li><p class="first">The constructor now accepts exactly three arguments, <tt class="docutils literal"><span class="pre">Zend_Controller_Request_Abstract</span></tt> <tt class="docutils literal"><span class="pre">$request</span></tt>,
+<tt class="docutils literal"><span class="pre">Zend_Controller_Response_Abstract</span></tt> <tt class="docutils literal"><span class="pre">$response</span></tt>, and <tt class="docutils literal"><span class="pre">Array</span></tt> <tt class="docutils literal"><span class="pre">$params</span></tt> (optional).
+<tt class="docutils literal"><span class="pre">Zend_Controller_Action::__construct()</span></tt> uses these to set the request, response, and invokeArgs properties of
+the object, and if overriding the constructor, you should do so as well. Better yet, use the <tt class="docutils literal"><span class="pre">init()</span></tt> method
+to do any instance configuration, as this method is called as the final action of the constructor.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">run()</span></tt> is no longer defined as final, but is also no longer used by the front controller; its sole purpose
+is for using the class as a page controller. It now takes two optional arguments, a
+<tt class="docutils literal"><span class="pre">Zend_Controller_Request_Abstract</span></tt> <tt class="docutils literal"><span class="pre">$request</span></tt> and a <tt class="docutils literal"><span class="pre">Zend_Controller_Response_Abstract</span></tt> <tt class="docutils literal"><span class="pre">$response</span></tt>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">indexAction()</span></tt> no longer needs to be defined, but is encouraged as the default action. This allows using the
+RewriteRouter and action controllers to specify different default action methods.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">__call()</span></tt> should be overridden to handle any undefined actions automatically.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">_redirect()</span></tt> now takes an optional second argument, the <em>HTTP</em> code to return with the redirect, and an
+optional third argument, <tt class="docutils literal"><span class="pre">$prependBase</span></tt>, that can indicate that the base <em>URL</em> registered with the request
+object should be prepended to the url specified.</p>
+</li>
+<li><p class="first">The <tt class="docutils literal"><span class="pre">$_action</span></tt> property is no longer set. This property was a <tt class="docutils literal"><span class="pre">Zend_Controller_Dispatcher_Token</span></tt>, which no
+longer exists in the current incarnation. The sole purpose of the token was to provide information about the
+requested controller, action, and <em>URL</em> parameters. This information is now available in the request object,
+and can be accessed as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Retrieve the requested controller name</span>
+<span class="c1">// Access used to be via: $this-&gt;_action-&gt;getControllerName().</span>
+<span class="c1">// The example below uses getRequest(), though you may also directly</span>
+<span class="c1">// access the $_request property; using getRequest() is recommended as</span>
+<span class="c1">// a parent class may override access to the request object.</span>
+<span class="nv">$controller</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getControllerName</span><span class="p">();</span>
+
+<span class="c1">// Retrieve the requested action name</span>
+<span class="c1">// Access used to be via: $this-&gt;_action-&gt;getActionName().</span>
+<span class="nv">$action</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getActionName</span><span class="p">();</span>
+
+<span class="c1">// Retrieve the request parameters</span>
+<span class="c1">// This hasn&#39;t changed; the _getParams() and _getParam() methods simply</span>
+<span class="c1">// proxy to the request object now.</span>
+<span class="nv">$params</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_getParams</span><span class="p">();</span>
+<span class="c1">// request &#39;foo&#39; parameter, using &#39;default&#39; as default value if not found</span>
+<span class="nv">$foo</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_getParam</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">noRouteAction()</span></tt> has been removed. The appropriate way to handle non-existent action methods should you wish
+to route them to a default action is using <tt class="docutils literal"><span class="pre">__call()</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">__call</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$args</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// If an unmatched &#39;Action&#39; method was requested, pass on to the</span>
+    <span class="c1">// default action method:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;Action&#39;</span> <span class="o">==</span> <span class="nb">substr</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="o">-</span><span class="mi">6</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">defaultAction</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">throw</span> <span class="k">new</span> <span class="nx">Zend_Controller_Exception</span><span class="p">(</span><span class="s1">&#39;Invalid method called&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Zend_Controller_RewriteRouter::setRewriteBase()</span></tt> has been removed. Use <tt class="docutils literal"><span class="pre">Zend_Controller_Front::setBaseUrl()</span></tt>
+instead (or <tt class="docutils literal"><span class="pre">Zend_Controller_Request_Http::setBaseUrl()</span></tt>, if using that request class).</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Zend_Controller_Plugin_Interface</span></tt> was replaced by <tt class="docutils literal"><span class="pre">Zend_Controller_Plugin_Abstract</span></tt>. All methods now accept
+and return a <em class="xref std std-ref">The Request Object</em> instead of a dispatcher token.</p>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend Framework 0.6</a><ul>
+<li><a class="reference internal" href="#zend-controller">Zend_Controller</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/ref/migration.06.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/ref/migration.06.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/ref/migration.06.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/ref/migration.06.rst">
+                Zend Framework 0.6
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

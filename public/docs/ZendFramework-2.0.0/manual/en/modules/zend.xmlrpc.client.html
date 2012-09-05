@@ -1,0 +1,655 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\XmlRpc\Client &mdash; Zend Framework 2 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0 documentation" href="../index.html" />
+    <link rel="next" title="Zend\XmlRpc\Server" href="zend.xmlrpc.server.html" />
+    <link rel="prev" title="Introduction" href="zend.xmlrpc.intro.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.xmlrpc.server.html" title="Zend\XmlRpc\Server"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.xmlrpc.intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-xmlrpc-client">
+<span id="id1"></span><h1>Zend\XmlRpc\Client<a class="headerlink" href="#zend-xmlrpc-client" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-xmlrpc-client-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Zend Framework provides support for consuming remote <em>XML-RPC</em> services as a client in the <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt>
+package. Its major features include automatic type conversion between <em>PHP</em> and <em>XML-RPC</em>, a server proxy object,
+and access to server introspection capabilities.</p>
+</div>
+<div class="section" id="method-calls">
+<span id="zend-xmlrpc-client-method-calls"></span><h2>Method Calls<a class="headerlink" href="#method-calls" title="Permalink to this headline">¶</a></h2>
+<p>The constructor of <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt> receives the <em>URL</em> of the remote <em>XML-RPC</em> server endpoint as its first
+parameter. The new instance returned may be used to call any number of remote methods at that endpoint.</p>
+<p>To call a remote method with the <em>XML-RPC</em> client, instantiate it and use the <tt class="docutils literal"><span class="pre">call()</span></tt> instance method. The code
+sample below uses a demonstration <em>XML-RPC</em> server on the Zend Framework website. You can use it for testing or
+exploring the <tt class="docutils literal"><span class="pre">Zend\XmlRpc</span></tt> components.</p>
+<p class="rubric" id="zend-xmlrpc-client-method-calls-example-1">XML-RPC Method Call</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Client</span><span class="p">(</span><span class="s1">&#39;http://framework.zend.com/xmlrpc&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">call</span><span class="p">(</span><span class="s1">&#39;test.sayHello&#39;</span><span class="p">);</span>
+
+<span class="c1">// hello</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <em>XML-RPC</em> value returned from the remote method call will be automatically unmarshaled and cast to the
+equivalent <em>PHP</em> native type. In the example above, a <em>PHP</em> <tt class="docutils literal"><span class="pre">String</span></tt> is returned and is immediately ready to be
+used.</p>
+<p>The first parameter of the <tt class="docutils literal"><span class="pre">call()</span></tt> method receives the name of the remote method to call. If the remote method
+requires any parameters, these can be sent by supplying a second, optional parameter to <tt class="docutils literal"><span class="pre">call()</span></tt> with an
+<tt class="docutils literal"><span class="pre">Array</span></tt> of values to pass to the remote method:</p>
+<p class="rubric" id="zend-xmlrpc-client-method-calls-example-2">XML-RPC Method Call with Parameters</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Client</span><span class="p">(</span><span class="s1">&#39;http://framework.zend.com/xmlrpc&#39;</span><span class="p">);</span>
+
+<span class="nv">$arg1</span> <span class="o">=</span> <span class="mf">1.1</span><span class="p">;</span>
+<span class="nv">$arg2</span> <span class="o">=</span> <span class="s1">&#39;foo&#39;</span><span class="p">;</span>
+
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">call</span><span class="p">(</span><span class="s1">&#39;test.sayHello&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$arg1</span><span class="p">,</span> <span class="nv">$arg2</span><span class="p">));</span>
+
+<span class="c1">// $result is a native PHP type</span>
+</pre></div>
+</td></tr></table></div>
+<p>If the remote method doesn&#8217;t require parameters, this optional parameter may either be left out or an empty
+<tt class="docutils literal"><span class="pre">array()</span></tt> passed to it. The array of parameters for the remote method can contain native <em>PHP</em> types,
+<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Value</span></tt> objects, or a mix of each.</p>
+<p>The <tt class="docutils literal"><span class="pre">call()</span></tt> method will automatically convert the <em>XML-RPC</em> response and return its equivalent <em>PHP</em> native
+type. A <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Response</span></tt> object for the return value will also be available by calling the
+<tt class="docutils literal"><span class="pre">getLastResponse()</span></tt> method after the call.</p>
+</div>
+<div class="section" id="types-and-conversions">
+<span id="zend-xmlrpc-value-parameters"></span><h2>Types and Conversions<a class="headerlink" href="#types-and-conversions" title="Permalink to this headline">¶</a></h2>
+<p>Some remote method calls require parameters. These are given to the <tt class="docutils literal"><span class="pre">call()</span></tt> method of <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt> as
+an array in the second parameter. Each parameter may be given as either a native <em>PHP</em> type which will be
+automatically converted, or as an object representing a specific <em>XML-RPC</em> type (one of the <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Value</span></tt>
+objects).</p>
+<div class="section" id="php-native-types-as-parameters">
+<span id="zend-xmlrpc-value-parameters-php-native"></span><h3>PHP Native Types as Parameters<a class="headerlink" href="#php-native-types-as-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Parameters may be passed to <tt class="docutils literal"><span class="pre">call()</span></tt> as native <em>PHP</em> variables, meaning as a <tt class="docutils literal"><span class="pre">String</span></tt>, <tt class="docutils literal"><span class="pre">Integer</span></tt>, <tt class="docutils literal"><span class="pre">Float</span></tt>,
+<tt class="docutils literal"><span class="pre">Boolean</span></tt>, <tt class="docutils literal"><span class="pre">Array</span></tt>, or an <tt class="docutils literal"><span class="pre">Object</span></tt>. In this case, each <em>PHP</em> native type will be auto-detected and converted
+into one of the <em>XML-RPC</em> types according to this table:</p>
+<table border="1" class="docutils" id="zend-xmlrpc-value-parameters-php-native-table-1">
+<caption>PHP and XML-RPC Type Conversions</caption>
+<colgroup>
+<col width="68%" />
+<col width="32%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">PHP Native Type</th>
+<th class="head">XML-RPC Type</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>integer</td>
+<td>int</td>
+</tr>
+<tr class="row-odd"><td>Zend\Math\BigInteger\BigInteger</td>
+<td>i8</td>
+</tr>
+<tr class="row-even"><td>double</td>
+<td>double</td>
+</tr>
+<tr class="row-odd"><td>boolean</td>
+<td>boolean</td>
+</tr>
+<tr class="row-even"><td>string</td>
+<td>string</td>
+</tr>
+<tr class="row-odd"><td>null</td>
+<td>nil</td>
+</tr>
+<tr class="row-even"><td>array</td>
+<td>array</td>
+</tr>
+<tr class="row-odd"><td>associative array</td>
+<td>struct</td>
+</tr>
+<tr class="row-even"><td>object</td>
+<td>array</td>
+</tr>
+<tr class="row-odd"><td>DateTime</td>
+<td>dateTime.iso8601</td>
+</tr>
+<tr class="row-even"><td>DateTime</td>
+<td>dateTime.iso8601</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>What type do empty arrays get cast to?</strong></p>
+<p>Passing an empty array to an <em>XML-RPC</em> method is problematic, as it could represent either an array or a struct.
+<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt> detects such conditions and makes a request to the server&#8217;s <tt class="docutils literal"><span class="pre">system.methodSignature</span></tt>
+method to determine the appropriate <em>XML-RPC</em> type to cast to.</p>
+<p>However, this in itself can lead to issues. First off, servers that do not support <tt class="docutils literal"><span class="pre">system.methodSignature</span></tt>
+will log failed requests, and <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt> will resort to casting the value to an <em>XML-RPC</em> array
+type. Additionally, this means that any call with array arguments will result in an additional call to the
+remote server.</p>
+<p>To disable the lookup entirely, you can call the <tt class="docutils literal"><span class="pre">setSkipSystemLookup()</span></tt> method prior to making your <em>XML-RPC</em>
+call:</p>
+<div class="last highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setSkipSystemLookup</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">call</span><span class="p">(</span><span class="s1">&#39;foo.bar&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="k">array</span><span class="p">()));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="zend-xmlrpc-value-objects-as-parameters">
+<span id="zend-xmlrpc-value-parameters-xmlrpc-value"></span><h3>Zend\XmlRpc\Value Objects as Parameters<a class="headerlink" href="#zend-xmlrpc-value-objects-as-parameters" title="Permalink to this headline">¶</a></h3>
+<p>Parameters may also be created as <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Value</span></tt> instances to specify an exact <em>XML-RPC</em> type. The primary
+reasons for doing this are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>When you want to make sure the correct parameter type is passed to the procedure (i.e. the procedure requires
+an integer and you may get it from a database as a string)</li>
+<li>When the procedure requires <tt class="docutils literal"><span class="pre">base64</span></tt> or <tt class="docutils literal"><span class="pre">dateTime.iso8601</span></tt> type (which doesn&#8217;t exists as a <em>PHP</em> native
+type)</li>
+<li>When auto-conversion may fail (i.e. you want to pass an empty <em>XML-RPC</em> struct as a parameter. Empty structs
+are represented as empty arrays in <em>PHP</em> but, if you give an empty array as a parameter it will be
+auto-converted to an <em>XML-RPC</em> array since it&#8217;s not an associative array)</li>
+</ul>
+</div></blockquote>
+<p>There are two ways to create a <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Value</span></tt> object: instantiate one of the <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Value</span></tt>
+subclasses directly, or use the static factory method <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Value::getXmlRpcValue()</span></tt>.</p>
+<table border="1" class="docutils" id="zend-xmlrpc-value-parameters-xmlrpc-value-table-1">
+<caption>Zend\XmlRpc\Value Objects for XML-RPC Types</caption>
+<colgroup>
+<col width="18%" />
+<col width="47%" />
+<col width="35%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">XML-RPC Type</th>
+<th class="head">Zend\XmlRpc\Value Constant</th>
+<th class="head">Zend\XmlRpc\Value Object</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>int</td>
+<td>Zend\XmlRpc\Value::XMLRPC_TYPE_INTEGER</td>
+<td>Zend\XmlRpc\Value\Integer</td>
+</tr>
+<tr class="row-odd"><td>i8</td>
+<td>Zend\XmlRpc\Value::XMLRPC_TYPE_I8</td>
+<td>Zend\XmlRpc\Value\BigInteger</td>
+</tr>
+<tr class="row-even"><td>ex:i8</td>
+<td>Zend\XmlRpc\Value::XMLRPC_TYPE_APACHEI8</td>
+<td>Zend\XmlRpc\Value\BigInteger</td>
+</tr>
+<tr class="row-odd"><td>double</td>
+<td>Zend\XmlRpc\Value::XMLRPC_TYPE_DOUBLE</td>
+<td>Zend\XmlRpc\Value_Double</td>
+</tr>
+<tr class="row-even"><td>boolean</td>
+<td>Zend\XmlRpc\Value::XMLRPC_TYPE_BOOLEAN</td>
+<td>Zend\XmlRpc\Value\Boolean</td>
+</tr>
+<tr class="row-odd"><td>string</td>
+<td>Zend\XmlRpc\Value::XMLRPC_TYPE_STRING</td>
+<td>Zend\XmlRpc\Value\String</td>
+</tr>
+<tr class="row-even"><td>nil</td>
+<td>Zend\XmlRpc\Value::XMLRPC_TYPE_NIL</td>
+<td>Zend\XmlRpc\Value\Nil</td>
+</tr>
+<tr class="row-odd"><td>ex:nil</td>
+<td>Zend\XmlRpc\Value::XMLRPC_TYPE_APACHENIL</td>
+<td>Zend\XmlRpc\Value\Nil</td>
+</tr>
+<tr class="row-even"><td>base64</td>
+<td>Zend\XmlRpc\Value::XMLRPC_TYPE_BASE64</td>
+<td>Zend\XmlRpc\Value\Base64</td>
+</tr>
+<tr class="row-odd"><td>dateTime.iso8601</td>
+<td>Zend\XmlRpc\Value::XMLRPC_TYPE_DATETIME</td>
+<td>Zend\XmlRpc\Value\DateTime</td>
+</tr>
+<tr class="row-even"><td>array</td>
+<td>Zend\XmlRpc\Value::XMLRPC_TYPE_ARRAY</td>
+<td>Zend\XmlRpc\Value\Array</td>
+</tr>
+<tr class="row-odd"><td>struct</td>
+<td>Zend\XmlRpc\Value::XMLRPC_TYPE_STRUCT</td>
+<td>Zend\XmlRpc\Value\Struct</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Automatic Conversion</strong></p>
+<p class="last">When building a new <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Value</span></tt> object, its value is set by a <em>PHP</em> type. The <em>PHP</em> type will be
+converted to the specified type using <em>PHP</em> casting. For example, if a string is given as a value to the
+<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Value\Integer</span></tt> object, it will be converted using <tt class="docutils literal"><span class="pre">(int)$value</span></tt>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="server-proxy-object">
+<span id="zend-xmlrpc-client-requests-and-responses"></span><h2>Server Proxy Object<a class="headerlink" href="#server-proxy-object" title="Permalink to this headline">¶</a></h2>
+<p>Another way to call remote methods with the <em>XML-RPC</em> client is to use the server proxy. This is a <em>PHP</em> object
+that proxies a remote <em>XML-RPC</em> namespace, making it work as close to a native <em>PHP</em> object as possible.</p>
+<p>To instantiate a server proxy, call the <tt class="docutils literal"><span class="pre">getProxy()</span></tt> instance method of <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt>. This will return
+an instance of <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client\ServerProxy</span></tt>. Any method call on the server proxy object will be forwarded to
+the remote, and parameters may be passed like any other <em>PHP</em> method.</p>
+<p class="rubric" id="zend-xmlrpc-client-requests-and-responses-example-1">Proxy the Default Namespace</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Client</span><span class="p">(</span><span class="s1">&#39;http://framework.zend.com/xmlrpc&#39;</span><span class="p">);</span>
+
+<span class="nv">$service</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">getProxy</span><span class="p">();</span>           <span class="c1">// Proxy the default namespace</span>
+
+<span class="nv">$hello</span> <span class="o">=</span> <span class="nv">$service</span><span class="o">-&gt;</span><span class="na">test</span><span class="o">-&gt;</span><span class="na">sayHello</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>  <span class="c1">// test.Hello(1, 2) returns &quot;hello&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getProxy()</span></tt> method receives an optional argument specifying which namespace of the remote server to proxy.
+If it does not receive a namespace, the default namespace will be proxied. In the next example, the &#8216;test&#8217;
+namespace will be proxied:</p>
+<p class="rubric" id="zend-xmlrpc-client-requests-and-responses-example-2">Proxy Any Namespace</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Client</span><span class="p">(</span><span class="s1">&#39;http://framework.zend.com/xmlrpc&#39;</span><span class="p">);</span>
+
+<span class="nv">$test</span>  <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">getProxy</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">);</span>     <span class="c1">// Proxy the &quot;test&quot; namespace</span>
+
+<span class="nv">$hello</span> <span class="o">=</span> <span class="nv">$test</span><span class="o">-&gt;</span><span class="na">sayHello</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>         <span class="c1">// test.Hello(1,2) returns &quot;hello&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>If the remote server supports nested namespaces of any depth, these can also be used through the server proxy. For
+example, if the server in the example above had a method <tt class="docutils literal"><span class="pre">test.foo.bar()</span></tt>, it could be called as
+<tt class="docutils literal"><span class="pre">$test-&gt;foo-&gt;bar()</span></tt>.</p>
+</div>
+<div class="section" id="error-handling">
+<span id="zend-xmlrpc-client-error-handling"></span><h2>Error Handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h2>
+<p>Two kinds of errors can occur during an <em>XML-RPC</em> method call: <em>HTTP</em> errors and <em>XML-RPC</em> faults. The
+<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt> recognizes each and provides the ability to detect and trap them independently.</p>
+<div class="section" id="http-errors">
+<span id="zend-xmlrpc-client-error-handling-http"></span><h3>HTTP Errors<a class="headerlink" href="#http-errors" title="Permalink to this headline">¶</a></h3>
+<p>If any <em>HTTP</em> error occurs, such as the remote <em>HTTP</em> server returns a <strong>404 Not Found</strong>, a
+<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client\Exception\HttpException</span></tt> will be thrown.</p>
+<p class="rubric" id="zend-xmlrpc-client-error-handling-http-example-1">Handling HTTP Errors</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Client</span><span class="p">(</span><span class="s1">&#39;http://foo/404&#39;</span><span class="p">);</span>
+
+<span class="k">try</span> <span class="p">{</span>
+
+    <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">call</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$arg1</span><span class="p">,</span> <span class="nv">$arg2</span><span class="p">));</span>
+
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend\XmlRpc\Client\Exception\HttpException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="c1">// $e-&gt;getCode() returns 404</span>
+    <span class="c1">// $e-&gt;getMessage() returns &quot;Not Found&quot;</span>
+
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Regardless of how the <em>XML-RPC</em> client is used, the <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client\Exception\HttpException</span></tt> will be thrown
+whenever an <em>HTTP</em> error occurs.</p>
+</div>
+<div class="section" id="xml-rpc-faults">
+<span id="zend-xmlrpc-client-error-handling-faults"></span><h3>XML-RPC Faults<a class="headerlink" href="#xml-rpc-faults" title="Permalink to this headline">¶</a></h3>
+<p>An <em>XML-RPC</em> fault is analogous to a <em>PHP</em> exception. It is a special type returned from an <em>XML-RPC</em> method call
+that has both an error code and an error message. <em>XML-RPC</em> faults are handled differently depending on the context
+of how the <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt> is used.</p>
+<p>When the <tt class="docutils literal"><span class="pre">call()</span></tt> method or the server proxy object is used, an <em>XML-RPC</em> fault will result in a
+<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client\Exception\FaultException</span></tt> being thrown. The code and message of the exception will map
+directly to their respective values in the original <em>XML-RPC</em> fault response.</p>
+<p class="rubric" id="zend-xmlrpc-client-error-handling-faults-example-1">Handling XML-RPC Faults</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Client</span><span class="p">(</span><span class="s1">&#39;http://framework.zend.com/xmlrpc&#39;</span><span class="p">);</span>
+
+<span class="k">try</span> <span class="p">{</span>
+
+    <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">call</span><span class="p">(</span><span class="s1">&#39;badMethod&#39;</span><span class="p">);</span>
+
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend\XmlRpc\Client\Exception\FaultException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="c1">// $e-&gt;getCode() returns 1</span>
+    <span class="c1">// $e-&gt;getMessage() returns &quot;Unknown method&quot;</span>
+
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>When the <tt class="docutils literal"><span class="pre">call()</span></tt> method is used to make the request, the <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client\Exception\FaultException</span></tt> will be
+thrown on fault. A <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Response</span></tt> object containing the fault will also be available by calling
+<tt class="docutils literal"><span class="pre">getLastResponse()</span></tt>.</p>
+<p>When the <tt class="docutils literal"><span class="pre">doRequest()</span></tt> method is used to make the request, it will not throw the exception. Instead, it will
+return a <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Response</span></tt> object returned will containing the fault. This can be checked with <tt class="docutils literal"><span class="pre">isFault()</span></tt>
+instance method of <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Response</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="server-introspection">
+<span id="zend-xmlrpc-client-introspection"></span><h2>Server Introspection<a class="headerlink" href="#server-introspection" title="Permalink to this headline">¶</a></h2>
+<p>Some <em>XML-RPC</em> servers support the de facto introspection methods under the <em>XML-RPC</em> <strong>system.</strong> namespace.
+<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt> provides special support for servers with these capabilities.</p>
+<p>A <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client\ServerIntrospection</span></tt> instance may be retrieved by calling the <tt class="docutils literal"><span class="pre">getIntrospector()</span></tt> method
+of <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt>. It can then be used to perform introspection operations on the server.</p>
+</div>
+<div class="section" id="from-request-to-response">
+<span id="zend-xmlrpc-client-request-to-response"></span><h2>From Request to Response<a class="headerlink" href="#from-request-to-response" title="Permalink to this headline">¶</a></h2>
+<p>Under the hood, the <tt class="docutils literal"><span class="pre">call()</span></tt> instance method of <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt> builds a request object
+(<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Request</span></tt>) and sends it to another method, <tt class="docutils literal"><span class="pre">doRequest()</span></tt>, that returns a response object
+(<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Response</span></tt>).</p>
+<p>The <tt class="docutils literal"><span class="pre">doRequest()</span></tt> method is also available for use directly:</p>
+<p class="rubric" id="zend-xmlrpc-client-request-to-response-example-1">Processing Request to Response</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Client</span><span class="p">(</span><span class="s1">&#39;http://framework.zend.com/xmlrpc&#39;</span><span class="p">);</span>
+
+<span class="nv">$request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\XmlRpc\Request</span><span class="p">();</span>
+<span class="nv">$request</span><span class="o">-&gt;</span><span class="na">setMethod</span><span class="p">(</span><span class="s1">&#39;test.sayHello&#39;</span><span class="p">);</span>
+<span class="nv">$request</span><span class="o">-&gt;</span><span class="na">setParams</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">));</span>
+
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">doRequest</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+
+<span class="c1">// $client-&gt;getLastRequest() returns instanceof Zend_XmlRpc_Request</span>
+<span class="c1">// $client-&gt;getLastResponse() returns instanceof Zend_XmlRpc_Response</span>
+</pre></div>
+</td></tr></table></div>
+<p>Whenever an <em>XML-RPC</em> method call is made by the client through any means, either the <tt class="docutils literal"><span class="pre">call()</span></tt> method,
+<tt class="docutils literal"><span class="pre">doRequest()</span></tt> method, or server proxy, the last request object and its resultant response object will always be
+available through the methods <tt class="docutils literal"><span class="pre">getLastRequest()</span></tt> and <tt class="docutils literal"><span class="pre">getLastResponse()</span></tt> respectively.</p>
+</div>
+<div class="section" id="http-client-and-testing">
+<span id="zend-xmlrpc-client-http-client"></span><h2>HTTP Client and Testing<a class="headerlink" href="#http-client-and-testing" title="Permalink to this headline">¶</a></h2>
+<p>In all of the prior examples, an <em>HTTP</em> client was never specified. When this is the case, a new instance of
+<tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt> will be created with its default options and used by <tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt> automatically.</p>
+<p>The <em>HTTP</em> client can be retrieved at any time with the <tt class="docutils literal"><span class="pre">getHttpClient()</span></tt> method. For most cases, the default
+<em>HTTP</em> client will be sufficient. However, the <tt class="docutils literal"><span class="pre">setHttpClient()</span></tt> method allows for a different <em>HTTP</em> client
+instance to be injected.</p>
+<p>The <tt class="docutils literal"><span class="pre">setHttpClient()</span></tt> is particularly useful for unit testing. When combined with the
+<tt class="docutils literal"><span class="pre">Zend\Http\Client\Adapter\Test</span></tt>, remote services can be mocked out for testing. See the unit tests for
+<tt class="docutils literal"><span class="pre">Zend\XmlRpc\Client</span></tt> for examples of how to do this.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\XmlRpc\Client</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#method-calls">Method Calls</a></li>
+<li><a class="reference internal" href="#types-and-conversions">Types and Conversions</a><ul>
+<li><a class="reference internal" href="#php-native-types-as-parameters">PHP Native Types as Parameters</a></li>
+<li><a class="reference internal" href="#zend-xmlrpc-value-objects-as-parameters">Zend\XmlRpc\Value Objects as Parameters</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#server-proxy-object">Server Proxy Object</a></li>
+<li><a class="reference internal" href="#error-handling">Error Handling</a><ul>
+<li><a class="reference internal" href="#http-errors">HTTP Errors</a></li>
+<li><a class="reference internal" href="#xml-rpc-faults">XML-RPC Faults</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#server-introspection">Server Introspection</a></li>
+<li><a class="reference internal" href="#from-request-to-response">From Request to Response</a></li>
+<li><a class="reference internal" href="#http-client-and-testing">HTTP Client and Testing</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.xmlrpc.intro.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.xmlrpc.server.html"
+                        title="next chapter">Zend\XmlRpc\Server</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.xmlrpc.client.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.xmlrpc.client.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.xmlrpc.client.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.xmlrpc.server.html" title="Zend\XmlRpc\Server"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.xmlrpc.intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.xmlrpc.client.rst">
+                Zend\XmlRpc\Client
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,1237 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Create a Model and Database Table &mdash; Zend Framework 2 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="create-a-model-and-database-table">
+<span id="learning-quickstart-create-model"></span><h1>Create a Model and Database Table<a class="headerlink" href="#create-a-model-and-database-table" title="Permalink to this headline">¶</a></h1>
+<p>Before we get started, let&#8217;s consider something: where will these classes live, and how will we find them? The
+default project we created instantiates an autoloader. We can attach other autoloaders to it so that it knows where
+to find different classes. Typically, we want our various MVC classes grouped under the same tree &#8211; in this case,
+<tt class="docutils literal"><span class="pre">application/</span></tt>&#8211; and most often using a common prefix.</p>
+<p><tt class="docutils literal"><span class="pre">Zend_Controller_Front</span></tt> has a notion of &#8220;modules&#8221;, which are individual mini-applications. Modules mimic the
+directory structure that the <tt class="docutils literal"><span class="pre">zf</span></tt> tool sets up under <tt class="docutils literal"><span class="pre">application/</span></tt>, and all classes inside them are assumed to
+begin with a common prefix, the module name. <tt class="docutils literal"><span class="pre">application/</span></tt> is itself a module &#8211; the &#8220;default&#8221; or &#8220;application&#8221;
+module. As such, we&#8217;ll want to setup autoloading for resources within this directory.</p>
+<p><tt class="docutils literal"><span class="pre">Zend_Application_Module_Autoloader</span></tt> provides the functionality needed to map the various resources under a
+module to the appropriate directories, and provides a standard naming mechanism as well. An instance of the class
+is created by default during initialization of the bootstrap object; your application bootstrap will be default use
+the module prefix &#8220;Application&#8221;. As such, our models, forms, and table classes will all begin with the class prefix
+&#8220;Application_&#8221;.</p>
+<p>Now, let&#8217;s consider what makes up a guestbook. Typically, they are simply a list of entries with a <strong>comment</strong>,
+<strong>timestamp</strong>, and, often, <strong>email address</strong>. Assuming we store them in a database, we may also want a <strong>unique
+identifier</strong> for each entry. We&#8217;ll likely want to be able to save an entry, fetch individual entries, and retrieve
+all entries. As such, a simple guestbook model <em>API</em> might look something like this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// application/models/Guestbook.php</span>
+
+<span class="k">class</span> <span class="nc">Application_Model_Guestbook</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$_comment</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$_created</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$_email</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$_id</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__set</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$value</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__get</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setComment</span><span class="p">(</span><span class="nv">$text</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getComment</span><span class="p">();</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setEmail</span><span class="p">(</span><span class="nv">$email</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getEmail</span><span class="p">();</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setCreated</span><span class="p">(</span><span class="nv">$ts</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getCreated</span><span class="p">();</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setId</span><span class="p">(</span><span class="nv">$id</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getId</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Application_Model_GuestbookMapper</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">save</span><span class="p">(</span><span class="nx">Application_Model_Guestbook</span> <span class="nv">$guestbook</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nv">$id</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">fetchAll</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">__get()</span></tt> and <tt class="docutils literal"><span class="pre">__set()</span></tt> will provide a convenience mechanism for us to access the individual entry properties,
+and proxy to the other getters and setters. They also will help ensure that only properties we whitelist will be
+available in the object.</p>
+<p><tt class="docutils literal"><span class="pre">find()</span></tt> and <tt class="docutils literal"><span class="pre">fetchAll()</span></tt> provide the ability to fetch a single entry or all entries, while <tt class="docutils literal"><span class="pre">save()</span></tt> takes
+care of saving an entry to the data store.</p>
+<p>Now from here, we can start thinking about setting up our database.</p>
+<p>First we need to initialize our <tt class="docutils literal"><span class="pre">Db</span></tt> resource. As with the <tt class="docutils literal"><span class="pre">Layout</span></tt> and <tt class="docutils literal"><span class="pre">View</span></tt> resource, we can provide
+configuration for the <tt class="docutils literal"><span class="pre">Db</span></tt> resource. We can do this with the <tt class="docutils literal"><span class="pre">zf</span> <span class="pre">configure</span> <span class="pre">db-adapter</span></tt> command:</p>
+<div class="highlight-console"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="gp">%</span> zf configure db-adapter <span class="se">\</span>
+<span class="gp">&gt;</span> <span class="s1">&#39;adapter=PDO_SQLITE&amp;dbname=APPLICATION_PATH &quot;/../data/db/guestbook.db&quot;&#39;</span> <span class="se">\</span>
+<span class="gp">&gt;</span> production
+<span class="go">A db configuration for the production has been written to the application config file.</span>
+
+<span class="gp">%</span> zf configure db-adapter <span class="se">\</span>
+<span class="gp">&gt;</span> <span class="s1">&#39;adapter=PDO_SQLITE&amp;dbname=APPLICATION_PATH &quot;/../data/db/guestbook-testing.db&quot;&#39;</span> <span class="se">\</span>
+<span class="gp">&gt;</span> testing
+<span class="go">A db configuration for the production has been written to the application config file.</span>
+
+<span class="gp">%</span> zf configure db-adapter <span class="se">\</span>
+<span class="gp">&gt;</span> <span class="s1">&#39;adapter=PDO_SQLITE&amp;dbname=APPLICATION_PATH &quot;/../data/db/guestbook-dev.db&quot;&#39;</span> <span class="se">\</span>
+<span class="gp">&gt;</span> development
+<span class="go">A db configuration for the production has been written to the application config file.</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now edit your <tt class="docutils literal"><span class="pre">application/configs/application.ini</span></tt> file, where you&#8217;ll see the following lines were added in the
+appropriate sections.</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">; application/configs/application.ini</span>
+
+<span class="k">[production]</span>
+<span class="c">; ...</span>
+<span class="na">resources.db.adapter</span> <span class="o">=</span> <span class="s">&quot;PDO_SQLITE&quot;</span>
+<span class="na">resources.db.params.dbname</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/../data/db/guestbook.db&quot;</span>
+
+<span class="k">[testing : production]</span>
+<span class="c">; ...</span>
+<span class="na">resources.db.adapter</span> <span class="o">=</span> <span class="s">&quot;PDO_SQLITE&quot;</span>
+<span class="na">resources.db.params.dbname</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/../data/db/guestbook-testing.db&quot;</span>
+
+<span class="k">[development : production]</span>
+<span class="c">; ...</span>
+<span class="na">resources.db.adapter</span> <span class="o">=</span> <span class="s">&quot;PDO_SQLITE&quot;</span>
+<span class="na">resources.db.params.dbname</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/../data/db/guestbook-dev.db&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Your final configuration file should look like the following:</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">; application/configs/application.ini</span>
+
+<span class="k">[production]</span>
+<span class="na">phpSettings.display_startup_errors</span> <span class="o">=</span> <span class="s">0</span>
+<span class="na">phpSettings.display_errors</span> <span class="o">=</span> <span class="s">0</span>
+<span class="na">bootstrap.path</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/Bootstrap.php&quot;</span>
+<span class="na">bootstrap.class</span> <span class="o">=</span> <span class="s">&quot;Bootstrap&quot;</span>
+<span class="na">appnamespace</span> <span class="o">=</span> <span class="s">&quot;Application&quot;</span>
+<span class="na">resources.frontController.controllerDirectory</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/controllers&quot;</span>
+<span class="na">resources.frontController.params.displayExceptions</span> <span class="o">=</span> <span class="s">0</span>
+<span class="na">resources.layout.layoutPath</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/layouts/scripts&quot;</span>
+<span class="na">resources.view[]</span> <span class="o">=</span>
+<span class="na">resources.db.adapter</span> <span class="o">=</span> <span class="s">&quot;PDO_SQLITE&quot;</span>
+<span class="na">resources.db.params.dbname</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/../data/db/guestbook.db&quot;</span>
+
+<span class="k">[staging : production]</span>
+
+<span class="k">[testing : production]</span>
+<span class="na">phpSettings.display_startup_errors</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">phpSettings.display_errors</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">resources.db.adapter</span> <span class="o">=</span> <span class="s">&quot;PDO_SQLITE&quot;</span>
+<span class="na">resources.db.params.dbname</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/../data/db/guestbook-testing.db&quot;</span>
+
+<span class="k">[development : production]</span>
+<span class="na">phpSettings.display_startup_errors</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">phpSettings.display_errors</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">resources.db.adapter</span> <span class="o">=</span> <span class="s">&quot;PDO_SQLITE&quot;</span>
+<span class="na">resources.db.params.dbname</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/../data/db/guestbook-dev.db&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that the database(s) will be stored in <tt class="docutils literal"><span class="pre">data/db/</span></tt>. Create those directories, and make them world-writeable.
+On unix-like systems, you can do that as follows:</p>
+<div class="highlight-console"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="gp">%</span> mkdir -p data/db; chmod -R a+rwX data
+</pre></div>
+</td></tr></table></div>
+<p>On Windows, you will need to create the directories in Explorer and set the permissions to allow anyone to write to
+the directory.</p>
+<p>At this point we have a connection to a database; in our case, its a connection to a Sqlite database located inside
+our <tt class="docutils literal"><span class="pre">application/data/</span></tt> directory. So, let&#8217;s design a simple table that will hold our guestbook entries.</p>
+<div class="highlight-sql"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">-- scripts/schema.sqlite.sql</span>
+<span class="c1">--</span>
+<span class="c1">-- You will need load your database schema with this SQL.</span>
+
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">guestbook</span> <span class="p">(</span>
+    <span class="n">id</span> <span class="nb">INTEGER</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">PRIMARY</span> <span class="k">KEY</span> <span class="n">AUTOINCREMENT</span><span class="p">,</span>
+    <span class="n">email</span> <span class="nb">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">DEFAULT</span> <span class="s1">&#39;noemail@test.com&#39;</span><span class="p">,</span>
+    <span class="k">comment</span> <span class="nb">TEXT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">created</span> <span class="n">DATETIME</span> <span class="k">NOT</span> <span class="k">NULL</span>
+<span class="p">);</span>
+
+<span class="k">CREATE</span> <span class="k">INDEX</span> <span class="ss">&quot;id&quot;</span> <span class="k">ON</span> <span class="ss">&quot;guestbook&quot;</span> <span class="p">(</span><span class="ss">&quot;id&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>And, so that we can have some working data out of the box, lets create a few rows of information to make our
+application interesting.</p>
+<div class="highlight-sql"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">-- scripts/data.sqlite.sql</span>
+<span class="c1">--</span>
+<span class="c1">-- You can begin populating the database with the following SQL statements.</span>
+
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">guestbook</span> <span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="k">comment</span><span class="p">,</span> <span class="n">created</span><span class="p">)</span> <span class="k">VALUES</span>
+    <span class="p">(</span><span class="s1">&#39;ralph.schindler@zend.com&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Hello! Hope you enjoy this sample zf application!&#39;</span><span class="p">,</span>
+    <span class="n">DATETIME</span><span class="p">(</span><span class="s1">&#39;NOW&#39;</span><span class="p">));</span>
+<span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">guestbook</span> <span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="k">comment</span><span class="p">,</span> <span class="n">created</span><span class="p">)</span> <span class="k">VALUES</span>
+    <span class="p">(</span><span class="s1">&#39;foo@bar.com&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Baz baz baz, baz baz Baz baz baz - baz baz baz.&#39;</span><span class="p">,</span>
+    <span class="n">DATETIME</span><span class="p">(</span><span class="s1">&#39;NOW&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now that we have both the schema and some data defined. Lets get a script together that we can now execute to build
+this database. Naturally, this is not needed in production, but this script will help developers build out the
+database requirements locally so they can have the fully working application. Create the script as
+<tt class="docutils literal"><span class="pre">scripts/load.sqlite.php</span></tt> with the following contents:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// scripts/load.sqlite.php</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Script for creating and loading database</span>
+<span class="sd"> */</span>
+
+<span class="c1">// Initialize the application path and autoloading</span>
+<span class="nb">defined</span><span class="p">(</span><span class="s1">&#39;APPLICATION_PATH&#39;</span><span class="p">)</span>
+    <span class="o">||</span> <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;APPLICATION_PATH&#39;</span><span class="p">,</span> <span class="nb">realpath</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/../application&#39;</span><span class="p">));</span>
+<span class="nb">set_include_path</span><span class="p">(</span><span class="nb">implode</span><span class="p">(</span><span class="nx">PATH_SEPARATOR</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="nx">APPLICATION_PATH</span> <span class="o">.</span> <span class="s1">&#39;/../library&#39;</span><span class="p">,</span>
+    <span class="nb">get_include_path</span><span class="p">(),</span>
+<span class="p">)));</span>
+<span class="k">require_once</span> <span class="s1">&#39;Zend/Loader/Autoloader.php&#39;</span><span class="p">;</span>
+<span class="nx">Zend_Loader_Autoloader</span><span class="o">::</span><span class="na">getInstance</span><span class="p">();</span>
+
+<span class="c1">// Define some CLI options</span>
+<span class="nv">$getopt</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Console_Getopt</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;withdata|w&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Load database with sample data&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;env|e-s&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;Application environment for which to create database (defaults to development)&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;help|h&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;Help -- usage message&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$getopt</span><span class="o">-&gt;</span><span class="na">parse</span><span class="p">();</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend_Console_Getopt_Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// Bad options passed: report usage</span>
+    <span class="k">echo</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getUsageMessage</span><span class="p">();</span>
+    <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// If help requested, report usage message</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$getopt</span><span class="o">-&gt;</span><span class="na">getOption</span><span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$getopt</span><span class="o">-&gt;</span><span class="na">getUsageMessage</span><span class="p">();</span>
+    <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Initialize values based on presence or absence of CLI options</span>
+<span class="nv">$withData</span> <span class="o">=</span> <span class="nv">$getopt</span><span class="o">-&gt;</span><span class="na">getOption</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">);</span>
+<span class="nv">$env</span>      <span class="o">=</span> <span class="nv">$getopt</span><span class="o">-&gt;</span><span class="na">getOption</span><span class="p">(</span><span class="s1">&#39;e&#39;</span><span class="p">);</span>
+<span class="nb">defined</span><span class="p">(</span><span class="s1">&#39;APPLICATION_ENV&#39;</span><span class="p">)</span>
+    <span class="o">||</span> <span class="nb">define</span><span class="p">(</span><span class="s1">&#39;APPLICATION_ENV&#39;</span><span class="p">,</span> <span class="p">(</span><span class="k">null</span> <span class="o">===</span> <span class="nv">$env</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39;development&#39;</span> <span class="o">:</span> <span class="nv">$env</span><span class="p">);</span>
+
+<span class="c1">// Initialize Zend_Application</span>
+<span class="nv">$application</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Application</span><span class="p">(</span>
+    <span class="nx">APPLICATION_ENV</span><span class="p">,</span>
+    <span class="nx">APPLICATION_PATH</span> <span class="o">.</span> <span class="s1">&#39;/configs/application.ini&#39;</span>
+<span class="p">);</span>
+
+<span class="c1">// Initialize and retrieve DB resource</span>
+<span class="nv">$bootstrap</span> <span class="o">=</span> <span class="nv">$application</span><span class="o">-&gt;</span><span class="na">getBootstrap</span><span class="p">();</span>
+<span class="nv">$bootstrap</span><span class="o">-&gt;</span><span class="na">bootstrap</span><span class="p">(</span><span class="s1">&#39;db&#39;</span><span class="p">);</span>
+<span class="nv">$dbAdapter</span> <span class="o">=</span> <span class="nv">$bootstrap</span><span class="o">-&gt;</span><span class="na">getResource</span><span class="p">(</span><span class="s1">&#39;db&#39;</span><span class="p">);</span>
+
+<span class="c1">// let the user know whats going on (we are actually creating a</span>
+<span class="c1">// database here)</span>
+<span class="k">if</span> <span class="p">(</span><span class="s1">&#39;testing&#39;</span> <span class="o">!=</span> <span class="nx">APPLICATION_ENV</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;Writing Database Guestbook in (control-c to cancel): &#39;</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="nv">$x</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span> <span class="nv">$x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="nv">$x</span><span class="o">--</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="nv">$x</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">;</span> <span class="nb">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// Check to see if we have a database file already</span>
+<span class="nv">$options</span> <span class="o">=</span> <span class="nv">$bootstrap</span><span class="o">-&gt;</span><span class="na">getOption</span><span class="p">(</span><span class="s1">&#39;resources&#39;</span><span class="p">);</span>
+<span class="nv">$dbFile</span>  <span class="o">=</span> <span class="nv">$options</span><span class="p">[</span><span class="s1">&#39;db&#39;</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">][</span><span class="s1">&#39;dbname&#39;</span><span class="p">];</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">file_exists</span><span class="p">(</span><span class="nv">$dbFile</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nb">unlink</span><span class="p">(</span><span class="nv">$dbFile</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// this block executes the actual statements that were loaded from</span>
+<span class="c1">// the schema file.</span>
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$schemaSql</span> <span class="o">=</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/schema.sqlite.sql&#39;</span><span class="p">);</span>
+    <span class="c1">// use the connection directly to load sql in batches</span>
+    <span class="nv">$dbAdapter</span><span class="o">-&gt;</span><span class="na">getConnection</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">exec</span><span class="p">(</span><span class="nv">$schemaSql</span><span class="p">);</span>
+    <span class="nb">chmod</span><span class="p">(</span><span class="nv">$dbFile</span><span class="p">,</span> <span class="mo">0666</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;testing&#39;</span> <span class="o">!=</span> <span class="nx">APPLICATION_ENV</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+        <span class="k">echo</span> <span class="s1">&#39;Database Created&#39;</span><span class="p">;</span>
+        <span class="k">echo</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$withData</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$dataSql</span> <span class="o">=</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/data.sqlite.sql&#39;</span><span class="p">);</span>
+        <span class="c1">// use the connection directly to load sql in batches</span>
+        <span class="nv">$dbAdapter</span><span class="o">-&gt;</span><span class="na">getConnection</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">exec</span><span class="p">(</span><span class="nv">$dataSql</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;testing&#39;</span> <span class="o">!=</span> <span class="nx">APPLICATION_ENV</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">echo</span> <span class="s1">&#39;Data Loaded.&#39;</span><span class="p">;</span>
+            <span class="k">echo</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;AN ERROR HAS OCCURED:&#39;</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="nx">PHP_EOL</span><span class="p">;</span>
+    <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// generally speaking, this script will be run from the command line</span>
+<span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now, let&#8217;s execute this script. From a terminal or the DOS command line, do the following:</p>
+<div class="highlight-console"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="gp">%</span> php scripts/load.sqlite.php --withdata
+</pre></div>
+</td></tr></table></div>
+<p>You should see output like the following:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre>path/to/ZendFrameworkQuickstart/scripts$ php load.sqlite.php --withdata
+Writing Database Guestbook in (control-c to cancel):
+1
+Database Created
+Data Loaded.
+</pre></div>
+</td></tr></table></div>
+<p>Now we have a fully working database and table for our guestbook application. Our next few steps are to build out
+our application code. This includes building a data source (in our case, we will use <tt class="docutils literal"><span class="pre">Zend_Db_Table</span></tt>), and a data
+mapper to connect that data source to our domain model. Finally we&#8217;ll also create the controller that will interact
+with this model to both display existing entries and process new entries.</p>
+<p>We&#8217;ll use a <a class="reference external" href="http://martinfowler.com/eaaCatalog/tableDataGateway.html">Table Data Gateway</a> to connect to our data source; <tt class="docutils literal"><span class="pre">Zend_Db_Table</span></tt> provides this functionality. To
+get started, lets create a <tt class="docutils literal"><span class="pre">Zend_Db_Table</span></tt>-based table class. Just as we&#8217;ve done for layouts and the database
+adapter, we can use the <tt class="docutils literal"><span class="pre">zf</span></tt> tool to assist, using the command <tt class="docutils literal"><span class="pre">create</span> <span class="pre">db-table</span></tt>. This takes minimally two
+arguments, the name by which you want to refer to the class, and the database table it maps to.</p>
+<div class="highlight-console"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="gp">%</span> zf create db-table Guestbook guestbook
+<span class="go">Creating a DbTable at application/models/DbTable/Guestbook.php</span>
+<span class="go">Updating project profile &#39;zfproject.xml&#39;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Looking at your directory tree, you&#8217;ll now see that a new directory, <tt class="docutils literal"><span class="pre">application/models/DbTable/</span></tt>, was created,
+with the file <tt class="docutils literal"><span class="pre">Guestbook.php</span></tt>. If you open that file, you&#8217;ll see the following contents:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// application/models/DbTable/Guestbook.php</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * This is the DbTable class for the guestbook table.</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Application_Model_DbTable_Guestbook</span> <span class="k">extends</span> <span class="nx">Zend_Db_Table_Abstract</span>
+<span class="p">{</span>
+    <span class="sd">/** Table name */</span>
+    <span class="k">protected</span> <span class="nv">$_name</span>    <span class="o">=</span> <span class="s1">&#39;guestbook&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note the class prefix: <tt class="docutils literal"><span class="pre">Application_Model_DbTable</span></tt>. The class prefix for our module, &#8220;Application&#8221;, is the first
+segment, and then we have the component, &#8220;Model_DbTable&#8221;; the latter is mapped to the <tt class="docutils literal"><span class="pre">models/DbTable/</span></tt> directory
+of the module.</p>
+<p>All that is truly necessary when extending <tt class="docutils literal"><span class="pre">Zend_Db_Table</span></tt> is to provide a table name and optionally the primary
+key (if it is not &#8220;id&#8221;).</p>
+<p>Now let&#8217;s create a <a class="reference external" href="http://martinfowler.com/eaaCatalog/dataMapper.html">Data Mapper</a>. A <strong>Data Mapper</strong> maps a domain object to the database. In our case, it will map
+our model, <tt class="docutils literal"><span class="pre">Application_Model_Guestbook</span></tt>, to our data source, <tt class="docutils literal"><span class="pre">Application_Model_DbTable_Guestbook</span></tt>. A typical
+<em>API</em> for a data mapper is as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// application/models/GuestbookMapper.php</span>
+
+<span class="k">class</span> <span class="nc">Application_Model_GuestbookMapper</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">save</span><span class="p">(</span><span class="nv">$model</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nv">$id</span><span class="p">,</span> <span class="nv">$model</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">fetchAll</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>In addition to these methods, we&#8217;ll add methods for setting and retrieving the Table Data Gateway. To create the
+initial class, use the <tt class="docutils literal"><span class="pre">zf</span></tt> CLI tool:</p>
+<div class="highlight-console"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="gp">%</span> zf create model GuestbookMapper
+<span class="go">Creating a model at application/models/GuestbookMapper.php</span>
+<span class="go">Updating project profile &#39;.zfproject.xml&#39;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now, edit the class <tt class="docutils literal"><span class="pre">Application_Model_GuestbookMapper</span></tt> found in <tt class="docutils literal"><span class="pre">application/models/GuestbookMapper.php</span></tt> to
+read as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// application/models/GuestbookMapper.php</span>
+
+<span class="k">class</span> <span class="nc">Application_Model_GuestbookMapper</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$_dbTable</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setDbTable</span><span class="p">(</span><span class="nv">$dbTable</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">is_string</span><span class="p">(</span><span class="nv">$dbTable</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$dbTable</span> <span class="o">=</span> <span class="k">new</span> <span class="nv">$dbTable</span><span class="p">();</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$dbTable</span> <span class="nx">instanceof</span> <span class="nx">Zend_Db_Table_Abstract</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">&#39;Invalid table data gateway provided&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_dbTable</span> <span class="o">=</span> <span class="nv">$dbTable</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getDbTable</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">null</span> <span class="o">===</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_dbTable</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setDbTable</span><span class="p">(</span><span class="s1">&#39;Application_Model_DbTable_Guestbook&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_dbTable</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">save</span><span class="p">(</span><span class="nx">Application_Model_Guestbook</span> <span class="nv">$guestbook</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$data</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;email&#39;</span>   <span class="o">=&gt;</span> <span class="nv">$guestbook</span><span class="o">-&gt;</span><span class="na">getEmail</span><span class="p">(),</span>
+            <span class="s1">&#39;comment&#39;</span> <span class="o">=&gt;</span> <span class="nv">$guestbook</span><span class="o">-&gt;</span><span class="na">getComment</span><span class="p">(),</span>
+            <span class="s1">&#39;created&#39;</span> <span class="o">=&gt;</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y-m-d H:i:s&#39;</span><span class="p">),</span>
+        <span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="k">null</span> <span class="o">===</span> <span class="p">(</span><span class="nv">$id</span> <span class="o">=</span> <span class="nv">$guestbook</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">()))</span> <span class="p">{</span>
+            <span class="nb">unset</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]);</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getDbTable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">insert</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getDbTable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">(</span><span class="nv">$data</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;id = ?&#39;</span> <span class="o">=&gt;</span> <span class="nv">$id</span><span class="p">));</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">find</span><span class="p">(</span><span class="nv">$id</span><span class="p">,</span> <span class="nx">Application_Model_Guestbook</span> <span class="nv">$guestbook</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getDbTable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$id</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="mi">0</span> <span class="o">==</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$result</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="nv">$row</span> <span class="o">=</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="na">current</span><span class="p">();</span>
+        <span class="nv">$guestbook</span><span class="o">-&gt;</span><span class="na">setId</span><span class="p">(</span><span class="nv">$row</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">)</span>
+                  <span class="o">-&gt;</span><span class="na">setEmail</span><span class="p">(</span><span class="nv">$row</span><span class="o">-&gt;</span><span class="na">email</span><span class="p">)</span>
+                  <span class="o">-&gt;</span><span class="na">setComment</span><span class="p">(</span><span class="nv">$row</span><span class="o">-&gt;</span><span class="na">comment</span><span class="p">)</span>
+                  <span class="o">-&gt;</span><span class="na">setCreated</span><span class="p">(</span><span class="nv">$row</span><span class="o">-&gt;</span><span class="na">created</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">fetchAll</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$resultSet</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getDbTable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">();</span>
+        <span class="nv">$entries</span>   <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$resultSet</span> <span class="k">as</span> <span class="nv">$row</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$entry</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application_Model_Guestbook</span><span class="p">();</span>
+            <span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">setId</span><span class="p">(</span><span class="nv">$row</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">)</span>
+                  <span class="o">-&gt;</span><span class="na">setEmail</span><span class="p">(</span><span class="nv">$row</span><span class="o">-&gt;</span><span class="na">email</span><span class="p">)</span>
+                  <span class="o">-&gt;</span><span class="na">setComment</span><span class="p">(</span><span class="nv">$row</span><span class="o">-&gt;</span><span class="na">comment</span><span class="p">)</span>
+                  <span class="o">-&gt;</span><span class="na">setCreated</span><span class="p">(</span><span class="nv">$row</span><span class="o">-&gt;</span><span class="na">created</span><span class="p">);</span>
+            <span class="nv">$entries</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$entry</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$entries</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now it&#8217;s time to create our model class. We&#8217;ll do so, once again, using the <tt class="docutils literal"><span class="pre">zf</span> <span class="pre">create</span> <span class="pre">model</span></tt> command:</p>
+<div class="highlight-console"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="gp">%</span> zf create model Guestbook
+<span class="go">Creating a model at application/models/Guestbook.php</span>
+<span class="go">Updating project profile &#39;.zfproject.xml&#39;</span>
+</pre></div>
+</td></tr></table></div>
+<p>We&#8217;ll modify this empty <em>PHP</em> class to make it easy to populate the model by passing an array of data either to the
+constructor or a <tt class="docutils literal"><span class="pre">setOptions()</span></tt> method. The final model class, located in <tt class="docutils literal"><span class="pre">application/models/Guestbook.php</span></tt>,
+should look like this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// application/models/Guestbook.php</span>
+
+<span class="k">class</span> <span class="nc">Application_Model_Guestbook</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$_comment</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$_created</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$_email</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$_id</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="k">array</span> <span class="nv">$options</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">is_array</span><span class="p">(</span><span class="nv">$options</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setOptions</span><span class="p">(</span><span class="nv">$options</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__set</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$method</span> <span class="o">=</span> <span class="s1">&#39;set&#39;</span> <span class="o">.</span> <span class="nv">$name</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">((</span><span class="s1">&#39;mapper&#39;</span> <span class="o">==</span> <span class="nv">$name</span><span class="p">)</span> <span class="o">||</span> <span class="o">!</span><span class="nb">method_exists</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="nv">$method</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">&#39;Invalid guestbook property&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="nv">$method</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__get</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$method</span> <span class="o">=</span> <span class="s1">&#39;get&#39;</span> <span class="o">.</span> <span class="nv">$name</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">((</span><span class="s1">&#39;mapper&#39;</span> <span class="o">==</span> <span class="nv">$name</span><span class="p">)</span> <span class="o">||</span> <span class="o">!</span><span class="nb">method_exists</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="nv">$method</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">&#39;Invalid guestbook property&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="nv">$method</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setOptions</span><span class="p">(</span><span class="k">array</span> <span class="nv">$options</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$methods</span> <span class="o">=</span> <span class="nb">get_class_methods</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$options</span> <span class="k">as</span> <span class="nv">$key</span> <span class="o">=&gt;</span> <span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$method</span> <span class="o">=</span> <span class="s1">&#39;set&#39;</span> <span class="o">.</span> <span class="nb">ucfirst</span><span class="p">(</span><span class="nv">$key</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">in_array</span><span class="p">(</span><span class="nv">$method</span><span class="p">,</span> <span class="nv">$methods</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="nv">$method</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setComment</span><span class="p">(</span><span class="nv">$text</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_comment</span> <span class="o">=</span> <span class="p">(</span><span class="nx">string</span><span class="p">)</span> <span class="nv">$text</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getComment</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_comment</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setEmail</span><span class="p">(</span><span class="nv">$email</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_email</span> <span class="o">=</span> <span class="p">(</span><span class="nx">string</span><span class="p">)</span> <span class="nv">$email</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getEmail</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_email</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setCreated</span><span class="p">(</span><span class="nv">$ts</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_created</span> <span class="o">=</span> <span class="nv">$ts</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getCreated</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_created</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setId</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_id</span> <span class="o">=</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span> <span class="nv">$id</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getId</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_id</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Lastly, to connect these elements all together, lets create a guestbook controller that will both list the entries
+that are currently inside the database.</p>
+<p>To create a new controller, use the <tt class="docutils literal"><span class="pre">zf</span> <span class="pre">create</span> <span class="pre">controller</span></tt> command:</p>
+<div class="highlight-console"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="gp">%</span> zf create controller Guestbook
+<span class="go">Creating a controller at</span>
+<span class="go">    application/controllers/GuestbookController.php</span>
+<span class="go">Creating an index action method in controller Guestbook</span>
+<span class="go">Creating a view script for the index action method at</span>
+<span class="go">    application/views/scripts/guestbook/index.phtml</span>
+<span class="go">Creating a controller test file at</span>
+<span class="go">    tests/application/controllers/GuestbookControllerTest.php</span>
+<span class="go">Updating project profile &#39;.zfproject.xml&#39;</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a new controller, <tt class="docutils literal"><span class="pre">GuestbookController</span></tt>, in <tt class="docutils literal"><span class="pre">application/controllers/GuestbookController.php</span></tt>,
+with a single action method, <tt class="docutils literal"><span class="pre">indexAction()</span></tt>. It will also create a view script directory for the controller,
+<tt class="docutils literal"><span class="pre">application/views/scripts/guestbook/</span></tt>, with a view script for the index action.</p>
+<p>We&#8217;ll use the &#8220;index&#8221; action as a landing page to view all guestbook entries.</p>
+<p>Now, let&#8217;s flesh out the basic application logic. On a hit to <tt class="docutils literal"><span class="pre">indexAction()</span></tt>, we&#8217;ll display all guestbook
+entries. This would look like the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// application/controllers/GuestbookController.php</span>
+
+<span class="k">class</span> <span class="nc">GuestbookController</span> <span class="k">extends</span> <span class="nx">Zend_Controller_Action</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">indexAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$guestbook</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application_Model_GuestbookMapper</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">view</span><span class="o">-&gt;</span><span class="na">entries</span> <span class="o">=</span> <span class="nv">$guestbook</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>And, of course, we need a view script to go along with that. Edit
+<tt class="docutils literal"><span class="pre">application/views/scripts/guestbook/index.phtml</span></tt> to read as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;!--</span> <span class="nx">application</span><span class="o">/</span><span class="nx">views</span><span class="o">/</span><span class="nx">scripts</span><span class="o">/</span><span class="nx">guestbook</span><span class="o">/</span><span class="nx">index</span><span class="o">.</span><span class="nx">phtml</span> <span class="o">--&gt;</span>
+
+<span class="o">&lt;</span><span class="nx">p</span><span class="o">&gt;&lt;</span><span class="nx">a</span> <span class="nx">href</span><span class="o">=</span><span class="s2">&quot;&lt;?php echo </span><span class="si">$this-&gt;url</span><span class="s2">(</span>
+<span class="s2">    array(</span>
+<span class="s2">        &#39;controller&#39; =&gt; &#39;guestbook&#39;,</span>
+<span class="s2">        &#39;action&#39;     =&gt; &#39;sign&#39;</span>
+<span class="s2">    ),</span>
+<span class="s2">    &#39;default&#39;,</span>
+<span class="s2">    true) ?&gt;&quot;</span><span class="o">&gt;</span><span class="nx">Sign</span> <span class="nx">Our</span> <span class="nx">Guestbook</span><span class="o">&lt;/</span><span class="nx">a</span><span class="o">&gt;&lt;/</span><span class="nx">p</span><span class="o">&gt;</span>
+
+<span class="nx">Guestbook</span> <span class="nx">Entries</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">br</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="nb">dl</span><span class="o">&gt;</span>
+    <span class="o">&lt;?</span><span class="nx">php</span> <span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">entries</span> <span class="k">as</span> <span class="nv">$entry</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    &lt;dt&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escape</span><span class="p">(</span><span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">email</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x">&lt;/dt&gt;</span>
+<span class="x">    &lt;dd&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escape</span><span class="p">(</span><span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">comment</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x">&lt;/dd&gt;</span>
+<span class="x">    </span><span class="cp">&lt;?php</span> <span class="k">endforeach</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/dl&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Checkpoint</strong></p>
+<p>Now browse to &#8220;<a class="reference external" href="http://localhost/guestbook">http://localhost/guestbook</a>&#8221;. You should see the following in your browser:</p>
+<img alt="../_images/learning.quickstart.create-model.png" class="last align-center" src="../_images/learning.quickstart.create-model.png" style="width: 525px;" />
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Using the data loader script</strong></p>
+<p>The data loader script introduced in this section (<tt class="docutils literal"><span class="pre">scripts/load.sqlite.php</span></tt>) can be used to create the
+database for each environment you have defined, as well as to load it with sample data. Internally, it utilizes
+<tt class="docutils literal"><span class="pre">Zend_Console_Getopt</span></tt>, which allows it to provide a number of command line switches. If you pass the &#8220;-h&#8221; or
+&#8220;&#8211;help&#8221; switch, it will give you the available options:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Usage</span><span class="o">:</span> <span class="nx">load</span><span class="o">.</span><span class="nx">sqlite</span><span class="o">.</span><span class="nx">php</span> <span class="p">[</span> <span class="nx">options</span> <span class="p">]</span>
+<span class="o">--</span><span class="nx">withdata</span><span class="o">|-</span><span class="nx">w</span>         <span class="nx">Load</span> <span class="nx">database</span> <span class="nx">with</span> <span class="nx">sample</span> <span class="nx">data</span>
+<span class="o">--</span><span class="nx">env</span><span class="o">|-</span><span class="nx">e</span> <span class="p">[</span>  <span class="p">]</span>         <span class="nx">Application</span> <span class="nx">environment</span> <span class="k">for</span> <span class="nx">which</span> <span class="nx">to</span> <span class="nx">create</span> <span class="nx">database</span>
+                      <span class="p">(</span><span class="nx">defaults</span> <span class="nx">to</span> <span class="nx">development</span><span class="p">)</span>
+<span class="o">--</span><span class="nx">help</span><span class="o">|-</span><span class="nx">h</span>             <span class="nx">Help</span> <span class="o">--</span> <span class="nx">usage</span> <span class="nx">message</span><span class="p">)]]</span>
+</pre></div>
+</td></tr></table></div>
+<p class="last">The &#8220;-e&#8221; switch allows you to specify the value to use for the constant <tt class="docutils literal"><span class="pre">APPLICATION_ENV</span></tt>&#8211; which in turn
+allows you to create a SQLite database for each environment you define. Be sure to run the script for the
+environment you choose for your application when deploying.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/quickstart.create.model.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/quickstart.create.model.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/quickstart.create.model.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/quickstart.create.model.rst">
+                Create a Model and Database Table
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

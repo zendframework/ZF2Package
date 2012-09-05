@@ -1,0 +1,457 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The ClassMapAutoloader &mdash; Zend Framework 2 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0 documentation" href="../index.html" />
+    <link rel="next" title="The StandardAutoloader" href="zend.loader.standard-autoloader.html" />
+    <link rel="prev" title="The SplAutoloader Interface" href="zend.loader.spl-autoloader.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.loader.standard-autoloader.html" title="The StandardAutoloader"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.loader.spl-autoloader.html" title="The SplAutoloader Interface"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-classmapautoloader">
+<span id="zend-loader-class-map-autoloader"></span><h1>The ClassMapAutoloader<a class="headerlink" href="#the-classmapautoloader" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-loader-class-map-autoloader-intro"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">ClassMapAutoloader</span></tt> is designed with performance in mind. The idea behind it is simple: when asked to load a
+class, see if it&#8217;s in the map, and, if so, load the file associated with the class in the map. This avoids
+unnecessary filesystem operations, and can also ensure the autoloader &#8220;plays nice&#8221; with opcode caches and PHP&#8217;s
+realpath cache.</p>
+<p>In order to use the <tt class="docutils literal"><span class="pre">ClassMapAutoloader</span></tt>, you first need class maps. Zend Framework ships with a class map per
+component or, if you grabbed the entire ZF distribution, a class map for the entire Zend Framework. These maps are
+typically in a file named <tt class="docutils literal"><span class="pre">.classmap.php</span></tt> within either the &#8220;Zend&#8221; directory, or an individual component&#8217;s source
+directory.</p>
+<p>Zend Framework also provides a tool for generating these class maps; you can find it in
+<tt class="docutils literal"><span class="pre">bin/classmap_generator.php</span></tt> of the distribution. Full documentation of this too is provided in :ref:`
+&lt;zend.loader.classmap-generator&gt;`.</p>
+</div>
+<div class="section" id="quick-start">
+<span id="zend-loader-class-map-autoloader-quick-start"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>The first step is to generate a class map file. You may run this over any directory containing source code anywhere
+underneath it.</p>
+<div class="highlight-sh"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>php classmap_generator.php Some/Directory/
+</pre></div>
+</td></tr></table></div>
+<p>This will create a file named <tt class="docutils literal"><span class="pre">Some/Directory/.classmap.php</span></tt>, which is a PHP file returning an associative array
+that represents the class map.</p>
+<p>Within your code, you will now instantiate the <tt class="docutils literal"><span class="pre">ClassMapAutoloader</span></tt>, and provide it the location of the map.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// This example assumes ZF is on your include_path.</span>
+<span class="c1">// You could also load the autoloader class from a path relative to the</span>
+<span class="c1">// current script, or via an absolute path.</span>
+<span class="k">require_once</span> <span class="s1">&#39;Zend/Loader/ClassMapAutoloader.php&#39;</span><span class="p">;</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Loader\ClassMapAutoloader</span><span class="p">();</span>
+
+<span class="c1">// Register the class map:</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">registerAutoloadMap</span><span class="p">(</span><span class="s1">&#39;Some/Directory/.classmap.php&#39;</span><span class="p">);</span>
+
+<span class="c1">// Register with spl_autoload:</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">register</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>At this point, you may now use any classes referenced in your class map.</p>
+</div>
+<div class="section" id="configuration-options">
+<span id="zend-loader-class-map-autoloader-options"></span><h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">ClassMapAutoloader</span></tt> defines the following options.</p>
+<p class="rubric">ClassMapAutoloader Options</p>
+<dl class="docutils">
+<dt><strong>$options</strong></dt>
+<dd><p class="first">The <tt class="docutils literal"><span class="pre">ClassMapAutoloader</span></tt> expects an array of options, where each option is either a filename referencing a
+class map, or an associative array of class name/filename pairs.</p>
+<p>As an example:</p>
+<div class="last highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Configuration defining both a file-based class map, and an array map</span>
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/library/.classmap.php&#39;</span><span class="p">,</span> <span class="c1">// file-based class map</span>
+    <span class="k">array</span><span class="p">(</span>                              <span class="c1">// array class map</span>
+        <span class="s1">&#39;Application\Bootstrap&#39;</span> <span class="o">=&gt;</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/application/Bootstrap.php&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Test\Bootstrap&#39;</span>        <span class="o">=&gt;</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/tests/Bootstrap.php&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</dd>
+</dl>
+</div>
+<div class="section" id="available-methods">
+<span id="zend-loader-class-map-autoloader-methods"></span><h2>Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="zend-loader-class-map-autoloader-methods-constructor">
+<dt>__construct</dt>
+<dd><p class="first">Initialize and configure the object
+<tt class="docutils literal"><span class="pre">__construct($options</span> <span class="pre">=</span> <span class="pre">null)</span></tt></p>
+<p class="last"><strong>Constructor</strong>
+Used during instantiation of the object. Optionally, pass options, which may be either an array or
+<tt class="docutils literal"><span class="pre">Traversable</span></tt> object; this argument will be passed to <a class="reference internal" href="#zend-loader-class-map-autoloader-methods-set-options"><em>setOptions()</em></a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-class-map-autoloader-methods-set-options">
+<dt>setOptions</dt>
+<dd><p class="first">Configure the autoloader
+<tt class="docutils literal"><span class="pre">setOptions($options)</span></tt></p>
+<p class="last"><strong>setOptions()</strong>
+Configures the state of the autoloader, including registering class maps. Expects an array or <tt class="docutils literal"><span class="pre">Traversable</span></tt>
+object; the argument will be passed to <a class="reference internal" href="#zend-loader-class-map-autoloader-methods-register-autoload-maps"><em>registerAutoloadMaps()</em></a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-class-map-autoloader-methods-register-autoload-map">
+<dt>registerAutoloadMap</dt>
+<dd><p class="first">Register a class map
+<tt class="docutils literal"><span class="pre">registerAutoloadMap($map)</span></tt></p>
+<p><strong>registerAutoloadMap()</strong>
+Registers a class map with the autoloader. <tt class="docutils literal"><span class="pre">$map</span></tt> may be either a string referencing a PHP script that returns
+a class map, or an array defining a class map.</p>
+<p class="last">More than one class map may be registered; each will be merged with the previous, meaning it&#8217;s possible for a
+later class map to overwrite entries from a previously registered map.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-class-map-autoloader-methods-register-autoload-maps">
+<dt>registerAutoloadMaps</dt>
+<dd><p class="first">Register multiple class maps at once
+<tt class="docutils literal"><span class="pre">registerAutoloadMaps($maps)</span></tt></p>
+<p class="last"><strong>registerAutoloadMaps()</strong>
+Register multiple class maps with the autoloader. Expects either an array or <tt class="docutils literal"><span class="pre">Traversable</span></tt> object; it then
+iterates over the argument and passes each value to <a class="reference internal" href="#zend-loader-class-map-autoloader-methods-register-autoload-map"><em>registerAutoloadMap()</em></a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-class-map-autoloader-methods-get-autoload-map">
+<dt>getAutoloadMap</dt>
+<dd><p class="first">Retrieve the current class map
+<tt class="docutils literal"><span class="pre">getAutoloadMap()</span></tt></p>
+<p class="last"><strong>getAutoloadMap()</strong>
+Retrieves the state of the current class map; the return value is simply an array.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-class-map-autoloader-methods-autoload">
+<dt>autoload</dt>
+<dd><p class="first">Attempt to load a class.
+<tt class="docutils literal"><span class="pre">autoload($class)</span></tt></p>
+<p class="last"><strong>autoload()</strong>
+Attempts to load the class specified. Returns a boolean <tt class="docutils literal"><span class="pre">false</span></tt> on failure, or a string indicating the class
+loaded on success.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-class-map-autoloader-methods-register">
+<dt>register</dt>
+<dd><p class="first">Register with spl_autoload.
+<tt class="docutils literal"><span class="pre">register()</span></tt></p>
+<p class="last"><strong>register()</strong>
+Registers the <tt class="docutils literal"><span class="pre">autoload()</span></tt> method of the current instance with <tt class="docutils literal"><span class="pre">spl_autoload_register()</span></tt>.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<span id="zend-loader-class-map-autoloader-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zend-loader-class-map-autoloader-examples-configuration">Using configuration to seed ClassMapAutoloader</p>
+<p>Often, you will want to configure your <tt class="docutils literal"><span class="pre">ClassMapAutoloader</span></tt>. These values may come from a configuration file, a
+cache (such as ShMem or memcached), or a simple PHP array. The following is an example of a PHP array that could be
+used to configure the autoloader:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Configuration defining both a file-based class map, and an array map</span>
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+<span class="nx">APPLICATION_PATH</span> <span class="o">.</span> <span class="s1">&#39;/../library/.classmap.php&#39;</span><span class="p">,</span> <span class="c1">// file-based class map</span>
+    <span class="k">array</span><span class="p">(</span>                              <span class="c1">// array class map</span>
+        <span class="s1">&#39;Application\Bootstrap&#39;</span> <span class="o">=&gt;</span> <span class="nx">APPLICATION_PATH</span> <span class="o">.</span> <span class="s1">&#39;/Bootstrap.php&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Test\Bootstrap&#39;</span>        <span class="o">=&gt;</span> <span class="nx">APPLICATION_PATH</span> <span class="o">.</span> <span class="s1">&#39;/../tests/Bootstrap.php&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>An eqivalent INI style configuration might look like this:</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="na">classmap.library</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/../library/.classmap.php&quot;</span>
+<span class="na">classmap.resources.Application\Bootstrap</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/Bootstrap.php&quot;</span>
+<span class="na">classmap.resources.Test\Bootstrap</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/../tests/Bootstrap.php&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Once you have your configuration, you can pass it either to the constructor of the <tt class="docutils literal"><span class="pre">ClassMapAutoloader</span></tt>, to its
+<tt class="docutils literal"><span class="pre">setOptions()</span></tt> method, or to <tt class="docutils literal"><span class="pre">registerAutoloadMaps()</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="cm">/* The following are all equivalent */</span>
+
+<span class="c1">// To the constructor:</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Loader\ClassMapAutoloader</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+
+<span class="c1">// To setOptions():</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Loader\ClassMapAutoloader</span><span class="p">();</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">setOptions</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+
+<span class="c1">// To registerAutoloadMaps():</span>
+<span class="nv">$loader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Loader\ClassMapAutoloader</span><span class="p">();</span>
+<span class="nv">$loader</span><span class="o">-&gt;</span><span class="na">registerAutoloadMaps</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The ClassMapAutoloader</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#available-methods">Available Methods</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.loader.spl-autoloader.html"
+                        title="previous chapter">The SplAutoloader Interface</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.loader.standard-autoloader.html"
+                        title="next chapter">The StandardAutoloader</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.loader.class-map-autoloader.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.loader.class-map-autoloader.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.loader.class-map-autoloader.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.loader.standard-autoloader.html" title="The StandardAutoloader"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.loader.spl-autoloader.html" title="The SplAutoloader Interface"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.loader.class-map-autoloader.rst">
+                The ClassMapAutoloader
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,499 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>WSDL Accessor &mdash; Zend Framework 2 2.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.0 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="wsdl-accessor">
+<span id="zend-soap-wsdl"></span><h1>WSDL Accessor<a class="headerlink" href="#wsdl-accessor" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl</span></tt> class is used by <tt class="docutils literal"><span class="pre">Zend\Soap\Server</span></tt> component internally to operate with WSDL documents.
+Nevertheless, you could also use functionality provided by this class for your own needs. The <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl</span></tt>
+package contains both a parser and a builder of WSDL documents.</p>
+<p class="last">If you don&#8217;t plan to do this, you can skip this documentation section.</p>
+</div>
+<div class="section" id="zend-soap-wsdl-constructor">
+<span id="id1"></span><h2>Zend\Soap\Wsdl constructor<a class="headerlink" href="#zend-soap-wsdl-constructor" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl</span></tt> constructor takes three parameters:</p>
+<blockquote>
+<div><p>. <tt class="docutils literal"><span class="pre">$name</span></tt>- name of the Web Service being described.</p>
+<p>. <tt class="docutils literal"><span class="pre">$uri</span></tt>-<em>URI</em> where the WSDL will be available (could also be a reference to the file in the filesystem.)</p>
+<dl class="docutils">
+<dt>. <tt class="docutils literal"><span class="pre">$strategy</span></tt>- optional flag used to identify the strategy for complex types (objects) detection. To read more</dt>
+<dd>on complex type detection strategies go to the section: <a class="reference internal" href="#zend-soap-wsdl-types-add-complex"><em>Add complex types</em></a>.</dd>
+</dl>
+<p>. <tt class="docutils literal"><span class="pre">$classMap</span></tt>- Optional array of class name translations from PHP Type (key) to WSDL type (value).</p>
+</div></blockquote>
+</div>
+<div class="section" id="addmessage-method">
+<span id="zend-soap-wsdl-addmessage"></span><h2>addMessage() method<a class="headerlink" href="#addmessage-method" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">addMessage($name,</span> <span class="pre">$parts)</span></tt> method adds new message description to the WSDL document (/definitions/message
+element).</p>
+<p>Each message correspond to methods in terms of <tt class="docutils literal"><span class="pre">Zend\Soap\Server</span></tt> and <tt class="docutils literal"><span class="pre">Zend\Soap\Client</span></tt> functionality.</p>
+<p><tt class="docutils literal"><span class="pre">$name</span></tt> parameter represents message name.</p>
+<p><tt class="docutils literal"><span class="pre">$parts</span></tt> parameter is an array of message parts which describe <em>SOAP</em> call parameters. It&#8217;s an associative array:
+&#8216;part name&#8217; (SOAP call parameter name) =&gt; &#8216;part type&#8217;.</p>
+<p>Type mapping management is performed using <tt class="docutils literal"><span class="pre">addTypes()</span></tt>, <tt class="docutils literal"><span class="pre">addTypes()</span></tt> and <tt class="docutils literal"><span class="pre">addComplexType()</span></tt> methods (see
+below).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Messages parts can use either &#8216;element&#8217; or &#8216;type&#8217; attribute for typing (see
+<a class="reference external" href="http://www.w3.org/TR/wsdl#_messages">http://www.w3.org/TR/wsdl#_messages</a>).</p>
+<p>&#8216;element&#8217; attribute must refer to a corresponding element of data type definition. &#8216;type&#8217; attribute refers to a
+corresponding complexType entry.</p>
+<p>All standard XSD types have both &#8216;element&#8217; and &#8216;complexType&#8217; definitions (see
+<a class="reference external" href="http://schemas.xmlsoap.org/soap/encoding/">http://schemas.xmlsoap.org/soap/encoding/</a>).</p>
+<p>All non-standard types, which may be added using <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl::addComplexType()</span></tt> method, are described
+using &#8216;complexType&#8217; node of &#8216;/definitions/types/schema/&#8217; section of WSDL document.</p>
+<p class="last">So <tt class="docutils literal"><span class="pre">addMessage()</span></tt> method always uses &#8216;type&#8217; attribute to describe types.</p>
+</div>
+</div>
+<div class="section" id="addporttype-method">
+<span id="zend-soap-wsdl-add-port-type"></span><h2>addPortType() method<a class="headerlink" href="#addporttype-method" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">addPortType($name)</span></tt> method adds new port type to the WSDL document (/definitions/portType) with the specified
+port type name.</p>
+<p>It joins a set of Web Service methods defined in terms of <tt class="docutils literal"><span class="pre">Zend\Soap\Server</span></tt> implementation.</p>
+<p>See <a class="reference external" href="http://www.w3.org/TR/wsdl#_porttypes">http://www.w3.org/TR/wsdl#_porttypes</a> for the details.</p>
+</div>
+<div class="section" id="addportoperation-method">
+<span id="zend-soap-wsdl-add-port-operation"></span><h2>addPortOperation() method<a class="headerlink" href="#addportoperation-method" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">addPortOperation($portType,</span> <span class="pre">$name,</span> <span class="pre">$input</span> <span class="pre">=</span> <span class="pre">false,</span> <span class="pre">$output</span> <span class="pre">=</span> <span class="pre">false,</span> <span class="pre">$fault</span> <span class="pre">=</span> <span class="pre">false)</span></tt> method adds new port
+operation to the specified port type of the WSDL document (/definitions/portType/operation).</p>
+<p>Each port operation corresponds to a class method (if Web Service is based on a class) or function (if Web Service
+is based on a set of methods) in terms of <tt class="docutils literal"><span class="pre">Zend\Soap\Server</span></tt> implementation.</p>
+<p>It also adds corresponding port operation messages depending on specified <tt class="docutils literal"><span class="pre">$input</span></tt>, <tt class="docutils literal"><span class="pre">$output</span></tt> and <tt class="docutils literal"><span class="pre">$fault</span></tt>
+parameters.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Soap\Server</span></tt> component generates two messages for each port operation while describing service based
+on <tt class="docutils literal"><span class="pre">Zend\Soap\Server</span></tt> class:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li>input message with name <em>$methodName . &#8216;Request&#8217;</em>.</li>
+<li>output message with name <em>$methodName . &#8216;Response&#8217;</em>.</li>
+</ul>
+</div></blockquote>
+</div>
+</div></blockquote>
+<p>See <a class="reference external" href="http://www.w3.org/TR/wsdl#_request-response">http://www.w3.org/TR/wsdl#_request-response</a> for the details.</p>
+</div>
+<div class="section" id="addbinding-method">
+<span id="zend-soap-wsdl-add-binding"></span><h2>addBinding() method<a class="headerlink" href="#addbinding-method" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">addBinding($name,</span> <span class="pre">$portType)</span></tt> method adds new binding to the WSDL document (/definitions/binding).</p>
+<p>&#8216;binding&#8217; WSDL document node defines message format and protocol details for operations and messages defined by a
+particular portType (see <a class="reference external" href="http://www.w3.org/TR/wsdl#_bindings">http://www.w3.org/TR/wsdl#_bindings</a>).</p>
+<p>The method creates binding node and returns it. Then it may be used to fill with actual data.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Soap\Server</span></tt> implementation uses <em>$serviceName . &#8216;Binding&#8217;</em> name for &#8216;binding&#8217; element of WSDL document.</p>
+</div>
+<div class="section" id="addbindingoperation-method">
+<span id="zend-soap-wsdl-add-binding-operation"></span><h2>addBindingOperation() method<a class="headerlink" href="#addbindingoperation-method" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">addBindingOperation($binding,</span> <span class="pre">$name,</span> <span class="pre">$input</span> <span class="pre">=</span> <span class="pre">false,</span> <span class="pre">$output</span> <span class="pre">=</span> <span class="pre">false,</span> <span class="pre">$fault</span> <span class="pre">=</span> <span class="pre">false)</span></tt> method adds an operation
+to a binding element (/definitions/binding/operation) with the specified name.</p>
+<p>It takes <em>XML_Tree_Node</em> object returned by <tt class="docutils literal"><span class="pre">addBinding()</span></tt> as an input (<tt class="docutils literal"><span class="pre">$binding</span></tt> parameter) to add
+&#8216;operation&#8217; element with input/output/false entries depending on specified parameters</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Soap\Server</span></tt> implementation adds corresponding binding entry for each Web Service method with input and
+output entries defining &#8216;soap:body&#8217; element as &#8216;&lt;soap:body use=&#8221;encoded&#8221;
+encodingStyle=&#8221;http://schemas.xmlsoap.org/soap/encoding/&#8221;/&gt;</p>
+<p>See <a class="reference external" href="http://www.w3.org/TR/wsdl#_bindings">http://www.w3.org/TR/wsdl#_bindings</a> for the details.</p>
+</div>
+<div class="section" id="addsoapbinding-method">
+<span id="zend-soap-wsdl-add-soap-binding"></span><h2>addSoapBinding() method<a class="headerlink" href="#addsoapbinding-method" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">addSoapBinding($binding,</span> <span class="pre">$style</span> <span class="pre">=</span> <span class="pre">'document',</span> <span class="pre">$transport</span> <span class="pre">=</span> <span class="pre">'http://schemas.xmlsoap.org/soap/http')</span></tt> method adds
+<em>SOAP</em> binding (&#8216;soap:binding&#8217;) entry to the binding element (which is already linked to some port type) with the
+specified style and transport (Zend\Soap\Server implementation uses RPC style over <em>HTTP</em>).</p>
+<p>&#8216;/definitions/binding/soap:binding&#8217; element is used to signify that the binding is bound to the <em>SOAP</em> protocol
+format.</p>
+<p>See <a class="reference external" href="http://www.w3.org/TR/wsdl#_bindings">http://www.w3.org/TR/wsdl#_bindings</a> for the details.</p>
+</div>
+<div class="section" id="addsoapoperation-method">
+<span id="zend-soap-wsdl-add-soap-operation"></span><h2>addSoapOperation() method<a class="headerlink" href="#addsoapoperation-method" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">addSoapOperation($binding,</span> <span class="pre">$soap_action)</span></tt> method adds <em>SOAP</em> operation (&#8216;soap:operation&#8217;) entry to the binding
+element with the specified action. &#8216;style&#8217; attribute of the &#8216;soap:operation&#8217; element is not used since programming
+model (RPC-oriented or document-oriented) may be using <tt class="docutils literal"><span class="pre">addSoapBinding()</span></tt> method</p>
+<p>&#8216;soapAction&#8217; attribute of &#8216;/definitions/binding/soap:operation&#8217; element specifies the value of the <em>SOAP</em>Action
+header for this operation. This attribute is required for <em>SOAP</em> over <em>HTTP</em> and <strong>must not</strong> be specified for
+other transports.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Soap\Server</span></tt> implementation uses <em>$serviceUri . &#8216;#&#8217; . $methodName</em> for <em>SOAP</em> operation action name.</p>
+<p>See <a class="reference external" href="http://www.w3.org/TR/wsdl#_soap:operation">http://www.w3.org/TR/wsdl#_soap:operation</a> for the details.</p>
+</div>
+<div class="section" id="addservice-method">
+<span id="zend-soap-wsdl-add-service"></span><h2>addService() method<a class="headerlink" href="#addservice-method" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">addService($name,</span> <span class="pre">$port_name,</span> <span class="pre">$binding,</span> <span class="pre">$location)</span></tt> method adds &#8216;/definitions/service&#8217; element to the WSDL
+document with the specified Wed Service name, port name, binding, and location.</p>
+<p>WSDL 1.1 allows to have several port types (sets of operations) per service. This ability is not used by
+<tt class="docutils literal"><span class="pre">Zend\Soap\Server</span></tt> implementation and not supported by <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl</span></tt> class.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Soap\Server</span></tt> implementation uses:</p>
+<blockquote>
+<div><ul class="simple">
+<li><em>$name . &#8216;Service&#8217;</em> as a Web Service name,</li>
+<li><em>$name . &#8216;Port&#8217;</em> as a port type name,</li>
+<li><em>&#8216;tns:&#8217; . $name . &#8216;Binding&#8217;</em> <a class="footnote-reference" href="#id5" id="id2">[1]</a> as binding name,</li>
+<li>script <em>URI</em> <a class="footnote-reference" href="#id6" id="id3">[2]</a> as a service URI for Web Service definition using classes.</li>
+</ul>
+</div></blockquote>
+<p>where <tt class="docutils literal"><span class="pre">$name</span></tt> is a class name for the Web Service definition mode using class and script name for the Web Service
+definition mode using set of functions.</p>
+<p>See <a class="reference external" href="http://www.w3.org/TR/wsdl#_services">http://www.w3.org/TR/wsdl#_services</a> for the details.</p>
+</div>
+<div class="section" id="type-mapping">
+<span id="zend-soap-wsdl-types"></span><h2>Type mapping<a class="headerlink" href="#type-mapping" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Soap</span></tt> WSDL accessor implementation uses the following type mapping between <em>PHP</em> and <em>SOAP</em> types:</p>
+<blockquote>
+<div><ul class="simple">
+<li>PHP strings &lt;-&gt; <em>xsd:string</em>.</li>
+<li>PHP integers &lt;-&gt; <em>xsd:int</em>.</li>
+<li>PHP floats and doubles &lt;-&gt; <em>xsd:float</em>.</li>
+<li>PHP booleans &lt;-&gt; <em>xsd:boolean</em>.</li>
+<li>PHP arrays &lt;-&gt; <em>soap-enc:Array</em>.</li>
+<li>PHP object &lt;-&gt; <em>xsd:struct</em>.</li>
+<li><em>PHP</em> class &lt;-&gt; based on complex type strategy (See: <a class="reference internal" href="#zend-soap-wsdl-types-add-complex"><em>this section</em></a>)
+<a class="footnote-reference" href="#id7" id="id4">[3]</a>.</li>
+<li>PHP void &lt;-&gt; empty type.</li>
+<li>If type is not matched to any of these types by some reason, then <em>xsd:anyType</em> is used.</li>
+</ul>
+</div></blockquote>
+<p>Where <em>xsd:</em> is &#8220;<a class="reference external" href="http://www.w3.org/2001/XMLSchema">http://www.w3.org/2001/XMLSchema</a>&#8221; namespace, <em>soap-enc:</em> is a
+&#8220;<a class="reference external" href="http://schemas.xmlsoap.org/soap/encoding/">http://schemas.xmlsoap.org/soap/encoding/</a>&#8221; namespace, <em>tns:</em> is a &#8220;target namespace&#8221; for a service.</p>
+<div class="section" id="retrieving-type-information">
+<span id="zend-soap-wsdl-types-retrieve"></span><h3>Retrieving type information<a class="headerlink" href="#retrieving-type-information" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">getType($type)</span></tt> method may be used to get mapping for a specified <em>PHP</em> type:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">...</span>
+<span class="nv">$wsdl</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\Wsdl</span><span class="p">(</span><span class="s1">&#39;My_Web_Service&#39;</span><span class="p">,</span> <span class="nv">$myWebServiceUri</span><span class="p">);</span>
+
+<span class="o">...</span>
+<span class="nv">$soapIntType</span> <span class="o">=</span> <span class="nv">$wsdl</span><span class="o">-&gt;</span><span class="na">getType</span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">);</span>
+
+<span class="o">...</span>
+<span class="k">class</span> <span class="nc">MyClass</span> <span class="p">{</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+<span class="o">...</span>
+<span class="nv">$soapMyClassType</span> <span class="o">=</span> <span class="nv">$wsdl</span><span class="o">-&gt;</span><span class="na">getType</span><span class="p">(</span><span class="s1">&#39;MyClass&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="adding-complex-type-information">
+<span id="zend-soap-wsdl-types-add-complex"></span><h3>Adding complex type information<a class="headerlink" href="#adding-complex-type-information" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">addComplexType($type)</span></tt> method is used to add complex types (PHP classes) to a WSDL document.</p>
+<p>It&#8217;s automatically used by <tt class="docutils literal"><span class="pre">getType()</span></tt> method to add corresponding complex types of method parameters or return
+types.</p>
+<p>Its detection and building algorithm is based on the currently active detection strategy for complex types. You can
+set the detection strategy either by specifying the class name as string or instance of a
+<tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl\ComplexTypeStrategy</span></tt> implementation as the third parameter of the constructor or using the
+<tt class="docutils literal"><span class="pre">setComplexTypeStrategy($strategy)</span></tt> function of <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl</span></tt>. The following detection strategies currently
+exist:</p>
+<ul class="simple">
+<li>Class <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl\ComplexTypeStrategy\DefaultComplexType</span></tt>: Enabled by default (when no third constructor
+parameter is set). Iterates over the public attributes of a class type and registers them as subtypes of the
+complex object type.</li>
+<li>Class <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl\ComplexTypeStrategy\AnyType</span></tt>: Casts all complex types into the simple XSD type
+xsd:anyType. Be careful this shortcut for complex type detection can probably only be handled successfully by
+weakly typed languages such as <em>PHP</em>.</li>
+<li>Class <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl\ComplexTypeStrategy\ArrayOfTypeSequence</span></tt>: This strategy allows to specify return
+parameters of the type: <em>int[]</em> or <em>string[]</em>. As of Zend Framework version 1.9 it can handle both simple <em>PHP</em>
+types such as int, string, boolean, float aswell as objects and arrays of objects.</li>
+<li>Class <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl\ComplexTypeStrategy\ArrayOfTypeComplex</span></tt>: This strategy allows to detect very complex
+arrays of objects. Objects types are detected based on the <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl_Strategy_DefaultComplexType</span></tt> and an
+array is wrapped around that definition.</li>
+<li>Class <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl\ComplexTypeStrategy\Composite</span></tt>: This strategy can combine all strategies by connecting
+<em>PHP</em> Complex types (Classnames) to the desired strategy via the <tt class="docutils literal"><span class="pre">connectTypeToStrategy($type,</span> <span class="pre">$strategy)</span></tt>
+method. A complete typemap can be given to the constructor as an array with <tt class="docutils literal"><span class="pre">$type</span></tt>-&gt; <tt class="docutils literal"><span class="pre">$strategy</span></tt> pairs. The
+second parameter specifies the default strategy that will be used if an unknown type is requested for adding.
+This parameter defaults to the <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl_Strategy_DefaultComplexType</span></tt> strategy.</li>
+</ul>
+<p><tt class="docutils literal"><span class="pre">addComplexType()</span></tt> method creates &#8216;/definitions/types/xsd:schema/xsd:complexType&#8217; element for each described
+complex type with name of the specified <em>PHP</em> class.</p>
+<p>Class property <strong>MUST</strong> have docblock section with the described <em>PHP</em> type to have property included into WSDL
+description.</p>
+<p><tt class="docutils literal"><span class="pre">addComplexType()</span></tt> checks if type is already described within types section of the WSDL document.</p>
+<p>It prevents duplications if this method is called two or more times and recursion in the types definition section.</p>
+<p>See <a class="reference external" href="http://www.w3.org/TR/wsdl#_types">http://www.w3.org/TR/wsdl#_types</a> for the details.</p>
+</div>
+</div>
+<div class="section" id="adddocumentation-method">
+<span id="zend-soap-wsdl-add-documentation"></span><h2>addDocumentation() method<a class="headerlink" href="#adddocumentation-method" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">addDocumentation($input_node,</span> <span class="pre">$documentation)</span></tt> method adds human readable documentation using optional
+&#8216;wsdl:document&#8217; element.</p>
+<p>&#8216;/definitions/binding/soap:binding&#8217; element is used to signify that the binding is bound to the <em>SOAP</em> protocol
+format.</p>
+<p>See <a class="reference external" href="http://www.w3.org/TR/wsdl#_documentation">http://www.w3.org/TR/wsdl#_documentation</a> for the details.</p>
+</div>
+<div class="section" id="get-finalized-wsdl-document">
+<span id="zend-soap-wsdl-retrieve"></span><h2>Get finalized WSDL document<a class="headerlink" href="#get-finalized-wsdl-document" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">toXML()</span></tt>, <tt class="docutils literal"><span class="pre">toDomDocument()</span></tt> and <tt class="docutils literal"><span class="pre">dump($filename</span> <span class="pre">=</span> <span class="pre">false)</span></tt> methods may be used to get WSDL document as an
+<em>XML</em>, DOM structure or a file.</p>
+<table class="docutils footnote" frame="void" id="id5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td><em>&#8216;tns:&#8217; namespace</em> is defined as script <em>URI</em> (<em>&#8216;http://&#8217; .$_SERVER[&#8216;HTTP_HOST&#8217;] .
+$_SERVER[&#8216;SCRIPT_NAME&#8217;]</em>).</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[2]</a></td><td><em>&#8216;http://&#8217; .$_SERVER[&#8216;HTTP_HOST&#8217;] . $_SERVER[&#8216;SCRIPT_NAME&#8217;]</em></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id7" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[3]</a></td><td>By default <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl</span></tt> will be created with the <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl_Strategy_DefaultComplexType</span></tt>
+class as detection algorithm for complex types. The first parameter of the AutoDiscover constructor
+takes any complex type strategy implementing <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl_Strategy_Interface</span></tt> or a string with the
+name of the class. For backwards compatibility with <tt class="docutils literal"><span class="pre">$extractComplexType</span></tt> boolean variables are
+parsed the following way: If <tt class="docutils literal"><span class="pre">TRUE</span></tt>, <tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl_Strategy_DefaultComplexType</span></tt>, if <tt class="docutils literal"><span class="pre">FALSE</span></tt>
+<tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl_Strategy_AnyType</span></tt>.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">WSDL Accessor</a><ul>
+<li><a class="reference internal" href="#zend-soap-wsdl-constructor">Zend\Soap\Wsdl constructor</a></li>
+<li><a class="reference internal" href="#addmessage-method">addMessage() method</a></li>
+<li><a class="reference internal" href="#addporttype-method">addPortType() method</a></li>
+<li><a class="reference internal" href="#addportoperation-method">addPortOperation() method</a></li>
+<li><a class="reference internal" href="#addbinding-method">addBinding() method</a></li>
+<li><a class="reference internal" href="#addbindingoperation-method">addBindingOperation() method</a></li>
+<li><a class="reference internal" href="#addsoapbinding-method">addSoapBinding() method</a></li>
+<li><a class="reference internal" href="#addsoapoperation-method">addSoapOperation() method</a></li>
+<li><a class="reference internal" href="#addservice-method">addService() method</a></li>
+<li><a class="reference internal" href="#type-mapping">Type mapping</a><ul>
+<li><a class="reference internal" href="#retrieving-type-information">Retrieving type information</a></li>
+<li><a class="reference internal" href="#adding-complex-type-information">Adding complex type information</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adddocumentation-method">addDocumentation() method</a></li>
+<li><a class="reference internal" href="#get-finalized-wsdl-document">Get finalized WSDL document</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.soap.wsdl.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.soap.wsdl.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.soap.wsdl.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.soap.wsdl.rst">
+                WSDL Accessor
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
