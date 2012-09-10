@@ -23,7 +23,7 @@ chdir(ROOT . '/packages/manual/' . $package_name_full . '/docs/_build/html/');
 script_run_command('zip -rq ' . ROOT . '/packages/manual/' . $package_name_full . '-manual-en.zip .');
 chdir(ROOT . '/packages/manual/');
 
-script_run_command('tar -czf ' . ROOT . '/packages/manual/' . $package_name_full . '-manual-en.tar.gz '
+script_run_command('tar -czf ' . ROOT . '/packages/manual/' . $package_name_full . '-manual-en.tgz '
     . '-C ' . ROOT . '/packages/manual/' . $package_name_full . '/docs/_build/html .'
 );
 
