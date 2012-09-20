@@ -1,0 +1,1005 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Form Collections &mdash; Zend Framework 2 2.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.1 documentation" href="../index.html" />
+    <link rel="next" title="Form Elements" href="zend.form.elements.html" />
+    <link rel="prev" title="Form Quick Start" href="zend.form.quick-start.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.form.elements.html" title="Form Elements"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.form.quick-start.html" title="Form Quick Start"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="form-collections">
+<h1>Form Collections<a class="headerlink" href="#form-collections" title="Permalink to this headline">¶</a></h1>
+<p>Often, fieldsets or elements in your forms will correspond to other domain
+objects. In some cases, they may correspond to collections of domain objects. In
+this latter case, in terms of user interfaces, you may want to add items
+dynamically in the user interface &#8211; a great example is adding tasks to a task
+list.</p>
+<p>This document is intended to demonstrate these features. To do so, we first need
+to define some domain objects that we&#8217;ll be using.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Application\Entity</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Product</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @var string</span>
+<span class="sd">     \*/</span>
+    <span class="k">protected</span> <span class="nv">$name</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @var int</span>
+<span class="sd">     \*/</span>
+    <span class="k">protected</span> <span class="nv">$price</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @var Brand</span>
+<span class="sd">     \*/</span>
+    <span class="k">protected</span> <span class="nv">$brand</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @var array</span>
+<span class="sd">     \*/</span>
+    <span class="k">protected</span> <span class="nv">$categories</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @param string $name</span>
+<span class="sd">     * @return Product</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setName</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @return string</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getName</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @param int $price</span>
+<span class="sd">     * @return Product</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setPrice</span><span class="p">(</span><span class="nv">$price</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">price</span> <span class="o">=</span> <span class="nv">$price</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @return int</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getPrice</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">price</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @param Brand $brand</span>
+<span class="sd">     * @return Product</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setBrand</span><span class="p">(</span><span class="nx">Brand</span> <span class="nv">$brand</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">brand</span> <span class="o">=</span> <span class="nv">$brand</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @return Brand</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getBrand</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">brand</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @param array $categories</span>
+<span class="sd">     * @return Product</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setCategories</span><span class="p">(</span><span class="k">array</span> <span class="nv">$categories</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">categories</span> <span class="o">=</span> <span class="nv">$categories</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @return array</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getCategories</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">categories</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Brand</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @var string</span>
+<span class="sd">     \*/</span>
+    <span class="k">protected</span> <span class="nv">$name</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @var string</span>
+<span class="sd">     \*/</span>
+    <span class="k">protected</span> <span class="nv">$url</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @param string $name</span>
+<span class="sd">     * @return Brand</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setName</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @return string</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getName</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @param string $url</span>
+<span class="sd">     * @return Brand</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setUrl</span><span class="p">(</span><span class="nv">$url</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span> <span class="o">=</span> <span class="nv">$url</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @return string</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getUrl</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Category</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @var string</span>
+<span class="sd">     \*/</span>
+    <span class="k">protected</span> <span class="nv">$name</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @param string $name</span>
+<span class="sd">     * @return Category</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setName</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="nv">$name</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @return string</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getName</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>As you can see, this is really simple code. A Product has two scalar properties
+(name and price), a OneToOne relationship (one product has one brand), and a
+OneToMany relationship (one product has many categories).</p>
+<div class="section" id="creating-fieldsets">
+<h2>Creating Fieldsets<a class="headerlink" href="#creating-fieldsets" title="Permalink to this headline">¶</a></h2>
+<p>The first step is to create three fieldsets. Each fieldset will contain all the
+fields and relationships for a specific entity.</p>
+<p>Here is the <tt class="docutils literal"><span class="pre">Brand</span></tt> fieldset:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Application\Form</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Application\Entity\Brand</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Fieldset</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilterProviderInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Stdlib\Hydrator\ClassMethods</span> <span class="k">as</span> <span class="nx">ClassMethodsHydrator</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">BrandFieldset</span> <span class="k">extends</span> <span class="nx">Fieldset</span> <span class="k">implements</span> <span class="nx">InputFilterProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s1">&#39;brand&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setHydrator</span><span class="p">(</span><span class="k">new</span> <span class="nx">ClassMethodsHydrator</span><span class="p">(</span><span class="k">false</span><span class="p">))</span>
+            <span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span><span class="k">new</span> <span class="nx">Brand</span><span class="p">());</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setLabel</span><span class="p">(</span><span class="s1">&#39;Brand&#39;</span><span class="p">);</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Name of the brand&#39;</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;required&#39;</span>
+            <span class="p">)</span>
+        <span class="p">));</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Form\Element\Url&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Website of the brand&#39;</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;required&#39;</span>
+            <span class="p">)</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @return array</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getInputFilterSpecification</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We can discover some new things here. As you can see, the fieldset calls the
+method <tt class="docutils literal"><span class="pre">setHydrator()</span></tt>, giving it a <tt class="docutils literal"><span class="pre">ClassMethods</span></tt> hydrator, and the
+<tt class="docutils literal"><span class="pre">setObject()</span></tt> method, giving it an empty instance of a concrete <tt class="docutils literal"><span class="pre">Brand</span></tt>
+object.</p>
+<p>When the data will be validated, the <tt class="docutils literal"><span class="pre">Form</span></tt> will automatically iterate through
+all the field sets it contains, and automatically populate the sub-objects, in
+order to return a complete entity.</p>
+<p>Also notice that the <tt class="docutils literal"><span class="pre">Url</span></tt> element has a type of <tt class="docutils literal"><span class="pre">Zend\Form\Element\Url</span></tt>.
+This information will be used to validate the input field. You don&#8217;t need to
+manually add filters or validators for this input as that element provides a
+reasonable input specification.</p>
+<p>Finally, <tt class="docutils literal"><span class="pre">getInputSpecification()</span></tt> gives the specification for the remaining
+input (&#8220;name&#8221;), indicating that this input is required. Note that <em>required</em> in
+the array &#8220;attributes&#8221; (when elements are added) is only meant to add the
+&#8220;required&#8221; attribute to the form markup (and therefore has semantic meaning
+only).</p>
+<p>Here is the <tt class="docutils literal"><span class="pre">Category</span></tt> fieldset:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Application\Form</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Application\Entity\Category</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Fieldset</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilterProviderInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Stdlib\Hydrator\ClassMethods</span> <span class="k">as</span> <span class="nx">ClassMethodsHydrator</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">CategoryFieldset</span> <span class="k">extends</span> <span class="nx">Fieldset</span> <span class="k">implements</span> <span class="nx">InputFilterProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setHydrator</span><span class="p">(</span><span class="k">new</span> <span class="nx">ClassMethodsHydrator</span><span class="p">(</span><span class="k">false</span><span class="p">))</span>
+             <span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span><span class="k">new</span> <span class="nx">Category</span><span class="p">());</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setLabel</span><span class="p">(</span><span class="s1">&#39;Category&#39;</span><span class="p">);</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Name of the category&#39;</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;required&#39;</span>
+            <span class="p">)</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * @return array</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getInputFilterSpecification</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Nothing new here.</p>
+<p>And finally the <tt class="docutils literal"><span class="pre">Product</span></tt> fieldset:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Application\Form</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Application\Entity\Product</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Fieldset</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilterProviderInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Stdlib\Hydrator\ClassMethods</span> <span class="k">as</span> <span class="nx">ClassMethodsHydrator</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">ProductFieldset</span> <span class="k">extends</span> <span class="nx">Fieldset</span> <span class="k">implements</span> <span class="nx">InputFilterProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s1">&#39;product&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setHydrator</span><span class="p">(</span><span class="k">new</span> <span class="nx">ClassMethodsHydrator</span><span class="p">(</span><span class="k">false</span><span class="p">))</span>
+             <span class="o">-&gt;</span><span class="na">setObject</span><span class="p">(</span><span class="k">new</span> <span class="nx">Product</span><span class="p">());</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Name of the product&#39;</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;required&#39;</span>
+            <span class="p">)</span>
+        <span class="p">));</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;price&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Price of the product&#39;</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;required&#39;</span>
+            <span class="p">)</span>
+        <span class="p">));</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Form\BrandFieldset&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;brand&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Brand of the product&#39;</span>
+            <span class="p">)</span>
+        <span class="p">));</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Form\Element\Collection&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;categories&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Please choose categories for this product&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;count&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="s1">&#39;should_create_template&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                <span class="s1">&#39;allow_add&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                <span class="s1">&#39;target_element&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Form\CategoryFieldset&#39;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Should return an array specification compatible with</span>
+<span class="sd">     * {@link Zend\InputFilter\Factory::createInputFilter()}.</span>
+<span class="sd">     *</span>
+<span class="sd">     * @return array</span>
+<span class="sd">     \*/</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getInputFilterSpecification</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;price&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                <span class="s1">&#39;validators&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Float&#39;</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>We have a lot of new things here!</p>
+<p>First, notice how the brand element is added: we specify it to be of type
+<tt class="docutils literal"><span class="pre">Application\Form\BrandFieldset</span></tt>. This is how you handle a OneToOne
+relationship.  When the form is validated, the <tt class="docutils literal"><span class="pre">BrandFieldset</span></tt> will first be
+populated, and will return a <tt class="docutils literal"><span class="pre">Brand</span></tt> entity (as we have specified a
+<tt class="docutils literal"><span class="pre">ClassMethods</span></tt> hydrator, and bound the fieldset to a <tt class="docutils literal"><span class="pre">Brand</span></tt> entity using
+the <tt class="docutils literal"><span class="pre">setObject()</span></tt> method). This <tt class="docutils literal"><span class="pre">Brand</span></tt> entity will then be used to populate
+the <tt class="docutils literal"><span class="pre">Product</span></tt> entity by calling the <tt class="docutils literal"><span class="pre">setBrand()</span></tt> method.</p>
+<p>The next element shows you how to handle OneToMany relationship. The type is
+<tt class="docutils literal"><span class="pre">Zend\Form\Element\Collection</span></tt>, which is a specialized element to handle such
+cases. As you can see, the name of the element (&#8220;categories&#8221;) perfectly matches
+the name of the property in the <tt class="docutils literal"><span class="pre">Product</span></tt> entity.</p>
+<p>This element has a few interesting options:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">count</span></tt>: this is how many times the element (in this case a category) has
+to be rendered. We&#8217;ve set it to two in this examples.</li>
+<li><tt class="docutils literal"><span class="pre">should_create_template</span></tt>: if set to <tt class="docutils literal"><span class="pre">true</span></tt>, it will generate a template
+markup in a <tt class="docutils literal"><span class="pre">&lt;span&gt;</span></tt> element, in order to simplify adding new element on the
+fly (we will speak about this one later).</li>
+<li><tt class="docutils literal"><span class="pre">allow_add</span></tt>: if set to <tt class="docutils literal"><span class="pre">true</span></tt> (which is the default), dynamically added
+elements will be retrieved and validated; otherwise, they will be completely
+ignored. This, of course, depends on what you want to do.</li>
+<li><tt class="docutils literal"><span class="pre">target_element</span></tt>: this is either an element or, as this is the case in this
+example, an array that describes the element or fieldset that will be used in
+the collection. In this case, the <tt class="docutils literal"><span class="pre">target_element</span></tt> is a <tt class="docutils literal"><span class="pre">Category</span></tt>
+fieldset.</li>
+</ul>
+</div>
+<div class="section" id="the-form-element">
+<h2>The Form Element<a class="headerlink" href="#the-form-element" title="Permalink to this headline">¶</a></h2>
+<p>So far, so good. We now have our field sets in place. But those are field sets,
+not forms. And only <tt class="docutils literal"><span class="pre">Form</span></tt> instances can be validated. So here is the form :</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Application\Form</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Form\Form</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilter</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Stdlib\Hydrator\ClassMethods</span> <span class="k">as</span> <span class="nx">ClassMethodsHydrator</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">CreateProduct</span> <span class="k">extends</span> <span class="nx">Form</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s1">&#39;create_product&#39;</span><span class="p">);</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="s1">&#39;post&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">setHydrator</span><span class="p">(</span><span class="k">new</span> <span class="nx">ClassMethodsHydrator</span><span class="p">(</span><span class="k">false</span><span class="p">))</span>
+             <span class="o">-&gt;</span><span class="na">setInputFilter</span><span class="p">(</span><span class="k">new</span> <span class="nx">InputFilter</span><span class="p">());</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Form\ProductFieldset&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;use_as_base_fieldset&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+            <span class="p">)</span>
+        <span class="p">));</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Form\Element\Csrf&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;csrf&#39;</span>
+        <span class="p">));</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;submit&#39;</span>
+            <span class="p">)</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">CreateForm</span></tt> is quite simple, as it only defines a <tt class="docutils literal"><span class="pre">Product</span></tt> fieldset, as
+well as some other useful fields (<tt class="docutils literal"><span class="pre">CSRF</span></tt> for security, and a <tt class="docutils literal"><span class="pre">Submit</span></tt> button).</p>
+<p>Notice the <tt class="docutils literal"><span class="pre">use_base_fieldset</span></tt> option. This option is here to say to the form:
+&#8220;hey, the object I bind to you is, in fact, bound to the fieldset that is the
+base fieldset.&#8221; This will be to true most of the times.</p>
+<p>What&#8217;s cool with this approach is that each entity can have its own <tt class="docutils literal"><span class="pre">Fieldset</span></tt> and
+can be reused. You describe the elements, the filters, and validators for each
+entity only once, and the concrete <tt class="docutils literal"><span class="pre">Form</span></tt> instance will only compose those
+fieldsets. You no longer have to add the &#8220;username&#8221; input to every form that
+deals with users!</p>
+</div>
+<div class="section" id="the-controller">
+<h2>The Controller<a class="headerlink" href="#the-controller" title="Permalink to this headline">¶</a></h2>
+<p>Now, let&#8217;s create the action in the controller:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="sd">/**</span>
+<span class="sd">  * @return array</span>
+<span class="sd">  \*/</span>
+ <span class="k">public</span> <span class="k">function</span> <span class="nf">indexAction</span><span class="p">()</span>
+ <span class="p">{</span>
+     <span class="nv">$form</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CreateProduct</span><span class="p">();</span>
+     <span class="nv">$product</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Product</span><span class="p">();</span>
+     <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">bind</span><span class="p">(</span><span class="nv">$product</span><span class="p">);</span>
+
+     <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">isPost</span><span class="p">())</span> <span class="p">{</span>
+         <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="o">-&gt;</span><span class="na">getPost</span><span class="p">());</span>
+
+         <span class="k">if</span> <span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+             <span class="nb">var_dump</span><span class="p">(</span><span class="nv">$product</span><span class="p">);</span>
+         <span class="p">}</span>
+     <span class="p">}</span>
+
+     <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+         <span class="s1">&#39;form&#39;</span> <span class="o">=&gt;</span> <span class="nv">$form</span>
+     <span class="p">);</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+<p>This is super easy. Nothing to do in the controllers. All the magic is done
+behind the scene.</p>
+</div>
+<div class="section" id="the-view">
+<h2>The View<a class="headerlink" href="#the-view" title="Permalink to this headline">¶</a></h2>
+<p>And finally, the view:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="s1">&#39;home&#39;</span><span class="p">))</span>
+     <span class="o">-&gt;</span><span class="na">prepare</span><span class="p">();</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">openTag</span><span class="p">(</span><span class="nv">$form</span><span class="p">);</span>
+
+<span class="nv">$product</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;product&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$product</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$product</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;price&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formCollection</span><span class="p">(</span><span class="nv">$product</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;categories&#39;</span><span class="p">));</span>
+
+<span class="nv">$brand</span> <span class="o">=</span> <span class="nv">$product</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;brand&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$brand</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$brand</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">));</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formHidden</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;csrf&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElement</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">));</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">closeTag</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>A few new things here :</p>
+<ul class="simple">
+<li>the <tt class="docutils literal"><span class="pre">prepare()</span></tt> method. You <em>must</em> call it prior to rendering anything in
+the view (this function is only meant to be called in views, not in
+controllers).</li>
+<li>the <tt class="docutils literal"><span class="pre">FormRow</span></tt> helper renders a label (if present), the input itself, and
+errors.</li>
+<li>the <tt class="docutils literal"><span class="pre">FormCollection</span></tt> helper will iterate through every element in the
+collection, and render every element with the FormRow helper (you may specify
+an alternate helper if desired, using the <tt class="docutils literal"><span class="pre">setElementHelper()</span></tt> method on
+that <tt class="docutils literal"><span class="pre">FormCollection</span></tt> helper instance). If you need more control about the
+way you render your forms, you can iterate through the elements in the
+collection, and render them manually one by one.</li>
+</ul>
+<p>Here is the result:</p>
+<img alt="../_images/zend.form.collections.view.png" src="../_images/zend.form.collections.view.png" style="width: 940px;" />
+<p>As you can see, collections are wrapped inside a fieldset, and every item in the
+collection is itself wrapped in the fieldset. In fact, the <tt class="docutils literal"><span class="pre">Collection</span></tt>
+element uses label for each item in the collection, while the label of the
+<tt class="docutils literal"><span class="pre">Collection</span></tt> element itself is used as the legend of the fieldset. If you
+don&#8217;t want the fieldset created (just the elements within it), just add a
+boolean <tt class="docutils literal"><span class="pre">false</span></tt> as the second parameter of the the <tt class="docutils literal"><span class="pre">FormCollection</span></tt> view
+helper.</p>
+<p>If you validate, all elements will show errors (this is normal, as we&#8217;ve marked
+them as required). As soon as the form is valid, this is what we get :</p>
+<img alt="../_images/zend.form.collections.view.result.png" src="../_images/zend.form.collections.view.result.png" />
+<p>As you can see, the bound object is completely filled, not with arrays, but with
+objects!</p>
+<p>But that&#8217;s not all.</p>
+</div>
+<div class="section" id="adding-new-elements-dynamically">
+<h2>Adding New Elements Dynamically<a class="headerlink" href="#adding-new-elements-dynamically" title="Permalink to this headline">¶</a></h2>
+<p>Remember the <tt class="docutils literal"><span class="pre">should_create_template</span></tt>? We are going to use it now.</p>
+<p>Often, forms are not completely static. In our case, let&#8217;s say that we don&#8217;t
+want only two categories, but we want the user to be able to add other ones at
+runtime. <tt class="docutils literal"><span class="pre">Zend\Form</span></tt> has this capability. First, let&#8217;s see what it generates
+when we ask it to create a template:</p>
+<img alt="../_images/zend.form.collections.dynamic-elements.template.png" src="../_images/zend.form.collections.dynamic-elements.template.png" />
+<p>As you can see, the collection generates two fieldsets (the two categories)
+<em>plus</em> a span with a <tt class="docutils literal"><span class="pre">data-template</span></tt> attribute that contains the full HTML
+code to copy to create a new element in the collection. Of course <tt class="docutils literal"><span class="pre">__index__</span></tt>
+(this is the placeholder generated) has to be changed to a valid value.
+Currently, we have
+2 elements (<tt class="docutils literal"><span class="pre">categories[0]</span></tt> and <tt class="docutils literal"><span class="pre">categories[1]</span></tt>, so <tt class="docutils literal"><span class="pre">__index__</span></tt> has to be
+changed to 2.</p>
+<p>If you want, this placeholder (<tt class="docutils literal"><span class="pre">__index__</span></tt> is the default) can be changed using
+the <tt class="docutils literal"><span class="pre">template_placeholder</span></tt> option key:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Form\Element\Collection&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;categories&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Please choose categories for this product&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;count&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s1">&#39;should_create_template&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+        <span class="s1">&#39;template_placeholder&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;__placeholder__&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;target_element&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Form\CategoryFieldset&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">));</span>
+</pre></div>
+</div>
+<p>First, let&#8217;s add a small button &#8220;Add new category&#8221; anywhere in the form:</p>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;button</span> <span class="na">onclick=</span><span class="s">&quot;return add_category()&quot;</span><span class="nt">&gt;</span>Add a new category<span class="nt">&lt;/button&gt;</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">add_category</span></tt> function is fairly simple:</p>
+<p># First, count the number of elements we already have.
+# Get the template from the <tt class="docutils literal"><span class="pre">span</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">data-template</span></tt> attribute.
+# Change the placeholder to a valid index.
+# Add the element to the DOM.</p>
+<p>Here is the code:</p>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;script&gt;</span>
+    <span class="kd">function</span> <span class="nx">add_category</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">currentCount</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;form &gt; fieldset &gt; fieldset&#39;</span><span class="p">).</span><span class="nx">length</span><span class="p">;</span>
+        <span class="kd">var</span> <span class="nx">template</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;form &gt; fieldset &gt; span&#39;</span><span class="p">).</span><span class="nx">data</span><span class="p">(</span><span class="s1">&#39;template&#39;</span><span class="p">);</span>
+        <span class="nx">template</span> <span class="o">=</span> <span class="nx">template</span><span class="p">.</span><span class="nx">replace</span><span class="p">(</span><span class="s1">&#39;__index__&#39;</span><span class="p">,</span> <span class="nx">currentCount</span><span class="p">);</span>
+
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;form &gt; fieldset&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">template</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="nt">&lt;/script&gt;</span>
+</pre></div>
+</div>
+<p>(Note: the above example assumes <tt class="docutils literal"><span class="pre">$()</span></tt> is defined, and equivalent to jQuery&#8217;s
+<tt class="docutils literal"><span class="pre">$()</span></tt> function, Dojo&#8217;s <tt class="docutils literal"><span class="pre">dojo.query</span></tt>, etc.)</p>
+<p>One small remark about the <tt class="docutils literal"><span class="pre">template.replace</span></tt>: the example uses
+<tt class="docutils literal"><span class="pre">currentCount</span></tt> and not <tt class="docutils literal"><span class="pre">currentCount</span> <span class="pre">+</span> <span class="pre">1</span></tt>, as the indices are zero-based
+(so, if we have two elements in the collection, the third one will have the
+index <tt class="docutils literal"><span class="pre">2</span></tt>).</p>
+<p>Now, if we validate the form, it will automatically take into account this new
+element by validating it, filtering it and retrieving it:</p>
+<img alt="../_images/zend.form.collections.dynamic-elements.result.png" src="../_images/zend.form.collections.dynamic-elements.result.png" />
+<p>Of course, if you don&#8217;t want to allow adding elements in a collection, you must
+to set the option <tt class="docutils literal"><span class="pre">allow_add</span></tt> to <a href="#id1"><span class="problematic" id="id2">``</span></a><cite>false</cite>. This way, even if new elements are
+added, they won&#8217;t be validated and, hence, not added to the entity. Here is how
+you do it (and, as we don&#8217;t want elements to be added, we don&#8217;t need the data
+template, either):</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Form\Element\Collection&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;categories&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Please choose categories for this product&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;count&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s1">&#39;should_create_template&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+        <span class="s1">&#39;allow_add&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+        <span class="s1">&#39;target_element&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Form\CategoryFieldset&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">));</span>
+</pre></div>
+</div>
+<p>There are some limitations of this capability:</p>
+<ul class="simple">
+<li>Although you can add new elements and remove them, you <em>CANNOT</em> remove more
+elements in a collection than the initial count (for instance, if your code
+specifies <tt class="docutils literal"><span class="pre">count</span> <span class="pre">==</span> <span class="pre">2</span></tt>, you will be able to add a third one and remove it, but
+you won&#8217;t be able to remove any others. If the initial count is 2, you <em>must</em>
+have at least two elements.</li>
+<li>Dynamically added elements have to be added at the end of the collection. They
+can be added anywhere (these elements will still be validated and inserted
+into the entity), but if the validation fails, this newly added element will
+be automatically be replaced at the end of the collection.</li>
+</ul>
+</div>
+<div class="section" id="validation-groups-for-fieldsets-and-collection">
+<h2>Validation groups for fieldsets and collection<a class="headerlink" href="#validation-groups-for-fieldsets-and-collection" title="Permalink to this headline">¶</a></h2>
+<p>Validation groups allow you to validate a subset of fields.</p>
+<p>As an example, although the <tt class="docutils literal"><span class="pre">Brand</span></tt> entity has a <tt class="docutils literal"><span class="pre">URL</span></tt> property, we don&#8217;t
+want to user to specify it in the creation form (but may wish to later in the
+&#8220;Edit Product&#8221; form, for instance). Let&#8217;s update the view to remove the <tt class="docutils literal"><span class="pre">URL</span></tt>
+input:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="s1">&#39;home&#39;</span><span class="p">))</span>
+     <span class="o">-&gt;</span><span class="na">prepare</span><span class="p">();</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">openTag</span><span class="p">(</span><span class="nv">$form</span><span class="p">);</span>
+
+<span class="nv">$product</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;product&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$product</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$product</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;price&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formCollection</span><span class="p">(</span><span class="nv">$product</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;categories&#39;</span><span class="p">));</span>
+
+<span class="nv">$brand</span> <span class="o">=</span> <span class="nv">$product</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;brand&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$brand</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">));</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formHidden</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;csrf&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElement</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">));</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">closeTag</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>This is what we get:</p>
+<img alt="../_images/zend.form.collections.validation-groups.png" src="../_images/zend.form.collections.validation-groups.png" />
+<p>The <tt class="docutils literal"><span class="pre">URL</span></tt> input has disappeared, but even if we fill every input, the form won&#8217;t
+validate. In fact, this is normal. We specified in the input filter that the <tt class="docutils literal"><span class="pre">URL</span></tt>
+is a <em>required</em> field, so if the form does not have it, it won&#8217;t validate, even
+though we didn&#8217;t add it to the view!</p>
+<p>Of course, you could create a <tt class="docutils literal"><span class="pre">BrandFieldsetWithoutURL</span></tt> fieldset, but of
+course this is not recommended, as a lot of code will be duplicated.</p>
+<p>The solution: validation groups. A validation group is specified in a <tt class="docutils literal"><span class="pre">Form</span></tt>
+object (hence, in our case, in the <tt class="docutils literal"><span class="pre">CreateProduct</span></tt> form) by giving an array of
+all the elements we want to validate.  Our <tt class="docutils literal"><span class="pre">CreateForm</span></tt> now looks like this:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Application\Form</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Form\Form</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilter</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Stdlib\Hydrator\ClassMethods</span> <span class="k">as</span> <span class="nx">ClassMethodsHydrator</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">CreateProduct</span> <span class="k">extends</span> <span class="nx">Form</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s1">&#39;create_product&#39;</span><span class="p">);</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="s1">&#39;post&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">setHydrator</span><span class="p">(</span><span class="k">new</span> <span class="nx">ClassMethodsHydrator</span><span class="p">())</span>
+             <span class="o">-&gt;</span><span class="na">setInputFilter</span><span class="p">(</span><span class="k">new</span> <span class="nx">InputFilter</span><span class="p">());</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Form\ProductFieldset&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;use_as_base_fieldset&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+            <span class="p">)</span>
+        <span class="p">));</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Form\Element\Csrf&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;csrf&#39;</span>
+        <span class="p">));</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;submit&#39;</span>
+            <span class="p">)</span>
+        <span class="p">));</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setValidationGroup</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;csrf&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;product&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;price&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;brand&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;name&#39;</span>
+                <span class="p">),</span>
+                <span class="s1">&#39;categories&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;name&#39;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Of course, don&#8217;t forget to add the <tt class="docutils literal"><span class="pre">CSRF</span></tt> element, as we want it to be
+validated too (but notice that I didn&#8217;t write the submit element, as we don&#8217;t
+care about it). You can recursively select the elements you want.</p>
+<p>There is one simple limitation currently: validation groups for collections are
+set on a per-collection basis, not element in a collection basis. This means you
+cannot say, &#8220;validate the name input for the first element of the categories
+collection, but don&#8217;t validate it for the second one.&#8221; But, honestly, this is
+really an edge-case.</p>
+<p>Now, the form validates (and the <tt class="docutils literal"><span class="pre">URL</span></tt> is set to null as we didn&#8217;t specify it).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Form Collections</a><ul>
+<li><a class="reference internal" href="#creating-fieldsets">Creating Fieldsets</a></li>
+<li><a class="reference internal" href="#the-form-element">The Form Element</a></li>
+<li><a class="reference internal" href="#the-controller">The Controller</a></li>
+<li><a class="reference internal" href="#the-view">The View</a></li>
+<li><a class="reference internal" href="#adding-new-elements-dynamically">Adding New Elements Dynamically</a></li>
+<li><a class="reference internal" href="#validation-groups-for-fieldsets-and-collection">Validation groups for fieldsets and collection</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.form.quick-start.html"
+                        title="previous chapter">Form Quick Start</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.form.elements.html"
+                        title="next chapter">Form Elements</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.form.collections.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.form.collections.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.form.collections.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.form.elements.html" title="Form Elements"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.form.quick-start.html" title="Form Quick Start"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.form.collections.rst">
+                Form Collections
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

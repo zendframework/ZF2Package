@@ -1,0 +1,777 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Http\Client &mdash; Zend Framework 2 2.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.1 documentation" href="../index.html" />
+    <link rel="next" title="Zend_Http_Client - Connection Adapters" href="zend.http.client.adapters.html" />
+    <link rel="prev" title="Zend_Http_Cookie and Zend_Http_CookieJar" href="zend.http.cookie.handling.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.http.client.adapters.html" title="Zend_Http_Client - Connection Adapters"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.http.cookie.handling.html" title="Zend_Http_Cookie and Zend_Http_CookieJar"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-http-client">
+<span id="id1"></span><h1>Zend\Http\Client<a class="headerlink" href="#zend-http-client" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-http-client-intro"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt> provides an easy interface for performing Hyper-Text Transfer Protocol (HTTP) requests.
+<tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt> supports most simple features expected from an <em>HTTP</em> client, as well as some more complex
+features such as <em>HTTP</em> authentication and file uploads. Successful requests (and most unsuccessful ones too)
+return a <tt class="docutils literal"><span class="pre">Zend\Http\Response</span></tt> object, which provides access to the response&#8217;s headers and body (see <a class="reference internal" href="zend.http.response.html#zend-http-response"><em>this
+section</em></a>).</p>
+</div>
+<div class="section" id="quick-start">
+<span id="zend-http-client-quick-start"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>The class constructor optionally accepts a URL as its first parameter (can be either a string or a
+<tt class="docutils literal"><span class="pre">Zend\Uri\Http</span></tt> object), and an array or <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object containing configuration options. Both can
+be left out, and set later using the setUri() and setConfig() methods.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Http\Client</span><span class="p">;</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Client</span><span class="p">(</span><span class="s1">&#39;http://example.org&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;maxredirects&#39;</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;timeout&#39;</span>      <span class="o">=&gt;</span> <span class="mi">30</span>
+<span class="p">));</span>
+
+<span class="c1">// This is actually exactly the same:</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Client</span><span class="p">();</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://example.org&#39;</span><span class="p">);</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setConfig</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;maxredirects&#39;</span> <span class="o">=&gt;</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;timeout&#39;</span>      <span class="o">=&gt;</span> <span class="mi">30</span>
+<span class="p">));</span>
+
+<span class="c1">// You can also use a Zend\Config\Ini object to set the client&#39;s configuration</span>
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Ini</span><span class="p">(</span><span class="s1">&#39;httpclient.ini&#39;</span><span class="p">,</span> <span class="s1">&#39;secure&#39;</span><span class="p">);</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setConfig</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt> uses <tt class="docutils literal"><span class="pre">Zend\Uri\Http</span></tt> to validate URLs. This means that some special characters like the
+pipe symbol (&#8216;|&#8217;) or the caret symbol (&#8216;^&#8217;) will not be accepted in the URL by default. This can be modified by
+setting the &#8216;allowunwise&#8217; option of <tt class="docutils literal"><span class="pre">Zend\Uri</span></tt> to &#8216;<tt class="docutils literal"><span class="pre">TRUE</span></tt>&#8216;. See <em class="xref std std-ref">this section</em> for more information.</p>
+</div>
+</div>
+<div class="section" id="configuration-options">
+<span id="zend-http-client-options"></span><h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>The constructor and setConfig() method accept an associative array of configuration parameters, or a
+<tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object. Setting these parameters is optional, as they all have default values.</p>
+<blockquote>
+<div><table border="1" class="docutils" id="zend-http-client-configuration-table">
+<caption>Zend\Http\Client configuration parameters</caption>
+<colgroup>
+<col width="6%" />
+<col width="73%" />
+<col width="6%" />
+<col width="15%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Parameter</th>
+<th class="head">Description</th>
+<th class="head">Expected Values</th>
+<th class="head">Default Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>maxredirects</td>
+<td>Maximum number of redirections to follow (0 = none)</td>
+<td>integer</td>
+<td>5</td>
+</tr>
+<tr class="row-odd"><td>strict</td>
+<td>Whether perform validation on header names. When set to FALSE, validation functions will be skipped. Usually this should not be changed</td>
+<td>boolean</td>
+<td>TRUE</td>
+</tr>
+<tr class="row-even"><td>strictredirects</td>
+<td>Whether to strictly follow the RFC when redirecting (see this section)</td>
+<td>boolean</td>
+<td>FALSE</td>
+</tr>
+<tr class="row-odd"><td>useragent</td>
+<td>User agent identifier string (sent in request headers)</td>
+<td>string</td>
+<td>&#8216;Zend\Http\Client&#8217;</td>
+</tr>
+<tr class="row-even"><td>timeout</td>
+<td>Connection timeout (seconds)</td>
+<td>integer</td>
+<td>10</td>
+</tr>
+<tr class="row-odd"><td>httpversion</td>
+<td>HTTP protocol version (usually &#8216;1.1&#8217; or &#8216;1.0&#8217;)</td>
+<td>string</td>
+<td>&#8216;1.1&#8217;</td>
+</tr>
+<tr class="row-even"><td>adapter</td>
+<td>Connection adapter class to use (see this section)</td>
+<td>mixed</td>
+<td>&#8216;Zend\Http\Client\Adapter\Socket&#8217;</td>
+</tr>
+<tr class="row-odd"><td>keepalive</td>
+<td>Whether to enable keep-alive connections with the server. Useful and might improve performance if several consecutive requests to the same server are performed.</td>
+<td>boolean</td>
+<td>FALSE</td>
+</tr>
+<tr class="row-even"><td>storeresponse</td>
+<td>Whether to store last response for later retrieval with getLastResponse(). If set to FALSEgetLastResponse() will return NULL.</td>
+<td>boolean</td>
+<td>TRUE</td>
+</tr>
+<tr class="row-odd"><td>encodecookies</td>
+<td>Whether to pass the cookie value through urlencode/urldecode. Enabling this breaks support with some web servers. Disabling this limits the range of values the cookies can contain.</td>
+<td>boolean</td>
+<td>TRUE</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="available-methods">
+<span id="zend-http-client-methods"></span><h2>Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="zend-http-client-methods-construct">
+<dt><strong>__construct</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">__construct(string</span> <span class="pre">$uri,</span> <span class="pre">array</span> <span class="pre">$config)</span></tt></p>
+<p>Constructor</p>
+<p class="last">Returns void</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-config">
+<dt><strong>setConfig</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setConfig(Config|array</span> <span class="pre">$config</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">(</span> <span class="pre">))</span></tt></p>
+<p>Set configuration parameters for this HTTP client</p>
+<p class="last">Returns Zend\Http\Client</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-adapter">
+<dt><strong>setAdapter</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setAdapter(Zend\Http\Client\Adapter|string</span> <span class="pre">$adapter)</span></tt></p>
+<p>Load the connection adapter</p>
+<p>While this method is not called more than one for a client, it is seperated from -&gt;send() to preserve logic
+and readability</p>
+<p class="last">Returns null</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-get-adapter">
+<dt><strong>getAdapter</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getAdapter()</span></tt></p>
+<p>Load the connection adapter</p>
+<p class="last">Returns Zend\Http\Client\Adapter</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-get-request">
+<dt><strong>getRequest</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getRequest()</span></tt></p>
+<p>Get Request</p>
+<p class="last">Returns Request</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-get-response">
+<dt><strong>getResponse</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getResponse()</span></tt></p>
+<p>Get Response</p>
+<p class="last">Returns Response</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-request">
+<dt><strong>setRequest</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setRequest(Zend\Http\Zend\Http\Request</span> <span class="pre">$request)</span></tt></p>
+<p>Set request</p>
+<p class="last">Returns void</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-response">
+<dt><strong>setResponse</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setResponse(Zend\Http\Zend\Http\Response</span> <span class="pre">$response)</span></tt></p>
+<p>Set response</p>
+<p class="last">Returns void</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-get-last-request">
+<dt><strong>getLastRequest</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getLastRequest()</span></tt></p>
+<p>Get the last request (as a string)</p>
+<p class="last">Returns string</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-get-last-response">
+<dt><strong>getLastResponse</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getLastResponse()</span></tt></p>
+<p>Get the last response (as a string)</p>
+<p class="last">Returns string</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-get-redirections-count">
+<dt><strong>getRedirectionsCount</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getRedirectionsCount()</span></tt></p>
+<p>Get the redirections count</p>
+<p class="last">Returns integer</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-uri">
+<dt><strong>setUri</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setUri(string|Zend\Http\Zend\Uri\Http</span> <span class="pre">$uri)</span></tt></p>
+<p>Set Uri (to the request)</p>
+<p class="last">Returns void</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-get-uri">
+<dt><strong>getUri</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getUri()</span></tt></p>
+<p>Get uri (from the request)</p>
+<p class="last">Returns Zend\Http\Zend\Uri\Http</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-method">
+<dt><strong>setMethod</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setMethod(string</span> <span class="pre">$method)</span></tt></p>
+<p>Set the HTTP method (to the request)</p>
+<p class="last">Returns Zend\Http\Client</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-get-method">
+<dt><strong>getMethod</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getMethod()</span></tt></p>
+<p>Get the HTTP method</p>
+<p class="last">Returns string</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-enc-type">
+<dt><strong>setEncType</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setEncType(string</span> <span class="pre">$encType,</span> <span class="pre">string</span> <span class="pre">$boundary)</span></tt></p>
+<p>Set the encoding type and the boundary (if any)</p>
+<p class="last">Returns void</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-get-enc-type">
+<dt><strong>getEncType</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getEncType()</span></tt></p>
+<p>Get the encoding type</p>
+<p class="last">Returns type</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-raw-body">
+<dt><strong>setRawBody</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setRawBody(string</span> <span class="pre">$body)</span></tt></p>
+<p>Set raw body (for advanced use cases)</p>
+<p class="last">Returns Zend\Http\Client</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-parameter-post">
+<dt><strong>setParameterPost</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setParameterPost(array</span> <span class="pre">$post)</span></tt></p>
+<p>Set the POST parameters</p>
+<p class="last">Returns Zend\Http\Client</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-parameter-get">
+<dt><strong>setParameterGet</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setParameterGet(array</span> <span class="pre">$query)</span></tt></p>
+<p>Set the GET parameters</p>
+<p class="last">Returns Zend\Http\Client</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-get-cookies">
+<dt><strong>getCookies</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getCookies()</span></tt></p>
+<p>Return the current cookies</p>
+<p class="last">Returns array</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-add-cookie">
+<dt><strong>addCookie</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">addCookie(ArrayIterator|SetCookie|string</span> <span class="pre">$cookie,</span> <span class="pre">string</span> <span class="pre">$value,</span> <span class="pre">string</span> <span class="pre">$domain,</span> <span class="pre">string</span> <span class="pre">$expire,</span> <span class="pre">string</span> <span class="pre">$path,</span> <span class="pre">boolean</span> <span class="pre">$secure</span> <span class="pre">=</span> <span class="pre">false,</span> <span class="pre">boolean</span> <span class="pre">$httponly</span> <span class="pre">=</span> <span class="pre">true)</span></tt></p>
+<p>Add a cookie</p>
+<p class="last">Returns Zend\Http\Client</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-cookies">
+<dt><strong>setCookies</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setCookies(array</span> <span class="pre">$cookies)</span></tt></p>
+<p>Set an array of cookies</p>
+<p class="last">Returns Zend\Http\Client</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-clear-cookies">
+<dt><strong>clearCookies</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">clearCookies()</span></tt></p>
+<p>Clear all the cookies</p>
+<p class="last">Returns void</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-headers">
+<dt><strong>setHeaders</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setHeaders(Headers|array</span> <span class="pre">$headers)</span></tt></p>
+<p>Set the headers (for the request)</p>
+<p class="last">Returns Zend\Http\Client</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-has-header">
+<dt><strong>hasHeader</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">hasHeader(string</span> <span class="pre">$name)</span></tt></p>
+<p>Check if exists the header type specified</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-get-header">
+<dt><strong>getHeader</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getHeader(string</span> <span class="pre">$name)</span></tt></p>
+<p>Get the header value of the request</p>
+<p class="last">Returns string|boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-stream">
+<dt><strong>setStream</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setStream(string|boolean</span> <span class="pre">$streamfile</span> <span class="pre">=</span> <span class="pre">true)</span></tt></p>
+<p>Set streaming for received data</p>
+<p class="last">Returns Zend\Http\Client</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-get-stream">
+<dt><strong>getStream</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getStream()</span></tt></p>
+<p>Get status of streaming for received data</p>
+<p class="last">Returns boolean|string</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-auth">
+<dt><strong>setAuth</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setAuth(string</span> <span class="pre">$user,</span> <span class="pre">string</span> <span class="pre">$password,</span> <span class="pre">string</span> <span class="pre">$type</span> <span class="pre">=</span> <span class="pre">'basic')</span></tt></p>
+<p>Create a HTTP authentication &#8220;Authorization:&#8221; header according to the specified user, password and
+authentication method.</p>
+<p class="last">Returns Zend\Http\Client</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-reset-parameters">
+<dt><strong>resetParameters</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">resetParameters()</span></tt></p>
+<p>Reset all the HTTP parameters (auth,cookies,request, response, etc)</p>
+<p class="last">Returns void</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-send">
+<dt><strong>send</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">send(Request</span> <span class="pre">$request)</span></tt></p>
+<p>Send HTTP request</p>
+<p class="last">Returns Response</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-set-file-upload">
+<dt><strong>setFileUpload</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setFileUpload(string</span> <span class="pre">$filename,</span> <span class="pre">string</span> <span class="pre">$formname,</span> <span class="pre">string</span> <span class="pre">$data,</span> <span class="pre">string</span> <span class="pre">$ctype)</span></tt></p>
+<p>Set a file to upload (using a POST request)</p>
+<p>Can be used in two ways: 1. $data is null (default): $filename is treated as the name if a local file which will
+be read and sent. Will try to guess the content type using mime_content_type(). 2. $data is set - $filename is
+sent as the file name, but $data is sent as the file contents and no file is read from the file system. In this
+case, you need to manually set the Content-Type ($ctype) or it will default to application/octet-stream.</p>
+<p class="last">Returns Zend\Http\Client</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-remove-file-upload">
+<dt><strong>removeFileUpload</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">removeFileUpload(string</span> <span class="pre">$filename)</span></tt></p>
+<p>Remove a file to upload</p>
+<p class="last">Returns boolean</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-methods-encode-form-data">
+<dt><strong>encodeFormData</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">encodeFormData(string</span> <span class="pre">$boundary,</span> <span class="pre">string</span> <span class="pre">$name,</span> <span class="pre">mixed</span> <span class="pre">$value,</span> <span class="pre">string</span> <span class="pre">$filename,</span> <span class="pre">array</span> <span class="pre">$headers</span> <span class="pre">=</span> <span class="pre">array</span> <span class="pre">(</span> <span class="pre">))</span></tt></p>
+<p>Encode data to a multipart/form-data part suitable for a POST request.</p>
+<p class="last">Returns string</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<span id="zend-http-client-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zend-http-client-basic-requests-example-1">Performing a Simple GET Request</p>
+<p>Performing simple <em>HTTP</em> requests is very easily done using the request() method, and rarely needs more than three
+lines of code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Config\Client</span><span class="p">;</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Client</span><span class="p">(</span><span class="s1">&#39;http://example.org&#39;</span><span class="p">);</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The request() method takes one optional parameter - the request method. This can be either <tt class="docutils literal"><span class="pre">GET</span></tt>, <tt class="docutils literal"><span class="pre">POST</span></tt>,
+<tt class="docutils literal"><span class="pre">PUT</span></tt>, <tt class="docutils literal"><span class="pre">HEAD</span></tt>, <tt class="docutils literal"><span class="pre">DELETE</span></tt>, <tt class="docutils literal"><span class="pre">TRACE</span></tt>, <tt class="docutils literal"><span class="pre">OPTIONS</span></tt> or <tt class="docutils literal"><span class="pre">CONNECT</span></tt> as defined by the <em>HTTP</em> protocol <a class="footnote-reference" href="#id3" id="id2">[1]</a>.</p>
+<p class="rubric" id="zend-http-client-basic-requests-example-2">Using Request Methods Other Than GET</p>
+<p>For convenience, these are all defined as class constants: Zend\Http\Client::GET, Zend\Http\Client::POST and so
+on.</p>
+<p>If no method is specified, the method set by the last <tt class="docutils literal"><span class="pre">setMethod()</span></tt> call is used. If <tt class="docutils literal"><span class="pre">setMethod()</span></tt> was never
+called, the default request method is <tt class="docutils literal"><span class="pre">GET</span></tt> (see the above example).</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Http\Client</span><span class="p">;</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Client</span><span class="p">();</span>
+<span class="c1">// Performing a POST request</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">);</span>
+
+<span class="c1">// Yet another way of performing a POST request</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setMethod</span><span class="p">(</span><span class="nx">Client</span><span class="o">::</span><span class="na">POST</span><span class="p">);</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-http-client-parameters-example-1">Adding GET and POST parameters</p>
+<p>Adding <tt class="docutils literal"><span class="pre">GET</span></tt> parameters to an <em>HTTP</em> request is quite simple, and can be done either by specifying them as part
+of the URL, or by using the setParameterGet() method. This method takes the <tt class="docutils literal"><span class="pre">GET</span></tt> parameter&#8217;s name as its first
+parameter, and the <tt class="docutils literal"><span class="pre">GET</span></tt> parameter&#8217;s value as its second parameter. For convenience, the setParameterGet() method
+can also accept a single associative array of name =&gt; value <tt class="docutils literal"><span class="pre">GET</span></tt> variables - which may be more comfortable when
+several <tt class="docutils literal"><span class="pre">GET</span></tt> parameters need to be set.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Http\Client</span><span class="p">;</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Client</span><span class="p">();</span>
+
+<span class="c1">// Setting a get parameter using the setParameterGet method</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setParameterGet</span><span class="p">(</span><span class="s1">&#39;knight&#39;</span><span class="p">,</span> <span class="s1">&#39;lancelot&#39;</span><span class="p">);</span>
+
+<span class="c1">// This is equivalent to setting such URL:</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://example.com/index.php?knight=lancelot&#39;</span><span class="p">);</span>
+
+<span class="c1">// Adding several parameters with one call</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setParameterGet</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;first_name&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;Bender&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;middle_name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bending&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;made_in&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;Mexico&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-http-client-parameters-example-2">Setting POST Parameters</p>
+<p>While <tt class="docutils literal"><span class="pre">GET</span></tt> parameters can be sent with every request method, POST parameters are only sent in the body of POST
+requests. Adding POST parameters to a request is very similar to adding <tt class="docutils literal"><span class="pre">GET</span></tt> parameters, and can be done with
+the setParameterPost() method, which is similar to the setParameterGet() method in structure.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Http\Client</span><span class="p">;</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Client</span><span class="p">();</span>
+<span class="c1">// Setting a POST parameter</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setParameterPost</span><span class="p">(</span><span class="s1">&#39;language&#39;</span><span class="p">,</span> <span class="s1">&#39;fr&#39;</span><span class="p">);</span>
+
+<span class="c1">// Setting several POST parameters, one of them with several values</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setParameterPost</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;language&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;es&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;country&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;ar&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;selection&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that when sending POST requests, you can set both <tt class="docutils literal"><span class="pre">GET</span></tt> and POST parameters. On the other hand, while
+setting POST parameters for a non-POST request will not trigger and error, it is useless. Unless the request is a
+POST request, POST parameters are simply ignored.</p>
+<p class="rubric" id="zend-http-client-request-object-usage">Using A Request Object With The Client</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Http\Request</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Http\Client</span><span class="p">;</span>
+<span class="nv">$request</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Request</span><span class="p">();</span>
+<span class="nv">$request</span><span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://www.test.com&#39;</span><span class="p">);</span>
+<span class="nv">$request</span><span class="o">-&gt;</span><span class="na">setMethod</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">);</span>
+<span class="nv">$request</span><span class="o">-&gt;</span><span class="na">setParameterPost</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;bar&#39;</span><span class="p">));</span>
+
+<span class="nv">$client</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Client</span><span class="p">();</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$response</span><span class="o">-&gt;</span><span class="na">isSuccess</span><span class="p">())</span> <span class="p">{</span>
+    <span class="c1">//  the POST was successful</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>See RFC 2616 -<a class="reference external" href="http://www.w3.org/Protocols/rfc2616/rfc2616.html">http://www.w3.org/Protocols/rfc2616/rfc2616.html</a>.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Http\Client</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#available-methods">Available Methods</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.http.cookie.handling.html"
+                        title="previous chapter">Zend_Http_Cookie and Zend_Http_CookieJar</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.http.client.adapters.html"
+                        title="next chapter">Zend_Http_Client - Connection Adapters</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.http.client.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.http.client.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.http.client.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.http.client.adapters.html" title="Zend_Http_Client - Connection Adapters"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.http.cookie.handling.html" title="Zend_Http_Cookie and Zend_Http_CookieJar"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.http.client.rst">
+                Zend\Http\Client
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

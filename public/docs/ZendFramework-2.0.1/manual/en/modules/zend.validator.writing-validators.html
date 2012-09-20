@@ -1,0 +1,519 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Writing Validators &mdash; Zend Framework 2 2.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.1 documentation" href="../index.html" />
+    <link rel="next" title="Validation Messages" href="zend.validator.messages.html" />
+    <link rel="prev" title="Validator Chains" href="zend.validator.validator-chains.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.validator.messages.html" title="Validation Messages"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.validator.validator-chains.html" title="Validator Chains"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="writing-validators">
+<span id="zend-validator-writing-validators"></span><h1>Writing Validators<a class="headerlink" href="#writing-validators" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Validator\AbstractValidator</span></tt> supplies a set of commonly needed validators, but inevitably, developers will
+wish to write custom validators for their particular needs. The task of writing a custom validator is described in
+this section.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Validator\ValidatorInterface</span></tt> defines two methods, <tt class="docutils literal"><span class="pre">isValid()</span></tt> and <tt class="docutils literal"><span class="pre">getMessages()</span></tt>, that may be
+implemented by user classes in order to create custom validation objects. An object that implements
+<tt class="docutils literal"><span class="pre">Zend\Validator\AbstractValidator</span></tt> interface may be added to a validator chain with
+<tt class="docutils literal"><span class="pre">Zend\Validator\ValidatorChain::addValidator()</span></tt>. Such objects may also be used with <a class="reference internal" href="zend.filter.input.html#zend-filter-input"><em>Zend\Filter\Input</em></a>.</p>
+<p>As you may already have inferred from the above description of <tt class="docutils literal"><span class="pre">Zend\Validator\ValidatorInterface</span></tt>, validation
+classes provided with Zend Framework return a boolean value for whether or not a value validates successfully. They
+also provide information about <strong>why</strong> a value failed validation. The availability of the reasons for validation
+failures may be valuable to an application for various purposes, such as providing statistics for usability
+analysis.</p>
+<p>Basic validation failure message functionality is implemented in <tt class="docutils literal"><span class="pre">Zend\Validator\AbstractValidator</span></tt>. To include
+this functionality when creating a validation class, simply extend <tt class="docutils literal"><span class="pre">Zend\Validator\AbstractValidator</span></tt>. In the
+extending class you would implement the <tt class="docutils literal"><span class="pre">isValid()</span></tt> method logic and define the message variables and message
+templates that correspond to the types of validation failures that can occur. If a value fails your validation
+tests, then <tt class="docutils literal"><span class="pre">isValid()</span></tt> should return <tt class="docutils literal"><span class="pre">FALSE</span></tt>. If the value passes your validation tests, then <tt class="docutils literal"><span class="pre">isValid()</span></tt>
+should return <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</p>
+<p>In general, the <tt class="docutils literal"><span class="pre">isValid()</span></tt> method should not throw any exceptions, except where it is impossible to determine
+whether or not the input value is valid. A few examples of reasonable cases for throwing an exception might be if a
+file cannot be opened, an <em>LDAP</em> server could not be contacted, or a database connection is unavailable, where such
+a thing may be required for validation success or failure to be determined.</p>
+<p class="rubric" id="zend-validator-writing-validators-example-simple">Creating a Simple Validation Class</p>
+<p>The following example demonstrates how a very simple custom validator might be written. In this case the validation
+rules are simply that the input value must be a floating point value.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MyValid\Float</span> <span class="k">extends</span> <span class="nx">Zend\Validator\AbstractValidator</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">FLOAT</span> <span class="o">=</span> <span class="s1">&#39;float&#39;</span><span class="p">;</span>
+
+    <span class="k">protected</span> <span class="nv">$messageTemplates</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+        <span class="nx">self</span><span class="o">::</span><span class="na">FLOAT</span> <span class="o">=&gt;</span> <span class="s2">&quot;&#39;%value%&#39; is not a floating point value&quot;</span>
+    <span class="p">);</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">isValid</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setValue</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">is_float</span><span class="p">(</span><span class="nv">$value</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="na">FLOAT</span><span class="p">);</span>
+            <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The class defines a template for its single validation failure message, which includes the built-in magic
+parameter, <strong>%value%</strong>. The call to <tt class="docutils literal"><span class="pre">setValue()</span></tt> prepares the object to insert the tested value into the failure
+message automatically, should the value fail validation. The call to <tt class="docutils literal"><span class="pre">error()</span></tt> tracks a reason for validation
+failure. Since this class only defines one failure message, it is not necessary to provide <tt class="docutils literal"><span class="pre">error()</span></tt> with the
+name of the failure message template.</p>
+<p class="rubric" id="zend-validator-writing-validators-example-conditions-dependent">Writing a Validation Class having Dependent Conditions</p>
+<p>The following example demonstrates a more complex set of validation rules, where it is required that the input
+value be numeric and within the range of minimum and maximum boundary values. An input value would fail validation
+for exactly one of the following reasons:</p>
+<ul class="simple">
+<li>The input value is not numeric.</li>
+<li>The input value is less than the minimum allowed value.</li>
+<li>The input value is more than the maximum allowed value.</li>
+</ul>
+<p>These validation failure reasons are then translated to definitions in the class:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MyValid\NumericBetween</span> <span class="k">extends</span> <span class="nx">Zend\Validator\AbstractValidator</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">MSG_NUMERIC</span> <span class="o">=</span> <span class="s1">&#39;msgNumeric&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">MSG_MINIMUM</span> <span class="o">=</span> <span class="s1">&#39;msgMinimum&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">MSG_MAXIMUM</span> <span class="o">=</span> <span class="s1">&#39;msgMaximum&#39;</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nv">$minimum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$maximum</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span>
+
+    <span class="k">protected</span> <span class="nv">$messageVariables</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;min&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;minimum&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;max&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;maximum&#39;</span>
+    <span class="p">);</span>
+
+    <span class="k">protected</span> <span class="nv">$messageTemplates</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+        <span class="nx">self</span><span class="o">::</span><span class="na">MSG_NUMERIC</span> <span class="o">=&gt;</span> <span class="s2">&quot;&#39;%value%&#39; is not numeric&quot;</span><span class="p">,</span>
+        <span class="nx">self</span><span class="o">::</span><span class="na">MSG_MINIMUM</span> <span class="o">=&gt;</span> <span class="s2">&quot;&#39;%value%&#39; must be at least &#39;%min%&#39;&quot;</span><span class="p">,</span>
+        <span class="nx">self</span><span class="o">::</span><span class="na">MSG_MAXIMUM</span> <span class="o">=&gt;</span> <span class="s2">&quot;&#39;%value%&#39; must be no more than &#39;%max%&#39;&quot;</span>
+    <span class="p">);</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">isValid</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setValue</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">is_numeric</span><span class="p">(</span><span class="nv">$value</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="na">MSG_NUMERIC</span><span class="p">);</span>
+            <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$value</span> <span class="o">&lt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">minimum</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="na">MSG_MINIMUM</span><span class="p">);</span>
+            <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$value</span> <span class="o">&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">maximum</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="na">MSG_MAXIMUM</span><span class="p">);</span>
+            <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The public properties <tt class="docutils literal"><span class="pre">$minimum</span></tt> and <tt class="docutils literal"><span class="pre">$maximum</span></tt> have been established to provide the minimum and maximum
+boundaries, respectively, for a value to successfully validate. The class also defines two message variables that
+correspond to the public properties and allow <tt class="docutils literal"><span class="pre">min</span></tt> and <tt class="docutils literal"><span class="pre">max</span></tt> to be used in message templates as magic
+parameters, just as with <tt class="docutils literal"><span class="pre">value</span></tt>.</p>
+<p>Note that if any one of the validation checks in <tt class="docutils literal"><span class="pre">isValid()</span></tt> fails, an appropriate failure message is prepared,
+and the method immediately returns <tt class="docutils literal"><span class="pre">FALSE</span></tt>. These validation rules are therefore sequentially dependent. That is,
+if one test should fail, there is no need to test any subsequent validation rules. This need not be the case,
+however. The following example illustrates how to write a class having independent validation rules, where the
+validation object may return multiple reasons why a particular validation attempt failed.</p>
+<p class="rubric" id="zend-validator-writing-validators-example-conditions-independent">Validation with Independent Conditions, Multiple Reasons for Failure</p>
+<p>Consider writing a validation class for password strength enforcement - when a user is required to choose a
+password that meets certain criteria for helping secure user accounts. Let us assume that the password security
+criteria enforce that the password:</p>
+<ul class="simple">
+<li>is at least 8 characters in length,</li>
+<li>contains at least one uppercase letter,</li>
+<li>contains at least one lowercase letter,</li>
+<li>and contains at least one digit character.</li>
+</ul>
+<p>The following class implements these validation criteria:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MyValid\PasswordStrength</span> <span class="k">extends</span> <span class="nx">Zend\Validator\AbstractValidator</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">LENGTH</span> <span class="o">=</span> <span class="s1">&#39;length&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">UPPER</span>  <span class="o">=</span> <span class="s1">&#39;upper&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">LOWER</span>  <span class="o">=</span> <span class="s1">&#39;lower&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">DIGIT</span>  <span class="o">=</span> <span class="s1">&#39;digit&#39;</span><span class="p">;</span>
+
+    <span class="k">protected</span> <span class="nv">$messageTemplates</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+        <span class="nx">self</span><span class="o">::</span><span class="na">LENGTH</span> <span class="o">=&gt;</span> <span class="s2">&quot;&#39;%value%&#39; must be at least 8 characters in length&quot;</span><span class="p">,</span>
+        <span class="nx">self</span><span class="o">::</span><span class="na">UPPER</span>  <span class="o">=&gt;</span> <span class="s2">&quot;&#39;%value%&#39; must contain at least one uppercase letter&quot;</span><span class="p">,</span>
+        <span class="nx">self</span><span class="o">::</span><span class="na">LOWER</span>  <span class="o">=&gt;</span> <span class="s2">&quot;&#39;%value%&#39; must contain at least one lowercase letter&quot;</span><span class="p">,</span>
+        <span class="nx">self</span><span class="o">::</span><span class="na">DIGIT</span>  <span class="o">=&gt;</span> <span class="s2">&quot;&#39;%value%&#39; must contain at least one digit character&quot;</span>
+    <span class="p">);</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">isValid</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setValue</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+
+        <span class="nv">$isValid</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="na">LENGTH</span><span class="p">);</span>
+            <span class="nv">$isValid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/[A-Z]/&#39;</span><span class="p">,</span> <span class="nv">$value</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="na">UPPER</span><span class="p">);</span>
+            <span class="nv">$isValid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/[a-z]/&#39;</span><span class="p">,</span> <span class="nv">$value</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="na">LOWER</span><span class="p">);</span>
+            <span class="nv">$isValid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">preg_match</span><span class="p">(</span><span class="s1">&#39;/\d/&#39;</span><span class="p">,</span> <span class="nv">$value</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">error</span><span class="p">(</span><span class="nx">self</span><span class="o">::</span><span class="na">DIGIT</span><span class="p">);</span>
+            <span class="nv">$isValid</span> <span class="o">=</span> <span class="k">false</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nv">$isValid</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that the four criteria tests in <tt class="docutils literal"><span class="pre">isValid()</span></tt> do not immediately return <tt class="docutils literal"><span class="pre">FALSE</span></tt>. This allows the validation
+class to provide <strong>all</strong> of the reasons that the input password failed to meet the validation requirements. if, for
+example, a user were to input the string &#8220;#$%&#8221; as a password, <tt class="docutils literal"><span class="pre">isValid()</span></tt> would cause all four validation failure
+messages to be returned by a subsequent call to <tt class="docutils literal"><span class="pre">getMessages()</span></tt>.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.validator.validator-chains.html"
+                        title="previous chapter">Validator Chains</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.validator.messages.html"
+                        title="next chapter">Validation Messages</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.validator.writing-validators.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.validator.writing-validators.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.validator.writing-validators.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.validator.messages.html" title="Validation Messages"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.validator.validator-chains.html" title="Validator Chains"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.validator.writing-validators.rst">
+                Writing Validators
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

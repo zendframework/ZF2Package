@@ -1,0 +1,536 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Filters for Zend_File_Transfer &mdash; Zend Framework 2 2.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.1 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="filters-for-zend-file-transfer">
+<span id="zend-file-transfer-filters"></span><h1>Filters for Zend_File_Transfer<a class="headerlink" href="#filters-for-zend-file-transfer" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> is delivered with several file related filters which can be used to automate several tasks
+which are often done on files. Note that file filters are applied after validation. Also file filters behave
+slightly different that other filters. They will always return the file name and not the changed content (which
+would be a bad idea when working on 1GB files). All filters which are provided with <tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> can be
+found in the <tt class="docutils literal"><span class="pre">Zend_Filter</span></tt> component and are named <tt class="docutils literal"><span class="pre">Zend_Filter_File_*</span></tt>. The following filters are actually
+available:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Decrypt</span></tt>: This filter can decrypt a encrypted file.</li>
+<li><tt class="docutils literal"><span class="pre">Encrypt</span></tt>: This filter can encrypt a file.</li>
+<li><tt class="docutils literal"><span class="pre">LowerCase</span></tt>: This filter can lowercase the content of a textfile.</li>
+<li><tt class="docutils literal"><span class="pre">Rename</span></tt>: This filter can rename files, change the location and even force overwriting of existing files.</li>
+<li><tt class="docutils literal"><span class="pre">UpperCase</span></tt>: This filter can uppercase the content of a textfile.</li>
+</ul>
+<div class="section" id="using-filters-with-zend-file-transfer">
+<span id="zend-file-transfer-filters-usage"></span><h2>Using filters with Zend_File_Transfer<a class="headerlink" href="#using-filters-with-zend-file-transfer" title="Permalink to this headline">¶</a></h2>
+<p>The usage of filters is quite simple. There are several methods for adding and manipulating filters.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">addFilter($filter,</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">null,</span> <span class="pre">$files</span> <span class="pre">=</span> <span class="pre">null)</span></tt>: Adds the given filter to the filter stack (optionally
+only to the file(s) specified). <tt class="docutils literal"><span class="pre">$filter</span></tt> may be either an actual filter instance, or a short name specifying
+the filter type (e.g., &#8216;Rename&#8217;).</li>
+<li><tt class="docutils literal"><span class="pre">addFilters(array</span> <span class="pre">$filters,</span> <span class="pre">$files</span> <span class="pre">=</span> <span class="pre">null)</span></tt>: Adds the given filters to the stack of filters. Each entry may be
+either a filter type/options pair, or an array with the key &#8216;filter&#8217; specifying the filter (all other options
+will be considered filter options for instantiation).</li>
+<li><tt class="docutils literal"><span class="pre">setFilters(array</span> <span class="pre">$filters,</span> <span class="pre">$files</span> <span class="pre">=</span> <span class="pre">null)</span></tt>: Overwrites any existing filters with the filters specified. The
+filters should follow the syntax for <tt class="docutils literal"><span class="pre">addFilters()</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">hasFilter($name)</span></tt>: Indicates if a filter has been registered.</li>
+<li><tt class="docutils literal"><span class="pre">getFilter($name)</span></tt>: Returns a previously registered filter.</li>
+<li><tt class="docutils literal"><span class="pre">getFilters($files</span> <span class="pre">=</span> <span class="pre">null)</span></tt>: Returns registered filters; if <tt class="docutils literal"><span class="pre">$files</span></tt> is passed, returns filters for that
+particular file or set of files.</li>
+<li><tt class="docutils literal"><span class="pre">removeFilter($name)</span></tt>: Removes a previously registered filter.</li>
+<li><tt class="docutils literal"><span class="pre">clearFilters()</span></tt>: Clears all registered filters.</li>
+</ul>
+<p class="rubric" id="zend-file-transfer-filters-usage-example">Add filters to a file transfer</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer</span><span class="p">();</span>
+
+<span class="c1">// Set a new destination path</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;Rename&#39;</span><span class="p">,</span> <span class="s1">&#39;C:\picture\uploads&#39;</span><span class="p">);</span>
+
+<span class="c1">// Set a new destination path and overwrites existing files</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;Rename&#39;</span><span class="p">,</span>
+                   <span class="k">array</span><span class="p">(</span><span class="s1">&#39;target&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;C:\picture\uploads&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;overwrite&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-file-transfer-filters-usage-exampletwo">Limit filters to single files</p>
+<p><tt class="docutils literal"><span class="pre">addFilter()</span></tt>, <tt class="docutils literal"><span class="pre">addFilters()</span></tt>, and <tt class="docutils literal"><span class="pre">setFilters()</span></tt> each accept a final <tt class="docutils literal"><span class="pre">$files</span></tt> argument. This argument can
+be used to specify a particular file or array of files on which to set the given filter.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer</span><span class="p">();</span>
+
+<span class="c1">// Set a new destination path and limits it only to &#39;file2&#39;</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;Rename&#39;</span><span class="p">,</span> <span class="s1">&#39;C:\picture\uploads&#39;</span><span class="p">,</span> <span class="s1">&#39;file2&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Generally you should simply use the <tt class="docutils literal"><span class="pre">addFilters()</span></tt> method, which can be called multiple times.</p>
+<p class="rubric" id="zend-file-transfer-filters-usage-examplemultiple">Add multiple filters</p>
+<p>Often it&#8217;s simpler just to call <tt class="docutils literal"><span class="pre">addFilter()</span></tt> multiple times. One call for each filter. This also increases the
+readability and makes your code more maintainable. As all methods provide a fluent interface you can couple the
+calls as shown below:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer</span><span class="p">();</span>
+
+<span class="c1">// Set a filesize with 20000 bytes</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;Rename&#39;</span><span class="p">,</span> <span class="s1">&#39;C:\picture\newjpg&#39;</span><span class="p">,</span> <span class="s1">&#39;file1&#39;</span><span class="p">)</span>
+       <span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;Rename&#39;</span><span class="p">,</span> <span class="s1">&#39;C:\picture\newgif&#39;</span><span class="p">,</span> <span class="s1">&#39;file2&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that even though setting the same filter multiple times is allowed, doing so can lead to issues when using
+different options for the same filter.</p>
+</div>
+</div>
+<div class="section" id="decrypt-filter">
+<span id="zend-file-transfer-filters-decrypt"></span><h2>Decrypt filter<a class="headerlink" href="#decrypt-filter" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Decrypt</span></tt> filter allows to decrypt a encrypted file.</p>
+<p>This filter makes use of <tt class="docutils literal"><span class="pre">Zend_Filter_Decrypt</span></tt>. It supports the <tt class="docutils literal"><span class="pre">Mcrypt</span></tt> and <tt class="docutils literal"><span class="pre">OpenSSL</span></tt> extensions from <em>PHP</em>.
+Please read the related section for details about how to set the options for decryption and which options are
+supported.</p>
+<p>This filter supports one additional option which can be used to save the decrypted file with another filename. Set
+the <tt class="docutils literal"><span class="pre">filename</span></tt> option to change the filename where the decrypted file will be stored. If you suppress this
+option, the decrypted file will overwrite the original encrypted file.</p>
+<p class="rubric" id="zend-file-transfer-filters-decrypt-example1">Using the Decrypt filter with Mcrypt</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer_Adapter_Http</span><span class="p">();</span>
+
+<span class="c1">// Adds a filter to decrypt the uploaded encrypted file</span>
+<span class="c1">// with mcrypt and the key mykey</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;Decrypt&#39;</span><span class="p">,</span>
+    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;mcrypt&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;mykey&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-file-transfer-filters-decrypt-example2">Using the Decrypt filter with OpenSSL</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer_Adapter_Http</span><span class="p">();</span>
+
+<span class="c1">// Adds a filter to decrypt the uploaded encrypted file</span>
+<span class="c1">// with openssl and the provided keys</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;Decrypt&#39;</span><span class="p">,</span>
+    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;openssl&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;private&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/privatekey.pem&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;envelope&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/envelopekey.pem&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="encrypt-filter">
+<span id="zend-file-transfer-filters-encrypt"></span><h2>Encrypt filter<a class="headerlink" href="#encrypt-filter" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Encrypt</span></tt> filter allows to encrypt a file.</p>
+<p>This filter makes use of <tt class="docutils literal"><span class="pre">Zend_Filter_Encrypt</span></tt>. It supports the <tt class="docutils literal"><span class="pre">Mcrypt</span></tt> and <tt class="docutils literal"><span class="pre">OpenSSL</span></tt> extensions from <em>PHP</em>.
+Please read the related section for details about how to set the options for encryption and which options are
+supported.</p>
+<p>This filter supports one additional option which can be used to save the encrypted file with another filename. Set
+the <tt class="docutils literal"><span class="pre">filename</span></tt> option to change the filename where the encrypted file will be stored. If you suppress this
+option, the encrypted file will overwrite the original file.</p>
+<p class="rubric" id="zend-file-transfer-filters-encrypt-example1">Using the Encrypt filter with Mcrypt</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer_Adapter_Http</span><span class="p">();</span>
+
+<span class="c1">// Adds a filter to encrypt the uploaded file</span>
+<span class="c1">// with mcrypt and the key mykey</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;Encrypt&#39;</span><span class="p">,</span>
+    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;mcrypt&#39;</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;mykey&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-file-transfer-filters-encrypt-example2">Using the Encrypt filter with OpenSSL</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer_Adapter_Http</span><span class="p">();</span>
+
+<span class="c1">// Adds a filter to encrypt the uploaded file</span>
+<span class="c1">// with openssl and the provided keys</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;Encrypt&#39;</span><span class="p">,</span>
+    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;openssl&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;public&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/path/to/publickey.pem&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="lowercase-filter">
+<span id="zend-file-transfer-filters-lowercase"></span><h2>LowerCase filter<a class="headerlink" href="#lowercase-filter" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">LowerCase</span></tt> filter allows to change the content of a file to lowercase. You should use this filter only on
+textfiles.</p>
+<p>At initiation you can give a string which will then be used as encoding. Or you can use the <tt class="docutils literal"><span class="pre">setEncoding()</span></tt>
+method to set it afterwards.</p>
+<p class="rubric" id="zend-file-transfer-filters-lowercase-example">Using the LowerCase filter</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer_Adapter_Http</span><span class="p">();</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="s1">&#39;MimeType&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">);</span>
+
+<span class="c1">// Adds a filter to lowercase the uploaded textfile</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;LowerCase&#39;</span><span class="p">);</span>
+
+<span class="c1">// Adds a filter to lowercase the uploaded file but only for uploadfile1</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;LowerCase&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">&#39;uploadfile1&#39;</span><span class="p">);</span>
+
+<span class="c1">// Adds a filter to lowercase with encoding set to ISO-8859-1</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;LowerCase&#39;</span><span class="p">,</span> <span class="s1">&#39;ISO-8859-1&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that due to the fact that the options for the LowerCase filter are optional, you must give a <tt class="docutils literal"><span class="pre">NULL</span></tt> as
+second parameter (the options) when you want to limit it to a single file element.</p>
+</div>
+</div>
+<div class="section" id="rename-filter">
+<span id="zend-file-transfer-filters-rename"></span><h2>Rename filter<a class="headerlink" href="#rename-filter" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Rename</span></tt> filter allows to change the destination of the upload, the filename and also to overwrite existing
+files. It supports the following options:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">source</span></tt>: The name and destination of the old file which shall be renamed.</li>
+<li><tt class="docutils literal"><span class="pre">target</span></tt>: The new directory, or filename of the file.</li>
+<li><tt class="docutils literal"><span class="pre">overwrite</span></tt>: Sets if the old file overwrites the new one if it already exists. The default value is <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</li>
+</ul>
+<p>Additionally you can also use the method <tt class="docutils literal"><span class="pre">setFile()</span></tt> to set files, which erases all previous set, <tt class="docutils literal"><span class="pre">addFile()</span></tt>
+to add a new file to existing ones, and <tt class="docutils literal"><span class="pre">getFile()</span></tt> to get all actually set files. To simplify things, this
+filter understands several notations and that methods and constructor understand the same notations.</p>
+<p class="rubric" id="zend-file-transfer-filters-rename-example">Using the Rename filter</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer_Adapter_Http</span><span class="p">();</span>
+
+<span class="c1">// Set a new destination path for all files</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;Rename&#39;</span><span class="p">,</span> <span class="s1">&#39;C:\mypics\new&#39;</span><span class="p">);</span>
+
+<span class="c1">// Set a new destination path only for uploadfile1</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;Rename&#39;</span><span class="p">,</span> <span class="s1">&#39;C:\mypics\newgifs&#39;</span><span class="p">,</span> <span class="s1">&#39;uploadfile1&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can use different notations. Below is a table where you will find a description and the intention for the
+supported notations. Note that when you use the Adapter or the Form Element you will not be able to use all
+described notations.</p>
+<table border="1" class="docutils" id="zend-file-transfer-filters-rename-notations">
+<caption>Different notations of the rename filter and their meaning</caption>
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">notation</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>addFile(&#8216;C:\uploads&#8217;)</td>
+<td>Specifies a new location for all files when the given string is a directory. Note that you will get an exception when the file already exists, see the overwriting parameter.</td>
+</tr>
+<tr class="row-odd"><td>addFile(&#8216;C:\uploads\file.ext&#8217;)</td>
+<td>Specifies a new location and filename for all files when the given string is not detected as directory. Note that you will get an exception when the file already exists, see the overwriting parameter.</td>
+</tr>
+<tr class="row-even"><td>addFile(array(&#8216;C:\uploads\file.ext&#8217;, &#8216;overwrite&#8217; =&gt; true))</td>
+<td>Specifies a new location and filename for all files when the given string is not detected as directory and overwrites an existing file with the same target name. Note, that you will get no notification that a file was overwritten.</td>
+</tr>
+<tr class="row-odd"><td>addFile(array(&#8216;source&#8217; =&gt; &#8216;C:\temp\uploads&#8217;, &#8216;target&#8217; =&gt; &#8216;C:\uploads&#8217;))</td>
+<td>Specifies a new location for all files in the old location when the given strings are detected as directory. Note that you will get an exception when the file already exists, see the overwriting parameter.</td>
+</tr>
+<tr class="row-even"><td>addFile(array(&#8216;source&#8217; =&gt; &#8216;C:\temp\uploads&#8217;, &#8216;target&#8217; =&gt; &#8216;C:\uploads&#8217;, &#8216;overwrite&#8217; =&gt; true))</td>
+<td>Specifies a new location for all files in the old location when the given strings are detected as directory and overwrites and existing file with the same target name. Note, that you will get no notification that a file was overwritten.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="uppercase-filter">
+<span id="zend-file-transfer-filters-uppercase"></span><h2>UpperCase filter<a class="headerlink" href="#uppercase-filter" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">UpperCase</span></tt> filter allows to change the content of a file to uppercase. You should use this filter only on
+textfiles.</p>
+<p>At initiation you can give a string which will then be used as encoding. Or you can use the <tt class="docutils literal"><span class="pre">setEncoding()</span></tt>
+method to set it afterwards.</p>
+<p class="rubric" id="zend-file-transfer-filters-uppercase-example">Using the UpperCase filter</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$upload</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_File_Transfer_Adapter_Http</span><span class="p">();</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="s1">&#39;MimeType&#39;</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">);</span>
+
+<span class="c1">// Adds a filter to uppercase the uploaded textfile</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;UpperCase&#39;</span><span class="p">);</span>
+
+<span class="c1">// Adds a filter to uppercase the uploaded file but only for uploadfile1</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;UpperCase&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">&#39;uploadfile1&#39;</span><span class="p">);</span>
+
+<span class="c1">// Adds a filter to uppercase with encoding set to ISO-8859-1</span>
+<span class="nv">$upload</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s1">&#39;UpperCase&#39;</span><span class="p">,</span> <span class="s1">&#39;ISO-8859-1&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that due to the fact that the options for the UpperCase filter are optional, you must give a <tt class="docutils literal"><span class="pre">NULL</span></tt> as
+second parameter (the options) when you want to limit it to a single file element.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Filters for Zend_File_Transfer</a><ul>
+<li><a class="reference internal" href="#using-filters-with-zend-file-transfer">Using filters with Zend_File_Transfer</a></li>
+<li><a class="reference internal" href="#decrypt-filter">Decrypt filter</a></li>
+<li><a class="reference internal" href="#encrypt-filter">Encrypt filter</a></li>
+<li><a class="reference internal" href="#lowercase-filter">LowerCase filter</a></li>
+<li><a class="reference internal" href="#rename-filter">Rename filter</a></li>
+<li><a class="reference internal" href="#uppercase-filter">UpperCase filter</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.file.transfer.filters.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.file.transfer.filters.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.file.transfer.filters.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.file.transfer.filters.rst">
+                Filters for Zend_File_Transfer
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
