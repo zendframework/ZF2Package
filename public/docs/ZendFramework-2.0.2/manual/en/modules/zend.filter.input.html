@@ -1,0 +1,1019 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend_Filter_Input &mdash; Zend Framework 2 2.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.2 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-filter-input">
+<span id="id1"></span><h1>Zend_Filter_Input<a class="headerlink" href="#zend-filter-input" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt> provides a declarative interface to associate multiple filters and validators, apply them to
+collections of data, and to retrieve input values after they have been processed by the filters and validators.
+Values are returned in escaped format by default for safe <em>HTML</em> output.</p>
+<p>Consider the metaphor that this class is a cage for external data. Data enter the application from external
+sources, such as <em>HTTP</em> request parameters, <em>HTTP</em> headers, a web service, or even read from a database or another
+file. Data are first put into the cage, and subsequently the application can access data only by telling the cage
+what the data should be and how they plan to use it. The cage inspects the data for validity. It might apply
+escaping to the data values for the appropriate context. The cage releases data only if it can fulfill these
+responsibilities. With a simple and convenient interface, it encourages good programming habits and makes
+developers think about how data are used.</p>
+<ul class="simple">
+<li><strong>Filters</strong> transform input values, by removing or changing characters within the value. The goal is to
+&#8220;normalize&#8221; input values until they match an expected format. For example, if a string of numeric digits is
+needed, and the input value is &#8220;abc123&#8221;, then it might be a reasonable transformation to change the value to the
+string &#8220;123&#8221;.</li>
+<li><strong>Validators</strong> check input values against criteria and report whether they passed the test or not. The value is
+not changed, but the check may fail. For example, if a string must look like an email address, and the input
+value is &#8220;abc123&#8221;, then the value is not considered valid.</li>
+<li><strong>Escapers</strong> transform a value by removing magic behavior of certain characters. In some output contexts, special
+characters have meaning. For example, the characters &#8216;&lt;&#8217; and &#8216;&gt;&#8217; delimit <em>HTML</em> tags, and if a string containing
+those characters is output in an <em>HTML</em> context, the content between them might affect the output or
+functionality of the <em>HTML</em> presentation. Escaping the characters removes the special meaning, so they are output
+as literal characters.</li>
+</ul>
+<p>To use <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt>, perform the following steps:</p>
+<p>. Declare filter and validator rules</p>
+<p>. Create the filter and validator processor</p>
+<p>. Provide input data</p>
+<p>. Retrieve validated fields and other reports</p>
+<p>The following sections describe the steps for using this class.</p>
+<div class="section" id="declaring-filter-and-validator-rules">
+<span id="zend-filter-input-declaring"></span><h2>Declaring Filter and Validator Rules<a class="headerlink" href="#declaring-filter-and-validator-rules" title="Permalink to this headline">¶</a></h2>
+<p>Before creating an instance of <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt>, declare an array of filter rules and an array of validator
+rules. This associative array maps a rule name to a filter or validator or a chain of filters or validators.</p>
+<p>The following example filter rule set that declares the field &#8216;month&#8217; is filtered by <tt class="docutils literal"><span class="pre">Zend_Filter_Digits</span></tt>, and
+the field &#8216;account&#8217; is filtered by <tt class="docutils literal"><span class="pre">Zend_Filter_StringTrim</span></tt>. Then a validation rule set declares that the field
+&#8216;account&#8217; is valid only if it contains only alphabetical characters.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filters</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;Digits&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;account&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;StringTrim&#39;</span>
+<span class="p">);</span>
+
+<span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;account&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Alpha&#39;</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Each key in the <tt class="docutils literal"><span class="pre">$filters</span></tt> array above is the name of a rule for applying a filter to a specific data field. By
+default, the name of the rule is also the name of the input data field to which to apply the rule.</p>
+<p>You can declare a rule in several formats:</p>
+<ul>
+<li><p class="first">A single string scalar, which is mapped to a class name.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;Digits&#39;</span><span class="p">,</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first">An object instance of one of the classes that implement <tt class="docutils literal"><span class="pre">Zend_Filter_Interface</span></tt> or <tt class="docutils literal"><span class="pre">Zend_Validate_Interface</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$digits</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Validate_Digits</span><span class="p">();</span>
+
+<span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span>   <span class="o">=&gt;</span> <span class="nv">$digits</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first">An array, to declare a chain of filters or validators. The elements of this array can be strings mapping to class
+names or filter/validator objects, as in the cases described above. In addition, you can use a third choice: an
+array containing a string mapping to the class name followed by arguments to pass to its constructor.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span>   <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;Digits&#39;</span><span class="p">,</span>                <span class="c1">// string</span>
+        <span class="k">new</span> <span class="nx">Zend_Validate_Int</span><span class="p">(),</span> <span class="c1">// object instance</span>
+        <span class="k">array</span><span class="p">(</span><span class="s1">&#39;Between&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>  <span class="c1">// string with constructor arguments</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you declare a filter or validator with constructor arguments in an array, then you must make an array for the
+rule, even if the rule has only one filter or validator.</p>
+</div>
+<p>You can use a special &#8220;wildcard&#8221; rule key <strong>&#8216;*&#8217;</strong> in either the filters array or the validators array. This means
+that the filters or validators declared in this rule will be applied to all input data fields. Note that the order
+of entries in the filters array or validators array is significant; the rules are applied in the same order in
+which you declare them.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filters</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;*&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;StringTrim&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;month&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Digits&#39;</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="creating-the-filter-and-validator-processor">
+<span id="zend-filter-input-running"></span><h2>Creating the Filter and Validator Processor<a class="headerlink" href="#creating-the-filter-and-validator-processor" title="Permalink to this headline">¶</a></h2>
+<p>After declaring the filters and validators arrays, use them as arguments in the constructor of
+<tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt>. This returns an object that knows all your filtering and validating rules, and you can use
+this object to process one or more sets of input data.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can specify input data as the third constructor argument. The data structure is an associative array. The keys
+are field names, and the values are data values. The standard <tt class="docutils literal"><span class="pre">$_GET</span></tt> and <tt class="docutils literal"><span class="pre">$_POST</span></tt> superglobal variables in
+<em>PHP</em> are examples of this format. You can use either of these variables as input data for <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$data</span> <span class="o">=</span> <span class="nv">$_GET</span><span class="p">;</span>
+
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">,</span> <span class="nv">$data</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Alternatively, use the <tt class="docutils literal"><span class="pre">setData()</span></tt> method, passing an associative array of key/value pairs the same format as
+described above.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">);</span>
+<span class="nv">$input</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$newData</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">setData()</span></tt> method redefines data in an existing <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt> object without changing the filtering
+and validation rules. Using this method, you can run the same rules against different sets of input data.</p>
+</div>
+<div class="section" id="retrieving-validated-fields-and-other-reports">
+<span id="zend-filter-input-results"></span><h2>Retrieving Validated Fields and other Reports<a class="headerlink" href="#retrieving-validated-fields-and-other-reports" title="Permalink to this headline">¶</a></h2>
+<p>After you have declared filters and validators and created the input processor, you can retrieve reports of
+missing, unknown, and invalid fields. You also can get the values of fields after filters have been applied.</p>
+<div class="section" id="querying-if-the-input-is-valid">
+<span id="zend-filter-input-results-isvalid"></span><h3>Querying if the input is valid<a class="headerlink" href="#querying-if-the-input-is-valid" title="Permalink to this headline">¶</a></h3>
+<p>If all input data pass the validation rules, the <tt class="docutils literal"><span class="pre">isValid()</span></tt> method returns <tt class="docutils literal"><span class="pre">TRUE</span></tt>. If any field is invalid or
+any required field is missing, <tt class="docutils literal"><span class="pre">isValid()</span></tt> returns <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="nv">$input</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+  <span class="k">echo</span> <span class="s2">&quot;OK</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This method accepts an optional string argument, naming an individual field. If the specified field passed
+validation and is ready for fetching, <tt class="docutils literal"><span class="pre">isValid('fieldName')</span></tt> returns <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="nv">$input</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">))</span> <span class="p">{</span>
+  <span class="k">echo</span> <span class="s2">&quot;Field &#39;month&#39; is OK</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="getting-invalid-missing-or-unknown-fields">
+<span id="zend-filter-input-results-reports"></span><h3>Getting Invalid, Missing, or Unknown Fields<a class="headerlink" href="#getting-invalid-missing-or-unknown-fields" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>Invalid</strong> fields are those that don&#8217;t pass one or more of their validation checks.</li>
+<li><strong>Missing</strong> fields are those that are not present in the input data, but were declared with the metacommand
+<tt class="docutils literal"><span class="pre">'presence'=&gt;'required'</span></tt> (see the <a class="reference internal" href="#zend-filter-input-metacommands-presence"><em>later section</em></a> on
+metacommands).</li>
+<li><strong>Unknown</strong> fields are those that are not declared in any rule in the array of validators, but appear in the
+input data.</li>
+</ul>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="nv">$input</span><span class="o">-&gt;</span><span class="na">hasInvalid</span><span class="p">()</span> <span class="o">||</span> <span class="nv">$input</span><span class="o">-&gt;</span><span class="na">hasMissing</span><span class="p">())</span> <span class="p">{</span>
+  <span class="nv">$messages</span> <span class="o">=</span> <span class="nv">$input</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="c1">// getMessages() simply returns the merge of getInvalid() and</span>
+<span class="c1">// getMissing()</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$input</span><span class="o">-&gt;</span><span class="na">hasInvalid</span><span class="p">())</span> <span class="p">{</span>
+  <span class="nv">$invalidFields</span> <span class="o">=</span> <span class="nv">$input</span><span class="o">-&gt;</span><span class="na">getInvalid</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$input</span><span class="o">-&gt;</span><span class="na">hasMissing</span><span class="p">())</span> <span class="p">{</span>
+  <span class="nv">$missingFields</span> <span class="o">=</span> <span class="nv">$input</span><span class="o">-&gt;</span><span class="na">getMissing</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$input</span><span class="o">-&gt;</span><span class="na">hasUnknown</span><span class="p">())</span> <span class="p">{</span>
+  <span class="nv">$unknownFields</span> <span class="o">=</span> <span class="nv">$input</span><span class="o">-&gt;</span><span class="na">getUnknown</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The results of the <tt class="docutils literal"><span class="pre">getMessages()</span></tt> method is an associative array, mapping a rule name to an array of error
+messages related to that rule. Note that the index of this array is the rule name used in the rule declaration,
+which may be different from the names of fields checked by the rule.</p>
+<p>The <tt class="docutils literal"><span class="pre">getMessages()</span></tt> method returns the merge of the arrays returned by the <tt class="docutils literal"><span class="pre">getInvalid()</span></tt> and <tt class="docutils literal"><span class="pre">getMissing()</span></tt>.
+These methods return subsets of the messages, related to validation failures, or fields that were declared as
+required but missing from the input.</p>
+<p>The <tt class="docutils literal"><span class="pre">getErrors()</span></tt> method returns an associative array, mapping a rule name to an array of error identifiers.
+Error identifiers are fixed strings, to identify the reason for a validation failure, while messages can be
+customized. See <a class="reference internal" href="zend.validator.html#zend-validator-introduction-using"><em>this section</em></a> for more information.</p>
+<p>You can specify the message returned by <tt class="docutils literal"><span class="pre">getMissing()</span></tt> using the &#8216;missingMessage&#8217; option, as an argument to the
+<tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt> constructor or using the <tt class="docutils literal"><span class="pre">setOptions()</span></tt> method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;missingMessage&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;Field &#39;%field%&#39; is required&quot;</span>
+<span class="p">);</span>
+
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+
+<span class="c1">// alternative method:</span>
+
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">,</span> <span class="nv">$data</span><span class="p">);</span>
+<span class="nv">$input</span><span class="o">-&gt;</span><span class="na">setOptions</span><span class="p">(</span><span class="nv">$options</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>And you can also add a translator which gives you the ability to provide multiple languages for the messages which
+are returned by <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$translate</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Translator_Adapter_Array</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;content&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="nx">Zend_Filter_Input</span><span class="o">::</span><span class="na">MISSING_MESSAGE</span> <span class="o">=&gt;</span> <span class="s2">&quot;Where is the field?&quot;</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">,</span> <span class="nv">$data</span><span class="p">);</span>
+<span class="nv">$input</span><span class="o">-&gt;</span><span class="na">setTranslator</span><span class="p">(</span><span class="nv">$translate</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>When you are using an application wide translator, then it will also be used by <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt>. In this case
+you will not have to set the translator manually.</p>
+<p>The results of the <tt class="docutils literal"><span class="pre">getUnknown()</span></tt> method is an associative array, mapping field names to field values. Field
+names are used as the array keys in this case, instead of rule names, because no rule mentions the fields
+considered to be unknown fields.</p>
+</div>
+<div class="section" id="getting-valid-fields">
+<span id="zend-filter-input-results-escaping"></span><h3>Getting Valid Fields<a class="headerlink" href="#getting-valid-fields" title="Permalink to this headline">¶</a></h3>
+<p>All fields that are neither invalid, missing, nor unknown are considered valid. You can get values for valid fields
+using a magic accessor. There are also non-magic accessor methods <tt class="docutils literal"><span class="pre">getEscaped()</span></tt> and <tt class="docutils literal"><span class="pre">getUnescaped()</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$m</span> <span class="o">=</span> <span class="nv">$input</span><span class="o">-&gt;</span><span class="na">month</span><span class="p">;</span>                 <span class="c1">// escaped output from magic accessor</span>
+<span class="nv">$m</span> <span class="o">=</span> <span class="nv">$input</span><span class="o">-&gt;</span><span class="na">getEscaped</span><span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">);</span>   <span class="c1">// escaped output</span>
+<span class="nv">$m</span> <span class="o">=</span> <span class="nv">$input</span><span class="o">-&gt;</span><span class="na">getUnescaped</span><span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">);</span> <span class="c1">// not escaped</span>
+</pre></div>
+</td></tr></table></div>
+<p>By default, when retrieving a value, it is filtered with the <tt class="docutils literal"><span class="pre">Zend_Filter_HtmlEntities</span></tt>. This is the default
+because it is considered the most common usage to output the value of a field in <em>HTML</em>. The HtmlEntities filter
+helps prevent unintentional output of code, which can result in security problems.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">As shown above, you can retrieve the unescaped value using the <tt class="docutils literal"><span class="pre">getUnescaped()</span></tt> method, but you must write
+code to use the value safely, and avoid security issues such as vulnerability to cross-site scripting attacks.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p><strong>Escaping unvalidated fields</strong></p>
+<p>As mentioned before <tt class="docutils literal"><span class="pre">getEscaped()</span></tt> returns only validated fields. Fields which do not have an associated
+validator can not be received this way. Still, there is a possible way. You can add a empty validator for all
+fields.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;*&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">());</span>
+
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="last">But be warned that using this notation introduces a security leak which could be used for cross-site scripting
+attacks. Therefor you should always set individual validators for each field.</p>
+</div>
+<p>You can specify a different filter for escaping values, by specifying it in the constructor options array:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;escapeFilter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;StringTrim&#39;</span><span class="p">);</span>
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Alternatively, you can use the <tt class="docutils literal"><span class="pre">setDefaultEscapeFilter()</span></tt> method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">,</span> <span class="nv">$data</span><span class="p">);</span>
+<span class="nv">$input</span><span class="o">-&gt;</span><span class="na">setDefaultEscapeFilter</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend_Filter_StringTrim</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>In either usage, you can specify the escape filter as a string base name of the filter class, or as an object
+instance of a filter class. The escape filter can be an instance of a filter chain, an object of the class
+<tt class="docutils literal"><span class="pre">Zend_Filter</span></tt>.</p>
+<p>Filters to escape output should be run in this way, to make sure they run after validation. Other filters you
+declare in the array of filter rules are applied to input data before data are validated. If escaping filters were
+run before validation, the process of validation would be more complex, and it would be harder to provide both
+escaped and unescaped versions of the data. So it is recommended to declare filters to escape output using
+<tt class="docutils literal"><span class="pre">setDefaultEscapeFilter()</span></tt>, not in the <tt class="docutils literal"><span class="pre">$filters</span></tt> array.</p>
+<p>There is only one method <tt class="docutils literal"><span class="pre">getEscaped()</span></tt>, and therefore you can specify only one filter for escaping (although
+this filter can be a filter chain). If you need a single instance of <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt> to return escaped output
+using more than one filtering method, you should extend <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt> and implement new methods in your
+subclass to get values in different ways.</p>
+</div>
+</div>
+<div class="section" id="using-metacommands-to-control-filter-or-validator-rules">
+<span id="zend-filter-input-metacommands"></span><h2>Using Metacommands to Control Filter or Validator Rules<a class="headerlink" href="#using-metacommands-to-control-filter-or-validator-rules" title="Permalink to this headline">¶</a></h2>
+<p>In addition to declaring the mapping from fields to filters or validators, you can specify some &#8220;metacommands&#8221; in
+the array declarations, to control some optional behavior of <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt>. Metacommands appear as
+string-indexed entries in a given filter or validator array value.</p>
+<div class="section" id="the-fields-metacommand">
+<span id="zend-filter-input-metacommands-fields"></span><h3>The FIELDS metacommand<a class="headerlink" href="#the-fields-metacommand" title="Permalink to this headline">¶</a></h3>
+<p>If the rule name for a filter or validator is different than the field to which it should apply, you can specify
+the field name with the &#8216;fields&#8217; metacommand.</p>
+<p>You can specify this metacommand using the class constant <tt class="docutils literal"><span class="pre">Zend_Filter_Input::FIELDS</span></tt> instead of the string.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filters</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;Digits&#39;</span><span class="p">,</span>        <span class="c1">// filter name at integer index [0]</span>
+        <span class="s1">&#39;fields&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;mo&#39;</span> <span class="c1">// field name at string index [&#39;fields&#39;]</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>In the example above, the filter rule applies the &#8216;digits&#8217; filter to the input field named &#8216;mo&#8217;. The string &#8216;month&#8217;
+simply becomes a mnemonic key for this filtering rule; it is not used as the field name if the field is specified
+with the &#8216;fields&#8217; metacommand, but it is used as the rule name.</p>
+<p>The default value of the &#8216;fields&#8217; metacommand is the index of the current rule. In the example above, if the
+&#8216;fields&#8217; metacommand is not specified, the rule would apply to the input field named &#8216;month&#8217;.</p>
+<p>Another use of the &#8216;fields&#8217; metacommand is to specify fields for filters or validators that require multiple fields
+as input. If the &#8216;fields&#8217; metacommand is an array, the argument to the corresponding filter or validator is an
+array of the values of those fields. For example, it is common for users to specify a password string in two
+fields, and they must type the same string in both fields. Suppose you implement a validator class that takes an
+array argument, and returns <tt class="docutils literal"><span class="pre">TRUE</span></tt> if all the values in the array are equal to each other.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;StringEquals&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;fields&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;password1&#39;</span><span class="p">,</span> <span class="s1">&#39;password2&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+<span class="c1">// Invokes hypothetical class Zend_Validate_StringEquals,</span>
+<span class="c1">// passing an array argument containing the values of the two input</span>
+<span class="c1">// data fields named &#39;password1&#39; and &#39;password2&#39;.</span>
+</pre></div>
+</td></tr></table></div>
+<p>If the validation of this rule fails, the rule key (&#8216;password&#8217;) is used in the return value of <tt class="docutils literal"><span class="pre">getInvalid()</span></tt>,
+not any of the fields named in the &#8216;fields&#8217; metacommand.</p>
+</div>
+<div class="section" id="the-presence-metacommand">
+<span id="zend-filter-input-metacommands-presence"></span><h3>The PRESENCE metacommand<a class="headerlink" href="#the-presence-metacommand" title="Permalink to this headline">¶</a></h3>
+<p>Each entry in the validator array may have a metacommand called &#8216;presence&#8217;. If the value of this metacommand is
+&#8216;required&#8217; then the field must exist in the input data, or else it is reported as a missing field.</p>
+<p>You can specify this metacommand using the class constant <tt class="docutils literal"><span class="pre">Zend_Filter_Input::PRESENCE</span></tt> instead of the string.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;digits&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;presence&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;required&#39;</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The default value of this metacommand is &#8216;optional&#8217;.</p>
+</div>
+<div class="section" id="the-default-value-metacommand">
+<span id="zend-filter-input-metacommands-default"></span><h3>The DEFAULT_VALUE metacommand<a class="headerlink" href="#the-default-value-metacommand" title="Permalink to this headline">¶</a></h3>
+<p>If a field is not present in the input data, and you specify a value for the &#8216;default&#8217; metacommand for that rule,
+the field takes the value of the metacommand.</p>
+<p>You can specify this metacommand using the class constant <tt class="docutils literal"><span class="pre">Zend_Filter_Input::DEFAULT_VALUE</span></tt> instead of the
+string.</p>
+<p>This default value is assigned to the field before any of the validators are invoked. The default value is applied
+to the field only for the current rule; if the same field is referenced in a subsequent rule, the field has no
+value when evaluating that rule. Thus different rules can declare different default values for a given field.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;digits&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;default&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;1&#39;</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// no value for &#39;month&#39; field</span>
+<span class="nv">$data</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">,</span> <span class="nv">$data</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$input</span><span class="o">-&gt;</span><span class="na">month</span><span class="p">;</span> <span class="c1">// echoes 1</span>
+</pre></div>
+</td></tr></table></div>
+<p>If your rule uses the <tt class="docutils literal"><span class="pre">FIELDS</span></tt> metacommand to define an array of multiple fields, you can define an array for the
+<tt class="docutils literal"><span class="pre">DEFAULT_VALUE</span></tt> metacommand and the defaults of corresponding keys are used for any missing fields. If <tt class="docutils literal"><span class="pre">FIELDS</span></tt>
+defines multiple fields but <tt class="docutils literal"><span class="pre">DEFAULT_VALUE</span></tt> is a scalar, then that default value is used as the value for any
+missing fields in the array.</p>
+<p>There is no default value for this metacommand.</p>
+</div>
+<div class="section" id="the-allow-empty-metacommand">
+<span id="zend-filter-input-metacommands-allow-empty"></span><h3>The ALLOW_EMPTY metacommand<a class="headerlink" href="#the-allow-empty-metacommand" title="Permalink to this headline">¶</a></h3>
+<p>By default, if a field exists in the input data, then validators are applied to it, even if the value of the field
+is an empty string (<strong>&#8216;&#8217;</strong>). This is likely to result in a failure to validate. For example, if the validator
+checks for digit characters, and there are none because a zero-length string has no characters, then the validator
+reports the data as invalid.</p>
+<p>If in your case an empty string should be considered valid, you can set the metacommand &#8216;allowEmpty&#8217; to <tt class="docutils literal"><span class="pre">TRUE</span></tt>.
+Then the input data passes validation if it is present in the input data, but has the value of an empty string.</p>
+<p>You can specify this metacommand using the class constant <tt class="docutils literal"><span class="pre">Zend_Filter_Input::ALLOW_EMPTY</span></tt> instead of the string.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;address2&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;Alnum&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;allowEmpty&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The default value of this metacommand is <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+<p>In the uncommon case that you declare a validation rule with no validators, but the &#8216;allowEmpty&#8217; metacommand is
+<tt class="docutils literal"><span class="pre">FALSE</span></tt> (that is, the field is considered invalid if it is empty), <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt> returns a default error
+message that you can retrieve with <tt class="docutils literal"><span class="pre">getMessages()</span></tt>. You can specify this message using the &#8216;notEmptyMessage&#8217;
+option, as an argument to the <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt> constructor or using the <tt class="docutils literal"><span class="pre">setOptions()</span></tt> method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;notEmptyMessage&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;A non-empty value is required for field &#39;%field%&#39;&quot;</span>
+<span class="p">);</span>
+
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+
+<span class="c1">// alternative method:</span>
+
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">,</span> <span class="nv">$data</span><span class="p">);</span>
+<span class="nv">$input</span><span class="o">-&gt;</span><span class="na">setOptions</span><span class="p">(</span><span class="nv">$options</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="the-break-chain-metacommand">
+<span id="zend-filter-input-metacommands-break-chain"></span><h3>The BREAK_CHAIN metacommand<a class="headerlink" href="#the-break-chain-metacommand" title="Permalink to this headline">¶</a></h3>
+<p>By default if a rule has more than one validator, all validators are applied to the input, and the resulting
+messages contain all error messages caused by the input.</p>
+<p>Alternatively, if the value of the &#8216;breakChainOnFailure&#8217; metacommand is <tt class="docutils literal"><span class="pre">TRUE</span></tt>, the validator chain terminates
+after the first validator fails. The input data is not checked against subsequent validators in the chain, so it
+might cause more violations even if you correct the one reported.</p>
+<p>You can specify this metacommand using the class constant <tt class="docutils literal"><span class="pre">Zend_Filter_Input::BREAK_CHAIN</span></tt> instead of the string.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;Digits&#39;</span><span class="p">,</span>
+        <span class="k">new</span> <span class="nx">Zend_Validate_Between</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">12</span><span class="p">),</span>
+        <span class="k">new</span> <span class="nx">Zend_Validate_GreaterThan</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+        <span class="s1">&#39;breakChainOnFailure&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The default value of this metacommand is <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+<p>The validator chain class, <tt class="docutils literal"><span class="pre">Zend_Validate</span></tt>, is more flexible with respect to breaking chain execution than
+<tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt>. With the former class, you can set the option to break the chain on failure independently
+for each validator in the chain. With the latter class, the defined value of the &#8216;breakChainOnFailure&#8217; metacommand
+for a rule applies uniformly for all validators in the rule. If you require the more flexible usage, you should
+create the validator chain yourself, and use it as an object in the validator rule definition:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create validator chain with non-uniform breakChainOnFailure</span>
+<span class="c1">// attributes</span>
+<span class="nv">$chain</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Validate</span><span class="p">();</span>
+<span class="nv">$chain</span><span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend_Validate_Digits</span><span class="p">(),</span> <span class="k">true</span><span class="p">);</span>
+<span class="nv">$chain</span><span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend_Validate_Between</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">12</span><span class="p">),</span> <span class="k">false</span><span class="p">);</span>
+<span class="nv">$chain</span><span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend_Validate_GreaterThan</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="k">true</span><span class="p">);</span>
+
+<span class="c1">// Declare validator rule using the chain defined above</span>
+<span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span> <span class="o">=&gt;</span> <span class="nv">$chain</span>
+<span class="p">);</span>
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="the-messages-metacommand">
+<span id="zend-filter-input-metacommands-messages"></span><h3>The MESSAGES metacommand<a class="headerlink" href="#the-messages-metacommand" title="Permalink to this headline">¶</a></h3>
+<p>You can specify error messages for each validator in a rule using the metacommand &#8216;messages&#8217;. The value of this
+metacommand varies based on whether you have multiple validators in the rule, or if you want to set the message for
+a specific error condition in a given validator.</p>
+<p>You can specify this metacommand using the class constant <tt class="docutils literal"><span class="pre">Zend_Filter_Input::MESSAGES</span></tt> instead of the string.</p>
+<p>Below is a simple example of setting the default error message for a single validator.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;digits&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;messages&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;A month must consist only of digits&#39;</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you have multiple validators for which you want to set the error message, you should use an array for the value
+of the &#8216;messages&#8217; metacommand.</p>
+<p>Each element of this array is applied to the validator at the same index position. You can specify a message for
+the validator at position <strong>n</strong> by using the value <strong>n</strong> as the array index. Thus you can allow some validators to
+use their default message, while setting the message for a subsequent validator in the chain.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;digits&#39;</span><span class="p">,</span>
+        <span class="k">new</span> <span class="nx">Zend_Validate_Between</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+        <span class="s1">&#39;messages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="c1">// use default message for validator [0]</span>
+            <span class="c1">// set new message for validator [1]</span>
+            <span class="mi">1</span> <span class="o">=&gt;</span> <span class="s1">&#39;A month value must be between 1 and 12&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If one of your validators has multiple error messages, they are identified by a message key. There are different
+keys in each validator class, serving as identifiers for error messages that the respective validator class might
+generate. Each validate class defines constants for its message keys. You can use these keys in the &#8216;messages&#8217;
+metacommand by passing an associative array instead of a string.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;digits&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">Zend_Validate_Between</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+        <span class="s1">&#39;messages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;A month must consist only of digits&#39;</span><span class="p">,</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="nx">Zend_Validate_Between</span><span class="o">::</span><span class="na">NOT_BETWEEN</span> <span class="o">=&gt;</span>
+                    <span class="s1">&#39;Month value %value% must be between &#39;</span> <span class="o">.</span>
+                    <span class="s1">&#39;%min% and %max%&#39;</span><span class="p">,</span>
+                <span class="nx">Zend_Validate_Between</span><span class="o">::</span><span class="na">NOT_BETWEEN_STRICT</span> <span class="o">=&gt;</span>
+                    <span class="s1">&#39;Month value %value% must be strictly between &#39;</span> <span class="o">.</span>
+                    <span class="s1">&#39;%min% and %max%&#39;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>You should refer to documentation for each validator class to know if it has multiple error messages, the keys of
+these messages, and the tokens you can use in the message templates.</p>
+<p>If you have only one validator in validation rule or all used validators has the same messages set, then they can
+be referenced without additional array construction:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="k">new</span> <span class="nx">Zend_Validate_Between</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+        <span class="s1">&#39;messages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                        <span class="nx">Zend_Validate_Between</span><span class="o">::</span><span class="na">NOT_BETWEEN</span> <span class="o">=&gt;</span>
+                            <span class="s1">&#39;Month value %value% must be between &#39;</span> <span class="o">.</span>
+                            <span class="s1">&#39;%min% and %max%&#39;</span><span class="p">,</span>
+                        <span class="nx">Zend_Validate_Between</span><span class="o">::</span><span class="na">NOT_BETWEEN_STRICT</span> <span class="o">=&gt;</span>
+                            <span class="s1">&#39;Month value %value% must be strictly between &#39;</span> <span class="o">.</span>
+                            <span class="s1">&#39;%min% and %max%&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="using-options-to-set-metacommands-for-all-rules">
+<span id="zend-filter-input-metacommands-global"></span><h3>Using options to set metacommands for all rules<a class="headerlink" href="#using-options-to-set-metacommands-for-all-rules" title="Permalink to this headline">¶</a></h3>
+<p>The default value for &#8216;allowEmpty&#8217;, &#8216;breakChainOnFailure&#8217;, and &#8216;presence&#8217; metacommands can be set for all rules
+using the <tt class="docutils literal"><span class="pre">$options</span></tt> argument to the constructor of <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt>. This allows you to set the default
+value for all rules, without requiring you to set the metacommand for every rule.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// The default is set so all fields allow an empty string.</span>
+<span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;allowEmpty&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">);</span>
+
+<span class="c1">// You can override this in a rule definition,</span>
+<span class="c1">// if a field should not accept an empty string.</span>
+<span class="nv">$validators</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;month&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;Digits&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;allowEmpty&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The &#8216;fields&#8217;, &#8216;messages&#8217;, and &#8216;default&#8217; metacommands cannot be set using this technique.</p>
+</div>
+</div>
+<div class="section" id="adding-filter-class-namespaces">
+<span id="zend-filter-input-namespaces"></span><h2>Adding Filter Class Namespaces<a class="headerlink" href="#adding-filter-class-namespaces" title="Permalink to this headline">¶</a></h2>
+<p>By default, when you declare a filter or validator as a string, <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt> searches for the
+corresponding classes under the <tt class="docutils literal"><span class="pre">Zend_Filter</span></tt> or <tt class="docutils literal"><span class="pre">Zend_Validate</span></tt> namespaces. For example, a filter named by the
+string &#8216;digits&#8217; is found in the class <tt class="docutils literal"><span class="pre">Zend_Filter_Digits</span></tt>.</p>
+<p>If you write your own filter or validator classes, or use filters or validators provided by a third-party, the
+classes may exist in different namespaces than <tt class="docutils literal"><span class="pre">Zend_Filter</span></tt> or <tt class="docutils literal"><span class="pre">Zend_Validate</span></tt>. You can tell
+<tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt> to search more namespaces. You can specify namespaces in the constructor options:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;filterNamespace&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;My_Namespace_Filter&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;validatorNamespace&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;My_Namespace_Validate&#39;</span><span class="p">);</span>
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Filter_Input</span><span class="p">(</span><span class="nv">$filters</span><span class="p">,</span> <span class="nv">$validators</span><span class="p">,</span> <span class="nv">$data</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Alternatively, you can use the <tt class="docutils literal"><span class="pre">addValidatorPrefixPath($prefix,</span> <span class="pre">$path)</span></tt> or <tt class="docutils literal"><span class="pre">addFilterPrefixPath($prefix,</span>
+<span class="pre">$path)</span></tt> methods, which directly proxy to the plugin loader that is used by <tt class="docutils literal"><span class="pre">Zend_Filter_Input</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$input</span><span class="o">-&gt;</span><span class="na">addValidatorPrefixPath</span><span class="p">(</span><span class="s1">&#39;Other_Namespace&#39;</span><span class="p">,</span> <span class="s1">&#39;Other/Namespace&#39;</span><span class="p">);</span>
+<span class="nv">$input</span><span class="o">-&gt;</span><span class="na">addFilterPrefixPath</span><span class="p">(</span><span class="s1">&#39;Foo_Namespace&#39;</span><span class="p">,</span> <span class="s1">&#39;Foo/Namespace&#39;</span><span class="p">);</span>
+
+<span class="c1">// Now the search order for validators is:</span>
+<span class="c1">// 1. My_Namespace_Validate</span>
+<span class="c1">// 2. Other_Namespace</span>
+<span class="c1">// 3. Zend_Validate</span>
+
+<span class="c1">// The search order for filters is:</span>
+<span class="c1">// 1. My_Namespace_Filter</span>
+<span class="c1">// 2. Foo_Namespace</span>
+<span class="c1">// 3. Zend_Filter</span>
+</pre></div>
+</td></tr></table></div>
+<p>You cannot remove <tt class="docutils literal"><span class="pre">Zend_Filter</span></tt> and <tt class="docutils literal"><span class="pre">Zend_Validate</span></tt> as namespaces, you only can add namespaces. User-defined
+namespaces are searched first, Zend namespaces are searched last.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">As of version 1.5 the function <tt class="docutils literal"><span class="pre">addNamespace($namespace)</span></tt> was deprecated and exchanged with the plugin loader
+and the <tt class="docutils literal"><span class="pre">addFilterPrefixPath()</span></tt> and <tt class="docutils literal"><span class="pre">addValidatorPrefixPath()</span></tt> were added. Also the constant
+<tt class="docutils literal"><span class="pre">Zend_Filter_Input::INPUT_NAMESPACE</span></tt> is now deprecated. The constants
+<tt class="docutils literal"><span class="pre">Zend_Filter_Input::VALIDATOR_NAMESPACE</span></tt> and <tt class="docutils literal"><span class="pre">Zend_Filter_Input::FILTER_NAMESPACE</span></tt> are available in releases
+after 1.7.0.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">As of version 1.0.4, <tt class="docutils literal"><span class="pre">Zend_Filter_Input::NAMESPACE</span></tt>, having value <tt class="docutils literal"><span class="pre">namespace</span></tt>, was changed to
+<tt class="docutils literal"><span class="pre">Zend_Filter_Input::INPUT_NAMESPACE</span></tt>, having value <tt class="docutils literal"><span class="pre">inputNamespace</span></tt>, in order to comply with the <em>PHP</em> 5.3
+reservation of the keyword <tt class="docutils literal"><span class="pre">namespace</span></tt>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend_Filter_Input</a><ul>
+<li><a class="reference internal" href="#declaring-filter-and-validator-rules">Declaring Filter and Validator Rules</a></li>
+<li><a class="reference internal" href="#creating-the-filter-and-validator-processor">Creating the Filter and Validator Processor</a></li>
+<li><a class="reference internal" href="#retrieving-validated-fields-and-other-reports">Retrieving Validated Fields and other Reports</a><ul>
+<li><a class="reference internal" href="#querying-if-the-input-is-valid">Querying if the input is valid</a></li>
+<li><a class="reference internal" href="#getting-invalid-missing-or-unknown-fields">Getting Invalid, Missing, or Unknown Fields</a></li>
+<li><a class="reference internal" href="#getting-valid-fields">Getting Valid Fields</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-metacommands-to-control-filter-or-validator-rules">Using Metacommands to Control Filter or Validator Rules</a><ul>
+<li><a class="reference internal" href="#the-fields-metacommand">The FIELDS metacommand</a></li>
+<li><a class="reference internal" href="#the-presence-metacommand">The PRESENCE metacommand</a></li>
+<li><a class="reference internal" href="#the-default-value-metacommand">The DEFAULT_VALUE metacommand</a></li>
+<li><a class="reference internal" href="#the-allow-empty-metacommand">The ALLOW_EMPTY metacommand</a></li>
+<li><a class="reference internal" href="#the-break-chain-metacommand">The BREAK_CHAIN metacommand</a></li>
+<li><a class="reference internal" href="#the-messages-metacommand">The MESSAGES metacommand</a></li>
+<li><a class="reference internal" href="#using-options-to-set-metacommands-for-all-rules">Using options to set metacommands for all rules</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adding-filter-class-namespaces">Adding Filter Class Namespaces</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.filter.input.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.filter.input.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.filter.input.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.filter.input.rst">
+                Zend_Filter_Input
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

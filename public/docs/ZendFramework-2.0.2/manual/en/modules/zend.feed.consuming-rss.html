@@ -1,0 +1,287 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Consuming an RSS Feed &mdash; Zend Framework 2 2.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.2 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="consuming-an-rss-feed">
+<span id="zend-feed-consuming-rss"></span><h1>Consuming an RSS Feed<a class="headerlink" href="#consuming-an-rss-feed" title="Permalink to this headline">¶</a></h1>
+<p>Reading an <em>RSS</em> feed is as simple as instantiating a <tt class="docutils literal"><span class="pre">Zend_Feed_Rss</span></tt> object with the <em>URL</em> of the feed:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$channel</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Feed_Rss</span><span class="p">(</span><span class="s1">&#39;http://rss.example.com/channelName&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If any errors occur fetching the feed, a <tt class="docutils literal"><span class="pre">Zend_Feed_Exception</span></tt> will be thrown.</p>
+<p>Once you have a feed object, you can access any of the standard <em>RSS</em>&#8220;channel&#8221; properties directly on the object:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">echo</span> <span class="nv">$channel</span><span class="o">-&gt;</span><span class="na">title</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note the function syntax. <tt class="docutils literal"><span class="pre">Zend_Feed</span></tt> uses a convention of treating properties as <em>XML</em> object if they are
+requested with variable &#8220;getter&#8221; syntax (<tt class="docutils literal"><span class="pre">$obj-&gt;property</span></tt>) and as strings if they are access with method syntax
+(<tt class="docutils literal"><span class="pre">$obj-&gt;property()</span></tt>). This enables access to the full text of any individual node while still allowing full
+access to all children.</p>
+<p>If channel properties have attributes, they are accessible using <em>PHP</em>&#8216;s array syntax:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">echo</span> <span class="nv">$channel</span><span class="o">-&gt;</span><span class="na">category</span><span class="p">[</span><span class="s1">&#39;domain&#39;</span><span class="p">];</span>
+</pre></div>
+</td></tr></table></div>
+<p>Since <em>XML</em> attributes cannot have children, method syntax is not necessary for accessing attribute values.</p>
+<p>Most commonly you&#8217;ll want to loop through the feed and do something with its entries. <tt class="docutils literal"><span class="pre">Zend_Feed_Abstract</span></tt>
+implements <em>PHP</em>&#8216;s <tt class="docutils literal"><span class="pre">Iterator</span></tt> interface, so printing all titles of articles in a channel is just a matter of:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">foreach</span> <span class="p">(</span><span class="nv">$channel</span> <span class="k">as</span> <span class="nv">$item</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$item</span><span class="o">-&gt;</span><span class="na">title</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you are not familiar with <em>RSS</em>, here are the standard elements you can expect to be available in an <em>RSS</em>
+channel and in individual <em>RSS</em> items (entries).</p>
+<p>Required channel elements:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">title</span></tt>- The name of the channel</li>
+<li><tt class="docutils literal"><span class="pre">link</span></tt>- The <em>URL</em> of the web site corresponding to the channel</li>
+<li><tt class="docutils literal"><span class="pre">description</span></tt>- A sentence or several describing the channel</li>
+</ul>
+<p>Common optional channel elements:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">pubDate</span></tt>- The publication date of this set of content, in <em>RFC</em> 822 date format</li>
+<li><tt class="docutils literal"><span class="pre">language</span></tt>- The language the channel is written in</li>
+<li><tt class="docutils literal"><span class="pre">category</span></tt>- One or more (specified by multiple tags) categories the channel belongs to</li>
+</ul>
+<p><em>RSS</em> <strong>&lt;item&gt;</strong> elements do not have any strictly required elements. However, either <tt class="docutils literal"><span class="pre">title</span></tt> or <tt class="docutils literal"><span class="pre">description</span></tt>
+must be present.</p>
+<p>Common item elements:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">title</span></tt>- The title of the item</li>
+<li><tt class="docutils literal"><span class="pre">link</span></tt>- The <em>URL</em> of the item</li>
+<li><tt class="docutils literal"><span class="pre">description</span></tt>- A synopsis of the item</li>
+<li><tt class="docutils literal"><span class="pre">author</span></tt>- The author&#8217;s email address</li>
+<li><tt class="docutils literal"><span class="pre">category</span></tt>- One more categories that the item belongs to</li>
+<li><tt class="docutils literal"><span class="pre">comments</span></tt>-<em>URL</em> of comments relating to this item</li>
+<li><tt class="docutils literal"><span class="pre">pubDate</span></tt>- The date the item was published, in <em>RFC</em> 822 date format</li>
+</ul>
+<p>In your code you can always test to see if an element is non-empty with:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="nv">$item</span><span class="o">-&gt;</span><span class="na">propname</span><span class="p">())</span> <span class="p">{</span>
+    <span class="c1">// ... proceed.</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you use <tt class="docutils literal"><span class="pre">$item-&gt;propname</span></tt> instead, you will always get an empty object which will evaluate to <tt class="docutils literal"><span class="pre">TRUE</span></tt>, so
+your check will fail.</p>
+<p>For further information, the official <em>RSS</em> 2.0 specification is available at:
+<a class="reference external" href="http://blogs.law.harvard.edu/tech/rss">http://blogs.law.harvard.edu/tech/rss</a></p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.feed.consuming-rss.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.feed.consuming-rss.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.feed.consuming-rss.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.feed.consuming-rss.rst">
+                Consuming an RSS Feed
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

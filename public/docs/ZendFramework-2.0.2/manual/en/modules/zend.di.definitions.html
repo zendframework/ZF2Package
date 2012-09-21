@@ -1,0 +1,395 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Di Definition &mdash; Zend Framework 2 2.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.2 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Di InstanceManager" href="zend.di.instance-manager.html" />
+    <link rel="prev" title="Zend\Di Quickstart" href="zend.di.quick-start.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.di.instance-manager.html" title="Zend\Di InstanceManager"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.di.quick-start.html" title="Zend\Di Quickstart"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-di-definition">
+<span id="id1"></span><h1>Zend\Di Definition<a class="headerlink" href="#zend-di-definition" title="Permalink to this headline">¶</a></h1>
+<p>Definitions are the place where Zend\Di attempts to understand the structure of the code it is attempting to wire.
+This means that if you&#8217;ve written non-ambiguous, clear and concise code; Zend\Di has a very good chance of
+understanding how to wire things up without much added complexity.</p>
+<div class="section" id="definitionlist">
+<span id="zend-di-definition-definitionlist"></span><h2>DefinitionList<a class="headerlink" href="#definitionlist" title="Permalink to this headline">¶</a></h2>
+<p>Definitions are introduced to the Zend\Di\Di object through a definition list implemented as
+Zend\Di\DefinitionList (SplDoublyLinkedList). Order is important. Definitions in the front of the list will be
+consulted on a class before definitions at the end of the list.</p>
+<p>Note: Regardless of what kind of Definition strategy you decide to use, it is important that your autoloaders are
+already setup and ready to use.</p>
+</div>
+<div class="section" id="runtimedefinition">
+<span id="zend-di-definition-runtimedefinition"></span><h2>RuntimeDefinition<a class="headerlink" href="#runtimedefinition" title="Permalink to this headline">¶</a></h2>
+<p>The default DefinitionList instantiated by Zend\Di\Di, when no other DefinitionList is provided, has as
+Definition\RuntimeDefinition baked-in. The RuntimeDefinition will respond to query&#8217;s about classes by using
+Reflection. This Runtime definitions uses any available information inside methods: their signature, the names of
+parameters, the type-hints of the parameters, and the default values to determine if something is optional or
+required when making a call to that method. The more explicit you can be in your method naming and method
+signatures, the easier of a time Zend\Di\Definition\RuntimeDefinition will have determining the structure of
+your code.</p>
+<p>This is what the constructor of a RuntimeDefinition looks like:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">IntrospectionStrategy</span> <span class="nv">$introspectionStrategy</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$explicitClasses</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">introspectionStrategy</span> <span class="o">=</span> <span class="p">(</span><span class="nv">$introspectionStrategy</span><span class="p">)</span> <span class="o">?:</span> <span class="k">new</span> <span class="nx">IntrospectionStrategy</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$explicitClasses</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setExplicitClasses</span><span class="p">(</span><span class="nv">$explicitClasses</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The IntrospectionStrategy object is an object that determines the rules, or guidelines, for how the
+RuntimeDefinition will introspect information about your classes. Here are the things it knows how to do:</p>
+<ul class="simple">
+<li>Whether or not to use Annotations (Annotations are expensive and off by default, read more about these in the
+Annotations section)</li>
+<li>Which method names to include in the introspection, by default, the pattern /^set[A-Z]{1}\w*/ is registered by
+default, this is a list of patterns.</li>
+<li>Which interface names represent the interface injection pattern. By default, the pattern /\w*Aware\w*/ is
+registered, this is a list of patterns.</li>
+</ul>
+<p>The constructor for the IntrospectionStrategy looks like this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">AnnotationManager</span> <span class="nv">$annotationManager</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">annotationManager</span> <span class="o">=</span> <span class="p">(</span><span class="nv">$annotationManager</span><span class="p">)</span> <span class="o">?:</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createDefaultAnnotationManager</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This goes to say that an AnnotationManager is not required, but if you wish to create a special AnnotationManager
+with your own annotations, and also wish to extend the RuntimeDefinition to look for these special Annotations,
+this is the place to do it.</p>
+<p>The RuntimeDefinition also can be used to look up either all classes (implicitly, which is default), or explicitly
+look up for particular pre-defined classes. This is useful when your strategy for inspecting one set of classes
+might differ from those of another strategy for another set of classes. This can be achieved by using the
+setExplictClasses() method or by passing a list of classes as a second argument to the constructor of the
+RuntimeDefinition.</p>
+</div>
+<div class="section" id="compilerdefinition">
+<span id="zend-di-definition-compilerdefinition"></span><h2>CompilerDefinition<a class="headerlink" href="#compilerdefinition" title="Permalink to this headline">¶</a></h2>
+<p>The CompilerDefinition is very much similar in nature to the RuntimeDefinition with the exception that it can be
+seeded with more information for the purposes of &#8220;compiling&#8221; a definition. This is useful when you do not want to
+be making all those (sometimes expensive) calls to reflection and the annotation scanning system during the request
+of your application. By using the compiler, a definition can be created and written to disk to be used during a
+request, as opposed to the task of scanning the actual code.</p>
+<p>For example, let&#8217;s assume we want to create a script that will create definitions for some of our library code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// in &quot;package name&quot; format</span>
+<span class="nv">$components</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;My_MovieApp&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;My_OtherClasses&#39;</span><span class="p">,</span>
+<span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$components</span> <span class="k">as</span> <span class="nv">$component</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$diCompiler</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Di\Definition\CompilerDefinition</span><span class="p">;</span>
+    <span class="nv">$diCompiler</span><span class="o">-&gt;</span><span class="na">addDirectory</span><span class="p">(</span><span class="s1">&#39;/path/to/classes/&#39;</span> <span class="o">.</span> <span class="nb">str_replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="nv">$component</span><span class="p">));</span>
+
+    <span class="nv">$diCompiler</span><span class="o">-&gt;</span><span class="na">compile</span><span class="p">();</span>
+    <span class="nb">file_put_contents</span><span class="p">(</span>
+        <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../data/di/&#39;</span> <span class="o">.</span> <span class="nv">$component</span> <span class="o">.</span> <span class="s1">&#39;-definition.php&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;&lt;?php return &#39;</span> <span class="o">.</span> <span class="nb">var_export</span><span class="p">(</span><span class="nv">$diCompiler</span><span class="o">-&gt;</span><span class="na">toArrayDefinition</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">(),</span> <span class="k">true</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;;&#39;</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a couple of files that will return an array of the definition for that class. To utilize this in
+an application, the following code will suffice:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">protected</span> <span class="k">function</span> <span class="nf">setupDi</span><span class="p">(</span><span class="nx">Application</span> <span class="nv">$app</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nv">$definitionList</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DefinitionList</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+        <span class="k">new</span> <span class="nx">Definition\ArrayDefinition</span><span class="p">(</span><span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/path/to/data/di/My_MovieApp-definition.php&#39;</span><span class="p">),</span>
+        <span class="k">new</span> <span class="nx">Definition\ArrayDefinition</span><span class="p">(</span><span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/path/to/data/di/My_OtherClasses-definition.php&#39;</span><span class="p">),</span>
+        <span class="nv">$runtime</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Definition\RuntimeDefinition</span><span class="p">(),</span>
+    <span class="p">));</span>
+    <span class="nv">$di</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Di</span><span class="p">(</span><span class="nv">$definitionList</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="k">new</span> <span class="nx">Configuration</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">config</span><span class="o">-&gt;</span><span class="na">di</span><span class="p">));</span>
+    <span class="nv">$di</span><span class="o">-&gt;</span><span class="na">instanceManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">addTypePreference</span><span class="p">(</span><span class="s1">&#39;Zend\Di\LocatorInterface&#39;</span><span class="p">,</span> <span class="nv">$di</span><span class="p">);</span>
+    <span class="nv">$app</span><span class="o">-&gt;</span><span class="na">setLocator</span><span class="p">(</span><span class="nv">$di</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above code would more than likely go inside your application&#8217;s or module&#8217;s bootstrap file. This represents the
+simplest and most performant way of configuring your DiC for usage.</p>
+</div>
+<div class="section" id="classdefinition">
+<span id="zend-di-definition-classdefinition"></span><h2>ClassDefinition<a class="headerlink" href="#classdefinition" title="Permalink to this headline">¶</a></h2>
+<p>The idea behind using a ClassDefinition is two-fold. First, you may want to override some information inside of a
+RuntimeDefinition. Secondly, you might want to simply define your complete class&#8217;s definition with an xml, ini, or
+php file describing the structure. This class definition can be fed in via Configuration or by directly
+instantiating and registering the Definition with the DefinitionList.</p>
+<p>Todo - example</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Di Definition</a><ul>
+<li><a class="reference internal" href="#definitionlist">DefinitionList</a></li>
+<li><a class="reference internal" href="#runtimedefinition">RuntimeDefinition</a></li>
+<li><a class="reference internal" href="#compilerdefinition">CompilerDefinition</a></li>
+<li><a class="reference internal" href="#classdefinition">ClassDefinition</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.di.quick-start.html"
+                        title="previous chapter">Zend\Di Quickstart</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.di.instance-manager.html"
+                        title="next chapter">Zend\Di InstanceManager</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.di.definitions.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.di.definitions.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.di.definitions.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.di.instance-manager.html" title="Zend\Di InstanceManager"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.di.quick-start.html" title="Zend\Di Quickstart"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.di.definitions.rst">
+                Zend\Di Definition
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,301 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Validator Chains &mdash; Zend Framework 2 2.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.2 documentation" href="../index.html" />
+    <link rel="next" title="Writing Validators" href="zend.validator.writing-validators.html" />
+    <link rel="prev" title="Standard Validation Classes" href="zend.validator.set.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.validator.writing-validators.html" title="Writing Validators"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.validator.set.html" title="Standard Validation Classes"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="validator-chains">
+<span id="zend-validator-validator-chains"></span><h1>Validator Chains<a class="headerlink" href="#validator-chains" title="Permalink to this headline">¶</a></h1>
+<p>Often multiple validations should be applied to some value in a particular order. The following code demonstrates a
+way to solve the example from the <a class="reference internal" href="zend.validator.html#zend-validator-introduction"><em>introduction</em></a>, where a username must be
+between 6 and 12 alphanumeric characters:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create a validator chain and add validators to it</span>
+<span class="nv">$validatorChain</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\ValidatorChain</span><span class="p">();</span>
+<span class="nv">$validatorChain</span><span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span>
+                    <span class="k">new</span> <span class="nx">Zend\Validator\StringLength</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;min&#39;</span> <span class="o">=&gt;</span> <span class="mi">6</span><span class="p">,</span>
+                                                         <span class="s1">&#39;max&#39;</span> <span class="o">=&gt;</span> <span class="mi">12</span><span class="p">)))</span>
+               <span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Validator\Alnum</span><span class="p">());</span>
+
+<span class="c1">// Validate the username</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$validatorChain</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="nv">$username</span><span class="p">))</span> <span class="p">{</span>
+    <span class="c1">// username passed validation</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// username failed validation; print reasons</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$validatorChain</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="si">$message</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Validators are run in the order they were added to <tt class="docutils literal"><span class="pre">Zend\Validator\ValidatorChain</span></tt>. In the above example, the
+username is first checked to ensure that its length is between 6 and 12 characters, and then it is checked to
+ensure that it contains only alphanumeric characters. The second validation, for alphanumeric characters, is
+performed regardless of whether the first validation, for length between 6 and 12 characters, succeeds. This means
+that if both validations fail, <tt class="docutils literal"><span class="pre">getMessages()</span></tt> will return failure messages from both validators.</p>
+<p>In some cases it makes sense to have a validator break the chain if its validation process fails.
+<tt class="docutils literal"><span class="pre">Zend\Validator\ValidatorChain</span></tt> supports such use cases with the second parameter to the <tt class="docutils literal"><span class="pre">addValidator()</span></tt>
+method. By setting <tt class="docutils literal"><span class="pre">$breakChainOnFailure</span></tt> to <tt class="docutils literal"><span class="pre">TRUE</span></tt>, the added validator will break the chain execution upon
+failure, which avoids running any other validations that are determined to be unnecessary or inappropriate for the
+situation. If the above example were written as follows, then the alphanumeric validation would not occur if the
+string length validation fails:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validatorChain</span><span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span>
+                    <span class="k">new</span> <span class="nx">Zend\Validator\StringLength</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;min&#39;</span> <span class="o">=&gt;</span> <span class="mi">6</span><span class="p">,</span>
+                                                         <span class="s1">&#39;max&#39;</span> <span class="o">=&gt;</span> <span class="mi">12</span><span class="p">)),</span>
+                    <span class="k">true</span><span class="p">)</span>
+               <span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Validator\Alnum</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>Any object that implements <tt class="docutils literal"><span class="pre">Zend\Validator\ValidatorInterface</span></tt> may be used in a validator chain.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.validator.set.html"
+                        title="previous chapter">Standard Validation Classes</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.validator.writing-validators.html"
+                        title="next chapter">Writing Validators</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.validator.validator-chains.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.validator.validator-chains.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.validator.validator-chains.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.validator.writing-validators.html" title="Writing Validators"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.validator.set.html" title="Standard Validation Classes"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.validator.validator-chains.rst">
+                Validator Chains
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

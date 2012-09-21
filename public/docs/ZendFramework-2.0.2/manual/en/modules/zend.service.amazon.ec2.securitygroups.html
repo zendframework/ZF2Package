@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend_Service_Amazon_Ec2: Security Groups &mdash; Zend Framework 2 2.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.2 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-service-amazon-ec2-security-groups">
+<span id="zend-service-amazon-ec2-securitygroups"></span><h1>Zend_Service_Amazon_Ec2: Security Groups<a class="headerlink" href="#zend-service-amazon-ec2-security-groups" title="Permalink to this headline">¶</a></h1>
+<p>A security group is a named collection of access rules. These access rules specify which ingress (i.e., incoming)
+network traffic should be delivered to your instance. All other ingress traffic will be discarded.</p>
+<p>You can modify rules for a group at any time. The new rules are automatically enforced for all running instances
+and instances launched in the future.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Maximum Security Groups</strong></p>
+<p class="last">You can create up to 100 security groups.</p>
+</div>
+<div class="section" id="security-group-maintenance">
+<span id="zend-service-amazon-ec2-securitygroups-maintenance"></span><h2>Security Group Maintenance<a class="headerlink" href="#security-group-maintenance" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zend-service-amazon-ec2-securitygroups-maintenance-create">Create a new Security Group</p>
+<p><em>create</em> a new security group. Every instance is launched in a security group. If no security group is specified
+during launch, the instances are launched in the default security group. Instances within the same security group
+have unrestricted network access to each other. Instances will reject network access attempts from other instances
+in a different security group.</p>
+<p><em>create</em> returns boolean <tt class="docutils literal"><span class="pre">TRUE</span></tt> or <tt class="docutils literal"><span class="pre">FALSE</span></tt></p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_sg</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Ec2_Securitygroups</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_sg</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="s1">&#39;mygroup&#39;</span><span class="p">,</span> <span class="s1">&#39;my group description&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-service-amazon-ec2-securitygroups-maintenance-describe">Describe a Security Group</p>
+<p><em>describe</em> returns information about security groups that you own.</p>
+<p>If you specify security group names, information about those security groups is returned. Otherwise, information
+for all security groups is returned. If you specify a group that does not exist, a fault is returned.</p>
+<p><em>describe</em> will return an array containing information about security groups which includes the ownerId, groupName,
+groupDescription and an array containing all the rules for that security group.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_sg</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Ec2_Securitygroups</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_sg</span><span class="o">-&gt;</span><span class="na">describe</span><span class="p">(</span><span class="s1">&#39;mygroup&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-service-amazon-ec2-securitygroups-maintenance-delete">Delete a Security Group</p>
+<p><em>delete</em> will remove the security group. If you attempt to delete a security group that contains instances, a fault
+is returned. If you attempt to delete a security group that is referenced by another security group, a fault is
+returned. For example, if security group B has a rule that allows access from security group A, security group A
+cannot be deleted until the allow rule is removed.</p>
+<p><em>delete</em> returns boolean <tt class="docutils literal"><span class="pre">TRUE</span></tt> or <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_sg</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Ec2_Securitygroups</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_sg</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">(</span><span class="s1">&#39;mygroup&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="authorizing-access">
+<span id="zend-service-amazon-ec2-securitygroups-authorize"></span><h2>Authorizing Access<a class="headerlink" href="#authorizing-access" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zend-service-amazon-ec2-securitygroups-authorize-ip">Authorizing by IP</p>
+<p><em>authorizeIp</em> Adds permissions to a security group based on an IP address, protocol type and port range.</p>
+<p>Permissions are specified by the IP protocol (TCP, UDP or ICMP), the source of the request (by IP range or an
+Amazon EC2 user-group pair), the source and destination port ranges (for <em>TCP</em> and UDP), and the ICMP codes and
+types (for ICMP). When authorizing ICMP, -1 can be used as a wildcard in the type and code fields.</p>
+<p>Permission changes are propagated to instances within the security group as quickly as possible. However, depending
+on the number of instances, a small delay might occur.</p>
+<p><em>authorizeIp</em> returns boolean <tt class="docutils literal"><span class="pre">TRUE</span></tt> or <tt class="docutils literal"><span class="pre">FALSE</span></tt></p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_sg</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Ec2_Securitygroups</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_sg</span><span class="o">-&gt;</span><span class="na">authorizeIp</span><span class="p">(</span><span class="s1">&#39;mygroup&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;protocol&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;fromPort&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;toPort&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;ipRange&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-service-amazon-ec2-securitygroups-authorize-group">Authorize By Group</p>
+<p><em>authorizeGroup</em> Adds permissions to a security group.</p>
+<p>Permission changes are propagated to instances within the security group as quickly as possible. However, depending
+on the number of instances, a small delay might occur.</p>
+<p><em>authorizeGroup</em> returns boolean <tt class="docutils literal"><span class="pre">TRUE</span></tt> or <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_sg</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Ec2_Securitygroups</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_sg</span><span class="o">-&gt;</span><span class="na">authorizeGroup</span><span class="p">(</span><span class="s1">&#39;mygroup&#39;</span><span class="p">,</span> <span class="s1">&#39;securityGroupName&#39;</span><span class="p">,</span> <span class="s1">&#39;ownerId&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="revoking-access">
+<span id="zend-service-amazon-ec2-securitygroups-revoke"></span><h2>Revoking Access<a class="headerlink" href="#revoking-access" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zend-service-amazon-ec2-securitygroups-revoke-ip">Revoke by IP</p>
+<p><em>revokeIp</em> Revokes permissions to a security group based on an IP address, protocol type and port range. The
+permissions used to revoke must be specified using the same values used to grant the permissions.</p>
+<p>Permissions are specified by the IP protocol (TCP, UDP or ICMP), the source of the request (by IP range or an
+Amazon EC2 user-group pair), the source and destination port ranges (for <em>TCP</em> and UDP), and the ICMP codes and
+types (for ICMP). When authorizing ICMP, -1 can be used as a wildcard in the type and code fields.</p>
+<p>Permission changes are propagated to instances within the security group as quickly as possible. However, depending
+on the number of instances, a small delay might occur.</p>
+<p><em>revokeIp</em> returns boolean <tt class="docutils literal"><span class="pre">TRUE</span></tt> or <tt class="docutils literal"><span class="pre">FALSE</span></tt></p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_sg</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Ec2_Securitygroups</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_sg</span><span class="o">-&gt;</span><span class="na">revokeIp</span><span class="p">(</span><span class="s1">&#39;mygroup&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;protocol&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;fromPort&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;toPort&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;ipRange&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-service-amazon-ec2-securitygroups-revoke-group">Revoke By Group</p>
+<p><em>revokeGroup</em> Adds permissions to a security group. The permissions to revoke must be specified using the same
+values used to grant the permissions.</p>
+<p>Permission changes are propagated to instances within the security group as quickly as possible. However, depending
+on the number of instances, a small delay might occur.</p>
+<p><em>revokeGroup</em> returns boolean <tt class="docutils literal"><span class="pre">TRUE</span></tt> or <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_sg</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_Amazon_Ec2_Securitygroups</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_sg</span><span class="o">-&gt;</span><span class="na">revokeGroup</span><span class="p">(</span><span class="s1">&#39;mygroup&#39;</span><span class="p">,</span> <span class="s1">&#39;securityGroupName&#39;</span><span class="p">,</span> <span class="s1">&#39;ownerId&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend_Service_Amazon_Ec2: Security Groups</a><ul>
+<li><a class="reference internal" href="#security-group-maintenance">Security Group Maintenance</a></li>
+<li><a class="reference internal" href="#authorizing-access">Authorizing Access</a></li>
+<li><a class="reference internal" href="#revoking-access">Revoking Access</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.service.amazon.ec2.securitygroups.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.service.amazon.ec2.securitygroups.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.service.amazon.ec2.securitygroups.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.service.amazon.ec2.securitygroups.rst">
+                Zend_Service_Amazon_Ec2: Security Groups
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

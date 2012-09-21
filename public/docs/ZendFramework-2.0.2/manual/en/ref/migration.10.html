@@ -1,0 +1,354 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend Framework 1.0 &mdash; Zend Framework 2 2.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.2 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-framework-1-0">
+<span id="migration-10"></span><h1>Zend Framework 1.0<a class="headerlink" href="#zend-framework-1-0" title="Permalink to this headline">¶</a></h1>
+<p>When upgrading from a previous release to Zend Framework 1.0 or higher you should note the following migration
+notes.</p>
+<div class="section" id="zend-controller">
+<span id="migration-10-zend-controller"></span><h2>Zend_Controller<a class="headerlink" href="#zend-controller" title="Permalink to this headline">¶</a></h2>
+<p>The principal changes introduced in 1.0.0RC1 are the introduction of and default enabling of the <em class="xref std std-ref">ErrorHandler</em> plugin and the <em class="xref std std-ref">ViewRenderer</em> action helper. Please read the documentation to each thoroughly to
+see how they work and what effect they may have on your applications.</p>
+<p>The <tt class="docutils literal"><span class="pre">ErrorHandler</span></tt> plugin runs during <tt class="docutils literal"><span class="pre">postDispatch()</span></tt> checking for exceptions, and forwarding to a specified
+error handler controller. You should include such a controller in your application. You may disable it by setting
+the front controller parameter <tt class="docutils literal"><span class="pre">noErrorHandler</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$front</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;noErrorHandler&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">ViewRenderer</span></tt> action helper automates view injection into action controllers as well as autorendering of
+view scripts based on the current action. The primary issue you may encounter is if you have actions that do not
+render view scripts and neither forward or redirect, as the <tt class="docutils literal"><span class="pre">ViewRenderer</span></tt> will attempt to render a view script
+based on the action name.</p>
+<p>There are several strategies you can take to update your code. In the short term, you can globally disable the
+<tt class="docutils literal"><span class="pre">ViewRenderer</span></tt> in your front controller bootstrap prior to dispatching:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Assuming $front is an instance of Zend_Controller_Front</span>
+<span class="nv">$front</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;noViewRenderer&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>However, this is not a good long term strategy, as it means most likely you&#8217;ll be writing more code.</p>
+<p>When you&#8217;re ready to start using the <tt class="docutils literal"><span class="pre">ViewRenderer</span></tt> functionality, there are several things to look for in your
+controller code. First, look at your action methods (the methods ending in &#8216;Action&#8217;), and determine what each is
+doing. If none of the following is happening, you&#8217;ll need to make changes:</p>
+<ul class="simple">
+<li>Calls to <tt class="docutils literal"><span class="pre">$this-&gt;render();</span></tt></li>
+<li>Calls to <tt class="docutils literal"><span class="pre">$this-&gt;_forward();</span></tt></li>
+<li>Calls to <tt class="docutils literal"><span class="pre">$this-&gt;_redirect();</span></tt></li>
+<li>Calls to the <tt class="docutils literal"><span class="pre">Redirector</span></tt> action helper</li>
+</ul>
+<p>The easiest change is to disable auto-rendering for that method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_helper</span><span class="o">-&gt;</span><span class="na">viewRenderer</span><span class="o">-&gt;</span><span class="na">setNoRender</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you find that none of your action methods are rendering, forwarding, or redirecting, you will likely want to put
+the above line in your <tt class="docutils literal"><span class="pre">preDispatch()</span></tt> or <tt class="docutils literal"><span class="pre">init()</span></tt> methods:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">preDispatch</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// disable view script autorendering</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_helper</span><span class="o">-&gt;</span><span class="na">viewRenderer</span><span class="o">-&gt;</span><span class="na">setNoRender</span><span class="p">()</span>
+    <span class="c1">// .. do other things...</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you are calling <tt class="docutils literal"><span class="pre">render()</span></tt>, and you&#8217;re using <em class="xref std std-ref">the Conventional Modular directory structure</em>, you&#8217;ll want to change your code to make use of autorendering:</p>
+<ul class="simple">
+<li>If you&#8217;re rendering multiple view scripts in a single action, you don&#8217;t need to change a thing.</li>
+<li>If you&#8217;re simply calling <tt class="docutils literal"><span class="pre">render()</span></tt> with no arguments, you can remove such lines.</li>
+<li>If you&#8217;re calling <tt class="docutils literal"><span class="pre">render()</span></tt> with arguments, and not doing any processing afterwards or rendering multiple view
+scripts, you can change these calls to read <tt class="docutils literal"><span class="pre">$this-&gt;_helper-&gt;viewRenderer();</span></tt>.</li>
+</ul>
+<p>If you&#8217;re not using the conventional modular directory structure, there are a variety of methods for setting the
+view base path and script path specifications so that you can make use of the <tt class="docutils literal"><span class="pre">ViewRenderer</span></tt>. Please read the
+<em class="xref std std-ref">ViewRenderer documentation</em> for information on these methods.</p>
+<p>If you&#8217;re using a view object from the registry, or customizing your view object, or using a different view
+implementation, you&#8217;ll want to inject the <tt class="docutils literal"><span class="pre">ViewRenderer</span></tt> with this object. This can be done easily at any time.</p>
+<ul>
+<li><p class="first">Prior to dispatching a front controller instance:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Assuming $view has already been defined</span>
+<span class="nv">$viewRenderer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Controller_Action_Helper_ViewRenderer</span><span class="p">(</span><span class="nv">$view</span><span class="p">);</span>
+<span class="nx">Zend_Controller_Action_HelperBroker</span><span class="o">::</span><span class="na">addHelper</span><span class="p">(</span><span class="nv">$viewRenderer</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first">Any time during the bootstrap process:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$viewRenderer</span> <span class="o">=</span>
+    <span class="nx">Zend_Controller_Action_HelperBroker</span><span class="o">::</span><span class="na">getStaticHelper</span><span class="p">(</span><span class="s1">&#39;viewRenderer&#39;</span><span class="p">);</span>
+<span class="nv">$viewRenderer</span><span class="o">-&gt;</span><span class="na">setView</span><span class="p">(</span><span class="nv">$view</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+<p>There are many ways to modify the <tt class="docutils literal"><span class="pre">ViewRenderer</span></tt>, including setting a different view script to render, specifying
+replacements for all replaceable elements of a view script path (including the suffix), choosing a response named
+segment to utilize, and more. If you aren&#8217;t using the conventional modular directory structure, you can even
+associate different path specifications with the <tt class="docutils literal"><span class="pre">ViewRenderer</span></tt>.</p>
+<p>We encourage you to adapt your code to use the <tt class="docutils literal"><span class="pre">ErrorHandler</span></tt> and <tt class="docutils literal"><span class="pre">ViewRenderer</span></tt> as they are now core
+functionality.</p>
+</div>
+<div class="section" id="zend-currency">
+<span id="migration-10-zend-currency"></span><h2>Zend_Currency<a class="headerlink" href="#zend-currency" title="Permalink to this headline">¶</a></h2>
+<p>Creating an object of <tt class="docutils literal"><span class="pre">Zend_Currency</span></tt> has become simpler. You no longer have to give a script or set it to
+<tt class="docutils literal"><span class="pre">NULL</span></tt>. The optional script parameter is now an option which can be set through the <tt class="docutils literal"><span class="pre">setFormat()</span></tt> method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$currency</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Currency</span><span class="p">(</span><span class="nv">$currency</span><span class="p">,</span> <span class="nv">$locale</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">setFormat()</span></tt> method takes now an array of options. These options are set permanently and override all
+previously set values. Also a new option &#8216;precision&#8217; has been added. The following options have been refactored:</p>
+<ul class="simple">
+<li><strong>position</strong>: Replacement for the old &#8216;rules&#8217; parameter.</li>
+<li><strong>script</strong>: Replacement for the old &#8216;script&#8217; parameter.</li>
+<li><strong>format</strong>: Replacement for the old &#8216;locale&#8217; parameter which does not set new currencies but only the number
+format.</li>
+<li><strong>display</strong>: Replacement for the old &#8216;rules&#8217; parameter.</li>
+<li><strong>precision</strong>: New parameter.</li>
+<li><strong>name</strong>: Replacement for the ole &#8216;rules&#8217; parameter. Sets the full currencies name.</li>
+<li><strong>currency</strong>: New parameter.</li>
+<li><strong>symbol</strong>: New parameter.</li>
+</ul>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$currency</span><span class="o">-&gt;</span><span class="na">setFormat</span><span class="p">(</span><span class="k">array</span> <span class="nv">$options</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">toCurrency()</span></tt> method no longer supports the optional &#8216;script&#8217; and &#8216;locale&#8217; parameters. Instead it takes an
+options array which can contain the same keys as for the <tt class="docutils literal"><span class="pre">setFormat()</span></tt> method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$currency</span><span class="o">-&gt;</span><span class="na">toCurrency</span><span class="p">(</span><span class="nv">$value</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$options</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The methods <tt class="docutils literal"><span class="pre">getSymbol()</span></tt>, <tt class="docutils literal"><span class="pre">getShortName()</span></tt>, <tt class="docutils literal"><span class="pre">getName()</span></tt>, <tt class="docutils literal"><span class="pre">getRegionList()</span></tt> and <tt class="docutils literal"><span class="pre">getCurrencyList()</span></tt> are
+no longer static and can be called from within the object. They return the set values of the object if no parameter
+has been set.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend Framework 1.0</a><ul>
+<li><a class="reference internal" href="#zend-controller">Zend_Controller</a></li>
+<li><a class="reference internal" href="#zend-currency">Zend_Currency</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/ref/migration.10.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/ref/migration.10.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/ref/migration.10.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/ref/migration.10.rst">
+                Zend Framework 1.0
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

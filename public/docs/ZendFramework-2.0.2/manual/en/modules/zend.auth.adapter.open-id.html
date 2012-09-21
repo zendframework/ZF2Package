@@ -1,0 +1,352 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Open ID Authentication &mdash; Zend Framework 2 2.0.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.2 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="open-id-authentication">
+<span id="zend-auth-adapter-openid"></span><h1>Open ID Authentication<a class="headerlink" href="#open-id-authentication" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-auth-adapter-openid-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend_Auth_Adapter_OpenId</span></tt> adapter can be used to authenticate users using remote OpenID servers. This
+authentication method assumes that the user submits only their OpenID identity to the web application. They are
+then redirected to their OpenID provider to prove identity ownership using a password or some other method. This
+password is never provided to the web application.</p>
+<p>The OpenID identity is just a <em>URI</em> that points to a web site with information about a user, along with special
+tags that describes which server to use and which identity to submit there. You can read more about OpenID at the
+<a class="reference external" href="http://www.openid.net/">OpenID official site</a>.</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend_Auth_Adapter_OpenId</span></tt> class wraps the <tt class="docutils literal"><span class="pre">Zend_OpenId_Consumer</span></tt> component, which implements the OpenID
+authentication protocol itself.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><tt class="docutils literal"><span class="pre">Zend_OpenId</span></tt> takes advantage of the <a class="reference external" href="http://php.net/gmp">GMP extension</a>, where available. Consider enabling the <em>GMP</em> extension
+for better performance when using <tt class="docutils literal"><span class="pre">Zend_Auth_Adapter_OpenId</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="specifics">
+<span id="zend-auth-adapter-openid-specifics"></span><h2>Specifics<a class="headerlink" href="#specifics" title="Permalink to this headline">¶</a></h2>
+<p>As is the case for all <tt class="docutils literal"><span class="pre">Zend_Auth</span></tt> adapters, the <tt class="docutils literal"><span class="pre">Zend_Auth_Adapter_OpenId</span></tt> class implements
+<tt class="docutils literal"><span class="pre">Zend_Auth_Adapter_Interface</span></tt>, which defines one method: <tt class="docutils literal"><span class="pre">authenticate()</span></tt>. This method performs the
+authentication itself, but the object must be prepared prior to calling it. Such adapter preparation includes
+setting up the OpenID identity and some other <tt class="docutils literal"><span class="pre">Zend_OpenId</span></tt> specific options.</p>
+<p>However, as opposed to other <tt class="docutils literal"><span class="pre">Zend_Auth</span></tt> adapters, <tt class="docutils literal"><span class="pre">Zend_Auth_Adapter_OpenId</span></tt> performs authentication on an
+external server in two separate <em>HTTP</em> requests. So the <tt class="docutils literal"><span class="pre">Zend_Auth_Adapter_OpenId::authenticate()</span></tt> method must be
+called twice. On the first invocation the method won&#8217;t return, but will redirect the user to their OpenID server.
+Then after the user is authenticated on the remote server, they will be redirected back and the script for this
+second request must call <tt class="docutils literal"><span class="pre">Zend_Auth_Adapter_OpenId::authenticate()</span></tt> again to verify the signature which comes
+with the redirected request from the server to complete the authentication process. On this second invocation, the
+method will return the <tt class="docutils literal"><span class="pre">Zend_Auth_Result</span></tt> object as expected.</p>
+<p>The following example shows the usage of <tt class="docutils literal"><span class="pre">Zend_Auth_Adapter_OpenId</span></tt>. As previously mentioned, the
+<tt class="docutils literal"><span class="pre">Zend_Auth_Adapter_OpenId::authenticate()</span></tt> must be called two times. The first time is after the user submits the
+<em>HTML</em> form with the <tt class="docutils literal"><span class="pre">$_POST['openid_action']</span></tt> set to <strong>&#8220;login&#8221;</strong>, and the second time is after the <em>HTTP</em>
+redirection from OpenID server with <tt class="docutils literal"><span class="pre">$_GET['openid_mode']</span></tt> or <tt class="docutils literal"><span class="pre">$_POST['openid_mode']</span></tt> set.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="nv">$status</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
+<span class="nv">$auth</span> <span class="o">=</span> <span class="nx">Zend_Auth</span><span class="o">::</span><span class="na">getInstance</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">((</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+     <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;login&quot;</span> <span class="o">&amp;&amp;</span>
+     <span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_identifier&#39;</span><span class="p">]))</span> <span class="o">||</span>
+    <span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_mode&#39;</span><span class="p">])</span> <span class="o">||</span>
+    <span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_mode&#39;</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$auth</span><span class="o">-&gt;</span><span class="na">authenticate</span><span class="p">(</span>
+        <span class="k">new</span> <span class="nx">Zend_Auth_Adapter_OpenId</span><span class="p">(</span><span class="o">@</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_identifier&#39;</span><span class="p">]));</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$result</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+        <span class="nv">$status</span> <span class="o">=</span> <span class="s2">&quot;You are logged in as &quot;</span>
+                <span class="o">.</span> <span class="nv">$auth</span><span class="o">-&gt;</span><span class="na">getIdentity</span><span class="p">()</span>
+                <span class="o">.</span> <span class="s2">&quot;&lt;br&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nv">$auth</span><span class="o">-&gt;</span><span class="na">clearIdentity</span><span class="p">();</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$result</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$status</span> <span class="o">.=</span> <span class="s2">&quot;</span><span class="si">$message</span><span class="s2">&lt;br&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$auth</span><span class="o">-&gt;</span><span class="na">hasIdentity</span><span class="p">())</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+        <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;logout&quot;</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$auth</span><span class="o">-&gt;</span><span class="na">clearIdentity</span><span class="p">();</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nv">$status</span> <span class="o">=</span> <span class="s2">&quot;You are logged in as &quot;</span>
+                <span class="o">.</span> <span class="nv">$auth</span><span class="o">-&gt;</span><span class="na">getIdentity</span><span class="p">()</span>
+                <span class="o">.</span> <span class="s2">&quot;&lt;br&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;html&gt;&lt;body&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$status</span><span class="p">);</span><span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;form method=&quot;post&quot;&gt;&lt;fieldset&gt;</span>
+<span class="x">&lt;legend&gt;OpenID Login&lt;/legend&gt;</span>
+<span class="x">&lt;input type=&quot;text&quot; name=&quot;openid_identifier&quot; value=&quot;&quot;&gt;</span>
+<span class="x">&lt;input type=&quot;submit&quot; name=&quot;openid_action&quot; value=&quot;login&quot;&gt;</span>
+<span class="x">&lt;input type=&quot;submit&quot; name=&quot;openid_action&quot; value=&quot;logout&quot;&gt;</span>
+<span class="x">&lt;/fieldset&gt;&lt;/form&gt;&lt;/body&gt;&lt;/html&gt;</span>
+<span class="x">*/</span>
+</pre></div>
+</td></tr></table></div>
+<p>You may customize the OpenID authentication process in several way. You can, for example, receive the redirect from
+the OpenID server on a separate page, specifying the &#8220;root&#8221; of web site and using a custom
+<tt class="docutils literal"><span class="pre">Zend_OpenId_Consumer_Storage</span></tt> or a custom <tt class="docutils literal"><span class="pre">Zend_Controller_Response</span></tt>. You may also use the Simple Registration
+Extension to retrieve information about user from the OpenID server. All of these possibilities are described in
+more detail in the <tt class="docutils literal"><span class="pre">Zend_OpenId_Consumer</span></tt> chapter.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Open ID Authentication</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#specifics">Specifics</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.auth.adapter.open-id.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.auth.adapter.open-id.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.auth.adapter.open-id.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.auth.adapter.open-id.rst">
+                Open ID Authentication
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
