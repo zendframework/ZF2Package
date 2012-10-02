@@ -187,6 +187,15 @@ foreach ($composers as $filename => $composer) {
         $zf2_metapackage[$composer['version']]['source']['reference'] .= $composer['version'];
         $zf2_metapackage[$composer['version']]['dist']['url'] = sprintf($zf2_metapackage[$composer['version']]['dist']['url'], $composer['version'], $composer['version']);
         $zf2_metapackage[$composer['version']]['dist']['reference'] .= $composer['version'];
+        $zf2_release_filename = sprintf(ROOT . '/public/releases/ZendFramework-%s/ZendFramework-%s.zip', $composer['version'], $composer['version']);
+        if (file_exists($zf2_release_filename)) {
+            $zf2_metapackage[$composer['version']]['dist']['shasum'] = sha1_file($zf2_release_filename);
+        } else {
+            $zf2_release_filename = sprintf(ROOT . '/packages/plain/ZendFramework-%s.zip', $composer['version']);
+            if (file_exists($zf2_release_filename)) {
+                $zf2_metapackage[$composer['version']]['dist']['shasum'] = sha1_file($zf2_release_filename);
+            }
+        }
     }
 }
 
