@@ -12,6 +12,13 @@ $worker->addFunction('process_composer', function (GearmanJob $job) {
     $sha        = $workload->sha;
     $repository = $workload->repository;
 
+    $logfile = tempnam('/tmp', 'composer-worker');
+    file_put_contents($logfile, json_encode(array(
+        'ref'        => $ref,
+        'sha'        => $sha,
+        'repository' => $repository,
+    ));
+
     // Make sure we recognize the repository
     if (!preg_match('#^https?://github.com/zendframework/zf2$#', $repository)) {
         $job->sendComplete('Unrecognized repository; finished');
