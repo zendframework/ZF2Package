@@ -3,6 +3,7 @@
 ini_set('memory_limit', -1);
 date_default_timezone_set('America/Los_Angeles');
 require_once '/var/www/website/vendor/autoload.php';
+$git = '/usr/local/git-1.7.10.2/bin/git';
 
 $worker = new GearmanWorker();
 $worker->addServer();
@@ -60,7 +61,7 @@ $worker->addFunction('process_composer', function (GearmanJob $job) {
     $output = '';
     $return = null;
     chdir('/var/www/packages.zendframework.com');
-    exec('/usr/local/bin/git add public/packages.json', $output, $return);
+    exec($git . ' add public/packages.json', $output, $return);
     if (0 !== $return) {
         fwrite($log, "Failed to add changes\n");
         fclose($log);
@@ -71,7 +72,7 @@ $worker->addFunction('process_composer', function (GearmanJob $job) {
     fwrite($log, "Committing changes\n");
     $output = '';
     $return = null;
-    exec('/usr/local/bin/git commit -m "Updated packages.json to $ref at $sha"', $output, $return);
+    exec($git . ' commit -m "Updated packages.json to $ref at $sha"', $output, $return);
     if (0 !== $return) {
         fwrite($log, "Failed to commit changes\n");
         fclose($log);
@@ -82,7 +83,7 @@ $worker->addFunction('process_composer', function (GearmanJob $job) {
     fwrite($log, "Pushing changes\n");
     $output = '';
     $return = null;
-    exec('/usr/local/bin/git push origin production:production', $output, $return);
+    exec($git . ' push origin production:production', $output, $return);
     if (0 !== $return) {
         fwrite($log, "Failed to push changes\n");
         fclose($log);
