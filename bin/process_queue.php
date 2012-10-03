@@ -46,7 +46,7 @@ $worker->addFunction('process_composer', function (GearmanJob $job) {
     $output = '';
     $return = null;
     chdir('/var/www/packages.zendframework.com');
-    exec('git add public/packages.json', $output, $return);
+    exec('/usr/local/bin/git add public/packages.json', $output, $return);
     if (0 !== $return) {
         $job->sendFail();
         return;
@@ -54,7 +54,7 @@ $worker->addFunction('process_composer', function (GearmanJob $job) {
 
     $output = '';
     $return = null;
-    exec('git commit -m "Updated packages.json to $ref at $sha"', $output, $return);
+    exec('/usr/local/bin/git commit -m "Updated packages.json to $ref at $sha"', $output, $return);
     if (0 !== $return) {
         $job->sendFail();
         return;
@@ -62,7 +62,7 @@ $worker->addFunction('process_composer', function (GearmanJob $job) {
 
     $output = '';
     $return = null;
-    exec('git push origin production:production', $output, $return);
+    exec('/usr/local/bin/git push origin production:production', $output, $return);
     if (0 !== $return) {
         $job->sendFail();
         return;
