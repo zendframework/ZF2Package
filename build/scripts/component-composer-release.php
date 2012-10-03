@@ -8,9 +8,16 @@ define('ROOT', realpath(__DIR__ . '/../../'));
 $default_data = [
     'type'         => 'library',
     'homepage'     => 'http://packages.zendframework.com/',
+    'license'      => 'BSD-3-Clause',
     'repositories' => [
         'type' => 'composer',
         'url'  => 'http://packages.zendframework.com/',
+    ],
+    'support'      => [
+        'email'    => 'fw-general-subscribe@lists.zend.com',
+        'irc'      => 'irc://irc.freenode.net/zftalk',
+        'issues'   => 'https://github.com/zendframework/zf2/issues',
+        'source'   => 'https://github.com/zendframework/zf2',
     ],
 ];
 
@@ -59,6 +66,13 @@ $zf2_metapackage_template = [
     'name'         => 'zendframework/zendframework',
     'description'  => 'Zend Framework 2',
     'type'         => 'library',
+    'license'      => 'BSD-3-Clause',
+    'support'      => [
+        'email'    => 'fw-general-subscribe@lists.zend.com',
+        'irc'      => 'irc://irc.freenode.net/zftalk',
+        'issues'   => 'https://github.com/zendframework/zf2/issues',
+        'source'   => 'https://github.com/zendframework/zf2',
+    ],
     'keywords'     => [
         'framework',
         'zf2',
