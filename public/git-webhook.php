@@ -38,7 +38,7 @@ file_put_contents($logfile, json_encode(array(
     'ref'        => $payload->ref,
     'sha'        => $payload->after,
     'repository' => $payload->repository->url
-));
+)));
 $gearman = new GearmanClient();
 $gearman->addServer();
 $job = $gearman->doBackground('process_composer', json_encode(array(
