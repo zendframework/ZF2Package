@@ -50,7 +50,7 @@ $worker->addFunction('process_composer', function (GearmanJob $job) {
     $packages   = file_get_contents('/var/www/packages.zendframework.com/public/packages.json');
     $packages   = json_decode($packages);
     $branchName = 'dev-' . $branch;
-    $packages->{'zendframework/zendframework'}->{$branchName}->source->reference = $sha;
+    $packages->packages->{'zendframework/zendframework'}->{$branchName}->source->reference = $sha;
     $packages   = Zend\Json\Json::encode($packages);
     $packages   = Zend\Json\Json::prettyPrint($packages, array('indent' => '    '));
     file_put_contents('/var/www/packages.zendframework.com/public/packages.json', $packages);
