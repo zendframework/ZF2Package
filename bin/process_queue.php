@@ -48,10 +48,12 @@ $worker->addFunction('process_composer', function (GearmanJob $job) use ($git) {
 
     // Update packages.json
     fwrite($log, "Preparing to update packages.json\n");
+    $date       = new DateTime();
     $packages   = file_get_contents('/var/www/packages.zendframework.com/public/packages.json');
     $packages   = json_decode($packages, true);
     $branchName = 'dev-' . $branch;
     $packages['packages']['zendframework/zendframework'][$branchName]['source']['reference'] = $sha;
+    $packages['packages']['zendframework/zendframework'][$branchName]['source']['time'] = $date->format('Y-m-d H:i:s');
     $packages   = Zend\Json\Json::encode($packages);
     $packages   = Zend\Json\Json::prettyPrint($packages, array('indent' => '    '));
     file_put_contents('/var/www/packages.zendframework.com/public/packages.json', $packages);
