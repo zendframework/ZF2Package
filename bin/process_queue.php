@@ -7,7 +7,7 @@ $git = '/usr/local/git-1.7.10.2/bin/git';
 
 $worker = new GearmanWorker();
 $worker->addServer();
-$worker->addFunction('process_composer', function (GearmanJob $job) {
+$worker->addFunction('process_composer', function (GearmanJob $job) use ($git) {
     $logfile = tempnam('/tmp', 'composer-worker');
     $log     = fopen($logfile, 'a');
     fwrite($log, "Received job\n");
@@ -49,9 +49,9 @@ $worker->addFunction('process_composer', function (GearmanJob $job) {
     // Update packages.json
     fwrite($log, "Preparing to update packages.json\n");
     $packages   = file_get_contents('/var/www/packages.zendframework.com/public/packages.json');
-    $packages   = json_decode($packages);
+    $packages   = json_decode($packages, true);
     $branchName = 'dev-' . $branch;
-    $packages->packages->{'zendframework/zendframework'}->{$branchName}->source->reference = $sha;
+    $packages['packages']['zendframework/zendframework'][$branchName]['source']['reference'] = $sha;
     $packages   = Zend\Json\Json::encode($packages);
     $packages   = Zend\Json\Json::prettyPrint($packages, array('indent' => '    '));
     file_put_contents('/var/www/packages.zendframework.com/public/packages.json', $packages);
