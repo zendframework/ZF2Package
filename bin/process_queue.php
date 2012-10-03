@@ -3,7 +3,7 @@
 ini_set('memory_limit', -1);
 date_default_timezone_set('UTC');
 require_once '/var/www/website/vendor/autoload.php';
-$git = '/usr/local/git-1.7.10.2/bin/git';
+$git = '/usr/local/bin/git';
 
 $worker = new GearmanWorker();
 $worker->addServer();
