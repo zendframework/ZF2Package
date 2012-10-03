@@ -27,11 +27,19 @@ $worker->addFunction('process_composer', function (GearmanJob $job) use ($git) {
     )) . "\n");
 
     // Make sure we recognize the repository
-    if (!preg_match('#^https?://github.com/zendframework/zf2$#', $repository)) {
-        fwrite($log, "Unrecognized repsitory\n");
+    if (!preg_match('#^https?://github.com/zendframework/(zf2|ZendSkeletonApplication)$#i', $repository, $matches)) {
+        fwrite($log, "Unrecognized repository\n");
         fclose($log);
         $job->sendComplete('Unrecognized repository; finished');
         return;
+    }
+    switch (strtolower($matches[1])) {
+        case 'zf2':
+            $package = 'zendframework/zendframework';
+            break;
+        case 'zendskeletonapplication':
+            $package = 'zendframework/skeleton-application';
+            break;
     }
 
     // Make sure we recognize the branch
@@ -52,8 +60,8 @@ $worker->addFunction('process_composer', function (GearmanJob $job) use ($git) {
     $packages   = file_get_contents('/var/www/packages.zendframework.com/public/packages.json');
     $packages   = json_decode($packages, true);
     $branchName = 'dev-' . $branch;
-    $packages['packages']['zendframework/zendframework'][$branchName]['source']['reference'] = $sha;
-    $packages['packages']['zendframework/zendframework'][$branchName]['source']['time'] = $date->format('Y-m-d H:i:s');
+    $packages['packages'][$package][$branchName]['source']['reference'] = $sha;
+    $packages['packages'][$package][$branchName]['source']['time'] = $date->format('Y-m-d H:i:s');
     $packages   = Zend\Json\Json::encode($packages);
     $packages   = Zend\Json\Json::prettyPrint($packages, array('indent' => '    '));
     file_put_contents('/var/www/packages.zendframework.com/public/packages.json', $packages);
