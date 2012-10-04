@@ -18,6 +18,8 @@ script_run_command('cp -R ' .  $package_source . '/* ' . ROOT . '/packages/manua
 
 chdir(ROOT . '/packages/manual/' . $package_name_full . '/docs');
 script_run_command('make html');
+script_run_command('make latexpdf');
+script_run_command('make epub');
 
 chdir(ROOT . '/packages/manual/' . $package_name_full . '/docs/_build/html/');
 script_run_command('zip -rq ' . ROOT . '/packages/manual/' . $package_name_full . '-manual-en.zip .');
@@ -26,5 +28,8 @@ chdir(ROOT . '/packages/manual/');
 script_run_command('tar -czf ' . ROOT . '/packages/manual/' . $package_name_full . '-manual-en.tgz '
     . '-C ' . ROOT . '/packages/manual/' . $package_name_full . '/docs/_build/html .'
 );
+
+script_run_command('cp ' . $package_name_full . '/docs/_build/latex/ZendFramework2.pdf ' . $package_name_full . '-manual-en.pdf');
+script_run_command('cp ' . $package_name_full . '/docs/_build/epub/ZendFramework2.epub ' . $package_name_full . '-manual-en.epub');
 
 script_run_command('rm -Rf ' . ROOT . '/packages/manual/' . $package_name_full . '/');
