@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction to the Module System &mdash; Zend Framework 2 2.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.3 documentation" href="../index.html" />
+    <link rel="next" title="The Module Manager" href="zend.module-manager.module-manager.html" />
+    <link rel="prev" title="Zend\Mime\Part" href="zend.mime.part.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.module-manager.module-manager.html" title="The Module Manager"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.mime.part.html" title="Zend\Mime\Part"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction-to-the-module-system">
+<span id="zend-module-manager-intro"></span><h1>Introduction to the Module System<a class="headerlink" href="#introduction-to-the-module-system" title="Permalink to this headline">¶</a></h1>
+<p>Zend Framework 2.0 introduces a new and powerful approach to modules. This new module system is designed with
+flexibility, simplicity, and re-usability in mind. A module may contain just about anything: PHP code, including
+MVC functionality; library code; view scripts; and/or public assets such as images, CSS, and JavaScript. The
+possibilities are endless.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The module system in ZF2 has been designed to be a generic and powerful foundation from which
+developers and other projects can build their own module or plugin systems.</p>
+<p class="last">For a better understanding of the event-driven concepts behind the ZF2 module system, it may be helpful to read
+the <a class="reference internal" href="zend.event-manager.event-manager.html#zend-event-manager-event-manager"><em>EventManager documentation</em></a>.</p>
+</div>
+<p>The module system is made up of the following:</p>
+<ul class="simple">
+<li><a class="reference internal" href="zend.loader.module-autoloader.html#zend-loader-module-autoloader"><em>The Module Autoloader</em></a> - <tt class="docutils literal"><span class="pre">Zend\Loader\ModuleAutoloader</span></tt> is a specialized
+autoloader that is responsible for the locating and loading of modules&#8217; <tt class="docutils literal"><span class="pre">Module</span></tt> classes from a variety of sources.</li>
+<li><a class="reference internal" href="zend.module-manager.module-manager.html#zend-module-manager-module-manager"><em>The Module Manager</em></a> - <tt class="docutils literal"><span class="pre">Zend\ModuleManager\ModuleManager</span></tt> simply takes
+an array of module names and fires a sequence of events for each one, allowing the behavior of the module system
+to be defined entirely by the listeners which are attached to the module manager.</li>
+<li><strong>ModuleManager Listeners</strong> - Event listeners can be attached to the module manager&#8217;s various events. These
+listeners can do everything from resolving and loading modules to performing complex initialization tasks and
+introspection into each returned module object.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The name of a module in a typical Zend Framework 2 application is simply a <a class="reference external" href="http://php.net/namespaces">PHP namespace</a> and must follow all
+of the same rules for naming.</p>
+</div>
+<p>The recommended structure of a typical MVC-oriented ZF2 module is as follows:</p>
+<div class="highlight-python"><pre>module_root/
+    Module.php
+    autoload_classmap.php
+    autoload_function.php
+    autoload_register.php
+    config/
+        module.config.php
+    public/
+        images/
+        css/
+        js/
+    src/
+        &lt;module_namespace&gt;/
+            &lt;code files&gt;
+    test/
+        phpunit.xml
+        bootstrap.php
+        &lt;module_namespace&gt;/
+            &lt;test code files&gt;
+    view/
+        &lt;dir-named-after-module-namespace&gt;/
+            &lt;dir-named-after-a-controller&gt;/
+                &lt;.phtml files&gt;</pre>
+</div>
+<div class="section" id="the-autoload-php-files">
+<span id="zend-module-manager-intro-the-autoload-files"></span><h2>The autoload_*.php Files<a class="headerlink" href="#the-autoload-php-files" title="Permalink to this headline">¶</a></h2>
+<p>The three <tt class="docutils literal"><span class="pre">autoload_*.php</span></tt> files are not required, but recommended. They provide the following:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">autoload_classmap.php</span></tt> should return an array classmap of class name/filename pairs (with the filenames
+resolved via the <tt class="docutils literal"><span class="pre">__DIR__</span></tt> magic constant).</li>
+<li><tt class="docutils literal"><span class="pre">autoload_function.php</span></tt> should return a PHP callback that can be passed to <tt class="docutils literal"><span class="pre">spl_autoload_register()</span></tt>.
+Typically, this callback should utilize the map returned by <tt class="docutils literal"><span class="pre">autoload_classmap.php</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">autoload_register.php</span></tt> should register a PHP callback (typically that returned by <tt class="docutils literal"><span class="pre">autoload_function.php</span></tt>
+with <tt class="docutils literal"><span class="pre">spl_autoload_register()</span></tt>.</li>
+</ul>
+<p>The purpose of these three files is to provide reasonable default mechanisms for autoloading the classes contained
+in the module, thus providing a trivial way to consume the module without requiring <tt class="docutils literal"><span class="pre">Zend\ModuleManager</span></tt> (e.g.,
+for use outside a ZF2 application).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction to the Module System</a><ul>
+<li><a class="reference internal" href="#the-autoload-php-files">The autoload_*.php Files</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.mime.part.html"
+                        title="previous chapter">Zend\Mime\Part</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.module-manager.module-manager.html"
+                        title="next chapter">The Module Manager</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.module-manager.intro.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.module-manager.intro.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.module-manager.intro.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.module-manager.module-manager.html" title="The Module Manager"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.mime.part.html" title="Zend\Mime\Part"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.module-manager.intro.rst">
+                Introduction to the Module System
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

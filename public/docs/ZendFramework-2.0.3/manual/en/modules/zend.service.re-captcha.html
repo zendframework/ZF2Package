@@ -1,0 +1,406 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend_Service_ReCaptcha &mdash; Zend Framework 2 2.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.3 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-service-recaptcha">
+<span id="id1"></span><h1>Zend_Service_ReCaptcha<a class="headerlink" href="#zend-service-recaptcha" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-service-recaptcha-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Service_ReCaptcha</span></tt> provides a client for the <a class="reference external" href="http://recaptcha.net/">reCAPTCHA Web Service</a>. Per the reCAPTCHA site, &#8220;reCAPTCHA
+is a free CAPTCHA service that helps to digitize books.&#8221; Each reCAPTCHA requires the user to input two words, the
+first of which is the actual CAPTCHA, and the second of which is a word from some scanned text that Optical
+Character Recognition (OCR) software has been unable to identify. The assumption is that if a user correctly
+provides the first word, the second is likely correctly entered as well, and can be used to improve OCR software
+for digitizing books.</p>
+<p>In order to use the reCAPTCHA service, you will need to <a class="reference external" href="http://recaptcha.net/whyrecaptcha.html">sign up for an account</a> and register one or more domains
+with the service in order to generate public and private keys.</p>
+</div>
+<div class="section" id="simplest-use">
+<span id="zend-service-recaptcha-simplestuse"></span><h2>Simplest use<a class="headerlink" href="#simplest-use" title="Permalink to this headline">¶</a></h2>
+<p>Instantiate a <tt class="docutils literal"><span class="pre">Zend_Service_ReCaptcha</span></tt> object, passing it your public and private keys:</p>
+<p class="rubric" id="zend-service-recaptcha-example-1">Creating an instance of the reCAPTCHA service</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$recaptcha</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_ReCaptcha</span><span class="p">(</span><span class="nv">$pubKey</span><span class="p">,</span> <span class="nv">$privKey</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>To render the reCAPTCHA, simply call the <tt class="docutils literal"><span class="pre">getHTML()</span></tt> method:</p>
+<p class="rubric" id="zend-service-recaptcha-example-2">Displaying the reCAPTCHA</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">echo</span> <span class="nv">$recaptcha</span><span class="o">-&gt;</span><span class="na">getHTML</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>When the form is submitted, you should receive two fields, &#8216;recaptcha_challenge_field&#8217; and
+&#8216;recaptcha_response_field&#8217;. Pass these to the reCAPTCHA object&#8217;s <tt class="docutils literal"><span class="pre">verify()</span></tt> method:</p>
+<p class="rubric" id="zend-service-recaptcha-example-3">Verifying the form fields</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$result</span> <span class="o">=</span> <span class="nv">$recaptcha</span><span class="o">-&gt;</span><span class="na">verify</span><span class="p">(</span>
+    <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;recaptcha_challenge_field&#39;</span><span class="p">],</span>
+    <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;recaptcha_response_field&#39;</span><span class="p">]</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Once you have the result, test against it to see if it is valid. The result is a
+<tt class="docutils literal"><span class="pre">Zend_Service_ReCaptcha_Response</span></tt> object, which provides an <tt class="docutils literal"><span class="pre">isValid()</span></tt> method.</p>
+<p class="rubric" id="zend-service-recaptcha-example-4">Validating the reCAPTCHA</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$result</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+    <span class="c1">// Failed validation</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>It is even simpler to use <a class="reference internal" href="zend.captcha.adapters.html#zend-captcha-adapters-recaptcha"><em>the reCAPTCHA</em></a> <tt class="docutils literal"><span class="pre">Zend_Captcha</span></tt> adapter, or to
+use that adapter as a backend for the <em class="xref std std-ref">CAPTCHA form element</em>. In each
+case, the details of rendering and validating the reCAPTCHA are automated for you.</p>
+</div>
+<div class="section" id="hiding-email-addresses">
+<span id="zend-service-recaptcha-mailhide"></span><h2>Hiding email addresses<a class="headerlink" href="#hiding-email-addresses" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend_Service_ReCaptcha_MailHide</span></tt> can be used to hide email addresses. It will replace a part of an email address
+with a link that opens a popup window with a reCAPTCHA challenge. Solving the challenge will reveal the complete
+email address.</p>
+<p>In order to use this component you will need <a class="reference external" href="http://recaptcha.net/whyrecaptcha.html">an account</a> to generate public and private keys for the mailhide
+<em>API</em>.</p>
+<p class="rubric" id="zend-service-recaptcha-mailhide-example-1">Using the mail hide component</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// The mail address we want to hide</span>
+<span class="nv">$mail</span> <span class="o">=</span> <span class="s1">&#39;mail@example.com&#39;</span><span class="p">;</span>
+
+<span class="c1">// Create an instance of the mailhide component, passing it your public</span>
+<span class="c1">// and private keys, as well as the mail address you want to hide</span>
+<span class="nv">$mailHide</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_ReCaptcha_Mailhide</span><span class="p">();</span>
+<span class="nv">$mailHide</span><span class="o">-&gt;</span><span class="na">setPublicKey</span><span class="p">(</span><span class="nv">$pubKey</span><span class="p">);</span>
+<span class="nv">$mailHide</span><span class="o">-&gt;</span><span class="na">setPrivateKey</span><span class="p">(</span><span class="nv">$privKey</span><span class="p">);</span>
+<span class="nv">$mailHide</span><span class="o">-&gt;</span><span class="na">setEmail</span><span class="p">(</span><span class="nv">$mail</span><span class="p">);</span>
+
+<span class="c1">// Display it</span>
+<span class="k">print</span><span class="p">(</span><span class="nv">$mailHide</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The example above will display &#8220;m...&#64;example.com&#8221; where &#8221;...&#8221; has a link that opens up a popup window with a
+reCAPTCHA challenge.</p>
+<p>The public key, private key, and the email address can also be specified in the constructor of the class. A fourth
+argument also exists that enables you to set some options for the component. The available options are listed in
+the following table:</p>
+<blockquote>
+<div><table border="1" class="docutils" id="zend-service-recaptcha-mailhide-options-table">
+<caption>Zend_Service_ReCaptcha_MailHide options</caption>
+<colgroup>
+<col width="15%" />
+<col width="39%" />
+<col width="16%" />
+<col width="30%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Description</th>
+<th class="head">Expected Values</th>
+<th class="head">Default Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>linkTitle</td>
+<td>The title attribute of the link</td>
+<td>string</td>
+<td>&#8216;Reveal this e=mail address&#8217;</td>
+</tr>
+<tr class="row-odd"><td>linkHiddenText</td>
+<td>The text that includes the popup link</td>
+<td>string</td>
+<td>&#8216;...&#8217;</td>
+</tr>
+<tr class="row-even"><td>popupWidth</td>
+<td>The width of the popup window</td>
+<td>int</td>
+<td>500</td>
+</tr>
+<tr class="row-odd"><td>popupHeight</td>
+<td>The height of the popup window</td>
+<td>int</td>
+<td>300</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>The configuration options can be set by sending them as the fourth argument to the constructor or by calling
+<tt class="docutils literal"><span class="pre">setOptions($options)</span></tt>, which takes an associative array or an instance of <a class="reference internal" href="../index.html#zend-config"><em>Zend_Config</em></a>.</p>
+<p class="rubric" id="zend-service-recaptcha-mailhide-example-2">Generating many hidden email addresses</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create an instance of the mailhide component, passing it your public</span>
+<span class="c1">// and private keys, as well as some configuration options</span>
+<span class="nv">$mailHide</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend_Service_ReCaptcha_Mailhide</span><span class="p">();</span>
+<span class="nv">$mailHide</span><span class="o">-&gt;</span><span class="na">setPublicKey</span><span class="p">(</span><span class="nv">$pubKey</span><span class="p">);</span>
+<span class="nv">$mailHide</span><span class="o">-&gt;</span><span class="na">setPrivateKey</span><span class="p">(</span><span class="nv">$privKey</span><span class="p">);</span>
+<span class="nv">$mailHide</span><span class="o">-&gt;</span><span class="na">setOptions</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;linkTitle&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Click me&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;linkHiddenText&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;+++++&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="c1">// The mail addresses we want to hide</span>
+<span class="nv">$mailAddresses</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;mail@example.com&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;johndoe@example.com&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;janedoe@example.com&#39;</span><span class="p">,</span>
+<span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$mailAddresses</span> <span class="k">as</span> <span class="nv">$mail</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$mailHide</span><span class="o">-&gt;</span><span class="na">setEmail</span><span class="p">(</span><span class="nv">$mail</span><span class="p">);</span>
+    <span class="k">print</span><span class="p">(</span><span class="nv">$mailHide</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend_Service_ReCaptcha</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#simplest-use">Simplest use</a></li>
+<li><a class="reference internal" href="#hiding-email-addresses">Hiding email addresses</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.service.re-captcha.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.service.re-captcha.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.service.re-captcha.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.service.re-captcha.rst">
+                Zend_Service_ReCaptcha
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

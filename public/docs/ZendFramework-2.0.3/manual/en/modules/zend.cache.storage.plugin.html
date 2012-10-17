@@ -1,0 +1,603 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Cache\Storage\Plugin &mdash; Zend Framework 2 2.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.3 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Cache\Pattern" href="zend.cache.pattern.html" />
+    <link rel="prev" title="Zend\Cache\Storage\Capabilities" href="zend.cache.storage.capabilities.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.cache.pattern.html" title="Zend\Cache\Pattern"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.cache.storage.capabilities.html" title="Zend\Cache\Storage\Capabilities"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-cache-storage-plugin">
+<span id="id1"></span><h1>Zend\Cache\Storage\Plugin<a class="headerlink" href="#zend-cache-storage-plugin" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-cache-storage-plugin-intro"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Cache storage plugins are objects to add missing functionality or to influence behavior of a storage adapter.</p>
+<p>The plugins listen to events the adapter triggers and can change called method arguments (*.post - events),
+skipping and directly return a result (using <tt class="docutils literal"><span class="pre">stopPropagation</span></tt>), changing the result (with <tt class="docutils literal"><span class="pre">setResult</span></tt> of
+<tt class="docutils literal"><span class="pre">Zend\Cache\Storage\PostEvent</span></tt>) and catching exceptions (with <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ExceptionEvent</span></tt>).</p>
+</div>
+<div class="section" id="quick-start">
+<span id="zend-cache-storage-plugin-quick-start"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>Storage plugins can either be created from <tt class="docutils literal"><span class="pre">Zend\Cache\StorageFactory</span></tt> with the <tt class="docutils literal"><span class="pre">pluginFactory</span></tt>, or by simply
+instantiating one of the <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Plugin\*</span></tt>classes.</p>
+<p>To make life easier, the <tt class="docutils literal"><span class="pre">Zend\Cache\StorageFactory</span></tt> comes with the method <tt class="docutils literal"><span class="pre">factory</span></tt> to create an adapter and
+all given plugins at once.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Cache\StorageFactory</span><span class="p">;</span>
+
+<span class="c1">// Via factory:</span>
+<span class="nv">$cache</span> <span class="o">=</span> <span class="nx">StorageFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;filesystem&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;plugins&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;serializer&#39;</span><span class="p">),</span>
+<span class="p">));</span>
+
+<span class="c1">// Alternately:</span>
+<span class="nv">$cache</span>  <span class="o">=</span> <span class="nx">StorageFactory</span><span class="o">::</span><span class="na">adapterFactory</span><span class="p">(</span><span class="s1">&#39;filesystem&#39;</span><span class="p">);</span>
+<span class="nv">$plugin</span> <span class="o">=</span> <span class="nx">StorageFactory</span><span class="o">::</span><span class="na">pluginFactory</span><span class="p">(</span><span class="s1">&#39;serializer&#39;</span><span class="p">);</span>
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">addPlugin</span><span class="p">(</span><span class="nv">$plugin</span><span class="p">);</span>
+
+<span class="c1">// Or manually:</span>
+<span class="nv">$cache</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Cache\Storage\Adapter\Filesystem</span><span class="p">();</span>
+<span class="nv">$plugin</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Cache\Storage\Plugin\Serializer</span><span class="p">();</span>
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">addPlugin</span><span class="p">(</span><span class="nv">$plugin</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="zend-cache-storage-adapter-clearexpiredbyfactor">
+<h2>Zend\Cache\Storage\Adapter\ClearExpiredByFactor<a class="headerlink" href="#zend-cache-storage-adapter-clearexpiredbyfactor" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>This plugin calls the storage method <tt class="docutils literal"><span class="pre">clearExpired()</span></tt> randomly (by factor)
+after every call of <tt class="docutils literal"><span class="pre">setItem()</span></tt>, <tt class="docutils literal"><span class="pre">setItems()</span></tt>, <tt class="docutils literal"><span class="pre">addItem()</span></tt> and <tt class="docutils literal"><span class="pre">addItems()</span></tt>.</div></blockquote>
+<table border="1" class="docutils">
+<caption>Plugin specific options</caption>
+<colgroup>
+<col width="22%" />
+<col width="13%" />
+<col width="16%" />
+<col width="48%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Data Type</th>
+<th class="head">Default Value</th>
+<th class="head">Describtion</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>clearing_factor</td>
+<td><tt class="docutils literal"><span class="pre">integer</span></tt></td>
+<td>0</td>
+<td>The automatic clearing factor</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="zend-cache-storage-adapter-exceptionhandler">
+<h2>Zend\Cache\Storage\Adapter\ExceptionHandler<a class="headerlink" href="#zend-cache-storage-adapter-exceptionhandler" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>This plugin catches all exceptions thown on reading or writing to cache
+and sends the exception to a defined callack function.</p>
+<p>It&#8217;s configurable if the plugin should re-throw the catched exception.</p>
+</div></blockquote>
+<table border="1" class="docutils">
+<caption>Plugin specific options</caption>
+<colgroup>
+<col width="20%" />
+<col width="22%" />
+<col width="15%" />
+<col width="44%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Data Type</th>
+<th class="head">Default Value</th>
+<th class="head">Describtion</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>exception_callback</td>
+<td><tt class="docutils literal"><span class="pre">callable</span></tt> <tt class="docutils literal"><span class="pre">null</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">null</span></tt></td>
+<td>Callback will be called on an exception
+and get the exception as argument</td>
+</tr>
+<tr class="row-odd"><td>throw_exceptions</td>
+<td><tt class="docutils literal"><span class="pre">boolean</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+<td>Re-throw catched excaptions</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="zend-cache-storage-adapter-ignoreuserabort">
+<h2>Zend\Cache\Storage\Adapter\IgnoreUserAbort<a class="headerlink" href="#zend-cache-storage-adapter-ignoreuserabort" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>This plugin ignores script terminations by users until write operations to cache finished.</div></blockquote>
+<table border="1" class="docutils">
+<caption>Plugin specific options</caption>
+<colgroup>
+<col width="20%" />
+<col width="13%" />
+<col width="8%" />
+<col width="6%" />
+<col width="8%" />
+<col width="44%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Data Type</th>
+<th class="head" colspan="2">Default Value</th>
+<th class="head" colspan="2">Describtion</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>exit_on_abort</td>
+<td colspan="5"><tt class="docutils literal"><span class="pre">boolean</span></tt>  <a href="#id2"><span class="problematic" id="id3">|</span></a><tt class="docutils literal"><span class="pre">true</span></tt>       <a href="#id4"><span class="problematic" id="id5">|</span></a>Terminate script execution if user abort the script</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="zend-cache-storage-adapter-optimizebyfactor">
+<h2>Zend\Cache\Storage\Adapter\OptimizeByFactor<a class="headerlink" href="#zend-cache-storage-adapter-optimizebyfactor" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>This plugin calls the storage method <tt class="docutils literal"><span class="pre">optimize()</span></tt> randomly (by factor)
+after removing items from cache.</div></blockquote>
+<table border="1" class="docutils">
+<caption>Plugin specific options</caption>
+<colgroup>
+<col width="20%" />
+<col width="13%" />
+<col width="15%" />
+<col width="52%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Data Type</th>
+<th class="head">Default Value</th>
+<th class="head">Describtion</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>optimizing_factor</td>
+<td><tt class="docutils literal"><span class="pre">integer</span></tt></td>
+<td>0</td>
+<td>The automatic optimization factor</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="zend-cache-storage-adapter-serializer">
+<h2>Zend\Cache\Storage\Adapter\Serializer<a class="headerlink" href="#zend-cache-storage-adapter-serializer" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div>This plugin will serialize data on writing to cache and unserialize on reading.
+So it&#8217;s possible to store different datatypes into cache storages only support strings.</div></blockquote>
+<table border="1" class="docutils">
+<caption>Plugin specific options</caption>
+<colgroup>
+<col width="12%" />
+<col width="38%" />
+<col width="9%" />
+<col width="42%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Data Type</th>
+<th class="head">Default Value</th>
+<th class="head">Describtion</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>serializer</td>
+<td><tt class="docutils literal"><span class="pre">null</span></tt> <tt class="docutils literal"><span class="pre">string</span></tt> <tt class="docutils literal"><span class="pre">Zend\Serializer\Adapter\AdapterInterface</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">null</span></tt></td>
+<td><p class="first">The serializer to use</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li>If <tt class="docutils literal"><span class="pre">null</span></tt> use the default serializer</li>
+<li>If <tt class="docutils literal"><span class="pre">string</span></tt> instantiate the serializer with <tt class="docutils literal"><span class="pre">serializer_options</span></tt></li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="row-odd"><td>serializer_options</td>
+<td><tt class="docutils literal"><span class="pre">array</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">[]</span></tt></td>
+<td>Array of serializer options used to instantiate the serializer</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="available-methods">
+<span id="zend-cache-storage-plugin-methods"></span><h2>Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="zend-cache-storage-plugin-methods-set-options">
+<dt><strong>setOptions</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">setOptions(Zend\Cache\Storage\Plugin\PluginOptions</span> <span class="pre">$options)</span></tt></p>
+<p>Set options</p>
+<p class="last">Implements a fluent interface.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-plugin-methods-get-options">
+<dt><strong>getOptions</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">getOptions()</span></tt></p>
+<p>Get options</p>
+<p class="last">Returns PluginOptions</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-plugin-methods-attach">
+<dt><strong>attach</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">attach(EventCollection</span> <span class="pre">$events)</span></tt></p>
+<p>Defined by <tt class="docutils literal"><span class="pre">Zend\EventManager\ListenerAggregate</span></tt>, attach one or more listeners.</p>
+<p class="last">Returns void</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-cache-storage-plugin-methods-detach">
+<dt><strong>detach</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">detach(EventCollection</span> <span class="pre">$events)</span></tt></p>
+<p>Defined by <tt class="docutils literal"><span class="pre">Zend\EventManager\ListenerAggregate</span></tt>, detach all previously attached listeners.</p>
+<p class="last">Returns void</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<span id="zend-cache-storage-plugin-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zend-cache-storage-plugin-examples-write-basics">Basics of writing an own storage plugin</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Cache\Storage\Event</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Cache\Storage\Plugin\AbstractPlugin</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\EventManager\EventManagerInterface</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">MyPlugin</span> <span class="k">extends</span> <span class="nx">AbstractPlugin</span>
+<span class="p">{</span>
+
+    <span class="k">protected</span> <span class="nv">$handles</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+    <span class="c1">// This method have to attach all events required by this plugin</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">attach</span><span class="p">(</span><span class="nx">EventManagerInterface</span> <span class="nv">$events</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">handles</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;getItem.pre&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;onGetItemPre&#39;</span><span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">handles</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$events</span><span class="o">-&gt;</span><span class="na">attach</span><span class="p">(</span><span class="s1">&#39;getItem.post&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="p">,</span> <span class="s1">&#39;onGetItemPost&#39;</span><span class="p">));</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// This method have to attach all events required by this plugin</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">detach</span><span class="p">(</span><span class="nx">EventManagerInterface</span> <span class="nv">$events</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">handles</span> <span class="k">as</span> <span class="nv">$handle</span><span class="p">)</span> <span class="p">{</span>
+           <span class="nv">$events</span><span class="o">-&gt;</span><span class="na">detach</span><span class="p">(</span><span class="nv">$handle</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">handles</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">onGetItemPre</span><span class="p">(</span><span class="nx">Event</span> <span class="nv">$event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$params</span> <span class="o">=</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getParams</span><span class="p">();</span>
+        <span class="k">echo</span> <span class="nb">sprintf</span><span class="p">(</span><span class="s2">&quot;Method &#39;getItem&#39; with key &#39;%s&#39; started</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nx">params</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">onGetItemPost</span><span class="p">(</span><span class="nx">Event</span> <span class="nv">$event</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$params</span> <span class="o">=</span> <span class="nv">$event</span><span class="o">-&gt;</span><span class="na">getParams</span><span class="p">();</span>
+        <span class="k">echo</span> <span class="nb">sprintf</span><span class="p">(</span><span class="s2">&quot;Method &#39;getItem&#39; with key &#39;%s&#39; finished</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nx">params</span><span class="p">[</span><span class="s1">&#39;key&#39;</span><span class="p">]);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// After defining this basic plugin we can instantiate and add it to an adapter instance</span>
+<span class="nv">$plugin</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyPlugin</span><span class="p">();</span>
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">addPlugin</span><span class="p">(</span><span class="nv">$plugin</span><span class="p">);</span>
+
+<span class="c1">// Now on calling getItem our basic plugin should print the expacted output</span>
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">getItem</span><span class="p">(</span><span class="s1">&#39;cache-key&#39;</span><span class="p">);</span>
+<span class="c1">// Method &#39;getItem&#39; with key &#39;cache-key&#39; started</span>
+<span class="c1">// Method &#39;getItem&#39; with key &#39;cache-key&#39; finished</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Cache\Storage\Plugin</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#zend-cache-storage-adapter-clearexpiredbyfactor">Zend\Cache\Storage\Adapter\ClearExpiredByFactor</a></li>
+<li><a class="reference internal" href="#zend-cache-storage-adapter-exceptionhandler">Zend\Cache\Storage\Adapter\ExceptionHandler</a></li>
+<li><a class="reference internal" href="#zend-cache-storage-adapter-ignoreuserabort">Zend\Cache\Storage\Adapter\IgnoreUserAbort</a></li>
+<li><a class="reference internal" href="#zend-cache-storage-adapter-optimizebyfactor">Zend\Cache\Storage\Adapter\OptimizeByFactor</a></li>
+<li><a class="reference internal" href="#zend-cache-storage-adapter-serializer">Zend\Cache\Storage\Adapter\Serializer</a></li>
+<li><a class="reference internal" href="#available-methods">Available Methods</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.cache.storage.capabilities.html"
+                        title="previous chapter">Zend\Cache\Storage\Capabilities</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.cache.pattern.html"
+                        title="next chapter">Zend\Cache\Pattern</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.cache.storage.plugin.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.cache.storage.plugin.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.cache.storage.plugin.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.cache.pattern.html" title="Zend\Cache\Pattern"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.cache.storage.capabilities.html" title="Zend\Cache\Storage\Capabilities"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.cache.storage.plugin.rst">
+                Zend\Cache\Storage\Plugin
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

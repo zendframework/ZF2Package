@@ -1,0 +1,394 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Dom\Query &mdash; Zend Framework 2 2.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.3 documentation" href="../index.html" />
+    <link rel="next" title="The EventManager" href="zend.event-manager.event-manager.html" />
+    <link rel="prev" title="Introduction" href="zend.dom.intro.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.event-manager.event-manager.html" title="The EventManager"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.dom.intro.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-dom-query">
+<span id="id1"></span><h1>Zend\Dom\Query<a class="headerlink" href="#zend-dom-query" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Dom\Query</span></tt> provides mechanisms for querying <em>XML</em> and (X) <em>HTML</em> documents utilizing either XPath or <em>CSS</em>
+selectors. It was developed to aid with functional testing of <em>MVC</em> applications, but could also be used for rapid
+development of screen scrapers.</p>
+<p><em>CSS</em> selector notation is provided as a simpler and more familiar notation for web developers to utilize when
+querying documents with <em>XML</em> structures. The notation should be familiar to anybody who has developed Cascading
+Style Sheets or who utilizes Javascript toolkits that provide functionality for selecting nodes utilizing <em>CSS</em>
+selectors (<a class="reference external" href="http://prototypejs.org/api/utility/dollar-dollar">Prototype&#8217;s $$()</a> and <a class="reference external" href="http://api.dojotoolkit.org/jsdoc/dojo/HEAD/dojo.query">Dojo&#8217;s dojo.query</a> were both inspirations for the component).</p>
+<div class="section" id="theory-of-operation">
+<span id="zend-dom-query-operation"></span><h2>Theory of Operation<a class="headerlink" href="#theory-of-operation" title="Permalink to this headline">¶</a></h2>
+<p>To use <tt class="docutils literal"><span class="pre">Zend\Dom\Query</span></tt>, you instantiate a <tt class="docutils literal"><span class="pre">Zend\Dom\Query</span></tt> object, optionally passing a document to query (a
+string). Once you have a document, you can use either the <tt class="docutils literal"><span class="pre">query()</span></tt> or <tt class="docutils literal"><span class="pre">queryXpath()</span></tt> methods; each method will
+return a <tt class="docutils literal"><span class="pre">Zend\Dom\NodeList</span></tt> object with any matching nodes.</p>
+<p>The primary difference between <tt class="docutils literal"><span class="pre">Zend\Dom\Query</span></tt> and using <a class="reference external" href="http://php.net/domdocument">DOMDocument</a> + <a class="reference external" href="http://php.net/domxpath">DOMXPath</a> is the ability to select
+against <em>CSS</em> selectors. You can utilize any of the following, in any combination:</p>
+<ul>
+<li><p class="first"><strong>element types</strong>: provide an element type to match: &#8216;div&#8217;, &#8216;a&#8217;, &#8216;span&#8217;, &#8216;h2&#8217;, etc.</p>
+</li>
+<li><p class="first"><strong>style attributes</strong>: <em>CSS</em> style attributes to match: &#8216;<tt class="docutils literal"><span class="pre">.error</span></tt>&#8216;, &#8216;<tt class="docutils literal"><span class="pre">div.error</span></tt>&#8216;, &#8216;<tt class="docutils literal"><span class="pre">label.required</span></tt>&#8216;, etc.
+If an element defines more than one style, this will match as long as the named style is present anywhere in the
+style declaration.</p>
+</li>
+<li><p class="first"><strong>id attributes</strong>: element ID attributes to match: &#8216;#content&#8217;, &#8216;div#nav&#8217;, etc.</p>
+</li>
+<li><p class="first"><strong>arbitrary attributes</strong>: arbitrary element attributes to match. Three different types of matching are provided:</p>
+<ul class="simple">
+<li><strong>exact match</strong>: the attribute exactly matches the string: &#8216;div[bar=&#8221;baz&#8221;]&#8217; would match a div element with a
+&#8220;bar&#8221; attribute that exactly matches the value &#8220;baz&#8221;.</li>
+<li><strong>word match</strong>: the attribute contains a word matching the string: &#8216;div[bar~=&#8221;baz&#8221;]&#8217; would match a div element
+with a &#8220;bar&#8221; attribute that contains the word &#8220;baz&#8221;. &#8216;&lt;div bar=&#8221;foo baz&#8221;&gt;&#8217; would match, but &#8216;&lt;div bar=&#8221;foo
+bazbat&#8221;&gt;&#8217; would not.</li>
+<li><strong>substring match</strong>: the attribute contains the string: &#8216;div[bar*=&#8221;baz&#8221;]&#8217; would match a div element with a
+&#8220;bar&#8221; attribute that contains the string &#8220;baz&#8221; anywhere within it.</li>
+</ul>
+</li>
+<li><p class="first"><strong>direct descendents</strong>: utilize &#8216;&gt;&#8217; between selectors to denote direct descendents. &#8216;div &gt; span&#8217; would select
+only &#8216;span&#8217; elements that are direct descendents of a &#8216;div&#8217;. Can also be used with any of the selectors above.</p>
+</li>
+<li><p class="first"><strong>descendents</strong>: string together multiple selectors to indicate a hierarchy along which to search. &#8216;<tt class="docutils literal"><span class="pre">div</span> <span class="pre">.foo</span>
+<span class="pre">span</span> <span class="pre">#one</span></tt>&#8216; would select an element of id &#8216;one&#8217; that is a descendent of arbitrary depth beneath a &#8216;span&#8217;
+element, which is in turn a descendent of arbitrary depth beneath an element with a class of &#8216;foo&#8217;, that is an
+descendent of arbitrary depth beneath a &#8216;div&#8217; element. For example, it would match the link to the word &#8216;One&#8217; in
+the listing below:</p>
+<div class="highlight-html"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="nt">&lt;div&gt;</span>
+<span class="nt">&lt;table&gt;</span>
+    <span class="nt">&lt;tr&gt;</span>
+        <span class="nt">&lt;td</span> <span class="na">class=</span><span class="s">&quot;foo&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;div&gt;</span>
+                Lorem ipsum <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;bar&quot;</span><span class="nt">&gt;</span>
+                    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;/foo/bar&quot;</span> <span class="na">id=</span><span class="s">&quot;one&quot;</span><span class="nt">&gt;</span>One<span class="nt">&lt;/a&gt;</span>
+                    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;/foo/baz&quot;</span> <span class="na">id=</span><span class="s">&quot;two&quot;</span><span class="nt">&gt;</span>Two<span class="nt">&lt;/a&gt;</span>
+                    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;/foo/bat&quot;</span> <span class="na">id=</span><span class="s">&quot;three&quot;</span><span class="nt">&gt;</span>Three<span class="nt">&lt;/a&gt;</span>
+                    <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;/foo/bla&quot;</span> <span class="na">id=</span><span class="s">&quot;four&quot;</span><span class="nt">&gt;</span>Four<span class="nt">&lt;/a&gt;</span>
+                <span class="nt">&lt;/span&gt;</span>
+            <span class="nt">&lt;/div&gt;</span>
+        <span class="nt">&lt;/td&gt;</span>
+    <span class="nt">&lt;/tr&gt;</span>
+<span class="nt">&lt;/table&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+<p>Once you&#8217;ve performed your query, you can then work with the result object to determine information about the
+nodes, as well as to pull them and/or their content directly for examination and manipulation.
+<tt class="docutils literal"><span class="pre">Zend\Dom\NodeList</span></tt> implements <tt class="docutils literal"><span class="pre">Countable</span></tt> and <tt class="docutils literal"><span class="pre">Iterator</span></tt>, and stores the results internally as a
+<a class="reference external" href="http://php.net/domdocument">DOMDocument</a> and <a class="reference external" href="http://php.net/domnodelist">DOMNodeList</a>. As an example, consider the following call, that selects against the <em>HTML</em>
+above:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Dom\Query</span><span class="p">;</span>
+
+<span class="nv">$dom</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Query</span><span class="p">(</span><span class="nv">$html</span><span class="p">);</span>
+<span class="nv">$results</span> <span class="o">=</span> <span class="nv">$dom</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="s1">&#39;.foo .bar a&#39;</span><span class="p">);</span>
+
+<span class="nv">$count</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$results</span><span class="p">);</span> <span class="c1">// get number of matches: 4</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$results</span> <span class="k">as</span> <span class="nv">$result</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// $result is a DOMElement</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">Zend\Dom\Query</span></tt> also allows straight XPath queries utilizing the <tt class="docutils literal"><span class="pre">queryXpath()</span></tt> method; you can pass any valid
+XPath query to this method, and it will return a <tt class="docutils literal"><span class="pre">Zend\Dom\NodeList</span></tt> object.</p>
+</div>
+<div class="section" id="methods-available">
+<span id="zend-dom-query-methods"></span><h2>Methods Available<a class="headerlink" href="#methods-available" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Dom\Query</span></tt> family of classes have the following methods available.</p>
+<div class="section" id="zend-dom-query-methods-zenddomquery">
+<span id="id2"></span><h3>Zend\Dom\Query<a class="headerlink" href="#zend-dom-query-methods-zenddomquery" title="Permalink to this headline">¶</a></h3>
+<p>The following methods are available to <tt class="docutils literal"><span class="pre">Zend\Dom\Query</span></tt>:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">setDocumentXml($document,</span> <span class="pre">$encoding</span> <span class="pre">=</span> <span class="pre">null)</span></tt>: specify an <em>XML</em> string to query against.</li>
+<li><tt class="docutils literal"><span class="pre">setDocumentXhtml($document,</span> <span class="pre">$encoding</span> <span class="pre">=</span> <span class="pre">null)</span></tt>: specify an <em>XHTML</em> string to query against.</li>
+<li><tt class="docutils literal"><span class="pre">setDocumentHtml($document,</span> <span class="pre">$encoding</span> <span class="pre">=</span> <span class="pre">null)</span></tt>: specify an <em>HTML</em> string to query against.</li>
+<li><tt class="docutils literal"><span class="pre">setDocument($document,</span> <span class="pre">$encoding</span> <span class="pre">=</span> <span class="pre">null)</span></tt>: specify a string to query against; <tt class="docutils literal"><span class="pre">Zend\Dom\Query</span></tt> will then
+attempt to autodetect the document type.</li>
+<li><tt class="docutils literal"><span class="pre">setEncoding($encoding)</span></tt>: specify an encoding string to use. This encoding will be passed to <a class="reference external" href="http://php.net/domdocument.construct">DOMDocument&#8217;s
+constructor</a> if specified.</li>
+<li><tt class="docutils literal"><span class="pre">getDocument()</span></tt>: retrieve the original document string provided to the object.</li>
+<li><tt class="docutils literal"><span class="pre">getDocumentType()</span></tt>: retrieve the document type of the document provided to the object; will be one of the
+<tt class="docutils literal"><span class="pre">DOC_XML</span></tt>, <tt class="docutils literal"><span class="pre">DOC_XHTML</span></tt>, or <tt class="docutils literal"><span class="pre">DOC_HTML</span></tt> class constants.</li>
+<li><tt class="docutils literal"><span class="pre">getEncoding()</span></tt>: retrieves the specified encoding.</li>
+<li><tt class="docutils literal"><span class="pre">execute($query)</span></tt>: query the document using <em>CSS</em> selector notation.</li>
+<li><tt class="docutils literal"><span class="pre">queryXpath($xPathQuery)</span></tt>: query the document using XPath notation.</li>
+</ul>
+</div>
+<div class="section" id="zend-dom-nodelist">
+<span id="zend-dom-query-methods-zenddomnodelist"></span><h3>Zend\Dom\NodeList<a class="headerlink" href="#zend-dom-nodelist" title="Permalink to this headline">¶</a></h3>
+<p>As mentioned previously, <tt class="docutils literal"><span class="pre">Zend\Dom\NodeList</span></tt> implements both <tt class="docutils literal"><span class="pre">Iterator</span></tt> and <tt class="docutils literal"><span class="pre">Countable</span></tt>, and as such can be
+used in a <tt class="docutils literal"><span class="pre">foreach()</span></tt> loop as well as with the <tt class="docutils literal"><span class="pre">count()</span></tt> function. Additionally, it exposes the following
+methods:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">getCssQuery()</span></tt>: return the <em>CSS</em> selector query used to produce the result (if any).</li>
+<li><tt class="docutils literal"><span class="pre">getXpathQuery()</span></tt>: return the XPath query used to produce the result. Internally, <tt class="docutils literal"><span class="pre">Zend\Dom\Query</span></tt> converts
+<em>CSS</em> selector queries to XPath, so this value will always be populated.</li>
+<li><tt class="docutils literal"><span class="pre">getDocument()</span></tt>: retrieve the DOMDocument the selection was made against.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Dom\Query</a><ul>
+<li><a class="reference internal" href="#theory-of-operation">Theory of Operation</a></li>
+<li><a class="reference internal" href="#methods-available">Methods Available</a><ul>
+<li><a class="reference internal" href="#zend-dom-query-methods-zenddomquery">Zend\Dom\Query</a></li>
+<li><a class="reference internal" href="#zend-dom-nodelist">Zend\Dom\NodeList</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.dom.intro.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.event-manager.event-manager.html"
+                        title="next chapter">The EventManager</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.dom.query.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.dom.query.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.dom.query.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.event-manager.event-manager.html" title="The EventManager"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.dom.intro.html" title="Introduction"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.dom.query.rst">
+                Zend\Dom\Query
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

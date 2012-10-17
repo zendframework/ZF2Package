@@ -1,0 +1,843 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Console-aware action controllers &mdash; Zend Framework 2 2.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.3 documentation" href="../index.html" />
+    <link rel="next" title="Console adapters" href="zend.console.adapter.html" />
+    <link rel="prev" title="Console-aware modules" href="zend.console.modules.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.console.adapter.html" title="Console adapters"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.console.modules.html" title="Console-aware modules"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="console-aware-action-controllers">
+<span id="zend-console-controllers"></span><h1>Console-aware action controllers<a class="headerlink" href="#console-aware-action-controllers" title="Permalink to this headline">¶</a></h1>
+<p>Zend Framework 2 has built-in <a class="reference internal" href="zend.console.introduction.html"><em>MVC integration with the console</em></a>. When the user runs
+an application in a console window, the request will be routed. By matching command line arguments against
+<a class="reference internal" href="zend.console.routes.html"><em>console routes we have defined in our application</em></a>, the MVC will invoke a controller and
+an action.</p>
+<p>In this chapter we will learn how ZF2 Controllers can interact with and return output to console window.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">In order for a controller to be invoked, at least one route must point to it. To learn about creating console
+routes, please read the chapter <a class="reference internal" href="zend.console.routes.html"><em>Console routes and routing</em></a></p>
+</div>
+<div class="section" id="handling-console-requests">
+<h2>Handling console requests<a class="headerlink" href="#handling-console-requests" title="Permalink to this headline">¶</a></h2>
+<p>Console requests are very similar to HTTP requests. In fact, they implement a common interface and are created at the
+same time in the MVC workflow. <a class="reference internal" href="zend.console.routes.html"><em>Console routes</em></a> match against command line arguments
+and provide a <tt class="docutils literal"><span class="pre">defaults</span></tt> array, which holds the <tt class="docutils literal"><span class="pre">controller</span></tt> and <tt class="docutils literal"><span class="pre">action</span></tt> keys. These correspond with controller
+aliases in the ServiceManager, and method names in the controller class. This is analogous to the way HTTP requests are handled
+in ZF2.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">To learn about defining and creating controllers, please read the chapter
+<a class="reference internal" href="../user-guide/routing-and-controllers.html"><em>Routing and controllers</em></a></p>
+</div>
+<p>In this example we&#8217;ll use the following simple route:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// FILE: modules/Application/config/module.config.php</span>
+<span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;router&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;routes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="c1">// HTTP routes are here</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+
+    <span class="s1">&#39;console&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;router&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;routes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">                <span class="s1">&#39;list-users&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class="hll">                    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class="hll">                        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;show [all|disabled|deleted]:mode users [--verbose|-v]&#39;</span><span class="p">,</span>
+</span><span class="hll">                        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class="hll">                            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Index&#39;</span><span class="p">,</span>
+</span><span class="hll">                            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;show-users&#39;</span>
+</span><span class="hll">                        <span class="p">)</span>
+</span><span class="hll">                    <span class="p">)</span>
+</span><span class="hll">                <span class="p">)</span>
+</span>            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>This route will match commands such as:</p>
+<div class="highlight-bash"><div class="highlight"><pre>&gt; php public/index.php show users
+&gt; php public/index.php show all users
+&gt; php public/index.php show disabled users
+</pre></div>
+</div>
+<p>This route points to the method <tt class="docutils literal"><span class="pre">Application\IndexController::showUsersAction()</span></tt>.</p>
+<p>Let&#8217;s add it to our controller.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">namespace</span> <span class="nx">Application\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Mvc\Controller\AbstractActionController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Model\ViewModel</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">IndexController</span> <span class="k">extends</span> <span class="nx">AbstractActionController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">indexAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">();</span> <span class="c1">// display standard index page</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">showUsersAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$request</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+
+        <span class="c1">// Check verbose flag</span>
+        <span class="nv">$verbose</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;verbose&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">);</span>
+
+        <span class="c1">// Check mode</span>
+        <span class="nv">$mode</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span><span class="p">);</span> <span class="c1">// defaults to &#39;all&#39;</span>
+
+        <span class="nv">$users</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="nv">$mode</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="s1">&#39;disabled&#39;</span><span class="o">:</span>
+                <span class="nv">$users</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getServiceLocator</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">fetchDisabledUsers</span><span class="p">();</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="s1">&#39;deleted&#39;</span><span class="o">:</span>
+                <span class="nv">$users</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getServiceLocator</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">fetchDeletedUsers</span><span class="p">();</span>
+                <span class="k">break</span><span class="p">;</span>
+            <span class="k">case</span> <span class="s1">&#39;all&#39;</span><span class="o">:</span>
+            <span class="k">default</span><span class="o">:</span>
+                <span class="nv">$users</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getServiceLocator</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">fetchAllUsers</span><span class="p">();</span>
+                <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>We fetch the console request, read parameters, and load users from our (theoretical) users service. In order to make
+this method functional, we&#8217;ll have to display the result in the console window.</p>
+</div>
+<div class="section" id="sending-output-to-console">
+<h2>Sending output to console<a class="headerlink" href="#sending-output-to-console" title="Permalink to this headline">¶</a></h2>
+<p>The simplest way for our controller to display data in the console window is to <tt class="docutils literal"><span class="pre">return</span></tt> a string. Let&#8217;s modify our
+example to output a list of users:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">showUsersAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$request</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+
+    <span class="c1">// Check verbose flag</span>
+    <span class="nv">$verbose</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;verbose&#39;</span><span class="p">)</span> <span class="o">||</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">);</span>
+
+    <span class="c1">// Check mode</span>
+    <span class="nv">$mode</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;mode&#39;</span><span class="p">,</span> <span class="s1">&#39;all&#39;</span><span class="p">);</span> <span class="c1">// defaults to &#39;all&#39;</span>
+
+    <span class="nv">$users</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="nv">$mode</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="s1">&#39;disabled&#39;</span><span class="o">:</span>
+            <span class="nv">$users</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getServiceLocator</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">fetchDisabledUsers</span><span class="p">();</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="s1">&#39;deleted&#39;</span><span class="o">:</span>
+            <span class="nv">$users</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getServiceLocator</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">fetchDeletedUsers</span><span class="p">();</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="s1">&#39;all&#39;</span><span class="o">:</span>
+        <span class="k">default</span><span class="o">:</span>
+            <span class="nv">$users</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getServiceLocator</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;users&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">fetchAllUsers</span><span class="p">();</span>
+            <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="nv">$users</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<span class="hll">        <span class="c1">// Show an error message in the console</span>
+</span><span class="hll">        <span class="k">return</span> <span class="s2">&quot;There are no users in the database</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class="hll">    <span class="p">}</span>
+</span><span class="hll">
+</span><span class="hll">    <span class="nv">$result</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+</span><span class="hll">
+</span><span class="hll">    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$users</span> <span class="k">as</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="hll">        <span class="nv">$result</span> <span class="o">.=</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">.</span> <span class="s1">&#39; &#39;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">email</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</span><span class="hll">    <span class="p">}</span>
+</span><span class="hll">
+</span><span class="hll">    <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span> <span class="c1">// show it in the console</span>
+</span><span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>On line 27, we are checking if the users service found any users - otherwise we are returning an error message that will
+be immediately displayed and the application will end.</p>
+<p>If there are 1 or more users, we will loop through them with and prepare a listing. It is then returned from the action
+and displayed in the console window.</p>
+</div>
+<div class="section" id="are-we-in-a-console">
+<h2>Are we in a console?<a class="headerlink" href="#are-we-in-a-console" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes we might need to check if our method is being called from a console or from a web request. This is useful
+to block certain methods from running in the console or to change their behavior based on that context.</p>
+<p>Here is an example of how to check if we are dealing with a console request:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Application\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Mvc\Controller\AbstractActionController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Model\ViewModel</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Console\Request</span> <span class="k">as</span> <span class="nx">ConsoleRequest</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">RuntimeException</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">IndexController</span> <span class="k">extends</span> <span class="nx">AbstractActionController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">showUsersAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$request</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+
+<span class="hll">        <span class="c1">// Make sure that we are running in a console and the user has not tricked our</span>
+</span><span class="hll">        <span class="c1">// application into running this action from a public web server.</span>
+</span><span class="hll">        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$request</span> <span class="nx">instanceof</span> <span class="nx">ConsoleRequest</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="hll">            <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">&#39;You can only use this action from a console!&#39;</span><span class="p">);</span>
+</span><span class="hll">        <span class="p">}</span>
+</span>        <span class="c1">// ...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>You do not need to secure all your controllers and methods from console requests. Controller actions will
+<strong>only be invoked</strong> when at least one <a class="reference internal" href="zend.console.routes.html"><em>console route</em></a> matches it. HTTP and Console
+routes are separated and defined in different places in module (and application) configuration.</p>
+<p class="last">There is no way to invoke a console action unless there is at least one route pointing to it. Similarly, there is
+no way for an HTTP action to be invoked unless there is at least one HTTP route that points to it.</p>
+</div>
+<p>The example below shows how a single controller method can handle <strong>both Console and HTTP requests</strong>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Application\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Mvc\Controller\AbstractActionController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Model\ViewModel</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Console\Request</span> <span class="k">as</span> <span class="nx">ConsoleRequest</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Http\Request</span> <span class="k">as</span> <span class="nx">HttpRequest</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">RuntimeException</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">IndexController</span> <span class="k">extends</span> <span class="nx">AbstractActionController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">showUsersAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$request</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+
+        <span class="nv">$users</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+        <span class="c1">// ... fetch users from database ...</span>
+
+<span class="hll">        <span class="k">if</span> <span class="p">(</span><span class="nv">$request</span> <span class="nx">instanceof</span> <span class="nx">HttpRequest</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="hll">            <span class="c1">// display a web page with users list</span>
+</span><span class="hll">            <span class="k">return</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
+</span><span class="hll">        <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$request</span> <span class="nx">instanceof</span> <span class="nx">ConsoleRequest</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="hll">            <span class="c1">// ... prepare console output and return it ...</span>
+</span><span class="hll">            <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+</span><span class="hll">        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class="hll">            <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">&#39;Cannot handle request of type &#39;</span> <span class="o">.</span> <span class="nb">get_class</span><span class="p">(</span><span class="nv">$request</span><span class="p">));</span>
+</span><span class="hll">        <span class="p">}</span>
+</span>    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="reading-values-from-console-parameters">
+<h2>Reading values from console parameters<a class="headerlink" href="#reading-values-from-console-parameters" title="Permalink to this headline">¶</a></h2>
+<p>There are several types of parameters recognized by the Console component - all of them are described in
+<a class="reference internal" href="zend.console.routes.html"><em>the console routing chapter</em></a>. Here, we&#8217;ll focus on how to retrieve values from distinct
+parameters and flags.</p>
+<div class="section" id="positional-parameters">
+<h3>Positional parameters<a class="headerlink" href="#positional-parameters" title="Permalink to this headline">¶</a></h3>
+<p>After a route matches, we can access both <strong>literal parameters</strong> and <strong>value parameters</strong> from within the <tt class="docutils literal"><span class="pre">$request</span></tt>
+container.</p>
+<p>Assuming we have the following route:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// inside of config.console.router.routes:</span>
+<span class="s1">&#39;show-users&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;show (all|deleted|locked|admin) [&lt;groupName&gt;]&#39;</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;showusers&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>If this route matches, our action can now query parameters in the following way:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// an action inside Application\UsersController:</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">showUsersAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$request</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+
+    <span class="c1">// We can access named value parameters directly by their name:</span>
+    <span class="nv">$showUsersFromGroup</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;groupName&#39;</span><span class="p">);</span>
+
+    <span class="c1">// Literal parameters can be checked with isset() against their exact spelling</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)))</span> <span class="p">{</span>
+        <span class="c1">// show all users</span>
+    <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;deleted&#39;</span><span class="p">)))</span> <span class="p">{</span>
+        <span class="c1">// show deleted users</span>
+    <span class="p">}</span>
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>In case of parameter alternatives, it is a good idea to <strong>assign a name to the group</strong>, which simplifies the branching
+in our action controllers. We can do this with the following syntax:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// inside of config.console.router.routes:</span>
+<span class="s1">&#39;show-users&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;show (all|deleted|locked|admin):userTypeFilter [&lt;groupName&gt;]&#39;</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;showusers&#39;</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now we can use a the group name <tt class="docutils literal"><span class="pre">userTypeFilter</span></tt> to check which option has been selected by the user:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">showUsersAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$request</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+
+    <span class="c1">// We can access named value parameters directly by their name:</span>
+    <span class="nv">$showUsersFromGroup</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;groupName&#39;</span><span class="p">);</span>
+
+<span class="hll">    <span class="c1">// The selected option from second parameter is now stored under &#39;userTypeFilter&#39;</span>
+</span><span class="hll">    <span class="nv">$userTypeFilter</span>     <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;userTypeFilter&#39;</span><span class="p">);</span>
+</span><span class="hll">
+</span><span class="hll">    <span class="k">switch</span> <span class="p">(</span><span class="nv">$userTypeFilter</span><span class="p">)</span> <span class="p">{</span>
+</span><span class="hll">        <span class="k">case</span> <span class="s1">&#39;all&#39;</span><span class="o">:</span>
+</span><span class="hll">            <span class="c1">// all users</span>
+</span><span class="hll">        <span class="k">case</span> <span class="s1">&#39;deleted&#39;</span><span class="o">:</span>
+</span><span class="hll">            <span class="c1">// deleted users</span>
+</span><span class="hll">        <span class="k">case</span> <span class="s1">&#39;locked&#39;</span>
+</span><span class="hll">           <span class="c1">// ...</span>
+</span><span class="hll">           <span class="c1">// ...</span>
+</span><span class="hll">    <span class="p">}</span>
+</span><span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="flags">
+<h3>Flags<a class="headerlink" href="#flags" title="Permalink to this headline">¶</a></h3>
+<p>Flags are directly accessible by name. Value-capturing flags will contain string values, as provided by the user.
+Non-value flags will be equal to <tt class="docutils literal"><span class="pre">true</span></tt>.</p>
+<p>Given the following route:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="s1">&#39;find-user&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;find user [--fast] [--verbose] [--id=] [--firstName=] [--lastName=] [--email=] &#39;</span><span class="p">,</span>
+</span>        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Users&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;find&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>We can easily retrieve values in the following fashion:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">findAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$request</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+
+    <span class="c1">// We can retrieve values from value flags using their name</span>
+    <span class="nv">$searchId</span>        <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span>        <span class="k">null</span><span class="p">);</span> <span class="c1">// default null</span>
+    <span class="nv">$searchFirstName</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;firstName&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">);</span>
+    <span class="nv">$searchLastName</span>  <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;lastName&#39;</span><span class="p">,</span>  <span class="k">null</span><span class="p">);</span>
+    <span class="nv">$searchEmail</span>     <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">,</span>     <span class="k">null</span><span class="p">);</span>
+
+    <span class="c1">// Standard flags that have been matched will be equal to TRUE</span>
+    <span class="nv">$isFast</span>          <span class="o">=</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;fast&#39;</span><span class="p">,</span>   <span class="k">false</span><span class="p">);</span> <span class="c1">// default false</span>
+    <span class="nv">$isVerbose</span>       <span class="o">=</span> <span class="p">(</span><span class="nx">bool</span><span class="p">)</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;verbose&#39;</span><span class="p">,</span><span class="k">false</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$isFast</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// perform a fast query ...</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="c1">// perform standard query ...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>In case of <strong>flag alternatives</strong>, we have to check each alternative separately:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="hll"><span class="c1">// Assuming our route now reads:</span>
+</span><span class="hll"><span class="c1">//      &#39;route&#39;    =&gt; &#39;find user [--fast|-f] [--verbose|-v] ... &#39;,</span>
+</span><span class="hll"><span class="c1">//</span>
+</span><span class="k">public</span> <span class="k">function</span> <span class="nf">findAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$request</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+
+<span class="hll">    <span class="c1">// Check both alternatives</span>
+</span><span class="hll">    <span class="nv">$isFast</span>    <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;fast&#39;</span><span class="p">,</span><span class="k">false</span><span class="p">)</span>    <span class="o">||</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span><span class="k">false</span><span class="p">);</span>
+</span>    <span class="nv">$isVerbose</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;verbose&#39;</span><span class="p">,</span><span class="k">false</span><span class="p">)</span> <span class="o">||</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getParam</span><span class="p">(</span><span class="s1">&#39;v&#39;</span><span class="p">,</span><span class="k">false</span><span class="p">);</span>
+
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Console-aware action controllers</a><ul>
+<li><a class="reference internal" href="#handling-console-requests">Handling console requests</a></li>
+<li><a class="reference internal" href="#sending-output-to-console">Sending output to console</a></li>
+<li><a class="reference internal" href="#are-we-in-a-console">Are we in a console?</a></li>
+<li><a class="reference internal" href="#reading-values-from-console-parameters">Reading values from console parameters</a><ul>
+<li><a class="reference internal" href="#positional-parameters">Positional parameters</a></li>
+<li><a class="reference internal" href="#flags">Flags</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.console.modules.html"
+                        title="previous chapter">Console-aware modules</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.console.adapter.html"
+                        title="next chapter">Console adapters</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.console.controllers.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.console.controllers.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.console.controllers.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.console.adapter.html" title="Console adapters"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.console.modules.html" title="Console-aware modules"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.console.controllers.rst">
+                Console-aware action controllers
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

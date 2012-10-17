@@ -1,0 +1,320 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Mime\Part &mdash; Zend Framework 2 2.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.3 documentation" href="../index.html" />
+    <link rel="next" title="Introduction to the Module System" href="zend.module-manager.intro.html" />
+    <link rel="prev" title="Zend\Mime\Message" href="zend.mime.message.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.module-manager.intro.html" title="Introduction to the Module System"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.mime.message.html" title="Zend\Mime\Message"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-mime-part">
+<span id="id1"></span><h1>Zend\Mime\Part<a class="headerlink" href="#zend-mime-part" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-mime-part-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This class represents a single part of a <em>MIME</em> message. It contains the actual content of the message part plus
+information about its encoding, content type and original filename. It provides a method for generating a string
+from the stored data. <tt class="docutils literal"><span class="pre">Zend\Mime\Part</span></tt> objects can be added to <a class="reference internal" href="zend.mime.message.html#zend-mime-message"><em>Zend\Mime\Message</em></a> to
+assemble a complete multipart message.</p>
+</div>
+<div class="section" id="instantiation">
+<span id="zend-mime-part-instantiation"></span><h2>Instantiation<a class="headerlink" href="#instantiation" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Mime\Part</span></tt> is instantiated with a string that represents the content of the new part. The type is assumed
+to be OCTET-STREAM, encoding is 8Bit. After instantiating a <tt class="docutils literal"><span class="pre">Zend\Mime\Part</span></tt>, meta information can be set by
+accessing its attributes directly:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="nv">$type</span> <span class="o">=</span> <span class="nx">Zend\Mime\Mime</span><span class="o">::</span><span class="na">TYPE_OCTETSTREAM</span><span class="p">;</span>
+<span class="k">public</span> <span class="nv">$encoding</span> <span class="o">=</span> <span class="nx">Zend\Mime\Mime</span><span class="o">::</span><span class="na">ENCODING_8BIT</span><span class="p">;</span>
+<span class="k">public</span> <span class="nv">$id</span><span class="p">;</span>
+<span class="k">public</span> <span class="nv">$disposition</span><span class="p">;</span>
+<span class="k">public</span> <span class="nv">$filename</span><span class="p">;</span>
+<span class="k">public</span> <span class="nv">$description</span><span class="p">;</span>
+<span class="k">public</span> <span class="nv">$charset</span><span class="p">;</span>
+<span class="k">public</span> <span class="nv">$boundary</span><span class="p">;</span>
+<span class="k">public</span> <span class="nv">$location</span><span class="p">;</span>
+<span class="k">public</span> <span class="nv">$language</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="methods-for-rendering-the-message-part-to-a-string">
+<span id="zend-mime-part-methods"></span><h2>Methods for rendering the message part to a string<a class="headerlink" href="#methods-for-rendering-the-message-part-to-a-string" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">getContent()</span></tt> returns the encoded content of the <tt class="docutils literal"><span class="pre">Zend\Mime\Part</span></tt> as a string using the encoding specified in
+the attribute <tt class="docutils literal"><span class="pre">$encoding</span></tt>. Valid values are ZendMimeMime::ENCODING_*. Characterset conversions are not performed.</p>
+<p><tt class="docutils literal"><span class="pre">getHeaders()</span></tt> returns the Mime-Headers for the <tt class="docutils literal"><span class="pre">Zend\Mime\Part</span></tt> as generated from the information in the publicly
+accessible attributes. The attributes of the object need to be set correctly before this method is called.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">$charset</span></tt> has to be set to the actual charset of the content if it is a text type (Text or <em>HTML</em>).</li>
+<li><tt class="docutils literal"><span class="pre">$id</span></tt> may be set to identify a content-id for inline images in a <em>HTML</em> mail.</li>
+<li><tt class="docutils literal"><span class="pre">$filename</span></tt> contains the name the file will get when downloading it.</li>
+<li><tt class="docutils literal"><span class="pre">$disposition</span></tt> defines if the file should be treated as an attachment or if it is used inside the (HTML-) mail
+(inline).</li>
+<li><tt class="docutils literal"><span class="pre">$description</span></tt> is only used for informational purposes.</li>
+<li><tt class="docutils literal"><span class="pre">$boundary</span></tt> defines string as boundary.</li>
+<li><tt class="docutils literal"><span class="pre">$location</span></tt> can be used as resource <em>URI</em> that has relation to the content.</li>
+<li><tt class="docutils literal"><span class="pre">$language</span></tt> defines languages in the content.</li>
+</ul>
+</div>
+<div class="section" id="available-methods">
+<h2>Available methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<p>A <tt class="docutils literal"><span class="pre">Zend\Mime\Part</span></tt> object has the following methods:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">isStream</span></tt>: Check if this <tt class="docutils literal"><span class="pre">Zend\Mime\Part</span></tt> can be read as a stream.</li>
+<li><tt class="docutils literal"><span class="pre">getEncodedStream</span></tt>: If this <tt class="docutils literal"><span class="pre">Zend\Mime\Part</span></tt> was created with a stream, return a filtered stream for reading
+the content. Useful for large file attachments.</li>
+<li><tt class="docutils literal"><span class="pre">getContent($EOL=Zend\Mime\Mime::LINEEND)</span></tt>: Get the content of the current <tt class="docutils literal"><span class="pre">Zend\Mime\Part</span></tt> in the given
+encoding.</li>
+<li><tt class="docutils literal"><span class="pre">getRawContent</span></tt>: Get the raw, unencoded for the current <tt class="docutils literal"><span class="pre">Zend\Mime\Part</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">getHeadersArray($EOL=Zend\Mime\Mime::LINEEND)</span></tt>: Create and return the array of headers for the current
+<tt class="docutils literal"><span class="pre">Zend\Mime\Part</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">getHeaders($EOL=Zend\Mime\Mime::LINEEND)</span></tt>: Return the headers for the current <tt class="docutils literal"><span class="pre">Zend\Mime\Part</span></tt> as a string.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Mime\Part</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#instantiation">Instantiation</a></li>
+<li><a class="reference internal" href="#methods-for-rendering-the-message-part-to-a-string">Methods for rendering the message part to a string</a></li>
+<li><a class="reference internal" href="#available-methods">Available methods</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.mime.message.html"
+                        title="previous chapter">Zend\Mime\Message</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.module-manager.intro.html"
+                        title="next chapter">Introduction to the Module System</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.mime.part.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.mime.part.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.mime.part.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.module-manager.intro.html" title="Introduction to the Module System"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.mime.message.html" title="Zend\Mime\Message"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.mime.part.rst">
+                Zend\Mime\Part
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

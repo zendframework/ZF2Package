@@ -1,0 +1,306 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Plugins &mdash; Zend Framework 2 2.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.3 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-plugins">
+<span id="learning-plugins-usage"></span><h1>Using Plugins<a class="headerlink" href="#using-plugins" title="Permalink to this headline">¶</a></h1>
+<p>Components that make use of plugins typically use <tt class="docutils literal"><span class="pre">Zend_Loader_PluginLoader</span></tt> to do their work. This class has you
+register plugins by specifying one or more &#8220;prefix paths&#8221;. The component will then call the PluginLoader&#8217;s
+<tt class="docutils literal"><span class="pre">load()</span></tt> method, passing the plugin&#8217;s short name to it. The PluginLoader will then query each prefix path to see
+if a class matching that short name exists. Prefix paths are searched in LIFO (last in, first out) order, so it
+will match those prefix paths registered last first &#8211; allowing you to override existing plugins.</p>
+<p>Some examples will make all of this more clear.</p>
+<p class="rubric" id="learning-plugins-usage-basic">Basic Plugin Example: Adding a single prefix path</p>
+<p>In this example, we will assume some validators have been written and placed in the directory
+<tt class="docutils literal"><span class="pre">foo/plugins/validators/</span></tt>, and that all these classes share the class prefix &#8220;Foo_Validate_&#8221;; these two bits of
+information form our &#8220;prefix path&#8221;. Furthermore, let&#8217;s assume we have two validators, one named &#8220;Even&#8221; (ensuring a
+number to be validated is even), and another named &#8220;Dozens&#8221; (ensuring the number is a multiple of 12). The tree
+might look like this:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre>foo/
+|-- plugins/
+|   |-- validators/
+|   |   |-- Even.php
+|   |   |-- Dozens.php
+</pre></div>
+</td></tr></table></div>
+<p>Now, we&#8217;ll inform a <tt class="docutils literal"><span class="pre">Zend_Form_Element</span></tt> instance of this prefix path. <tt class="docutils literal"><span class="pre">Zend_Form_Element</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">addPrefixPath()</span></tt>
+method expects a third argument that indicates the type of plugin for which the path is being registered; in this
+case, it&#8217;s a &#8220;validate&#8221; plugin.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">addPrefixPath</span><span class="p">(</span><span class="s1">&#39;Foo_Validate&#39;</span><span class="p">,</span> <span class="s1">&#39;foo/plugins/validators/&#39;</span><span class="p">,</span> <span class="s1">&#39;validate&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now we can simply tell the element the short name of the validators we want to use. In the following example, we&#8217;re
+using a mix of standard validators (&#8220;NotEmpty&#8221;, &#8220;Int&#8221;) and custom validators (&#8220;Even&#8221;, &#8220;Dozens&#8221;):</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="s1">&#39;NotEmpty&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="s1">&#39;Int&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="s1">&#39;Even&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="s1">&#39;Dozens&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>When the element needs to validate, it will then request the plugin class from the PluginLoader. The first two
+validators will resolve to <tt class="docutils literal"><span class="pre">Zend_Validate_NotEmpty</span></tt> and <tt class="docutils literal"><span class="pre">Zend_Validate_Int</span></tt>, respectively; the next two will
+resolve to <tt class="docutils literal"><span class="pre">Foo_Validate_Even</span></tt> and <tt class="docutils literal"><span class="pre">Foo_Validate_Dozens</span></tt>, respectively.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>What happens if a plugin is not found?</strong></p>
+<p>What happens if a plugin is requested, but the PluginLoader is unable to find a class matching it? For instance,
+in the above example, if we registered the plugin &#8220;Bar&#8221; with the element, what would happen?</p>
+<p>The plugin loader will look through each prefix path, checking to see if a file matching the plugin name is
+found on that path. If the file is not found, it then moves on to the next prefix path.</p>
+<p class="last">Once the stack of prefix paths has been exhausted, if no matching file has been found, it will throw a
+<tt class="docutils literal"><span class="pre">Zend_Loader_PluginLoader_Exception</span></tt>.</p>
+</div>
+<p class="rubric" id="learning-plugins-usage-override">Intermediate Plugin Usage: Overriding existing plugins</p>
+<p>One strength of the PluginLoader is that its use of a LIFO stack allows you to override existing plugins by
+creating your own versions locally with a different prefix path, and registering that prefix path later in the
+stack.</p>
+<p>For example, let&#8217;s consider <tt class="docutils literal"><span class="pre">Zend_View_Helper_FormButton</span></tt> (view helpers are one form of plugin). This view helper
+accepts three arguments, an element name (also used as the element&#8217;s DOM identifier), a value (used as the button
+label), and an optional array of attributes. The helper then generates <em>HTML</em> markup for a form input element.</p>
+<p>Let&#8217;s say you want the helper to instead generate a true <em>HTML</em> <tt class="docutils literal"><span class="pre">button</span></tt> element; don&#8217;t want the helper to
+generate a DOM identifier, but instead use the value for a CSS class selector; and that you have no interest in
+handling arbitrary attributes. You could accomplish this in a couple of ways. In both cases, you&#8217;d create your own
+view helper class that implements the behavior you want; the difference is in how you would name and invoke them.</p>
+<p>Our first example will be to name the element with a unique name: <tt class="docutils literal"><span class="pre">Foo_View_Helper_CssButton</span></tt>, which implies the
+plugin name &#8220;CssButton&#8221;. While this certainly is a viable approach, it poses several issues: if you&#8217;ve already used
+the Button view helper in your code, you now have to refactor; alternately, if another developer starts writing
+code for your application, they may inadvertently use the Button view helper instead of your new view helper.</p>
+<p>So, the better example is to use the plugin name &#8220;Button&#8221;, giving us the class name <tt class="docutils literal"><span class="pre">Foo_View_Helper_Button</span></tt>. We
+then register the prefix path with the view:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Zend_View::addHelperPath() utilizes the PluginLoader; however, it inverts</span>
+<span class="c1">// the arguments, as it provides a default value of &quot;Zend_View_Helper&quot; for the</span>
+<span class="c1">// plugin prefix.</span>
+<span class="c1">//</span>
+<span class="c1">// The below assumes your class is in the directory &#39;foo/view/helpers/&#39;.</span>
+<span class="nv">$view</span><span class="o">-&gt;</span><span class="na">addHelperPath</span><span class="p">(</span><span class="s1">&#39;foo/view/helpers&#39;</span><span class="p">,</span> <span class="s1">&#39;Foo_View_Helper&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Once done, anywhere you now use the &#8220;Button&#8221; helper will delegate to your custom <tt class="docutils literal"><span class="pre">Foo_View_Helper_Button</span></tt> class!</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/plugins.usage.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/plugins.usage.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/plugins.usage.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/plugins.usage.rst">
+                Using Plugins
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

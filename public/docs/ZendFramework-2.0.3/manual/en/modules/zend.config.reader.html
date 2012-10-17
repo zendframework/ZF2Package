@@ -1,0 +1,611 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Config\Reader &mdash; Zend Framework 2 2.0.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.3 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Config\Writer" href="zend.config.writer.html" />
+    <link rel="prev" title="Theory of Operation" href="zend.config.theory-of-operation.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.config.writer.html" title="Zend\Config\Writer"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.config.theory-of-operation.html" title="Theory of Operation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-config-reader">
+<span id="zend-config-reader-introduction"></span><h1>Zend\Config\Reader<a class="headerlink" href="#zend-config-reader" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Config\Reader</span></tt> gives you the ability to read a config file. It works with concrete implementations for
+different file format. The <tt class="docutils literal"><span class="pre">Zend\Config\Reader</span></tt> is only an interface, that define the two methods <tt class="docutils literal"><span class="pre">fromFile()</span></tt>
+and <tt class="docutils literal"><span class="pre">fromString()</span></tt>. The concrete implementations of this interface are:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Config\Reader\Ini</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Config\Reader\Xml</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Config\Reader\Json</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Config\Reader\Yaml</span></tt></li>
+</ul>
+<p>The <tt class="docutils literal"><span class="pre">fromFile()</span></tt> and <tt class="docutils literal"><span class="pre">fromString()</span></tt> return a PHP array contains the data of the configuration file.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Differences from ZF1</strong></p>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Config\Reader</span></tt> component no longer supports the following features:</p>
+<ul class="last simple">
+<li>Inheritance of sections.</li>
+<li>Reading of specific sections.</li>
+</ul>
+</div>
+<div class="section" id="zend-config-reader-ini">
+<span id="id1"></span><h2>Zend\Config\Reader\Ini<a class="headerlink" href="#zend-config-reader-ini" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Config\Reader\Ini</span></tt> enables developers to store configuration data in a familiar <em>INI</em> format and read them
+in the application by using an array syntax.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Config\Reader\Ini</span></tt> utilizes the <a class="reference external" href="http://php.net/parse_ini_file">parse_ini_file()</a> <em>PHP</em> function. Please review this documentation to be
+aware of its specific behaviors, which propagate to <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Ini</span></tt>, such as how the special values of
+&#8220;<tt class="docutils literal"><span class="pre">TRUE</span></tt>&#8221;, &#8220;<tt class="docutils literal"><span class="pre">FALSE</span></tt>&#8221;, &#8220;yes&#8221;, &#8220;no&#8221;, and &#8220;<tt class="docutils literal"><span class="pre">NULL</span></tt>&#8221; are handled.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Key Separator</strong></p>
+<p>By default, the key separator character is the period character (&#8220;<strong>.</strong>&#8221;). This can be changed, however, using
+the <tt class="docutils literal"><span class="pre">setNestSeparator()</span></tt> method. For example:</p>
+<div class="last highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$reader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Reader\Ini</span><span class="p">();</span>
+<span class="nv">$reader</span><span class="o">-&gt;</span><span class="na">setNestSeparator</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<p>The following example illustrates a basic use of <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Ini</span></tt> for loading configuration data from an
+<em>INI</em> file. In this example there are configuration data for both a production system and for a staging system.
+Suppose we have the following INI configuration file:</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="na">webhost</span>                  <span class="o">=</span> <span class="s">&#39;www.example.com&#39;</span>
+<span class="na">database.adapter</span>         <span class="o">=</span> <span class="s">&#39;pdo_mysql&#39;</span>
+<span class="na">database.params.host</span>     <span class="o">=</span> <span class="s">&#39;db.example.com&#39;</span>
+<span class="na">database.params.username</span> <span class="o">=</span> <span class="s">&#39;dbuser&#39;</span>
+<span class="na">database.params.password</span> <span class="o">=</span> <span class="s">&#39;secret&#39;</span>
+<span class="na">database.params.dbname</span>   <span class="o">=</span> <span class="s">&#39;dbproduction&#39;</span>
+</pre></div>
+</td></tr></table></div>
+<p>We can use the <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Ini</span></tt> to read this INI file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$reader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Reader\Ini</span><span class="p">();</span>
+<span class="nv">$data</span>   <span class="o">=</span> <span class="nv">$reader</span><span class="o">-&gt;</span><span class="na">fromFile</span><span class="p">(</span><span class="s1">&#39;/path/to/config.ini&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;webhost&#39;</span><span class="p">]</span>  <span class="c1">// prints &quot;www.example.com&quot;</span>
+<span class="k">echo</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;database&#39;</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">][</span><span class="s1">&#39;dbname&#39;</span><span class="p">];</span>  <span class="c1">// prints &quot;dbproduction&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Ini</span></tt> supports a feature to include the content of a INI file in a specific section of
+another INI file. For instance, suppose we have an INI file with the database configuration:</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="na">database.adapter</span>         <span class="o">=</span> <span class="s">&#39;pdo_mysql&#39;</span>
+<span class="na">database.params.host</span>     <span class="o">=</span> <span class="s">&#39;db.example.com&#39;</span>
+<span class="na">database.params.username</span> <span class="o">=</span> <span class="s">&#39;dbuser&#39;</span>
+<span class="na">database.params.password</span> <span class="o">=</span> <span class="s">&#39;secret&#39;</span>
+<span class="na">database.params.dbname</span>   <span class="o">=</span> <span class="s">&#39;dbproduction&#39;</span>
+</pre></div>
+</td></tr></table></div>
+<p>We can include this configuration in another INI file, for instance:</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="na">webhost</span>  <span class="o">=</span> <span class="s">&#39;www.example.com&#39;</span>
+<span class="na">@include</span> <span class="o">=</span> <span class="s">&#39;database.ini&#39;</span>
+</pre></div>
+</td></tr></table></div>
+<p>If we read this file using the component <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Ini</span></tt> we will obtain the same configuration data
+structure of the previous example.</p>
+<p>The <tt class="docutils literal"><span class="pre">&#64;include</span> <span class="pre">=</span> <span class="pre">'file-to-include.ini'</span></tt> can be used also in a subelement of a value. For instance we can have an
+INI file like that:</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="na">adapter</span>         <span class="o">=</span> <span class="s">&#39;pdo_mysql&#39;</span>
+<span class="na">params.host</span>     <span class="o">=</span> <span class="s">&#39;db.example.com&#39;</span>
+<span class="na">params.username</span> <span class="o">=</span> <span class="s">&#39;dbuser&#39;</span>
+<span class="na">params.password</span> <span class="o">=</span> <span class="s">&#39;secret&#39;</span>
+<span class="na">params.dbname</span>   <span class="o">=</span> <span class="s">&#39;dbproduction&#39;</span>
+</pre></div>
+</td></tr></table></div>
+<p>And assign the <tt class="docutils literal"><span class="pre">&#64;include</span></tt> as sublement of the database value:</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="na">webhost</span>           <span class="o">=</span> <span class="s">&#39;www.example.com&#39;</span>
+<span class="na">database.@include</span> <span class="o">=</span> <span class="s">&#39;database.ini&#39;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="zend-config-reader-xml">
+<span id="id2"></span><h2>Zend\Config\Reader\Xml<a class="headerlink" href="#zend-config-reader-xml" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Config\Reader\Xml</span></tt> enables developers to read configuration data in a familiar <em>XML</em> format and read them
+in the application by using an array syntax. The root element of the <em>XML</em> file or string is irrelevant and may be
+named arbitrarily.</p>
+<p>The following example illustrates a basic use of <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Xml</span></tt> for loading configuration data from an
+<em>XML</em> file. Suppose we have the following <em>XML</em> configuration file:</p>
+<div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>?&gt;
+<span class="nt">&lt;config&gt;</span>
+    <span class="nt">&lt;webhost&gt;</span>www.example.com<span class="nt">&lt;/webhost&gt;</span>
+    <span class="nt">&lt;database&gt;</span>
+        <span class="nt">&lt;adapter</span> <span class="na">value=</span><span class="s">&quot;pdo_mysql&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;params&gt;</span>
+            <span class="nt">&lt;host</span> <span class="na">value=</span><span class="s">&quot;db.example.com&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;username</span> <span class="na">value=</span><span class="s">&quot;dbuser&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;password</span> <span class="na">value=</span><span class="s">&quot;secret&quot;</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;dbname</span> <span class="na">value=</span><span class="s">&quot;dbproduction&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/params&gt;</span>
+    <span class="nt">&lt;/database&gt;</span>
+<span class="nt">&lt;/config&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>We can use the <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Xml</span></tt> to read this XML file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$reader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Reader\Xml</span><span class="p">();</span>
+<span class="nv">$data</span>   <span class="o">=</span> <span class="nv">$reader</span><span class="o">-&gt;</span><span class="na">fromFile</span><span class="p">(</span><span class="s1">&#39;/path/to/config.xml&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;webhost&#39;</span><span class="p">]</span>  <span class="c1">// prints &quot;www.example.com&quot;</span>
+<span class="k">echo</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;database&#39;</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">][</span><span class="s1">&#39;dbname&#39;</span><span class="p">];</span>  <span class="c1">// prints &quot;dbproduction&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">Zend\Config\Reader\Xml</span></tt> utilizes the <a class="reference external" href="http://php.net/xmlreader">XMLReader</a> <em>PHP</em> class. Please review this documentation to be aware of
+its specific behaviors, which propagate to <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Xml</span></tt>.</p>
+<p>Using <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Xml</span></tt> we can include the content of XML files in a specific XML element. This is
+provided using the standard function <a class="reference external" href="http://www.w3.org/TR/xinclude/">XInclude</a> of XML. To use this function you have to add the namespace
+<tt class="docutils literal"><span class="pre">xmlns:xi=&quot;http://www.w3.org/2001/XInclude&quot;</span></tt> to the XML file. Suppose we have an XML files that contains only the
+database configuration:</p>
+<div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+<span class="nt">&lt;config&gt;</span>
+    <span class="nt">&lt;database&gt;</span>
+        <span class="nt">&lt;adapter&gt;</span>pdo_mysql<span class="nt">&lt;/adapter&gt;</span>
+        <span class="nt">&lt;params&gt;</span>
+            <span class="nt">&lt;host&gt;</span>db.example.com<span class="nt">&lt;/host&gt;</span>
+            <span class="nt">&lt;username&gt;</span>dbuser<span class="nt">&lt;/username&gt;</span>
+            <span class="nt">&lt;password&gt;</span>secret<span class="nt">&lt;/password&gt;</span>
+            <span class="nt">&lt;dbname&gt;</span>dbproduction<span class="nt">&lt;/dbname&gt;</span>
+        <span class="nt">&lt;/params&gt;</span>
+    <span class="nt">&lt;/database&gt;</span>
+<span class="nt">&lt;/config&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>We can include this configuration in another XML file, for instance:</p>
+<div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+<span class="nt">&lt;config</span> <span class="na">xmlns:xi=</span><span class="s">&quot;http://www.w3.org/2001/XInclude&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;webhost&gt;</span>www.example.com<span class="nt">&lt;/webhost&gt;</span>
+    <span class="nt">&lt;xi:include</span> <span class="na">href=</span><span class="s">&quot;database.xml&quot;</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/config&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The syntax to include an XML file in a specific element is <tt class="docutils literal"><span class="pre">&lt;xi:include</span> <span class="pre">href=&quot;file-to-include.xml&quot;/&gt;</span></tt></p>
+</div>
+<div class="section" id="zend-config-reader-json">
+<span id="id3"></span><h2>Zend\Config\Reader\Json<a class="headerlink" href="#zend-config-reader-json" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Config\Reader\Json</span></tt> enables developers to read configuration data in a <em>JSON</em> format and read them in the
+application by using an array syntax.</p>
+<p>The following example illustrates a basic use of <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Json</span></tt> for loading configuration data from a
+<em>JSON</em> file. Suppose we have the following <em>JSON</em> configuration file:</p>
+<div class="highlight-json"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nt">&quot;webhost&quot;</span>  <span class="p">:</span> <span class="s2">&quot;www.example.com&quot;</span><span class="p">,</span>
+  <span class="nt">&quot;database&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;adapter&quot;</span> <span class="p">:</span> <span class="s2">&quot;pdo_mysql&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;params&quot;</span>  <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;host&quot;</span>     <span class="p">:</span> <span class="s2">&quot;db.example.com&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;username&quot;</span> <span class="p">:</span> <span class="s2">&quot;dbuser&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;password&quot;</span> <span class="p">:</span> <span class="s2">&quot;secret&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;dbname&quot;</span>   <span class="p">:</span> <span class="s2">&quot;dbproduction&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>We can use the <tt class="docutils literal"><span class="pre">Zend\Config\Reader\&gt;Json</span></tt> to read this JSON file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$reader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Reader\Json</span><span class="p">();</span>
+<span class="nv">$data</span>   <span class="o">=</span> <span class="nv">$reader</span><span class="o">-&gt;</span><span class="na">fromFile</span><span class="p">(</span><span class="s1">&#39;/path/to/config.json&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;webhost&#39;</span><span class="p">]</span>  <span class="c1">// prints &quot;www.example.com&quot;</span>
+<span class="k">echo</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;database&#39;</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">][</span><span class="s1">&#39;dbname&#39;</span><span class="p">];</span>  <span class="c1">// prints &quot;dbproduction&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">Zend\Config\Reader\Json</span></tt> utilizes the <a class="reference internal" href="zend.json.introduction.html#zend-json-introduction"><em>Zend\Json\Json</em></a> class.</p>
+<p>Using <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Json</span></tt> we can include the content of a JSON file in a specific JSON section or element.
+This is provided using the special syntax <tt class="docutils literal"><span class="pre">&#64;include</span></tt>. Suppose we have a JSON file that contains only the database
+configuration:</p>
+<div class="highlight-json"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="p">{</span>
+  <span class="nt">&quot;database&quot;</span> <span class="p">:</span> <span class="p">{</span>
+    <span class="nt">&quot;adapter&quot;</span> <span class="p">:</span> <span class="s2">&quot;pdo_mysql&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;params&quot;</span>  <span class="p">:</span> <span class="p">{</span>
+      <span class="nt">&quot;host&quot;</span>     <span class="p">:</span> <span class="s2">&quot;db.example.com&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;username&quot;</span> <span class="p">:</span> <span class="s2">&quot;dbuser&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;password&quot;</span> <span class="p">:</span> <span class="s2">&quot;secret&quot;</span><span class="p">,</span>
+      <span class="nt">&quot;dbname&quot;</span>   <span class="p">:</span> <span class="s2">&quot;dbproduction&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>We can include this configuration in another JSON file, for instance:</p>
+<div class="highlight-json"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="p">{</span>
+    <span class="nt">&quot;webhost&quot;</span>  <span class="p">:</span> <span class="s2">&quot;www.example.com&quot;</span><span class="p">,</span>
+    <span class="nt">&quot;@include&quot;</span> <span class="p">:</span> <span class="s2">&quot;database.json&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="zend-config-reader-yaml">
+<span id="id4"></span><h2>Zend\Config\Reader\Yaml<a class="headerlink" href="#zend-config-reader-yaml" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Config\Reader\Yaml</span></tt> enables developers to read configuration data in a <em>YAML</em> format and read them in the
+application by using an array syntax. In order to use the YAML reader we need to pass a callback to an external PHP
+library or use the <a class="reference external" href="http://www.php.net/manual/en/book.yaml.php">Yaml PECL extension</a>.</p>
+<p>The following example illustrates a basic use of <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Yaml</span></tt> that use the Yaml PECL extension.
+Suppose we have the following <em>YAML</em> configuration file:</p>
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="l-Scalar-Plain">webhost</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">www.example.com</span>
+<span class="l-Scalar-Plain">database</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">adapter</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">pdo_mysql</span>
+    <span class="l-Scalar-Plain">params</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">host</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">db.example.com</span>
+      <span class="l-Scalar-Plain">username</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">dbuser</span>
+      <span class="l-Scalar-Plain">password</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">secret</span>
+      <span class="l-Scalar-Plain">dbname</span><span class="p-Indicator">:</span>   <span class="l-Scalar-Plain">dbproduction</span>
+</pre></div>
+</td></tr></table></div>
+<p>We can use the <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Yaml</span></tt> to read this YAML file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$reader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Reader\Yaml</span><span class="p">();</span>
+<span class="nv">$data</span>   <span class="o">=</span> <span class="nv">$reader</span><span class="o">-&gt;</span><span class="na">fromFile</span><span class="p">(</span><span class="s1">&#39;/path/to/config.yaml&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;webhost&#39;</span><span class="p">]</span>  <span class="c1">// prints &quot;www.example.com&quot;</span>
+<span class="k">echo</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;database&#39;</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">][</span><span class="s1">&#39;dbname&#39;</span><span class="p">];</span>  <span class="c1">// prints &quot;dbproduction&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you want to use an external YAML reader you have to pass the callback function in the constructor of the class.
+For instance, if you want to use the <a class="reference external" href="http://code.google.com/p/spyc/">Spyc</a> library:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// include the Spyc library</span>
+<span class="k">require_once</span> <span class="p">(</span><span class="s1">&#39;path/to/spyc.php&#39;</span><span class="p">);</span>
+
+<span class="nv">$reader</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Reader\Yaml</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;Spyc&#39;</span><span class="p">,</span><span class="s1">&#39;YAMLLoadString&#39;</span><span class="p">));</span>
+<span class="nv">$data</span>   <span class="o">=</span> <span class="nv">$reader</span><span class="o">-&gt;</span><span class="na">fromFile</span><span class="p">(</span><span class="s1">&#39;/path/to/config.yaml&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;webhost&#39;</span><span class="p">]</span>  <span class="c1">// prints &quot;www.example.com&quot;</span>
+<span class="k">echo</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;database&#39;</span><span class="p">][</span><span class="s1">&#39;params&#39;</span><span class="p">][</span><span class="s1">&#39;dbname&#39;</span><span class="p">];</span>  <span class="c1">// prints &quot;dbproduction&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can also instantiate the <tt class="docutils literal"><span class="pre">Zend\Config\Reader\Yaml</span></tt> without any parameter and specify the YAML reader in a
+second moment using the <tt class="docutils literal"><span class="pre">setYamlDecoder()</span></tt> method.</p>
+<p>Using <tt class="docutils literal"><span class="pre">Zend\Config\ReaderYaml</span></tt> we can include the content of a YAML file in a specific YAML section or element.
+This is provided using the special syntax <tt class="docutils literal"><span class="pre">&#64;include</span></tt>. Suppose we have a YAML file that contains only the database
+configuration:</p>
+<div class="highlight-yaml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="l-Scalar-Plain">database</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">adapter</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">pdo_mysql</span>
+    <span class="l-Scalar-Plain">params</span><span class="p-Indicator">:</span>
+      <span class="l-Scalar-Plain">host</span><span class="p-Indicator">:</span>     <span class="l-Scalar-Plain">db.example.com</span>
+      <span class="l-Scalar-Plain">username</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">dbuser</span>
+      <span class="l-Scalar-Plain">password</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">secret</span>
+      <span class="l-Scalar-Plain">dbname</span><span class="p-Indicator">:</span>   <span class="l-Scalar-Plain">dbproduction</span>
+</pre></div>
+</td></tr></table></div>
+<p>We can include this configuration in another YAML file, for instance:</p>
+<div class="highlight-yaml"><pre>webhost:  www.example.com
+@include: database.yaml</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Config\Reader</a><ul>
+<li><a class="reference internal" href="#zend-config-reader-ini">Zend\Config\Reader\Ini</a></li>
+<li><a class="reference internal" href="#zend-config-reader-xml">Zend\Config\Reader\Xml</a></li>
+<li><a class="reference internal" href="#zend-config-reader-json">Zend\Config\Reader\Json</a></li>
+<li><a class="reference internal" href="#zend-config-reader-yaml">Zend\Config\Reader\Yaml</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.config.theory-of-operation.html"
+                        title="previous chapter">Theory of Operation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.config.writer.html"
+                        title="next chapter">Zend\Config\Writer</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.config.reader.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.config.reader.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.config.reader.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.config.writer.html" title="Zend\Config\Writer"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.config.theory-of-operation.html" title="Theory of Operation"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.config.reader.rst">
+                Zend\Config\Reader
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
