@@ -1,0 +1,1760 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Cache\Storage\Adapter &mdash; Zend Framework 2 2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.4 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Cache\Storage\Capabilities" href="zend.cache.storage.capabilities.html" />
+    <link rel="prev" title="Zend\Barcode Renderers" href="zend.barcode.renderers.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.cache.storage.capabilities.html" title="Zend\Cache\Storage\Capabilities"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.barcode.renderers.html" title="Zend\Barcode Renderers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-cache-storage-adapter">
+<span id="id1"></span><h1>Zend\Cache\Storage\Adapter<a class="headerlink" href="#zend-cache-storage-adapter" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-cache-storage-adapter-intro"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Storage adapters are wrappers for real storage resources such as memory
+and the filesystem, using the well known adapter pattern.</p>
+<p>They comes with tons of methods to read, write and modify stored items
+and to get information about stored items and the storage.</p>
+<p>All adapters implements the interface <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\StorageInterface</span></tt>
+and most extend <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\AbstractAdapter</span></tt>, which comes with basic logic.</p>
+<p>Configuration is handled by either <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\AdapterOptions</span></tt>,
+or an adapter-specific options class if it exists. You may pass the options
+instance to the class at instantiation or via the <tt class="docutils literal"><span class="pre">setOptions()</span></tt> method,
+or alternately pass an associative array of options in either place
+(internally, these are then passed to an options class instance).
+Alternately, you can pass either the options instance or associative array
+to the <tt class="docutils literal"><span class="pre">Zend\Cache\StorageFactory::factory</span></tt> method.</p>
+</div></blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Many methods throw exceptions</strong></p>
+<p class="last">Because many caching methods can throw exceptions, you need to catch them manually or you can use the plug-in
+<tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Plugin\ExceptionHandler</span></tt> to automatically catch them and redirect exceptions into a log
+file using the option &#8220;exception_callback&#8221;.</p>
+</div>
+</div>
+<div class="section" id="quick-start">
+<span id="zend-cache-storage-adapter-quick-start"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>Caching adapters can either be created from the provided <tt class="docutils literal"><span class="pre">Zend\Cache\StorageFactory</span></tt> factory, or by simply
+instantiating one of the <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\*</span></tt>classes.</p>
+<p>To make life easier, the <tt class="docutils literal"><span class="pre">Zend\Cache\StorageFactory</span></tt> comes with a <tt class="docutils literal"><span class="pre">factory</span></tt> method to create an adapter and
+create/add all requested plugins at once.</p>
+</div></blockquote>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Cache\StorageFactory</span><span class="p">;</span>
+
+<span class="c1">// Via factory:</span>
+<span class="nv">$cache</span> <span class="o">=</span> <span class="nx">StorageFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;apc&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;plugins&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;exception_handler&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;throw_exceptions&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+
+<span class="c1">// Alternately:</span>
+<span class="nv">$cache</span>  <span class="o">=</span> <span class="nx">StorageFactory</span><span class="o">::</span><span class="na">adapterFactory</span><span class="p">(</span><span class="s1">&#39;apc&#39;</span><span class="p">);</span>
+<span class="nv">$plugin</span> <span class="o">=</span> <span class="nx">StorageFactory</span><span class="o">::</span><span class="na">pluginFactory</span><span class="p">(</span><span class="s1">&#39;exception_handler&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;throw_exceptions&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+<span class="p">));</span>
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">addPlugin</span><span class="p">(</span><span class="nv">$plugin</span><span class="p">);</span>
+
+<span class="c1">// Or manually:</span>
+<span class="nv">$cache</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Cache\Storage\Adapter\Apc</span><span class="p">();</span>
+<span class="nv">$plugin</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Cache\Storage\Plugin\ExceptionHandler</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;throw_exceptions&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+<span class="p">));</span>
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">addPlugin</span><span class="p">(</span><span class="nv">$plugin</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="basic-configuration-options">
+<span id="zend-cache-storage-adapter-options"></span><h2>Basic Configuration Options<a class="headerlink" href="#basic-configuration-options" title="Permalink to this headline">¶</a></h2>
+<blockquote id="zend-cache-adapter-common-options">
+<div><p>Basic configuration is handled by either <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\AdapterOptions</span></tt>, or an adapter-specific options
+class if it exists. You may pass the options instance to the class at instantiation or via the <tt class="docutils literal"><span class="pre">setOptions()</span></tt>
+method, or alternately pass an associative array of options in either place (internally, these are then passed to
+an options class instance). Alternately, you can pass either the options instance or associative array to the
+<tt class="docutils literal"><span class="pre">Zend\Cache\StorageFactory::factory</span></tt> method.</p>
+<p>The following configuration options are defined by <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\AdapterOptions</span></tt>
+and are available for every supported adapter. Adapter-specific configuration options
+are descriped on adapter level below.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="24%" />
+<col width="15%" />
+<col width="47%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option</th>
+<th class="head">Data Type</th>
+<th class="head">Default Value</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ttl</td>
+<td><tt class="docutils literal"><span class="pre">integer</span></tt></td>
+<td>0</td>
+<td>Time to live</td>
+</tr>
+<tr class="row-odd"><td>namespace</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt></td>
+<td>&#8220;&#8221;</td>
+<td>The &#8220;namespace&#8221; in which cache items will live</td>
+</tr>
+<tr class="row-even"><td>key_pattern</td>
+<td><tt class="docutils literal"><span class="pre">null</span></tt> <tt class="docutils literal"><span class="pre">string</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">null</span></tt></td>
+<td>Pattern against which to validate cache keys</td>
+</tr>
+<tr class="row-odd"><td>readable</td>
+<td><tt class="docutils literal"><span class="pre">boolean</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+<td>Enable/Disable reading data from cache</td>
+</tr>
+<tr class="row-even"><td>writable</td>
+<td><tt class="docutils literal"><span class="pre">boolean</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+<td>Enable/Disable writing data to cache</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="the-storageinterface">
+<span id="zend-cache-storage-adapter-methods-storage-interface"></span><h2>The StorageInterface<a class="headerlink" href="#the-storageinterface" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\StorageInterface</span></tt> is the basic interface implemented by all storage adapters.</p>
+<dl class="function">
+<dt>
+<tt class="descname">getItem</tt><big>(</big><em>string $key</em>, <em>boolean &amp; $success = null</em>, <em>mixed &amp; $casToken = null</em><big>)</big></dt>
+<dd><p>Load an item with the given $key.</p>
+<p>If item exists set parameter $success to <tt class="docutils literal"><span class="pre">true</span></tt>, set parameter $casToken and returns <tt class="docutils literal"><span class="pre">mixed</span></tt> value of item.</p>
+<p>If item can&#8217;t load set parameter $success to <tt class="docutils literal"><span class="pre">false</span></tt> and returns <tt class="docutils literal"><span class="pre">null</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mixed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">getItems</tt><big>(</big><em>array $keys</em><big>)</big></dt>
+<dd><p>Load all items given by $keys returning key-value pairs.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">hasItem</tt><big>(</big><em>string $key</em><big>)</big></dt>
+<dd><p>Test if an item exists.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">hasItems</tt><big>(</big><em>array $keys</em><big>)</big></dt>
+<dd><p>Test multiple items.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string[]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">getMetadata</tt><big>(</big><em>string $key</em><big>)</big></dt>
+<dd><p>Get metadata of an item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array|boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">getMetadatas</tt><big>(</big><em>array $keys</em><big>)</big></dt>
+<dd><p>Get multiple metadata.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">setItem</tt><big>(</big><em>string $key</em>, <em>mixed $value</em><big>)</big></dt>
+<dd><p>Store an item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">setItems</tt><big>(</big><em>array $keyValuePairs</em><big>)</big></dt>
+<dd><p>Store multiple items.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">addItem</tt><big>(</big><em>string $key</em>, <em>mixed $value</em><big>)</big></dt>
+<dd><p>Add an item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">addItems</tt><big>(</big><em>array $keyValuePairs</em><big>)</big></dt>
+<dd><p>Add multiple items.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">replaceItem</tt><big>(</big><em>string $key</em>, <em>mixed $value</em><big>)</big></dt>
+<dd><p>Replace an item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">replaceItems</tt><big>(</big><em>array $keyValuePairs</em><big>)</big></dt>
+<dd><p>Replace multiple items.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">checkAndSetItem</tt><big>(</big><em>mixed $token</em>, <em>string $key</em>, <em>mixed $value</em><big>)</big></dt>
+<dd><p>Set item only if token matches. It uses the token received from <tt class="docutils literal"><span class="pre">getItem()</span></tt>
+to check if the item has changed before overwriting it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">touchItem</tt><big>(</big><em>string $key</em><big>)</big></dt>
+<dd><p>Reset lifetime of an item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">touchItems</tt><big>(</big><em>array $keys</em><big>)</big></dt>
+<dd><p>Reset lifetime of multiple items.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">removeItem</tt><big>(</big><em>string $key</em><big>)</big></dt>
+<dd><p>Remove an item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">removeItems</tt><big>(</big><em>array $keys</em><big>)</big></dt>
+<dd><p>Remove multiple items.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">incrementItem</tt><big>(</big><em>string $key</em>, <em>int $value</em><big>)</big></dt>
+<dd><p>Increment an item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">integer|boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">incrementItems</tt><big>(</big><em>array $keyValuePairs</em><big>)</big></dt>
+<dd><p>Increment multiple items.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">decrementItem</tt><big>(</big><em>string $key</em>, <em>int $value</em><big>)</big></dt>
+<dd><p>Decrement an item.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">interger|boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">decrementItems</tt><big>(</big><em>array $keyValuePairs</em><big>)</big></dt>
+<dd><p>Decrement multiple items.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">getCapabilities</tt><big>(</big><big>)</big></dt>
+<dd><p>Capabilities of this storage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Zend\Cache\Storage\Capabilities</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="the-availablespacecapableinterface">
+<span id="zend-cache-storage-adapter-methods-available-space-capable-interface"></span><h2>The AvailableSpaceCapableInterface<a class="headerlink" href="#the-availablespacecapableinterface" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\AvailableSpaceCapableInterface</span></tt> implements a method
+to make it possible getting the current available space of the storage.</p>
+<dl class="function">
+<dt>
+<tt class="descname">getAvailableSpace</tt><big>(</big><big>)</big></dt>
+<dd><p>Get available space in bytes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">integer|float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="the-totalspacecapableinterface">
+<span id="zend-cache-storage-adapter-methods-total-space-capable-interface"></span><h2>The TotalSpaceCapableInterface<a class="headerlink" href="#the-totalspacecapableinterface" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\TotalSpaceCapableInterface</span></tt> implements a method to
+make it possible getting the total space of the storage.</p>
+<dl class="function">
+<dt>
+<tt class="descname">getTotalSpace</tt><big>(</big><big>)</big></dt>
+<dd><p>Get total space in bytes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">integer|float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="the-clearbynamespaceinterface">
+<span id="zend-cache-storage-adapter-methods-clear-by-namespace-interface"></span><h2>The ClearByNamespaceInterface<a class="headerlink" href="#the-clearbynamespaceinterface" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearByNamespaceInterface</span></tt> implements a method to
+clear all items of a given namespace.</p>
+<dl class="function">
+<dt>
+<tt class="descname">clearByNamespace</tt><big>(</big><em>string $namespace</em><big>)</big></dt>
+<dd><p>Remove items of given namespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="the-clearbyprefixinterface">
+<h2>The ClearByPrefixInterface<a class="headerlink" href="#the-clearbyprefixinterface" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearByPrefixInterface</span></tt> implements a method to clear
+all items of a given prefix (within the current configured namespace).</p>
+<dl class="function">
+<dt>
+<tt class="descname">clearByPrefix</tt><big>(</big><em>string $prefix</em><big>)</big></dt>
+<dd><p>Remove items matching given prefix.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="the-clearexpiredinterface">
+<h2>The ClearExpiredInterface<a class="headerlink" href="#the-clearexpiredinterface" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearExpiredInterface</span></tt> implements a method to clear
+all expired items (within the current configured namespace).</p>
+<dl class="function">
+<dt>
+<tt class="descname">clearExpired</tt><big>(</big><big>)</big></dt>
+<dd><p>Remove expired items.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="the-flushableinterface">
+<h2>The FlushableInterface<a class="headerlink" href="#the-flushableinterface" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\FlushableInterface</span></tt> implements a method to flush
+the complete storage.</p>
+<dl class="function">
+<dt>
+<tt class="descname">flush</tt><big>(</big><big>)</big></dt>
+<dd><p>Flush the whole storage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="the-iterableinterface">
+<h2>The IterableInterface<a class="headerlink" href="#the-iterableinterface" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\IterableInterface</span></tt> implements a method to get an
+iterator to iterate over items of the storage. It extends <tt class="docutils literal"><span class="pre">IteratorAggregate</span></tt>
+so it&#8217;s possible to directly iterator over the storage using <tt class="docutils literal"><span class="pre">foreach</span></tt>.</p>
+<dl class="function">
+<dt>
+<tt class="descname">getIterator</tt><big>(</big><big>)</big></dt>
+<dd><p>Get an Iterator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Zend\Cache\Storage\IteratorInterface</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="the-optimizableinterface">
+<h2>The OptimizableInterface<a class="headerlink" href="#the-optimizableinterface" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\OptimizableInterface</span></tt> implements a method to run
+optimization processes on the storage.</p>
+<dl class="function">
+<dt>
+<tt class="descname">optimize</tt><big>(</big><big>)</big></dt>
+<dd><p>Optimize the storage.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="the-taggableinterface">
+<h2>The TaggableInterface<a class="headerlink" href="#the-taggableinterface" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\TaggableInterface</span></tt> implements methods to mark items
+with one or more tags and to clean items matching tags.</p>
+<dl class="function">
+<dt>
+<tt class="descname">setTags</tt><big>(</big><em>string $key</em>, <em>string[] $tags</em><big>)</big></dt>
+<dd><p>Set tags to an item by given key.
+(An empty array will remove all tags)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">getTags</tt><big>(</big><em>string $key</em><big>)</big></dt>
+<dd><p>Get tags of an item by given key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string[]|false</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">clearByTags</tt><big>(</big><em>string[] $tags</em>, <em>boolean $disjunction = false</em><big>)</big></dt>
+<dd><p>Remove items matching given tags.</p>
+<p>If $disjunction is <tt class="docutils literal"><span class="pre">true</span></tt> only one of the given tags must match
+else all given tags must match.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="the-apc-adapter">
+<h2>The Apc Adapter<a class="headerlink" href="#the-apc-adapter" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\Apc</span></tt> adapter stores cache items in shared
+memory through the required PHP extension <a class="reference external" href="http://pecl.php.net/package/APC">APC</a> (Alternative PHP Cache).</p>
+<p>This adapter implements the following interfaces:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\StorageInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\AvailableSpaceCapableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearByNamespaceInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearByPrefixInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\FlushableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\IterableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\TotalSpaceCapableInterface</span></tt></li>
+</ul>
+</div></blockquote>
+<table border="1" class="docutils">
+<caption>Capabilities</caption>
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Capability</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>supportedDatatypes</td>
+<td><tt class="docutils literal"><span class="pre">null</span></tt>, <tt class="docutils literal"><span class="pre">boolean</span></tt>, <tt class="docutils literal"><span class="pre">integer</span></tt>, <tt class="docutils literal"><span class="pre">double</span></tt>, <tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">array</span></tt> (serialized), <tt class="docutils literal"><span class="pre">object</span></tt> (serialized)</td>
+</tr>
+<tr class="row-odd"><td>supportedMetadata</td>
+<td>internal_key, atime, ctime, mtime, rtime, size, hits, ttl</td>
+</tr>
+<tr class="row-even"><td>minTtl</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>maxTtl</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td>staticTtl</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-odd"><td>ttlPrecision</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td>useRequestTime</td>
+<td>&lt;ini value of <tt class="docutils literal"><span class="pre">apc.use_request_time</span></tt>&gt;</td>
+</tr>
+<tr class="row-odd"><td>expiredRead</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-even"><td>maxKeyLength</td>
+<td>5182</td>
+</tr>
+<tr class="row-odd"><td>namespaceIsPrefix</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-even"><td>namespaceSeparator</td>
+<td>&lt;Option value of <tt class="docutils literal"><span class="pre">namespace_separator</span></tt>&gt;</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<table border="1" class="docutils">
+<caption>Adapter specific options</caption>
+<colgroup>
+<col width="22%" />
+<col width="12%" />
+<col width="17%" />
+<col width="49%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Data Type</th>
+<th class="head">Default Value</th>
+<th class="head">Describtion</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>namespace_separator</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt></td>
+<td>&#8221;:&#8221;</td>
+<td>A separator for the namespace and prefix</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="the-dba-adapter">
+<h2>The Dba Adapter<a class="headerlink" href="#the-dba-adapter" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\Dba</span></tt> adapter stores cache items into <a class="reference external" href="http://en.wikipedia.org/wiki/Dbm">dbm</a>
+like databases using the required PHP extension <a class="reference external" href="http://php.net/manual/book.dba.php">dba</a>.</p>
+<p>This adapter implements the following interfaces:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\StorageInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\AvailableSpaceCapableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearByNamespaceInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearByPrefixInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\FlushableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\IterableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\OptimizableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\TotalSpaceCapableInterface</span></tt></li>
+</ul>
+</div></blockquote>
+<table border="1" class="docutils">
+<caption>Capabilities</caption>
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Capability</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>supportedDatatypes</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">null</span></tt> =&gt; <tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">boolean</span></tt> =&gt; <tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">integer</span></tt> =&gt; <tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">double</span></tt> =&gt; <tt class="docutils literal"><span class="pre">string</span></tt></td>
+</tr>
+<tr class="row-odd"><td>supportedMetadata</td>
+<td>&lt;none&gt;</td>
+</tr>
+<tr class="row-even"><td>minTtl</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td>maxKeyLength</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td>namespaceIsPrefix</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-odd"><td>namespaceSeparator</td>
+<td>&lt;Option value of <tt class="docutils literal"><span class="pre">namespace_separator</span></tt>&gt;</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<table border="1" class="docutils">
+<caption>Adapter specific options</caption>
+<colgroup>
+<col width="15%" />
+<col width="8%" />
+<col width="12%" />
+<col width="65%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Data Type</th>
+<th class="head">Default Value</th>
+<th class="head">Describtion</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>namespace_separator</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt></td>
+<td>&#8221;:&#8221;</td>
+<td>A separator for the namespace and prefix</td>
+</tr>
+<tr class="row-odd"><td>pathname</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt></td>
+<td>&#8220;&#8221;</td>
+<td>Pathname to the database file</td>
+</tr>
+<tr class="row-even"><td>mode</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt></td>
+<td>&#8220;c&#8221;</td>
+<td>The mode to open the database
+Please read <a class="reference external" href="http://php.net/manual/function.dba-open.php">dba_open</a> for more information</td>
+</tr>
+<tr class="row-odd"><td>handler</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt></td>
+<td>&#8220;flatfile&#8221;</td>
+<td>The name of the handler which shall be used for accessing the database.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>This adapter doesn&#8217;t support automatically expire items</strong></p>
+<p class="last">Because of this adapter doesn&#8217;t support automatically expire items it&#8217;s
+very important to clean outdated items by self.</p>
+</div>
+</div>
+<div class="section" id="the-filesystem-adapter">
+<h2>The Filesystem Adapter<a class="headerlink" href="#the-filesystem-adapter" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\Filesystem</span></tt> adapter stores cache items
+into the filesystem.</p>
+<p>This adapter implements the following interfaces:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\StorageInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\AvailableSpaceCapableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearByNamespaceInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearByPrefixInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearExpiredInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\FlushableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\IterableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\OptimizableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\TaggableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\TotalSpaceCapableInterface</span></tt></li>
+</ul>
+</div></blockquote>
+<table border="1" class="docutils">
+<caption>Capabilities</caption>
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Capability</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>supportedDatatypes</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">null</span></tt> =&gt; <tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">boolean</span></tt> =&gt; <tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">integer</span></tt> =&gt; <tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">double</span></tt> =&gt; <tt class="docutils literal"><span class="pre">string</span></tt></td>
+</tr>
+<tr class="row-odd"><td>supportedMetadata</td>
+<td>mtime, filespec, atime, ctime</td>
+</tr>
+<tr class="row-even"><td>minTtl</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>maxTtl</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td>staticTtl</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-odd"><td>ttlPrecision</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td>useRequestTime</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-odd"><td>expiredRead</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-even"><td>maxKeyLength</td>
+<td>251</td>
+</tr>
+<tr class="row-odd"><td>namespaceIsPrefix</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-even"><td>namespaceSeparator</td>
+<td>&lt;Option value of <tt class="docutils literal"><span class="pre">namespace_separator</span></tt>&gt;</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<table border="1" class="docutils">
+<caption>Adapter specific options</caption>
+<colgroup>
+<col width="13%" />
+<col width="15%" />
+<col width="17%" />
+<col width="56%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Data Type</th>
+<th class="head">Default Value</th>
+<th class="head">Describtion</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>namespace_separator</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt></td>
+<td>&#8221;:&#8221;</td>
+<td>A separator for the namespace and prefix</td>
+</tr>
+<tr class="row-odd"><td>cache_dir</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt></td>
+<td>&#8220;&#8221;</td>
+<td>Directory to store cache files</td>
+</tr>
+<tr class="row-even"><td>clear_stat_cache</td>
+<td><tt class="docutils literal"><span class="pre">boolean</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+<td>Call <tt class="docutils literal"><span class="pre">clearstatcache()</span></tt> enabled?</td>
+</tr>
+<tr class="row-odd"><td>dir_level</td>
+<td><tt class="docutils literal"><span class="pre">integer</span></tt></td>
+<td>1</td>
+<td>Defines how much sub-directaries should be created</td>
+</tr>
+<tr class="row-even"><td>dir_permission</td>
+<td><tt class="docutils literal"><span class="pre">integer</span></tt> <tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td>0700</td>
+<td>Set explicit permission on creating new directories</td>
+</tr>
+<tr class="row-odd"><td>file_locking</td>
+<td><tt class="docutils literal"><span class="pre">boolean</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+<td>Lock files on writing</td>
+</tr>
+<tr class="row-even"><td>file_permission</td>
+<td><tt class="docutils literal"><span class="pre">integer</span></tt> <tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td>0600</td>
+<td>Set explicit permission on creating new files</td>
+</tr>
+<tr class="row-odd"><td>key_pattern</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">/^[a-z0-9_\+\-]*$/Di</span></tt></td>
+<td>Validate key against pattern</td>
+</tr>
+<tr class="row-even"><td>no_atime</td>
+<td><tt class="docutils literal"><span class="pre">boolean</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+<td>Don&#8217;t get &#8216;fileatime&#8217; as &#8216;atime&#8217; on metadata</td>
+</tr>
+<tr class="row-odd"><td>no_ctime</td>
+<td><tt class="docutils literal"><span class="pre">boolean</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+<td>Don&#8217;t get &#8216;filectime&#8217; as &#8216;ctime&#8217; on metadata</td>
+</tr>
+<tr class="row-even"><td>umask</td>
+<td><tt class="docutils literal"><span class="pre">integer</span></tt> <tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+<td>Use <a class="reference external" href="http://wikipedia.org/wiki/Umask">umask</a> to set file and directory permissions</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="the-memcached-adapter">
+<h2>The Memcached Adapter<a class="headerlink" href="#the-memcached-adapter" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\Memcached</span></tt> adapter stores cache
+items over the memcached protocol. It&#8217;s using the required PHP extension
+<a class="reference external" href="http://pecl.php.net/package/memcached">memcached</a> which is based on <a class="reference external" href="http://libmemcached.org/">Libmemcached</a>.</p>
+<p>This adapter implements the following interfaces:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\StorageInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\AvailableSpaceCapableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\FlushableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\TotalSpaceCapableInterface</span></tt></li>
+</ul>
+</div></blockquote>
+<table border="1" class="docutils">
+<caption>Capabilities</caption>
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Capability</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>supportedDatatypes</td>
+<td><tt class="docutils literal"><span class="pre">null</span></tt>, <tt class="docutils literal"><span class="pre">boolean</span></tt>, <tt class="docutils literal"><span class="pre">integer</span></tt>, <tt class="docutils literal"><span class="pre">double</span></tt>, <tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">array</span></tt> (serialized), <tt class="docutils literal"><span class="pre">object</span></tt> (serialized)</td>
+</tr>
+<tr class="row-odd"><td>supportedMetadata</td>
+<td>&lt;none&gt;</td>
+</tr>
+<tr class="row-even"><td>minTtl</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>maxTtl</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td>staticTtl</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-odd"><td>ttlPrecision</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td>useRequestTime</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-odd"><td>expiredRead</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-even"><td>maxKeyLength</td>
+<td>255</td>
+</tr>
+<tr class="row-odd"><td>namespaceIsPrefix</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-even"><td>namespaceSeparator</td>
+<td>&lt;none&gt;</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<table border="1" class="docutils">
+<caption>Adapter specific options</caption>
+<colgroup>
+<col width="12%" />
+<col width="13%" />
+<col width="15%" />
+<col width="60%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Data Type</th>
+<th class="head">Default Value</th>
+<th class="head">Describtion</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>servers</td>
+<td><tt class="docutils literal"><span class="pre">array</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">[]</span></tt></td>
+<td>List of servers in [] = array(<tt class="docutils literal"><span class="pre">string</span></tt> host, <tt class="docutils literal"><span class="pre">integer</span></tt> port)</td>
+</tr>
+<tr class="row-odd"><td>lib_options</td>
+<td><tt class="docutils literal"><span class="pre">array</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">[]</span></tt></td>
+<td><p class="first">Assosiative array of Libmemcached options were the array key is the option name
+(without the prefix &#8220;OPT_&#8221;) or the constant value. The array value is the option value</p>
+<p class="last">Please read this&lt;<a class="reference external" href="http://php.net/manual/memcached.setoption.php">http://php.net/manual/memcached.setoption.php</a>&gt; for more information</p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="the-memory-adapter">
+<h2>The Memory Adapter<a class="headerlink" href="#the-memory-adapter" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\Memory</span></tt> adapter stores cache items into
+the PHP process using an array.</p>
+<p>This adapter implements the following interfaces:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\StorageInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\AvailableSpaceCapableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearByPrefixInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearExpiredInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\FlushableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\IterableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\TaggableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\TotalSpaceCapableInterface</span></tt></li>
+</ul>
+</div></blockquote>
+<table border="1" class="docutils">
+<caption>Capabilities</caption>
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Capability</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>supportedDatatypes</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">null</span></tt>, <tt class="docutils literal"><span class="pre">boolean</span></tt>, <tt class="docutils literal"><span class="pre">integer</span></tt>, <tt class="docutils literal"><span class="pre">double</span></tt>, <tt class="docutils literal"><span class="pre">array</span></tt>, <tt class="docutils literal"><span class="pre">object</span></tt>, <tt class="docutils literal"><span class="pre">resource</span></tt></td>
+</tr>
+<tr class="row-odd"><td>supportedMetadata</td>
+<td>mtime</td>
+</tr>
+<tr class="row-even"><td>minTtl</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>maxTtl</td>
+<td>&lt;Value of <tt class="docutils literal"><span class="pre">PHP_INT_MAX</span></tt>&gt;</td>
+</tr>
+<tr class="row-even"><td>staticTtl</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-odd"><td>ttlPrecision</td>
+<td>0.05</td>
+</tr>
+<tr class="row-even"><td>useRequestTime</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-odd"><td>expiredRead</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-even"><td>maxKeyLength</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td>namespaceIsPrefix</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<table border="1" class="docutils">
+<caption>Adapter specific options</caption>
+<colgroup>
+<col width="11%" />
+<col width="13%" />
+<col width="21%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Data Type</th>
+<th class="head">Default Value</th>
+<th class="head">Describtion</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>memory_limit</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt> <tt class="docutils literal"><span class="pre">integer</span></tt></td>
+<td>&lt;50% of ini value <tt class="docutils literal"><span class="pre">memory_limit</span></tt>&gt;</td>
+<td><p class="first">Limit of how much memory can PHP allocate to allow store items into this adapter</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li>If the used memory of PHP exceeds this limit an OutOfSpaceException will be thrown.</li>
+<li>A number less or equal 0 will disable the memory limit</li>
+<li>When a number is used, the value is measured in bytes (Shorthand notation may also be used)</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">All stored items will be lost after terminating the script.</p>
+</div>
+</div>
+<div class="section" id="the-wincache-adapter">
+<h2>The WinCache Adapter<a class="headerlink" href="#the-wincache-adapter" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\WinCache</span></tt> adapter stores cache items into
+shared memory through the required PHP extension <a class="reference external" href="http://pecl.php.net/package/WinCache">WinCache</a>.</p>
+<p>This adapter implements the following interfaces:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\StorageInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\AvailableSpaceCapableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\FlushableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\TotalSpaceCapableInterface</span></tt></li>
+</ul>
+</div></blockquote>
+<table border="1" class="docutils">
+<caption>Capabilities</caption>
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Capability</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>supportedDatatypes</td>
+<td><tt class="docutils literal"><span class="pre">null</span></tt>, <tt class="docutils literal"><span class="pre">boolean</span></tt>, <tt class="docutils literal"><span class="pre">integer</span></tt>, <tt class="docutils literal"><span class="pre">double</span></tt>, <tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">array</span></tt> (serialized), <tt class="docutils literal"><span class="pre">object</span></tt> (serialized)</td>
+</tr>
+<tr class="row-odd"><td>supportedMetadata</td>
+<td>internal_key, ttl, hits, size</td>
+</tr>
+<tr class="row-even"><td>minTtl</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>maxTtl</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td>staticTtl</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-odd"><td>ttlPrecision</td>
+<td>1</td>
+</tr>
+<tr class="row-even"><td>useRequestTime</td>
+<td>&lt;ini value of <tt class="docutils literal"><span class="pre">apc.use_request_time</span></tt>&gt;</td>
+</tr>
+<tr class="row-odd"><td>expiredRead</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-even"><td>namespaceIsPrefix</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-odd"><td>namespaceSeparator</td>
+<td>&lt;Option value of <tt class="docutils literal"><span class="pre">namespace_separator</span></tt>&gt;</td>
+</tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<table border="1" class="docutils">
+<caption>Adapter specific options</caption>
+<colgroup>
+<col width="22%" />
+<col width="12%" />
+<col width="17%" />
+<col width="49%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Data Type</th>
+<th class="head">Default Value</th>
+<th class="head">Describtion</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>namespace_separator</td>
+<td><tt class="docutils literal"><span class="pre">string</span></tt></td>
+<td>&#8221;:&#8221;</td>
+<td>A separator for the namespace and prefix</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="the-zendserverdisk-adapter">
+<h2>The ZendServerDisk Adapter<a class="headerlink" href="#the-zendserverdisk-adapter" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>This <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\ZendServerDisk</span></tt> adapter stores cache
+items on filesystem through the <a class="reference external" href="http://www.zend.com/en/products/server/">Zend Server Data Caching API</a>.</p>
+<p>This adapter implements the following interfaces:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\StorageInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\AvailableSpaceCapableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearByNamespaceInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\FlushableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\TotalSpaceCapableInterface</span></tt></li>
+</ul>
+</div></blockquote>
+<table border="1" class="docutils">
+<caption>Capabilities</caption>
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Capability</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>supportedDatatypes</td>
+<td><tt class="docutils literal"><span class="pre">null</span></tt>, <tt class="docutils literal"><span class="pre">boolean</span></tt>, <tt class="docutils literal"><span class="pre">integer</span></tt>, <tt class="docutils literal"><span class="pre">double</span></tt>, <tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">array</span></tt> (serialized), <tt class="docutils literal"><span class="pre">object</span></tt> (serialized)</td>
+</tr>
+<tr class="row-odd"><td>supportedMetadata</td>
+<td>&lt;none&gt;</td>
+</tr>
+<tr class="row-even"><td>minTtl</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>maxTtl</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td>maxKeyLength</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td>staticTtl</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-even"><td>ttlPrecision</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>useRequestTime</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-even"><td>expiredRead</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-odd"><td>namespaceIsPrefix</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-even"><td>namespaceSeparator</td>
+<td><tt class="docutils literal"><span class="pre">::</span></tt></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="the-zendservershm-adapter">
+<h2>The ZendServerShm Adapter<a class="headerlink" href="#the-zendservershm-adapter" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>The <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Adapter\ZendServerShm</span></tt> adapter stores cache
+items in shared memory through the <a class="reference external" href="http://www.zend.com/en/products/server/">Zend Server Data Caching API</a>.</p>
+<p>This adapter implements the following interfaces:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\StorageInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\ClearByNamespaceInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\FlushableInterface</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Cache\Storage\TotalSpaceCapableInterface</span></tt></li>
+</ul>
+</div></blockquote>
+<table border="1" class="docutils">
+<caption>Capabilities</caption>
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Capability</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>supportedDatatypes</td>
+<td><tt class="docutils literal"><span class="pre">null</span></tt>, <tt class="docutils literal"><span class="pre">boolean</span></tt>, <tt class="docutils literal"><span class="pre">integer</span></tt>, <tt class="docutils literal"><span class="pre">double</span></tt>, <tt class="docutils literal"><span class="pre">string</span></tt>, <tt class="docutils literal"><span class="pre">array</span></tt> (serialized), <tt class="docutils literal"><span class="pre">object</span></tt> (serialized)</td>
+</tr>
+<tr class="row-odd"><td>supportedMetadata</td>
+<td>&lt;none&gt;</td>
+</tr>
+<tr class="row-even"><td>minTtl</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>maxTtl</td>
+<td>0</td>
+</tr>
+<tr class="row-even"><td>maxKeyLength</td>
+<td>0</td>
+</tr>
+<tr class="row-odd"><td>staticTtl</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-even"><td>ttlPrecision</td>
+<td>1</td>
+</tr>
+<tr class="row-odd"><td>useRequestTime</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-even"><td>expiredRead</td>
+<td><tt class="docutils literal"><span class="pre">false</span></tt></td>
+</tr>
+<tr class="row-odd"><td>namespaceIsPrefix</td>
+<td><tt class="docutils literal"><span class="pre">true</span></tt></td>
+</tr>
+<tr class="row-even"><td>namespaceSeparator</td>
+<td><tt class="docutils literal"><span class="pre">::</span></tt></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="examples">
+<span id="zend-cache-storage-adapter-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zend-cache-storage-adapter-examples-basic">Basic usage</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$cache</span>   <span class="o">=</span> <span class="nx">\Zend\Cache\StorageFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;storage&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;filesystem&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;plugins&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="c1">// Don&#39;t throw exceptions on cache errors</span>
+        <span class="s1">&#39;exaption_hander&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;throw_exceptions&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+<span class="p">));</span>
+<span class="nv">$key</span>    <span class="o">=</span> <span class="s1">&#39;unique-cache-key&#39;</span><span class="p">;</span>
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">getItem</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$success</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$success</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$result</span> <span class="o">=</span> <span class="nx">doExpansiveStuff</span><span class="p">();</span>
+    <span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">setItem</span><span class="p">(</span><span class="nv">$key</span><span class="p">,</span> <span class="nv">$result</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="id2">Get multiple rows from db</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Instantiate the cache instance using a namespace for the same type of items</span>
+<span class="nv">$cache</span>   <span class="o">=</span> <span class="nx">\Zend\Cache\StorageFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;storage&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;filesystem&#39;</span>
+        <span class="c1">// With a namespace we can indicate the same type of items</span>
+        <span class="c1">// -&gt; So we can simple use the db id as cache key</span>
+        <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;namespace&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;dbtable&#39;</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;plugins&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="c1">// Don&#39;t throw exceptions on cache errors</span>
+        <span class="s1">&#39;exception_handler&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;throw_exceptions&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span>
+        <span class="p">),</span>
+        <span class="c1">// We store database rows on filesystem so we need to serialize them</span>
+        <span class="s1">&#39;Serializer&#39;</span>
+    <span class="p">)</span>
+<span class="p">));</span>
+
+<span class="c1">// Load two rows from cache if possible</span>
+<span class="nv">$ids</span>     <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+<span class="nv">$results</span> <span class="o">=</span> <span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">getItems</span><span class="p">(</span><span class="nv">$ids</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="nv">$results</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$ids</span><span class="p">))</span> <span class="p">{</span>
+    <span class="c1">// Load rows from db if loading from cache failed</span>
+    <span class="nv">$missingIds</span>     <span class="o">=</span> <span class="nb">array_diff</span><span class="p">(</span><span class="nv">$ids</span><span class="p">,</span> <span class="nb">array_keys</span><span class="p">(</span><span class="nv">$results</span><span class="p">));</span>
+    <span class="nv">$missingResults</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+    <span class="nv">$query</span>          <span class="o">=</span> <span class="s1">&#39;SELECT * FROM dbtable WHERE id IN (&#39;</span> <span class="o">.</span> <span class="nb">implode</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="nv">$missingIds</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;)&#39;</span><span class="p">;</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$pdo</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="nv">$query</span><span class="p">,</span> <span class="nx">PDO</span><span class="o">::</span><span class="na">FETCH_ASSOC</span><span class="p">)</span> <span class="k">as</span> <span class="nv">$row</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$missingResults</span><span class="p">[</span> <span class="nv">$row</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="p">]</span> <span class="o">=</span> <span class="nv">$row</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Update cache items of the loaded rows from db</span>
+    <span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">setItems</span><span class="p">(</span><span class="nv">$missingResults</span><span class="p">);</span>
+
+    <span class="c1">// merge results from cache and db</span>
+    <span class="nv">$results</span> <span class="o">=</span> <span class="nb">array_merge</span><span class="p">(</span><span class="nv">$results</span><span class="p">,</span> <span class="nv">$missingResults</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Cache\Storage\Adapter</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#basic-configuration-options">Basic Configuration Options</a></li>
+<li><a class="reference internal" href="#the-storageinterface">The StorageInterface</a></li>
+<li><a class="reference internal" href="#the-availablespacecapableinterface">The AvailableSpaceCapableInterface</a></li>
+<li><a class="reference internal" href="#the-totalspacecapableinterface">The TotalSpaceCapableInterface</a></li>
+<li><a class="reference internal" href="#the-clearbynamespaceinterface">The ClearByNamespaceInterface</a></li>
+<li><a class="reference internal" href="#the-clearbyprefixinterface">The ClearByPrefixInterface</a></li>
+<li><a class="reference internal" href="#the-clearexpiredinterface">The ClearExpiredInterface</a></li>
+<li><a class="reference internal" href="#the-flushableinterface">The FlushableInterface</a></li>
+<li><a class="reference internal" href="#the-iterableinterface">The IterableInterface</a></li>
+<li><a class="reference internal" href="#the-optimizableinterface">The OptimizableInterface</a></li>
+<li><a class="reference internal" href="#the-taggableinterface">The TaggableInterface</a></li>
+<li><a class="reference internal" href="#the-apc-adapter">The Apc Adapter</a></li>
+<li><a class="reference internal" href="#the-dba-adapter">The Dba Adapter</a></li>
+<li><a class="reference internal" href="#the-filesystem-adapter">The Filesystem Adapter</a></li>
+<li><a class="reference internal" href="#the-memcached-adapter">The Memcached Adapter</a></li>
+<li><a class="reference internal" href="#the-memory-adapter">The Memory Adapter</a></li>
+<li><a class="reference internal" href="#the-wincache-adapter">The WinCache Adapter</a></li>
+<li><a class="reference internal" href="#the-zendserverdisk-adapter">The ZendServerDisk Adapter</a></li>
+<li><a class="reference internal" href="#the-zendservershm-adapter">The ZendServerShm Adapter</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.barcode.renderers.html"
+                        title="previous chapter">Zend\Barcode Renderers</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.cache.storage.capabilities.html"
+                        title="next chapter">Zend\Cache\Storage\Capabilities</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.cache.storage.adapter.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.cache.storage.adapter.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.cache.storage.adapter.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.cache.storage.capabilities.html" title="Zend\Cache\Storage\Capabilities"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.barcode.renderers.html" title="Zend\Barcode Renderers"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.cache.storage.adapter.rst">
+                Zend\Cache\Storage\Adapter
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

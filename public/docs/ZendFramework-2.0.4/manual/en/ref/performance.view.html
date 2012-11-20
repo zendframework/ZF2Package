@@ -1,0 +1,560 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>View Rendering &mdash; Zend Framework 2 2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.4 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="view-rendering">
+<span id="performance-view"></span><h1>View Rendering<a class="headerlink" href="#view-rendering" title="Permalink to this headline">¶</a></h1>
+<p>When using Zend Framework&#8217;s <em>MVC</em> layer, chances are you will be using <tt class="docutils literal"><span class="pre">Zend_View</span></tt>. <tt class="docutils literal"><span class="pre">Zend_View</span></tt> is performs
+well compared to other view or templating engines; since view scripts are written in <em>PHP</em>, you do not incur the
+overhead of compiling custom markup to <em>PHP</em>, nor do you need to worry that the compiled <em>PHP</em> is not optimized.
+However, <tt class="docutils literal"><span class="pre">Zend_View</span></tt> presents its own issues: extension is done via overloading (view helpers), and a number of
+view helpers, while carrying out key functionality do so with a performance cost.</p>
+<div class="section" id="how-can-i-speed-up-resolution-of-view-helpers">
+<span id="performance-view-pluginloader"></span><h2>How can I speed up resolution of view helpers?<a class="headerlink" href="#how-can-i-speed-up-resolution-of-view-helpers" title="Permalink to this headline">¶</a></h2>
+<p>Most <tt class="docutils literal"><span class="pre">Zend_View</span></tt>&#8220;methods&#8221; are actually provided via overloading to the helper system. This provides important
+flexibility to <tt class="docutils literal"><span class="pre">Zend_View</span></tt>; instead of needing to extend <tt class="docutils literal"><span class="pre">Zend_View</span></tt> and provide all the helper methods you may
+utilize in your application, you can define your helper methods in separate classes and consume them at will as if
+they were direct methods of <tt class="docutils literal"><span class="pre">Zend_View</span></tt>. This keeps the view object itself relatively thin, and ensures that
+objects are created only when needed.</p>
+<p>Internally, <tt class="docutils literal"><span class="pre">Zend_View</span></tt> uses the <em class="xref std std-ref">PluginLoader</em> to look up helper classes. This
+means that for each helper you call, <tt class="docutils literal"><span class="pre">Zend_View</span></tt> needs to pass the helper name to the PluginLoader, which then
+needs to determine the class name, load the class file if necessary, and then return the class name so it may be
+instantiated. Subsequent uses of the helper are much faster, as <tt class="docutils literal"><span class="pre">Zend_View</span></tt> keeps an internal registry of loaded
+helpers, but if you use many helpers, the calls add up.</p>
+<p>The question, then, is: how can you speed up helper resolution?</p>
+<div class="section" id="use-the-pluginloader-include-file-cache">
+<span id="performance-view-pluginloader-cache"></span><h3>Use the PluginLoader include file cache<a class="headerlink" href="#use-the-pluginloader-include-file-cache" title="Permalink to this headline">¶</a></h3>
+<p>The simplest, cheapest solution is the same as for <a class="reference internal" href="performance.classloading.html#performance-classloading-pluginloader"><em>general PluginLoader performance</em></a>: <em class="xref std std-ref">use the PluginLoader include file cache</em>. Anecdotal evidence has shown this technique to provide a 25-30%
+performance gain on systems without an opcode cache, and a 40-65% gain on systems with an opcode cache.</p>
+</div>
+<div class="section" id="extend-zend-view-to-provide-often-used-helper-methods">
+<span id="performance-view-pluginloader-extend"></span><h3>Extend Zend_View to provide often used helper methods<a class="headerlink" href="#extend-zend-view-to-provide-often-used-helper-methods" title="Permalink to this headline">¶</a></h3>
+<p>Another solution for those seeking to tune performance even further is to extend <tt class="docutils literal"><span class="pre">Zend_View</span></tt> to manually add the
+helper methods they most use in their application. Such helper methods may simply manually instantiate the
+appropriate helper class and proxy to it, or stuff the full helper implementation into the method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">My_View</span> <span class="k">extends</span> <span class="nx">Zend_View</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @var array Registry of helper classes used</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$_localHelperObjects</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Proxy to url view helper</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param  array $urlOptions Options passed to the assemble method</span>
+<span class="sd">     *                           of the Route object.</span>
+<span class="sd">     * @param  mixed $name The name of a Route to use. If null it will</span>
+<span class="sd">     *                     use the current Route</span>
+<span class="sd">     * @param  bool $reset Whether or not to reset the route defaults</span>
+<span class="sd">     *                     with those provided</span>
+<span class="sd">     * @return string Url for the link href attribute.</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">url</span><span class="p">(</span><span class="k">array</span> <span class="nv">$urlOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(),</span> <span class="nv">$name</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span>
+        <span class="nv">$reset</span> <span class="o">=</span> <span class="k">false</span><span class="p">,</span> <span class="nv">$encode</span> <span class="o">=</span> <span class="k">true</span>
+    <span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">array_key_exists</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_localHelperObjects</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_localHelperObjects</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\View_Helper\Url</span><span class="p">();</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_localHelperObjects</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span><span class="o">-&gt;</span><span class="na">setView</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="nv">$helper</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_localHelperObjects</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">];</span>
+        <span class="k">return</span> <span class="nv">$helper</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="nv">$urlOptions</span><span class="p">,</span> <span class="nv">$name</span><span class="p">,</span> <span class="nv">$reset</span><span class="p">,</span> <span class="nv">$encode</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Echo a message</span>
+<span class="sd">     *</span>
+<span class="sd">     * Direct implementation.</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param  string $string</span>
+<span class="sd">     * @return string</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">message</span><span class="p">(</span><span class="nv">$string</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;h1&gt;&quot;</span> <span class="o">.</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escape</span><span class="p">(</span><span class="nv">$message</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;&lt;/h1&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Either way, this technique will substantially reduce the overhead of the helper system by avoiding calls to the
+PluginLoader entirely, and either benefiting from autoloading or bypassing it altogether.</p>
+</div>
+</div>
+<div class="section" id="how-can-i-speed-up-view-partials">
+<span id="performance-view-partial"></span><h2>How can I speed up view partials?<a class="headerlink" href="#how-can-i-speed-up-view-partials" title="Permalink to this headline">¶</a></h2>
+<p>Those who use partials heavily and who profile their applications will often immediately notice that the
+<tt class="docutils literal"><span class="pre">partial()</span></tt> view helper incurs a lot of overhead, due to the need to clone the view object. Is it possible to
+speed this up?</p>
+<div class="section" id="use-partial-only-when-really-necessary">
+<span id="performance-view-partial-render"></span><h3>Use partial() only when really necessary<a class="headerlink" href="#use-partial-only-when-really-necessary" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">partial()</span></tt> view helper accepts three arguments:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">$name</span></tt>: the name of the view script to render</li>
+<li><tt class="docutils literal"><span class="pre">$module</span></tt>: the name of the module in which the view script resides; or, if no third argument is provided and
+this is an array or object, it will be the <tt class="docutils literal"><span class="pre">$model</span></tt> argument.</li>
+<li><tt class="docutils literal"><span class="pre">$model</span></tt>: an array or object to pass to the partial representing the clean data to assign to the view.</li>
+</ul>
+<p>The power and use of <tt class="docutils literal"><span class="pre">partial()</span></tt> come from the second and third arguments. The <tt class="docutils literal"><span class="pre">$module</span></tt> argument allows
+<tt class="docutils literal"><span class="pre">partial()</span></tt> to temporarily add a script path for the given module so that the partial view script will resolve to
+that module; the <tt class="docutils literal"><span class="pre">$model</span></tt> argument allows you to explicitly pass variables for use with the partial view. If
+you&#8217;re not passing either argument, <strong>use render() instead</strong>!</p>
+<p>Basically, unless you are actually passing variables to the partial and need the clean variable scope, or rendering
+a view script from another <em>MVC</em> module, there is no reason to incur the overhead of <tt class="docutils literal"><span class="pre">partial()</span></tt>; instead, use
+<tt class="docutils literal"><span class="pre">Zend_View</span></tt>&#8216;s built-in <tt class="docutils literal"><span class="pre">render()</span></tt> method to render the view script.</p>
+</div>
+</div>
+<div class="section" id="how-can-i-speed-up-calls-to-the-action-view-helper">
+<span id="performance-view-action"></span><h2>How can I speed up calls to the action() view helper?<a class="headerlink" href="#how-can-i-speed-up-calls-to-the-action-view-helper" title="Permalink to this headline">¶</a></h2>
+<p>Version 1.5.0 introduced the <tt class="docutils literal"><span class="pre">action()</span></tt> view helper, which allows you to dispatch an <em>MVC</em> action and capture its
+rendered content. This provides an important step towards the <em>DRY</em> principle, and promotes code reuse. However, as
+those who profile their applications will quickly realize, it, too, is an expensive operation. Internally, the
+<tt class="docutils literal"><span class="pre">action()</span></tt> view helper needs to clone new request and response objects, invoke the dispatcher, invoke the
+requested controller and action, etc.</p>
+<p>How can you speed it up?</p>
+<div class="section" id="use-the-actionstack-when-possible">
+<span id="performance-view-action-actionstack"></span><h3>Use the ActionStack when possible<a class="headerlink" href="#use-the-actionstack-when-possible" title="Permalink to this headline">¶</a></h3>
+<p>Introduced at the same time as the <tt class="docutils literal"><span class="pre">action()</span></tt> view helper, the <em class="xref std std-ref">ActionStack</em> consists of an action helper and a front controller plugin. Together,
+they allow you to push additional actions to invoke during the dispatch cycle onto a stack. If you are calling
+<tt class="docutils literal"><span class="pre">action()</span></tt> from your layout view scripts, you may want to instead use the ActionStack, and render your views to
+discrete response segments. As an example, you could write a <tt class="docutils literal"><span class="pre">dispatchLoopStartup()</span></tt> plugin like the following to
+add a login form box to each page:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">LoginPlugin</span> <span class="k">extends</span> <span class="nx">Zend\Controller_Plugin\Abstract</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$_stack</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">dispatchLoopStartup</span><span class="p">(</span>
+        <span class="nx">Zend\Controller_Request\Abstract</span> <span class="nv">$request</span>
+    <span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$stack</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getStack</span><span class="p">();</span>
+        <span class="nv">$loginRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Controller_Request\Simple</span><span class="p">();</span>
+        <span class="nv">$loginRequest</span><span class="o">-&gt;</span><span class="na">setControllerName</span><span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">)</span>
+                     <span class="o">-&gt;</span><span class="na">setActionName</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+                     <span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;responseSegment&#39;</span><span class="p">,</span> <span class="s1">&#39;login&#39;</span><span class="p">);</span>
+        <span class="nv">$stack</span><span class="o">-&gt;</span><span class="na">pushStack</span><span class="p">(</span><span class="nv">$loginRequest</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getStack</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">null</span> <span class="o">===</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_stack</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$front</span> <span class="o">=</span> <span class="nx">Zend\Controller\Front</span><span class="o">::</span><span class="na">getInstance</span><span class="p">();</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$front</span><span class="o">-&gt;</span><span class="na">hasPlugin</span><span class="p">(</span><span class="s1">&#39;Zend\Controller_Plugin\ActionStack&#39;</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nv">$stack</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Controller_Plugin\ActionStack</span><span class="p">();</span>
+                <span class="nv">$front</span><span class="o">-&gt;</span><span class="na">registerPlugin</span><span class="p">(</span><span class="nv">$stack</span><span class="p">);</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="nv">$stack</span> <span class="o">=</span> <span class="nv">$front</span><span class="o">-&gt;</span><span class="na">getPlugin</span><span class="p">(</span><span class="s1">&#39;ActionStack&#39;</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_stack</span> <span class="o">=</span> <span class="nv">$stack</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_stack</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">UserController::indexAction()</span></tt> method might then use the <tt class="docutils literal"><span class="pre">$responseSegment</span></tt> parameter to indicate which
+response segment to render to. In the layout script, you would then simply render that response segment:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">layout</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">login</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<p>While the ActionStack still requires a dispatch cycle, this is still cheaper than the <tt class="docutils literal"><span class="pre">action()</span></tt> view helper as
+it does not need to clone objects and reset internal state. Additionally, it ensures that all pre and post dispatch
+plugins are invoked, which may be of particular concern if you are using front controller plugins for handling
+<em>ACL</em>&#8216;s to particular actions.</p>
+</div>
+<div class="section" id="favor-helpers-that-query-the-model-over-action">
+<span id="performance-view-action-model"></span><h3>Favor helpers that query the model over action()<a class="headerlink" href="#favor-helpers-that-query-the-model-over-action" title="Permalink to this headline">¶</a></h3>
+<p>In most cases, using <tt class="docutils literal"><span class="pre">action()</span></tt> is simply overkill. If you have most business logic nested in your models and are
+simply querying the model and passing the results to a view script, it will typically be faster and cleaner to
+simply write a view helper that pulls the model, queries it, and does something with that information.</p>
+<p>As an example, consider the following controller action and view script:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">BugController</span> <span class="k">extends</span> <span class="nx">Zend\Controller\Action</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">listAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$model</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Bug</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">view</span><span class="o">-&gt;</span><span class="na">bugs</span> <span class="o">=</span> <span class="nv">$model</span><span class="o">-&gt;</span><span class="na">fetchActive</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// bug/list.phtml:</span>
+<span class="k">echo</span> <span class="s2">&quot;&lt;ul&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">bugs</span> <span class="k">as</span> <span class="nv">$bug</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">printf</span><span class="p">(</span><span class="s2">&quot;&lt;li&gt;&lt;b&gt;%s&lt;/b&gt;: %s&lt;/li&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escape</span><span class="p">(</span><span class="nv">$bug</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">),</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escape</span><span class="p">(</span><span class="nv">$bug</span><span class="o">-&gt;</span><span class="na">summary</span><span class="p">)</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+<span class="k">echo</span> <span class="s2">&quot;&lt;/ul&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Using <tt class="docutils literal"><span class="pre">action()</span></tt>, you would then invoke it with the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">action</span><span class="p">(</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="s1">&#39;bug&#39;</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<p>This could be refactored to a view helper that looks like the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">My_View_Helper_BugList</span> <span class="k">extends</span> <span class="nx">Zend\View_Helper\Abstract</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">bugList</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$model</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Bug</span><span class="p">();</span>
+        <span class="nv">$html</span>  <span class="o">=</span> <span class="s2">&quot;&lt;ul&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="nv">$model</span><span class="o">-&gt;</span><span class="na">fetchActive</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$bug</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$html</span> <span class="o">.=</span> <span class="nb">sprintf</span><span class="p">(</span>
+                <span class="s2">&quot;&lt;li&gt;&lt;b&gt;%s&lt;/b&gt;: %s&lt;/li&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">view</span><span class="o">-&gt;</span><span class="na">escape</span><span class="p">(</span><span class="nv">$bug</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">),</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">view</span><span class="o">-&gt;</span><span class="na">escape</span><span class="p">(</span><span class="nv">$bug</span><span class="o">-&gt;</span><span class="na">summary</span><span class="p">)</span>
+            <span class="p">);</span>
+        <span class="p">}</span>
+        <span class="nv">$html</span> <span class="o">.=</span> <span class="s2">&quot;&lt;/ul&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$html</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>You would then invoke the helper as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">bugList</span><span class="p">()</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<p>This has two benefits: it no longer incurs the overhead of the <tt class="docutils literal"><span class="pre">action()</span></tt> view helper, and also presents a more
+semantically understandable <em>API</em>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">View Rendering</a><ul>
+<li><a class="reference internal" href="#how-can-i-speed-up-resolution-of-view-helpers">How can I speed up resolution of view helpers?</a><ul>
+<li><a class="reference internal" href="#use-the-pluginloader-include-file-cache">Use the PluginLoader include file cache</a></li>
+<li><a class="reference internal" href="#extend-zend-view-to-provide-often-used-helper-methods">Extend Zend_View to provide often used helper methods</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-can-i-speed-up-view-partials">How can I speed up view partials?</a><ul>
+<li><a class="reference internal" href="#use-partial-only-when-really-necessary">Use partial() only when really necessary</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-can-i-speed-up-calls-to-the-action-view-helper">How can I speed up calls to the action() view helper?</a><ul>
+<li><a class="reference internal" href="#use-the-actionstack-when-possible">Use the ActionStack when possible</a></li>
+<li><a class="reference internal" href="#favor-helpers-that-query-the-model-over-action">Favor helpers that query the model over action()</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/ref/performance.view.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/ref/performance.view.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/ref/performance.view.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/ref/performance.view.rst">
+                View Rendering
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

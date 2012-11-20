@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Internationalization (i18n) and Localization (l10n) &mdash; Zend Framework 2 2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.4 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="internationalization-i18n-and-localization-l10n">
+<span id="performance-localization"></span><h1>Internationalization (i18n) and Localization (l10n)<a class="headerlink" href="#internationalization-i18n-and-localization-l10n" title="Permalink to this headline">¶</a></h1>
+<p>Internationalizing and localizing a site are fantastic ways to expand your audience and ensure that all visitors
+can get to the information they need. However, it often comes with a performance penalty. Below are some strategies
+you can employ to reduce the overhead of i18n and l10n.</p>
+<div class="section" id="which-translation-adapter-should-i-use">
+<span id="performance-localization-translationadapter"></span><h2>Which translation adapter should I use?<a class="headerlink" href="#which-translation-adapter-should-i-use" title="Permalink to this headline">¶</a></h2>
+<p>Not all translation adapters are made equal. Some have more features than others, and some perform better than
+others. Additionally, you may have business requirements that force you to use a particular adapter. However, if
+you have a choice, which adapters are fastest?</p>
+<div class="section" id="use-non-xml-translation-adapters-for-greatest-speed">
+<span id="performance-localization-translationadapter-fastest"></span><h3>Use non-XML translation adapters for greatest speed<a class="headerlink" href="#use-non-xml-translation-adapters-for-greatest-speed" title="Permalink to this headline">¶</a></h3>
+<p>Zend Framework ships with a variety of translation adapters. Fully half of them utilize an <em>XML</em> format, incurring
+memory and performance overhead. Fortunately, there are several adapters that utilize other formats that can be
+parsed much more quickly. In order of speed, from fastest to slowest, they are:</p>
+<ul class="simple">
+<li><strong>Array</strong>: this is the fastest, as it is, by definition, parsed into a native <em>PHP</em> format immediately on
+inclusion.</li>
+<li><strong>CSV</strong>: uses <tt class="docutils literal"><span class="pre">fgetcsv()</span></tt> to parse a <em>CSV</em> file and transform it into a native <em>PHP</em> format.</li>
+<li><strong>INI</strong>: uses <tt class="docutils literal"><span class="pre">parse_ini_file()</span></tt> to parse an <em>INI</em> file and transform it into a native <em>PHP</em> format. This and
+the <em>CSV</em> adapter are roughly equivalent performance-wise.</li>
+<li><strong>Gettext</strong>: The gettext adapter from Zend Framework does <strong>not</strong> use the gettext extension as it is not thread
+safe and does not allow specifying more than one locale per server. As a result, it is slower than using the
+gettext extension directly, but, because the gettext format is binary, it&#8217;s faster to parse than <em>XML</em>.</li>
+</ul>
+<p>If high performance is one of your concerns, we suggest utilizing one of the above adapters.</p>
+</div>
+</div>
+<div class="section" id="how-can-i-make-translation-and-localization-even-faster">
+<span id="performance-localization-cache"></span><h2>How can I make translation and localization even faster?<a class="headerlink" href="#how-can-i-make-translation-and-localization-even-faster" title="Permalink to this headline">¶</a></h2>
+<p>Maybe, for business reasons, you&#8217;re limited to an <em>XML</em>-based translation adapter. Or perhaps you&#8217;d like to speed
+things up even more. Or perhaps you want to make l10n operations faster. How can you do this?</p>
+<div class="section" id="use-translation-and-localization-caches">
+<span id="performance-localization-cache-usage"></span><h3>Use translation and localization caches<a class="headerlink" href="#use-translation-and-localization-caches" title="Permalink to this headline">¶</a></h3>
+<p>Both <tt class="docutils literal"><span class="pre">Zend_Translator</span></tt> and <tt class="docutils literal"><span class="pre">Zend_Locale</span></tt> implement caching functionality that can greatly affect performance.
+In the case of each, the major bottleneck is typically reading the files, not the actual lookups; using a cache
+eliminates the need to read the translation and/or localization files.</p>
+<p>You can read about caching of translation and localization strings in the following locations:</p>
+<ul class="simple">
+<li><em class="xref std std-ref">Zend_Translator adapter caching</em></li>
+<li><em class="xref std std-ref">Zend_Locale caching</em></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Internationalization (i18n) and Localization (l10n)</a><ul>
+<li><a class="reference internal" href="#which-translation-adapter-should-i-use">Which translation adapter should I use?</a><ul>
+<li><a class="reference internal" href="#use-non-xml-translation-adapters-for-greatest-speed">Use non-XML translation adapters for greatest speed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-can-i-make-translation-and-localization-even-faster">How can I make translation and localization even faster?</a><ul>
+<li><a class="reference internal" href="#use-translation-and-localization-caches">Use translation and localization caches</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/ref/performance.localization.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/ref/performance.localization.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/ref/performance.localization.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/ref/performance.localization.rst">
+                Internationalization (i18n) and Localization (l10n)
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

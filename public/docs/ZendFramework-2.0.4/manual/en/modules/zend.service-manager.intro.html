@@ -1,0 +1,280 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\ServiceManager &mdash; Zend Framework 2 2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.4 documentation" href="../index.html" />
+    <link rel="next" title="Zend\ServiceManager Quick Start" href="zend.service-manager.quick-start.html" />
+    <link rel="prev" title="Zend\Server\Reflection" href="zend.server.reflection.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.service-manager.quick-start.html" title="Zend\ServiceManager Quick Start"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.server.reflection.html" title="Zend\Server\Reflection"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-servicemanager">
+<span id="zend-service-manager-intro"></span><h1>Zend\ServiceManager<a class="headerlink" href="#zend-servicemanager" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference external" href="http://en.wikipedia.org/wiki/Service_locator_pattern">Service Locator design pattern</a> is implemented by the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>.  The Service Locator is a
+service/object locator, tasked with retrieving other objects. You may interact with the <tt class="docutils literal"><span class="pre">ServiceManger</span></tt>
+via the following methods</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// /library/Zend/ServiceManager/ServiceLocatorInterface.php</span>
+      <span class="k">namespace</span> <span class="nx">Zend\ServiceManager</span><span class="p">;</span>
+
+      <span class="k">interface</span> <span class="nx">ServiceLocatorInterface</span>
+      <span class="p">{</span>
+              <span class="k">public</span> <span class="k">function</span> <span class="nf">get</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span>
+              <span class="k">public</span> <span class="k">function</span> <span class="nf">has</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span>
+      <span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">has($name)</span></tt>, tests whether the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> has a named service;</li>
+<li><tt class="docutils literal"><span class="pre">get($name)</span></tt>, retrieves a service by the given name.</li>
+</ul>
+<p>In addition to above methods, the <tt class="docutils literal"><span class="pre">ServiceManger</span></tt> can be instantiated via the following features:</p>
+<ul class="simple">
+<li><strong>Service registration</strong>. You can register an object under a given name <tt class="docutils literal"><span class="pre">$services-&gt;setService('foo',</span>
+<span class="pre">$object)</span></tt>.</li>
+<li><strong>Lazy-loaded service objects</strong>. You can tell the manager what class to instantiate on first request
+<tt class="docutils literal"><span class="pre">$services-&gt;setInvokableClass('foo',</span> <span class="pre">'Fully\Qualified\Classname')</span></tt>.</li>
+<li><strong>Service factories</strong>. Instead of an actual object instance or a class name, you can tell the manager to invoke
+the provided factory in order to get the object instance. Factories may be either any PHP callable, an object
+implementing <tt class="docutils literal"><span class="pre">Zend\ServiceManager\FactoryInterface</span></tt>, or the name of a class implementing that interface.</li>
+<li><strong>Service aliasing</strong>. You can tell the manager that when a particular name is requested, use the provided name
+instead. You can alias to a known service, a lazy-loaded service, a factory, or even other aliases.</li>
+<li><strong>Abstract factories</strong>. An abstract factory can be considered a &#8220;fallback&#8221; &#8211; if the service does not exist in
+the manager, it will then pass it to any abstract factories attached to it until one of them is able to return an
+object.</li>
+<li><strong>Initializers</strong>. You may want certain injection points always populated &#8211; as an example, any object you load
+via the service manager that implements <tt class="docutils literal"><span class="pre">Zend\EventManager\EventManagerAware</span></tt> should likely receive an
+<tt class="docutils literal"><span class="pre">EventManager</span></tt> instance. <strong>Initializers</strong> are PHP callbacks or classes implementing
+<tt class="docutils literal"><span class="pre">Zend\ServiceManager\InitializerInterface</span></tt>; they receive the new instance, and can then manipulate it.</li>
+</ul>
+<p>In addition to the above, the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> also provides optional ties to <tt class="docutils literal"><span class="pre">Zend\Di</span></tt>, allowing <tt class="docutils literal"><span class="pre">Di</span></tt> to act
+as an initializer or an abstract factory for the manager.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.server.reflection.html"
+                        title="previous chapter">Zend\Server\Reflection</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.service-manager.quick-start.html"
+                        title="next chapter">Zend\ServiceManager Quick Start</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.service-manager.intro.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.service-manager.intro.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.service-manager.intro.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.service-manager.quick-start.html" title="Zend\ServiceManager Quick Start"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.server.reflection.html" title="Zend\Server\Reflection"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.service-manager.intro.rst">
+                Zend\ServiceManager
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

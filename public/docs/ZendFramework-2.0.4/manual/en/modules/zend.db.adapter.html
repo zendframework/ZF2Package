@@ -1,0 +1,789 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Db\Adapter &mdash; Zend Framework 2 2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.4 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Db\ResultSet" href="zend.db.result-set.html" />
+    <link rel="prev" title="Public key cryptography" href="zend.crypt.public-key.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.db.result-set.html" title="Zend\Db\ResultSet"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.crypt.public-key.html" title="Public key cryptography"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-db-adapter">
+<span id="id1"></span><h1>Zend\Db\Adapter<a class="headerlink" href="#zend-db-adapter" title="Permalink to this headline">¶</a></h1>
+<p>The Adapter object is the most important sub-component of <tt class="docutils literal"><span class="pre">Zend\Db</span></tt>. It is responsible for adapting any code written
+in or for Zend\Db to the targeted php extensions and vendor databases. In doing this, it creates an abstraction
+layer for the PHP extensions, which is called the &#8220;Driver&#8221; portion of the <tt class="docutils literal"><span class="pre">Zend\Db</span></tt> adapter. It also creates a
+lightweight abstraction layer, called the &#8220;Platform&#8221; portion of the adapter, for the various idiosyncrasies that
+each vendor-specific platform might have in its SQL/RDBMS implementation.</p>
+<div class="section" id="creating-an-adapter-quickstart">
+<span id="zend-db-adapter-quickstart"></span><h2>Creating an Adapter - Quickstart<a class="headerlink" href="#creating-an-adapter-quickstart" title="Permalink to this headline">¶</a></h2>
+<p>Creating an adapter can simply be done by instantiating the <tt class="docutils literal"><span class="pre">Zend\Db\Adapter\Adapter</span></tt> class. The most common use
+case, while not the most explicit, is to pass an array of configuration to the <tt class="docutils literal"><span class="pre">Adapter</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Db\Adapter\Adapter</span><span class="p">(</span><span class="nv">$configArray</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>This driver array is an abstraction for the extension level required parameters. Here is a table for the
+key-value pairs that should be in configuration array.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="13%" />
+<col width="23%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Key</th>
+<th class="head">Is Required?</th>
+<th class="head">Value</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>driver</td>
+<td>required</td>
+<td>Mysqli, Sqlsrv, Pdo_Sqlite, Pdo_Mysql, Pdo=OtherPdoDriver</td>
+</tr>
+<tr class="row-odd"><td>database</td>
+<td>generally required</td>
+<td>the name of the database (schema)</td>
+</tr>
+<tr class="row-even"><td>username</td>
+<td>generally required</td>
+<td>the connection username</td>
+</tr>
+<tr class="row-odd"><td>password</td>
+<td>generally required</td>
+<td>the connection password</td>
+</tr>
+<tr class="row-even"><td>hostname</td>
+<td>not generally required</td>
+<td>the IP address or hostname to connect to</td>
+</tr>
+<tr class="row-odd"><td>port</td>
+<td>not generally required</td>
+<td>the port to connect to (if applicable)</td>
+</tr>
+<tr class="row-even"><td>charset</td>
+<td>not generally required</td>
+<td>the character set to use</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Other names will work as well. Effectively, if the PHP manual uses a particular naming, this naming will be
+supported by our Driver. For example, dbname in most cases will also work for &#8216;database&#8217;. Another example is that
+in the case of Sqlsrv, UID will work in place of username. Which format you chose is up to you, but the above table
+represents the official abstraction names.</p>
+</div>
+<p>So, for example, a MySQL connection using ext/mysqli:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre> <span class="nv">$adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Db\Adapter\Adapter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;driver&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Mysqli&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;database&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;zend_db_example&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;developer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;developer-password&#39;</span>
+ <span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>Another example, of a Sqlite connection via PDO:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre> <span class="nv">$adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Db\Adapter\Adapter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;driver&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Pdo_Sqlite&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;database&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;path/to/sqlite.db&#39;</span>
+ <span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>It is important to know that by using this style of adapter creation, the <tt class="docutils literal"><span class="pre">Adapter</span></tt> will attempt to create any
+dependencies that were not explicitly provided. A Driver object will be created from the configuration
+array provided in the constructor. A Platform object will be created based off the type of Driver class that was
+instantiated. And lastly, a default ResultSet object is created and utilized. Any of these objects can be injected,
+to do this, see the next section.</p>
+<p>The list of officially supported drivers:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Mysqli</span></tt>: The ext/mysqli driver</li>
+<li><tt class="docutils literal"><span class="pre">Pgsql</span></tt>: The ext/pgsql driver</li>
+<li><tt class="docutils literal"><span class="pre">Sqlsrv</span></tt>: The ext/sqlsrv driver (from Microsoft)</li>
+<li><tt class="docutils literal"><span class="pre">Pdo_Mysql</span></tt>: MySQL through the PDO extension</li>
+<li><tt class="docutils literal"><span class="pre">Pdo_Sqlite</span></tt>: SQLite though the PDO extension</li>
+<li><tt class="docutils literal"><span class="pre">Pdo_Pgsql</span></tt>: PostgreSQL through the PDO extension</li>
+</ul>
+</div>
+<div class="section" id="creating-an-adapter-using-dependency-injection">
+<span id="zend-db-adapter-instantiating"></span><h2>Creating an Adapter Using Dependency Injection<a class="headerlink" href="#creating-an-adapter-using-dependency-injection" title="Permalink to this headline">¶</a></h2>
+<p>The more expressive and explicit way of creating an adapter is by injecting all your dependencies up front.
+<tt class="docutils literal"><span class="pre">Zend\Db\Adapter\Adapter</span></tt> uses constructor injection, and all required dependencies are injected through the
+constructor, which has the following signature (in pseudo-code):</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Db\Adapter\Platform\PlatformInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Db\ResultSet\ResultSet</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Zend\Db\Adapter\Adapter</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$driver</span><span class="p">,</span> <span class="nx">PlatformInterface</span> <span class="nv">$platform</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nx">ResultSet</span> <span class="nv">$queryResultSetPrototype</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>What can be injected:</p>
+<ul class="simple">
+<li>$driver - an array of connection parameters (see above) or an instance of <tt class="docutils literal"><span class="pre">Zend\Db\Adapter\Driver\DriverInterface</span></tt></li>
+<li>$platform - (optional) an instance of <tt class="docutils literal"><span class="pre">Zend\Db\Platform\PlatformInterface</span></tt>, the default will be created based off the driver implementation</li>
+<li>$queryResultSetPrototype - (optional) an instance of <tt class="docutils literal"><span class="pre">Zend\Db\ResultSet\ResultSet</span></tt>, to understand this object&#8217;s role, see the section below on querying through the adapter</li>
+</ul>
+</div>
+<div class="section" id="query-preparation-through-zend-db-adapter-adapter-query">
+<span id="zend-db-adapter-query-preparing"></span><h2>Query Preparation Through Zend\Db\Adapter\Adapter::query()<a class="headerlink" href="#query-preparation-through-zend-db-adapter-adapter-query" title="Permalink to this headline">¶</a></h2>
+<p>By default, query() prefers that you use &#8220;preparation&#8221; as a means for processing SQL statements. This generally
+means that you will supply a SQL statement with the values substituted by placeholders, and then the parameters for
+those placeholders are supplied separately. An example of this workflow with <tt class="docutils literal"><span class="pre">Zend\Db\Adapter\Adapter</span></tt> is:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s1">&#39;SELECT * FROM `artist` WHERE `id` = ?&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="mi">5</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above example will go through the following steps:</p>
+<ul class="simple">
+<li>create a new Statement object</li>
+<li>prepare an array into a ParameterContainer if necessary</li>
+<li>inject the ParameterContainer into the Statement object</li>
+<li>execute the Statement object, producing a Result object</li>
+<li>check the Result object to check if the supplied sql was a &#8220;query&#8221;, or a result set producing statement</li>
+<li>if it is a result set producing query, clone the ResultSet prototype, inject Result as datasource, return it</li>
+<li>else, return the Result</li>
+</ul>
+</div>
+<div class="section" id="query-execution-through-zend-db-adapter-adapter-query">
+<span id="zend-db-adapter-query-execution"></span><h2>Query Execution Through Zend\Db\Adapter\Adapter::query()<a class="headerlink" href="#query-execution-through-zend-db-adapter-adapter-query" title="Permalink to this headline">¶</a></h2>
+<p>In some cases, you have to execute statements directly. The primary purpose for needing to execute sql instead of
+prepare and execute a sql statement, might be because you are attempting to execute a DDL statement (which in most
+extensions and vendor platforms), are un-preparable. An example of executing:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s1">&#39;ALTER TABLE ADD INDEX(`foo_index`) ON (`foo_column`)&#39;</span><span class="p">,</span> <span class="nx">Adapter</span><span class="o">::</span><span class="na">QUERY_MODE_EXECUTE</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The primary difference to notice is that you must provide the Adapter::QUERY_MODE_EXECUTE (execute) as the second
+parameter.</p>
+</div>
+<div class="section" id="creating-statements">
+<span id="zend-db-adapter-statement-creation"></span><h2>Creating Statements<a class="headerlink" href="#creating-statements" title="Permalink to this headline">¶</a></h2>
+<p>While query() is highly useful for one-off and quick querying of a database through Adapter, it generally makes
+more sense to create a statement and interact with it directly, so that you have greater control over the
+prepare-then-execute workflow. To do this, Adapter gives you a routine called createStatement() that allows you to
+create a Driver specific Statement to use so you can manage your own prepare-then-execute workflow.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// with optional parameters to bind up-front</span>
+<span class="nv">$statement</span> <span class="o">=</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">createStatement</span><span class="p">(</span><span class="nv">$sql</span><span class="p">,</span> <span class="nv">$optionalParameters</span><span class="p">);</span>
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$statement</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="using-the-driver-object">
+<span id="zend-db-adapter-driver"></span><h2>Using the Driver Object<a class="headerlink" href="#using-the-driver-object" title="Permalink to this headline">¶</a></h2>
+<p>The Driver object is the primary place where  <tt class="docutils literal"><span class="pre">Zend\Db\Adapter\Adapter</span></tt> implements the connection level
+abstraction making it possible to use all of ZendDb&#8217;s interfaces via the various ext/mysqli, ext/sqlsrv,
+PDO, and other PHP level drivers.  To make this possible, each driver is composed of 3 objects:</p>
+<ul class="simple">
+<li>A connection: <tt class="docutils literal"><span class="pre">Zend\Db\Adapter\Driver\ConnectionInterface</span></tt></li>
+<li>A statement: <tt class="docutils literal"><span class="pre">Zend\Db\Adapter\Driver\StatementInterface</span></tt></li>
+<li>A result: <tt class="docutils literal"><span class="pre">Zend\Db\Adapter\Driver\ResultInterface</span></tt></li>
+</ul>
+<p>Each of the built-in drivers practices &#8220;prytotyping&#8221; as a means of creating objects when new instances
+are requested.  The workflow looks like this:</p>
+<ul class="simple">
+<li>An adapter is created with a set of connection parameters</li>
+<li>The adapter chooses the proper driver to instantiate, for example <tt class="docutils literal"><span class="pre">Zend\Db\Adapter\Driver\Mysqli</span></tt></li>
+<li>That driver class is instantiated</li>
+<li>If no connection, statement or result objects are injected, defaults are instantiated</li>
+</ul>
+<p>This driver is now ready to be called on when particular workflows are requested.  Here is what the
+Driver API looks like:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Zend\Db\Adapter\Driver</span><span class="p">;</span>
+
+ <span class="k">interface</span> <span class="nx">DriverInterface</span>
+ <span class="p">{</span>
+     <span class="k">const</span> <span class="no">PARAMETERIZATION_POSITIONAL</span> <span class="o">=</span> <span class="s1">&#39;positional&#39;</span><span class="p">;</span>
+     <span class="k">const</span> <span class="no">PARAMETERIZATION_NAMED</span> <span class="o">=</span> <span class="s1">&#39;named&#39;</span><span class="p">;</span>
+     <span class="k">const</span> <span class="no">NAME_FORMAT_CAMELCASE</span> <span class="o">=</span> <span class="s1">&#39;camelCase&#39;</span><span class="p">;</span>
+     <span class="k">const</span> <span class="no">NAME_FORMAT_NATURAL</span> <span class="o">=</span> <span class="s1">&#39;natural&#39;</span><span class="p">;</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getDatabasePlatformName</span><span class="p">(</span><span class="nv">$nameFormat</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">NAME_FORMAT_CAMELCASE</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">checkEnvironment</span><span class="p">();</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getConnection</span><span class="p">();</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">createStatement</span><span class="p">(</span><span class="nv">$sqlOrResource</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">createResult</span><span class="p">(</span><span class="nv">$resource</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getPrepareType</span><span class="p">();</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">formatParameterName</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$type</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getLastGeneratedValue</span><span class="p">();</span>
+ <span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>From this DriverInterface, you can</p>
+<ul class="simple">
+<li>Determine the name of the platform this driver supports (useful for choosing the proper platform object)</li>
+<li>Check that the environment can support this driver</li>
+<li>Return the Connnection object</li>
+<li>Create a Statement object which is optionally seeded by an SQL statement (this will generally be a clone of a prototypical statement object)</li>
+<li>Create a Result object which is optionally seeded by a statement resource (this will generally be a clone of a prototypical result object)</li>
+<li>Format parameter names, important to distinguish the difference between the various ways parameters are named between extensions</li>
+<li>Retrieve the overall last generated value (such as an auto-increment value)</li>
+</ul>
+<p>Statement objects generally look like this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Zend\Db\Adapter\Driver</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="nx">StatementInterface</span> <span class="k">extends</span> <span class="nx">StatementContainerInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getResource</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">prepare</span><span class="p">(</span><span class="nv">$sql</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">isPrepared</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">execute</span><span class="p">(</span><span class="nv">$parameters</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+
+    <span class="sd">/** Inherited from StatementContainerInterface */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setSql</span><span class="p">(</span><span class="nv">$sql</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getSql</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setParameterContainer</span><span class="p">(</span><span class="nx">ParameterContainer</span> <span class="nv">$parameterContainer</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getParameterContainer</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Result objects generally look like this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Zend\Db\Adapter\Driver</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="nx">ResultInterface</span> <span class="k">extends</span> <span class="nx">\Countable</span><span class="p">,</span> <span class="nx">\Iterator</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">buffer</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">isQueryResult</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getAffectedRows</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getGeneratedValue</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getResource</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getFieldCount</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="using-the-platform-object">
+<span id="zend-db-adapter-platform"></span><h2>Using The Platform Object<a class="headerlink" href="#using-the-platform-object" title="Permalink to this headline">¶</a></h2>
+<p>The Platform object provides an API to assist in crafting queries in a way that is specific to the SQL
+implementation of a particular vendor. Nuances such as how identifiers or values are quoted, or what the identifier
+separator character is are handled by this object. To get an idea of the capabilities, the interface for a platform
+object looks like this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Zend\Db\Adapter\Platform</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="nx">PlatformInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getName</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getQuoteIdentifierSymbol</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">quoteIdentifier</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">quoteIdentifierChain</span><span class="p">(</span><span class="nv">$identiferChain</span><span class="p">)</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getQuoteValueSymbol</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">quoteValue</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">quoteValueList</span><span class="p">(</span><span class="nv">$valueList</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getIdentifierSeparator</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">quoteIdentifierInFragment</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$additionalSafeWords</span> <span class="o">=</span> <span class="k">array</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>While one can instantiate your own Plaform object, generally speaking, it is easier to get the proper
+Platform instance from the configured adapter (by default the Platform type will match the underlying
+driver implementation):</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$platform</span> <span class="o">=</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">getPlatform</span><span class="p">();</span>
+<span class="c1">// or</span>
+<span class="nv">$platform</span> <span class="o">=</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">platform</span><span class="p">;</span> <span class="c1">// magic property access</span>
+</pre></div>
+</td></tr></table></div>
+<p>The following is a couple of example of Platform usage:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">/** @var $adapter Zend\Db\Adapter\Adapter */</span>
+<span class="sd">/** @var $platform Zend\Db\Adapter\Platform\Sql92 */</span>
+<span class="nv">$platform</span> <span class="o">=</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">getPlatform</span><span class="p">();</span>
+
+<span class="c1">// &quot;first_name&quot;</span>
+<span class="k">echo</span> <span class="nv">$platform</span><span class="o">-&gt;</span><span class="na">quoteIdentifier</span><span class="p">(</span><span class="s1">&#39;first_name&#39;</span><span class="p">);</span>
+
+<span class="c1">// &quot;</span>
+<span class="k">echo</span> <span class="nv">$platform</span><span class="o">-&gt;</span><span class="na">getQuoteIdentifierSymbol</span><span class="p">();</span>
+
+<span class="c1">// &quot;schema&quot;.&quot;mytable&quot;</span>
+<span class="k">echo</span> <span class="nv">$platform</span><span class="o">-&gt;</span><span class="na">quoteIdentifierChain</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;schema&#39;</span><span class="p">,</span><span class="s1">&#39;mytable&#39;</span><span class="p">)));</span>
+
+<span class="c1">// &#39;</span>
+<span class="k">echo</span> <span class="nv">$platform</span><span class="o">-&gt;</span><span class="na">getQuoteValueSymbol</span><span class="p">();</span>
+
+<span class="c1">// &#39;myvalue&#39;</span>
+<span class="k">echo</span> <span class="nv">$platform</span><span class="o">-&gt;</span><span class="na">quoteValue</span><span class="p">(</span><span class="s1">&#39;myvalue&#39;</span><span class="p">);</span>
+
+<span class="c1">// &#39;value&#39;, &#39;Foo O\\&#39;Bar&#39;</span>
+<span class="k">echo</span> <span class="nv">$platform</span><span class="o">-&gt;</span><span class="na">quoteValueList</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span><span class="s2">&quot;Foo O&#39;Bar&quot;</span><span class="p">)));</span>
+
+<span class="c1">// .</span>
+<span class="k">echo</span> <span class="nv">$platform</span><span class="o">-&gt;</span><span class="na">getIdentifierSeparator</span><span class="p">();</span>
+
+<span class="c1">// &quot;foo&quot; as &quot;bar&quot;</span>
+<span class="k">echo</span> <span class="nv">$platform</span><span class="o">-&gt;</span><span class="na">quoteIdentifierInFragment</span><span class="p">(</span><span class="s1">&#39;foo as bar&#39;</span><span class="p">);</span>
+
+<span class="c1">// additionally, with some safe words:</span>
+<span class="c1">// (&quot;foo&quot;.&quot;bar&quot; = &quot;boo&quot;.&quot;baz&quot;)</span>
+<span class="k">echo</span> <span class="nv">$platform</span><span class="o">-&gt;</span><span class="na">quoteIdentifierInFragment</span><span class="p">(</span><span class="s1">&#39;(foo.bar = boo.baz)&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="using-the-parameter-container">
+<span id="zend-db-adapter-parameter-container"></span><h2>Using The Parameter Container<a class="headerlink" href="#using-the-parameter-container" title="Permalink to this headline">¶</a></h2>
+<p>The ParameterContainer object is a container for the various parameters that need to be passed into a Statement
+object to fulfill all the various parameterized parts of the SQL statement. This object implements the ArrayAccess
+interface.  Below is the ParameterContainer API:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Zend\Db\Adapter</span><span class="p">;</span>
+
+ <span class="k">class</span> <span class="nc">ParameterContainer</span> <span class="k">implements</span> <span class="nx">\Iterator</span><span class="p">,</span> <span class="nx">\ArrayAccess</span><span class="p">,</span> <span class="nx">\Countable</span> <span class="p">{</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="k">array</span> <span class="nv">$data</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+
+     <span class="sd">/** methods to interact with values */</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">offsetExists</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">offsetGet</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">offsetSetReference</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$from</span><span class="p">)</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">offsetSet</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$value</span><span class="p">,</span> <span class="nv">$errata</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">offsetUnset</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+
+     <span class="sd">/** set values from array (will reset first) */</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">setFromArray</span><span class="p">(</span><span class="k">Array</span> <span class="nv">$data</span><span class="p">)</span>
+
+     <span class="sd">/** methods to interact with value errata */</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">offsetSetErrata</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$errata</span><span class="p">)</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">offsetGetErrata</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">offsetHasErrata</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">offsetUnsetErrata</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span>
+
+     <span class="sd">/** errata only iterator */</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getErrataIterator</span><span class="p">()</span>
+
+     <span class="sd">/** get array with named keys */</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getNamedArray</span><span class="p">()</span>
+
+     <span class="sd">/** get array with int keys, ordered by position */</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getPositionalArray</span><span class="p">()</span>
+
+     <span class="sd">/** iterator: */</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">count</span><span class="p">()</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">current</span><span class="p">()</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">next</span><span class="p">()</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">key</span><span class="p">()</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">valid</span><span class="p">()</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">rewind</span><span class="p">()</span>
+
+     <span class="sd">/** merge existing array of parameters with existing parameters */</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">merge</span><span class="p">(</span><span class="nv">$parameters</span><span class="p">)</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+<p>In addition to handling parameter names and values, the container will assist in tracking parameter
+types for PHP type to SQL type handling.  For example, it might be important that:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="nv">$container</span><span class="o">-&gt;</span><span class="na">offsetSet</span><span class="p">(</span><span class="s1">&#39;limit&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>be bound as an integer.  To achieve this, pass in the ParameterContainer::TYPE_INTEGER constant as the 3rd parameter:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="nv">$container</span><span class="o">-&gt;</span><span class="na">offsetSet</span><span class="p">(</span><span class="s1">&#39;limit&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="nv">$container</span><span class="o">::</span><span class="na">TYPE_INTEGER</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This will ensure that if the underlying driver supports typing of bound parameters, that this translated
+information will also be passed along to the actual php database driver.</p>
+</div>
+<div class="section" id="examples">
+<span id="zend-db-adapter-parameter-container-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Creating a Driver and Vendor portable Query, Preparing and Iterating Result</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Db\Adapter\Adapter</span><span class="p">(</span><span class="nv">$driverConfig</span><span class="p">);</span>
+
+<span class="nv">$qi</span> <span class="o">=</span> <span class="k">function</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$adapter</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">platform</span><span class="o">-&gt;</span><span class="na">quoteIdentifier</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span> <span class="p">};</span>
+<span class="nv">$fp</span> <span class="o">=</span> <span class="k">function</span><span class="p">(</span><span class="nv">$name</span><span class="p">)</span> <span class="k">use</span> <span class="p">(</span><span class="nv">$adapter</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">driver</span><span class="o">-&gt;</span><span class="na">formatParameterName</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span> <span class="p">};</span>
+
+<span class="nv">$sql</span> <span class="o">=</span> <span class="s1">&#39;UPDATE &#39;</span> <span class="o">.</span> <span class="nv">$qi</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span><span class="p">)</span>
+    <span class="o">.</span> <span class="s1">&#39; SET &#39;</span> <span class="o">.</span> <span class="nv">$qi</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39; = &#39;</span> <span class="o">.</span> <span class="nv">$fp</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="o">.</span> <span class="s1">&#39; WHERE &#39;</span> <span class="o">.</span> <span class="nv">$qi</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39; = &#39;</span> <span class="o">.</span> <span class="nv">$fp</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">);</span>
+
+<span class="sd">/** @var $statement Zend\Db\Adapter\Driver\StatementInterface */</span>
+<span class="nv">$statement</span> <span class="o">=</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="nv">$sql</span><span class="p">);</span>
+
+<span class="nv">$parameters</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Updated Artist&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span>
+<span class="p">);</span>
+
+<span class="nv">$statement</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="nv">$parameters</span><span class="p">);</span>
+
+<span class="c1">// DATA INSERTED, NOW CHECK</span>
+
+<span class="cm">/* @var $statement Zend\Db\Adapter\DriverStatementInterface */</span>
+<span class="nv">$statement</span> <span class="o">=</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="s1">&#39;SELECT * FROM &#39;</span>
+    <span class="o">.</span> <span class="nv">$qi</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span><span class="p">)</span>
+    <span class="o">.</span> <span class="s1">&#39; WHERE id = &#39;</span> <span class="o">.</span> <span class="nv">$fp</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">));</span>
+
+<span class="cm">/* @var $results Zend\Db\ResultSet\ResultSet */</span>
+<span class="nv">$results</span> <span class="o">=</span> <span class="nv">$statement</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">));</span>
+
+<span class="nv">$row</span> <span class="o">=</span> <span class="nv">$results</span><span class="o">-&gt;</span><span class="na">current</span><span class="p">();</span>
+<span class="nv">$name</span> <span class="o">=</span> <span class="nv">$row</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">];</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Db\Adapter</a><ul>
+<li><a class="reference internal" href="#creating-an-adapter-quickstart">Creating an Adapter - Quickstart</a></li>
+<li><a class="reference internal" href="#creating-an-adapter-using-dependency-injection">Creating an Adapter Using Dependency Injection</a></li>
+<li><a class="reference internal" href="#query-preparation-through-zend-db-adapter-adapter-query">Query Preparation Through Zend\Db\Adapter\Adapter::query()</a></li>
+<li><a class="reference internal" href="#query-execution-through-zend-db-adapter-adapter-query">Query Execution Through Zend\Db\Adapter\Adapter::query()</a></li>
+<li><a class="reference internal" href="#creating-statements">Creating Statements</a></li>
+<li><a class="reference internal" href="#using-the-driver-object">Using the Driver Object</a></li>
+<li><a class="reference internal" href="#using-the-platform-object">Using The Platform Object</a></li>
+<li><a class="reference internal" href="#using-the-parameter-container">Using The Parameter Container</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.crypt.public-key.html"
+                        title="previous chapter">Public key cryptography</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.db.result-set.html"
+                        title="next chapter">Zend\Db\ResultSet</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.db.adapter.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.db.adapter.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.db.adapter.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.db.result-set.html" title="Zend\Db\ResultSet"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.crypt.public-key.html" title="Public key cryptography"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.db.adapter.rst">
+                Zend\Db\Adapter
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

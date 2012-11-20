@@ -1,0 +1,423 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Authenticating Users in Zend Framework &mdash; Zend Framework 2 2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.4 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="authenticating-users-in-zend-framework">
+<span id="learning-multiuser-authentication"></span><h1>Authenticating Users in Zend Framework<a class="headerlink" href="#authenticating-users-in-zend-framework" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction-to-authentication">
+<span id="learning-multiuser-authentication-intro"></span><h2>Introduction to Authentication<a class="headerlink" href="#introduction-to-authentication" title="Permalink to this headline">¶</a></h2>
+<p>Once a web application has been able to distinguish one user from another by establishing a session, web
+applications typically want to validate the identity of a user. The process of validating a consumer as being
+authentic is &#8220;authentication.&#8221; Authentication is made up of two distinctive parts: an identity and a set of
+credentials. It takes some variation of both presented to the application for processing so that it may
+authenticate a user.</p>
+<p>While the most common pattern of authentication revolves around usernames and passwords, it should be stated that
+this is not always the case. Identities are not limited to usernames. In fact, any public identifier can be used:
+an assigned number, social security number, or residence address. Likewise, credentials are not limited to
+passwords. Credentials can come in the form of protected private information: fingerprint, eye retinal scan,
+passphrase, or any other obscure personal information.</p>
+</div>
+<div class="section" id="basic-usage-of-zend-auth">
+<span id="learning-multiuser-authentication-basic-usage"></span><h2>Basic Usage of Zend_Auth<a class="headerlink" href="#basic-usage-of-zend-auth" title="Permalink to this headline">¶</a></h2>
+<p>In the following example, we will be using <tt class="docutils literal"><span class="pre">Zend_Auth</span></tt> to complete what is probably the most prolific form of
+authentication: username and password from a database table. This example assumes that you have already setup your
+application using <tt class="docutils literal"><span class="pre">Zend_Application</span></tt>, and that inside that application you have configured a database connection.</p>
+<p>The job of the <tt class="docutils literal"><span class="pre">Zend_Auth</span></tt> class is twofold. First, it should be able to accept an authentication adapter to use
+to authenticate a user. Secondly, after a successful authentication of a user, it should persist throughout each
+and every request that might need to know if the current user has indeed been authenticated. To persist this data,
+<tt class="docutils literal"><span class="pre">Zend_Auth</span></tt> consumes <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt>, but you will generally never need to interact with this session
+object.</p>
+<p>Lets assume we have the following database table setup:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">CREATE</span> <span class="nx">TABLE</span> <span class="nx">users</span> <span class="p">(</span>
+    <span class="nx">id</span> <span class="nx">INTEGER</span>  <span class="k">NOT</span> <span class="k">NULL</span> <span class="nx">PRIMARY</span> <span class="nx">KEY</span><span class="p">,</span>
+    <span class="nx">username</span> <span class="nx">VARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="nx">UNIQUE</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="nx">password</span> <span class="nx">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="nx">password_salt</span> <span class="nx">VARCHAR</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="nx">real_name</span> <span class="nx">VARCHAR</span><span class="p">(</span><span class="mi">150</span><span class="p">)</span> <span class="k">NULL</span>
+<span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above demonstrates a user table that includes a username, password, and also a password salt column. This salt
+column is used as part of a technique called salting that would improve the security of your database of
+information against brute force attacks targeting the algorithm of your password hashing. <a class="reference external" href="http://en.wikipedia.org/wiki/Salting_%28cryptography%29">More information</a> on
+salting.</p>
+<p>For this implementation, we must first make a simple form that we can utilized as the &#8220;login form&#8221;. We will use
+<tt class="docutils literal"><span class="pre">Zend_Form</span></tt> to accomplish this.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// located at application/forms/Auth/Login.php</span>
+
+<span class="k">class</span> <span class="nc">Default_Form_Auth_Login</span> <span class="k">extends</span> <span class="nx">Zend_Form</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">init</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setMethod</span><span class="p">(</span><span class="s1">&#39;post&#39;</span><span class="p">);</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">addElement</span><span class="p">(</span>
+            <span class="s1">&#39;text&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Username:&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                <span class="s1">&#39;filters&#39;</span>    <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;StringTrim&#39;</span><span class="p">),</span>
+            <span class="p">));</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">addElement</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Password:&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+            <span class="p">));</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">addElement</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">,</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;ignore&#39;</span>   <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+            <span class="s1">&#39;label&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;Login&#39;</span><span class="p">,</span>
+            <span class="p">));</span>
+
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>With the above form, we can now go about creating our login action for our authentication controller. This
+controller will be called &#8220;<tt class="docutils literal"><span class="pre">AuthController</span></tt>&#8221;, and will be located at
+<tt class="docutils literal"><span class="pre">application/controllers/AuthController.php</span></tt>. It will have a single method called &#8220;<tt class="docutils literal"><span class="pre">loginAction()</span></tt>&#8221; which will
+serve as the self-posting action. In other words, regardless of the url was POSTed to or GETed to, this method will
+handle the logic.</p>
+<p>The following code will demonstrate how to construct the proper adapter, integrate it with the form:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">AuthController</span> <span class="k">extends</span> <span class="nx">Zend\Controller\Action</span>
+<span class="p">{</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">loginAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$db</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_getParam</span><span class="p">(</span><span class="s1">&#39;db&#39;</span><span class="p">);</span>
+
+        <span class="nv">$loginForm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Default_Form_Auth_Login</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$loginForm</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+
+            <span class="nv">$adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Auth_Adapter\DbTable</span><span class="p">(</span>
+                <span class="nv">$db</span><span class="p">,</span>
+                <span class="s1">&#39;users&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;username&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;password&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;MD5(CONCAT(?, password_salt))&#39;</span>
+                <span class="p">);</span>
+
+            <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">setIdentity</span><span class="p">(</span><span class="nv">$loginForm</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">));</span>
+            <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">setCredential</span><span class="p">(</span><span class="nv">$loginForm</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">));</span>
+
+            <span class="nv">$result</span> <span class="o">=</span> <span class="nv">$auth</span><span class="o">-&gt;</span><span class="na">authenticate</span><span class="p">(</span><span class="nv">$adapter</span><span class="p">);</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$result</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_helper</span><span class="o">-&gt;</span><span class="na">FlashMessenger</span><span class="p">(</span><span class="s1">&#39;Successful Login&#39;</span><span class="p">);</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+
+        <span class="p">}</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">view</span><span class="o">-&gt;</span><span class="na">loginForm</span> <span class="o">=</span> <span class="nv">$loginForm</span><span class="p">;</span>
+
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The corresponding view script is quite simple for this action. It will set the current url since this form is self
+processing, and it will display the form. This view script is located at
+<tt class="docutils literal"><span class="pre">application/views/scripts/auth/login.phtml</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="o">-&gt;</span><span class="na">setAction</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">());</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>There you have it. With these basics you can expand the general concepts to include more complex authentication
+scenarios. For more information on other <tt class="docutils literal"><span class="pre">Zend_Auth</span></tt> adapters, have a look in <em class="xref std std-ref">the reference guide</em>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Authenticating Users in Zend Framework</a><ul>
+<li><a class="reference internal" href="#introduction-to-authentication">Introduction to Authentication</a></li>
+<li><a class="reference internal" href="#basic-usage-of-zend-auth">Basic Usage of Zend_Auth</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/multiuser.authentication.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/multiuser.authentication.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/multiuser.authentication.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/multiuser.authentication.rst">
+                Authenticating Users in Zend Framework
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

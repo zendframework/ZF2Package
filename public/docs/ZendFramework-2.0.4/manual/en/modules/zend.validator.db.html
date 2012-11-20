@@ -1,0 +1,460 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Db\RecordExists and Db\NoRecordExists &mdash; Zend Framework 2 2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.4 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="db-recordexists-and-db-norecordexists">
+<span id="zend-validator-db"></span><h1>Db\RecordExists and Db\NoRecordExists<a class="headerlink" href="#db-recordexists-and-db-norecordexists" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Validator\Db\RecordExists</span></tt> and <tt class="docutils literal"><span class="pre">Zend\Validator\Db\NoRecordExists</span></tt> provide a means to test whether a
+record exists in a given table of a database, with a given value.</p>
+<div class="section" id="supported-options-for-zend-validator-db">
+<span id="zend-validator-set-db-options"></span><h2>Supported options for Zend\Validator\Db\*<a class="headerlink" href="#supported-options-for-zend-validator-db" title="Permalink to this headline">¶</a></h2>
+<p>The following options are supported for <tt class="docutils literal"><span class="pre">Zend\Validator\Db\NoRecordExists</span></tt> and
+<tt class="docutils literal"><span class="pre">Zend\Validator\Db\RecordExists</span></tt>:</p>
+<ul class="simple">
+<li><strong>adapter</strong>: The database adapter which will be used for the search.</li>
+<li><strong>exclude</strong>: Sets records which will be excluded from the search.</li>
+<li><strong>field</strong>: The database field within this table which will be searched for the record.</li>
+<li><strong>schema</strong>: Sets the schema which will be used for the search.</li>
+<li><strong>table</strong>: The table which will be searched for the record.</li>
+</ul>
+</div>
+<div class="section" id="basic-usage">
+<span id="zend-validator-db-basic-usage"></span><h2>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>An example of basic usage of the validators:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">//Check that the email address exists in the database</span>
+<span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\Db\RecordExists</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;table&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;users&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;field&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;emailaddress&#39;</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="nv">$emailaddress</span><span class="p">))</span> <span class="p">{</span>
+    <span class="c1">// email address appears to be valid</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// email address is invalid; print the reasons</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="si">$message</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above will test that a given email address is in the database table. If no record is found containing the value
+of <tt class="docutils literal"><span class="pre">$emailaddress</span></tt> in the specified column, then an error message is displayed.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">//Check that the username is not present in the database</span>
+<span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\Db\NoRecordExists</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;table&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;users&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;field&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;username&#39;</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="nv">$username</span><span class="p">))</span> <span class="p">{</span>
+    <span class="c1">// username appears to be valid</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// username is invalid; print the reason</span>
+    <span class="nv">$messages</span> <span class="o">=</span> <span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">();</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$messages</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="si">$message</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above will test that a given username is not in the database table. If a record is found containing the value
+of <tt class="docutils literal"><span class="pre">$username</span></tt> in the specified column, then an error message is displayed.</p>
+</div>
+<div class="section" id="excluding-records">
+<span id="zend-validator-db-excluding-records"></span><h2>Excluding records<a class="headerlink" href="#excluding-records" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Validator\Db\RecordExists</span></tt> and <tt class="docutils literal"><span class="pre">Zend\Validator\Db\NoRecordExists</span></tt> also provide a means to test the
+database, excluding a part of the table, either by providing a where clause as a string, or an array with the keys
+&#8220;field&#8221; and &#8220;value&#8221;.</p>
+<p>When providing an array for the exclude clause, the <strong>!=</strong> operator is used, so you can check the rest of a table
+for a value before altering a record (for example on a user profile form)</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">//Check no other users have the username</span>
+<span class="nv">$user_id</span>   <span class="o">=</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">();</span>
+<span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\Db\NoRecordExists</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;table&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;users&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;field&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exclude&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;field&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;value&#39;</span> <span class="o">=&gt;</span> <span class="nv">$user_id</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="nv">$username</span><span class="p">))</span> <span class="p">{</span>
+    <span class="c1">// username appears to be valid</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// username is invalid; print the reason</span>
+    <span class="nv">$messages</span> <span class="o">=</span> <span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">();</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$messages</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="si">$message</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above example will check the table to ensure no records other than the one where <tt class="docutils literal"><span class="pre">id</span> <span class="pre">=</span> <span class="pre">$user_id</span></tt> contains the
+value $username.</p>
+<p>You can also provide a string to the exclude clause so you can use an operator other than <strong>!=</strong>. This can be
+useful for testing against composite keys.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$email</span>     <span class="o">=</span> <span class="s1">&#39;user@example.com&#39;</span><span class="p">;</span>
+<span class="nv">$clause</span>    <span class="o">=</span> <span class="nv">$db</span><span class="o">-&gt;</span><span class="na">quoteInto</span><span class="p">(</span><span class="s1">&#39;email = ?&#39;</span><span class="p">,</span> <span class="nv">$email</span><span class="p">);</span>
+<span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\Db\RecordExists</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;table&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;users&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;field&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;exclude&#39;</span> <span class="o">=&gt;</span> <span class="nv">$clause</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="nv">$username</span><span class="p">))</span> <span class="p">{</span>
+    <span class="c1">// username appears to be valid</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// username is invalid; print the reason</span>
+    <span class="nv">$messages</span> <span class="o">=</span> <span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">();</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$messages</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="si">$message</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above example will check the &#8216;users&#8217; table to ensure that only a record with both the username <tt class="docutils literal"><span class="pre">$username</span></tt>
+and with the email <tt class="docutils literal"><span class="pre">$email</span></tt> is valid.</p>
+</div>
+<div class="section" id="database-adapters">
+<span id="zend-validator-db-database-adapters"></span><h2>Database Adapters<a class="headerlink" href="#database-adapters" title="Permalink to this headline">¶</a></h2>
+<p>You can also specify an adapter. This will allow you to work with applications using multiple database adapters, or
+where you have not set a default adapter. As in the example below:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\Db\RecordExists</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;table&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;users&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;field&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;adapter&#39;</span> <span class="o">=&gt;</span> <span class="nv">$dbAdapter</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="database-schemas">
+<span id="zend-validator-db-database-schemas"></span><h2>Database Schemas<a class="headerlink" href="#database-schemas" title="Permalink to this headline">¶</a></h2>
+<p>You can specify a schema within your database for adapters such as PostgreSQL and DB/2 by simply supplying an array
+with <tt class="docutils literal"><span class="pre">table</span></tt> and <tt class="docutils literal"><span class="pre">schema</span></tt> keys. As in the example below:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\Db\RecordExists</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;table&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;users&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;schema&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;my&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;field&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;id&#39;</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Db\RecordExists and Db\NoRecordExists</a><ul>
+<li><a class="reference internal" href="#supported-options-for-zend-validator-db">Supported options for Zend\Validator\Db\*</a></li>
+<li><a class="reference internal" href="#basic-usage">Basic usage</a></li>
+<li><a class="reference internal" href="#excluding-records">Excluding records</a></li>
+<li><a class="reference internal" href="#database-adapters">Database Adapters</a></li>
+<li><a class="reference internal" href="#database-schemas">Database Schemas</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.validator.db.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.validator.db.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.validator.db.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.validator.db.rst">
+                Db\RecordExists and Db\NoRecordExists
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

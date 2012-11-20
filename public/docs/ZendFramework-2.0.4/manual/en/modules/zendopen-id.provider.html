@@ -1,0 +1,719 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ZendOpenIdProvider &mdash; Zend Framework 2 2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.4 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zendopenidprovider">
+<span id="zendopenid-provider"></span><h1>ZendOpenIdProvider<a class="headerlink" href="#zendopenidprovider" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">ZendOpenId\Provider</span></tt> can be used to implement OpenID servers. This chapter provides examples that demonstrate
+how to build a very basic server. However, for implementation of a production OpenID server (such as
+<a class="reference external" href="http://www.myopenid.com">www.myopenid.com</a>) you may have to deal with more complex issues.</p>
+<div class="section" id="quick-start">
+<span id="zendopenid-provider-start"></span><h2>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>The following example includes code for creating a user account using <tt class="docutils literal"><span class="pre">ZendOpenId\Provider::register</span></tt>. The link
+element with <tt class="docutils literal"><span class="pre">rel=&quot;openid.server&quot;</span></tt> points to our own server script. If you submit this identity to an
+OpenID-enabled site, it will perform authentication on this server.</p>
+<p>The code before the &lt;html&gt; tag is just a trick that automatically creates a user account. You won&#8217;t need such code
+when using real identities.</p>
+<p class="rubric" id="zendopenid-provider-example-1">The Identity</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">// Set up test identity</span>
+<span class="nb">define</span><span class="p">(</span><span class="s2">&quot;TEST_SERVER&quot;</span><span class="p">,</span> <span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">absoluteURL</span><span class="p">(</span><span class="s2">&quot;example-8.php&quot;</span><span class="p">));</span>
+<span class="nb">define</span><span class="p">(</span><span class="s2">&quot;TEST_ID&quot;</span><span class="p">,</span> <span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">selfURL</span><span class="p">());</span>
+<span class="nb">define</span><span class="p">(</span><span class="s2">&quot;TEST_PASSWORD&quot;</span><span class="p">,</span> <span class="s2">&quot;123&quot;</span><span class="p">);</span>
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOpenId\Provider</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$server</span><span class="o">-&gt;</span><span class="na">hasUser</span><span class="p">(</span><span class="nx">TEST_ID</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">register</span><span class="p">(</span><span class="nx">TEST_ID</span><span class="p">,</span> <span class="nx">TEST_PASSWORD</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;html&gt;&lt;head&gt;</span>
+<span class="x">&lt;link rel=&quot;openid.server&quot; href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nx">TEST_SERVER</span><span class="p">;</span><span class="cp">?&gt;</span><span class="x">&quot; /&gt;</span>
+<span class="x">&lt;/head&gt;&lt;body&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nx">TEST_ID</span><span class="p">;</span><span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/body&gt;&lt;/html&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The following identity server script handles two kinds of requests from OpenID-enabled sites (for association and
+authentication). Both of them are handled by the same method: <tt class="docutils literal"><span class="pre">ZendOpenId\Provider::handle</span></tt>. The two arguments
+to the <tt class="docutils literal"><span class="pre">ZendOpenId\Provider</span></tt> constructor are <em>URL</em>s of login and trust pages, which ask for input from the end
+user.</p>
+<p>On success, the method <tt class="docutils literal"><span class="pre">ZendOpenId\Provider::handle</span></tt> returns a string that should be passed back to the
+OpenID-enabled site. On failure, it returns <tt class="docutils literal"><span class="pre">FALSE</span></tt>. This example will return an <em>HTTP</em> 403 response if
+<tt class="docutils literal"><span class="pre">ZendOpenId\Provider::handle</span></tt> fails. You will get this response if you open this script with a web browser,
+because it sends a non-OpenID conforming request.</p>
+<p class="rubric" id="zendopenid-provider-example-2">Simple Identity Provider</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOpenId\Provider</span><span class="p">(</span><span class="s2">&quot;example-8-login.php&quot;</span><span class="p">,</span>
+                                   <span class="s2">&quot;example-8-trust.php&quot;</span><span class="p">);</span>
+<span class="nv">$ret</span> <span class="o">=</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">is_string</span><span class="p">(</span><span class="nv">$ret</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$ret</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$ret</span> <span class="o">!==</span> <span class="k">true</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">header</span><span class="p">(</span><span class="s1">&#39;HTTP/1.0 403 Forbidden&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="s1">&#39;Forbidden&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is a good idea to use a secure connection (HTTPS) for these scripts- especially for the following interactive
+scripts- to prevent password disclosure.</p>
+</div>
+<p>The following script implements a login screen for an identity server using <tt class="docutils literal"><span class="pre">ZendOpenId\Provider</span></tt> and redirects
+to this page when a required user has not yet logged in. On this page, a user will enter his password to login.</p>
+<p>You should use the password &#8220;123&#8221; that was used in the identity script above.</p>
+<p>On submit, the script calls <tt class="docutils literal"><span class="pre">ZendOpenId\Provider::login</span></tt> with the accepted user&#8217;s identity and password, then
+redirects back to the main identity provider&#8217;s script. On success, the <tt class="docutils literal"><span class="pre">ZendOpenId\Provider::login</span></tt> establishes
+a session between the user and the identity provider and stores the information about the user, who is now logged
+in. All following requests from the same user won&#8217;t require a login procedure- even if they come from another
+OpenID enabled web site.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that this session is between end-user and identity provider only. OpenID enabled sites know nothing about
+it.</p>
+</div>
+<p class="rubric" id="zendopenid-provider-example-3">Simple Login Screen</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOpenId\Provider</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_METHOD&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span> <span class="o">&amp;&amp;</span>
+    <span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+    <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;login&#39;</span> <span class="o">&amp;&amp;</span>
+    <span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_identifier&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+    <span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_password&#39;</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">login</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_identifier&#39;</span><span class="p">],</span>
+                   <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_password&#39;</span><span class="p">]);</span>
+    <span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">redirect</span><span class="p">(</span><span class="s2">&quot;example-8.php&quot;</span><span class="p">,</span> <span class="nv">$_GET</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;html&gt;</span>
+<span class="x">&lt;body&gt;</span>
+<span class="x">&lt;form method=&quot;post&quot;&gt;</span>
+<span class="x">&lt;fieldset&gt;</span>
+<span class="x">&lt;legend&gt;OpenID Login&lt;/legend&gt;</span>
+<span class="x">&lt;table border=0&gt;</span>
+<span class="x">&lt;tr&gt;</span>
+<span class="x">&lt;td&gt;Name:&lt;/td&gt;</span>
+<span class="x">&lt;td&gt;</span>
+<span class="x">&lt;input type=&quot;text&quot;</span>
+<span class="x">       name=&quot;openid_identifier&quot;</span>
+<span class="x">       value=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_identity&#39;</span><span class="p">]);</span><span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="x">&lt;/td&gt;</span>
+<span class="x">&lt;/tr&gt;</span>
+<span class="x">&lt;tr&gt;</span>
+<span class="x">&lt;td&gt;Password:&lt;/td&gt;</span>
+<span class="x">&lt;td&gt;</span>
+<span class="x">&lt;input type=&quot;text&quot;</span>
+<span class="x">       name=&quot;openid_password&quot;</span>
+<span class="x">       value=&quot;&quot;&gt;</span>
+<span class="x">&lt;/td&gt;</span>
+<span class="x">&lt;/tr&gt;</span>
+<span class="x">&lt;tr&gt;</span>
+<span class="x">&lt;td&gt; &lt;/td&gt;</span>
+<span class="x">&lt;td&gt;</span>
+<span class="x">&lt;input type=&quot;submit&quot;</span>
+<span class="x">       name=&quot;openid_action&quot;</span>
+<span class="x">       value=&quot;login&quot;&gt;</span>
+<span class="x">&lt;/td&gt;</span>
+<span class="x">&lt;/tr&gt;</span>
+<span class="x">&lt;/table&gt;</span>
+<span class="x">&lt;/fieldset&gt;</span>
+<span class="x">&lt;/form&gt;</span>
+<span class="x">&lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The fact that the user is now logged in doesn&#8217;t mean that the authentication must necessarily succeed. The user may
+decide not to trust particular OpenID enabled sites. The following trust screen allows the end user to make that
+choice. This choice may either be made only for current requests or forever. In the second case, information about
+trusted/untrusted sites is stored in an internal database, and all following authentication requests from this site
+will be handled automatically without user interaction.</p>
+<p class="rubric" id="zendopenid-provider-example-4">Simple Trust Screen</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOpenId\Provider</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_METHOD&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span> <span class="o">&amp;&amp;</span>
+    <span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+    <span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;trust&#39;</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;allow&#39;</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;forever&#39;</span><span class="p">]))</span> <span class="p">{</span>
+            <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">allowSite</span><span class="p">(</span><span class="nv">$server</span><span class="o">-&gt;</span><span class="na">getSiteRoot</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">));</span>
+        <span class="p">}</span>
+        <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">respondToConsumer</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;deny&#39;</span><span class="p">]))</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">[</span><span class="s1">&#39;forever&#39;</span><span class="p">]))</span> <span class="p">{</span>
+            <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">denySite</span><span class="p">(</span><span class="nv">$server</span><span class="o">-&gt;</span><span class="na">getSiteRoot</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">));</span>
+        <span class="p">}</span>
+        <span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">redirect</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_return_to&#39;</span><span class="p">],</span>
+                              <span class="k">array</span><span class="p">(</span><span class="s1">&#39;openid.mode&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;cancel&#39;</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;html&gt;</span>
+<span class="x">&lt;body&gt;</span>
+<span class="x">&lt;p&gt;A site identifying as</span>
+<span class="x">&lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$server</span><span class="o">-&gt;</span><span class="na">getSiteRoot</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">));</span><span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$server</span><span class="o">-&gt;</span><span class="na">getSiteRoot</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">));</span><span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/a&gt;</span>
+<span class="x">has asked us for confirmation that</span>
+<span class="x">&lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$server</span><span class="o">-&gt;</span><span class="na">getLoggedInUser</span><span class="p">());</span><span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$server</span><span class="o">-&gt;</span><span class="na">getLoggedInUser</span><span class="p">());</span><span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/a&gt;</span>
+<span class="x">is your identity URL.</span>
+<span class="x">&lt;/p&gt;</span>
+<span class="x">&lt;form method=&quot;post&quot;&gt;</span>
+<span class="x">&lt;input type=&quot;checkbox&quot; name=&quot;forever&quot;&gt;</span>
+<span class="x">&lt;label for=&quot;forever&quot;&gt;forever&lt;/label&gt;&lt;br&gt;</span>
+<span class="x">&lt;input type=&quot;hidden&quot; name=&quot;openid_action&quot; value=&quot;trust&quot;&gt;</span>
+<span class="x">&lt;input type=&quot;submit&quot; name=&quot;allow&quot; value=&quot;Allow&quot;&gt;</span>
+<span class="x">&lt;input type=&quot;submit&quot; name=&quot;deny&quot; value=&quot;Deny&quot;&gt;</span>
+<span class="x">&lt;/form&gt;</span>
+<span class="x">&lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Production OpenID servers usually support the Simple Registration Extension that allows consumers to request some
+information about the user from the provider. In this case, the trust page can be extended to allow entering
+requested fields or selecting a specific user profile.</p>
+</div>
+<div class="section" id="combined-provide-scripts">
+<span id="zendopenid-provider-all"></span><h2>Combined Provide Scripts<a class="headerlink" href="#combined-provide-scripts" title="Permalink to this headline">¶</a></h2>
+<p>It is possible to combine all provider functionality in one script. In this case login and trust <em>URL</em>s are
+omitted, and <tt class="docutils literal"><span class="pre">ZendOpenId\Provider</span></tt> assumes that they point to the same page with the additional
+&#8220;openid.action&#8221;<tt class="docutils literal"><span class="pre">GET</span></tt> argument.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The following example is not complete. It doesn&#8217;t provide GUI code for the user, instead performing an automatic
+login and trust relationship instead. This is done just to simplify the example; a production server should
+include some code from previous examples.</p>
+</div>
+<p class="rubric" id="zendopenid-provider-example-5">Everything Together</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOpenId\Provider</span><span class="p">();</span>
+
+<span class="nb">define</span><span class="p">(</span><span class="s2">&quot;TEST_ID&quot;</span><span class="p">,</span> <span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">absoluteURL</span><span class="p">(</span><span class="s2">&quot;example-9-id.php&quot;</span><span class="p">));</span>
+<span class="nb">define</span><span class="p">(</span><span class="s2">&quot;TEST_PASSWORD&quot;</span><span class="p">,</span> <span class="s2">&quot;123&quot;</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_METHOD&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span> <span class="o">&amp;&amp;</span>
+    <span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+    <span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;login&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">login</span><span class="p">(</span><span class="nx">TEST_ID</span><span class="p">,</span> <span class="nx">TEST_PASSWORD</span><span class="p">);</span>
+    <span class="nb">unset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">]);</span>
+    <span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">redirect</span><span class="p">(</span><span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">selfUrl</span><span class="p">(),</span> <span class="nv">$_GET</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_METHOD&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span> <span class="o">&amp;&amp;</span>
+    <span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+    <span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;trust&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nb">unset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">]);</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">respondToConsumer</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nv">$ret</span> <span class="o">=</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">is_string</span><span class="p">(</span><span class="nv">$ret</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="nv">$ret</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$ret</span> <span class="o">!==</span> <span class="k">true</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">header</span><span class="p">(</span><span class="s1">&#39;HTTP/1.0 403 Forbidden&#39;</span><span class="p">);</span>
+        <span class="k">echo</span> <span class="s1">&#39;Forbidden&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you compare this example with previous examples split in to separate pages, you will see only the one difference
+besides the dispatch code: <tt class="docutils literal"><span class="pre">unset($_GET['openid_action'])</span></tt>. This call to <tt class="docutils literal"><span class="pre">unset()</span></tt> is necessary to route the
+next request to main handler.</p>
+</div>
+<div class="section" id="simple-registration-extension">
+<span id="zendopenid-provider-sreg"></span><h2>Simple Registration Extension<a class="headerlink" href="#simple-registration-extension" title="Permalink to this headline">¶</a></h2>
+<p>Again, the code before the &lt;html&gt; tag is just a trick to demonstrate functionality. It creates a new user account
+and associates it with a profile (nickname and password). Such tricks aren&#8217;t needed in deployed providers where end
+users register on OpenID servers and fill in their profiles. Implementing this GUI is out of scope for this manual.</p>
+<p class="rubric" id="zendopenid-provider-example-6">Identity with Profile</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="nb">define</span><span class="p">(</span><span class="s2">&quot;TEST_SERVER&quot;</span><span class="p">,</span> <span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">absoluteURL</span><span class="p">(</span><span class="s2">&quot;example-10.php&quot;</span><span class="p">));</span>
+<span class="nb">define</span><span class="p">(</span><span class="s2">&quot;TEST_ID&quot;</span><span class="p">,</span> <span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">selfURL</span><span class="p">());</span>
+<span class="nb">define</span><span class="p">(</span><span class="s2">&quot;TEST_PASSWORD&quot;</span><span class="p">,</span> <span class="s2">&quot;123&quot;</span><span class="p">);</span>
+<span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOpenId\Provider</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$server</span><span class="o">-&gt;</span><span class="na">hasUser</span><span class="p">(</span><span class="nx">TEST_ID</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">register</span><span class="p">(</span><span class="nx">TEST_ID</span><span class="p">,</span> <span class="nx">TEST_PASSWORD</span><span class="p">);</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">login</span><span class="p">(</span><span class="nx">TEST_ID</span><span class="p">,</span> <span class="nx">TEST_PASSWORD</span><span class="p">);</span>
+    <span class="nv">$sreg</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOpenId\Extension\Sreg</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;nickname&#39;</span> <span class="o">=&gt;</span><span class="s1">&#39;test&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;email&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;test@test.com&#39;</span>
+    <span class="p">));</span>
+    <span class="nv">$root</span> <span class="o">=</span> <span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">absoluteURL</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">);</span>
+    <span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">normalizeUrl</span><span class="p">(</span><span class="nv">$root</span><span class="p">);</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">allowSite</span><span class="p">(</span><span class="nv">$root</span><span class="p">,</span> <span class="nv">$sreg</span><span class="p">);</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">logout</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;html&gt;</span>
+<span class="x">&lt;head&gt;</span>
+<span class="x">&lt;link rel=&quot;openid.server&quot; href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nx">TEST_SERVER</span><span class="p">;</span><span class="cp">?&gt;</span><span class="x">&quot; /&gt;</span>
+<span class="x">&lt;/head&gt;</span>
+<span class="x">&lt;body&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nx">TEST_ID</span><span class="p">;</span><span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>You should now pass this identity to the OpenID-enabled web site (use the Simple Registration Extension example
+from the previous section), and it should use the following OpenID server script.</p>
+<p>This script is a variation of the script in the &#8220;Everything Together&#8221; example. It uses the same automatic login
+mechanism, but doesn&#8217;t contain any code for a trust page. The user already trusts the example scripts forever. This
+trust was established by calling the <tt class="docutils literal"><span class="pre">ZendOpenId\Provider::allowSite()</span></tt> method in the identity script. The same
+method associates the profile with the trusted <em>URL</em>. This profile will be returned automatically for a request
+from the trusted <em>URL</em>.</p>
+<p>To make Simple Registration Extension work, you must simply pass an instance of <tt class="docutils literal"><span class="pre">ZendOpenId\Extension\Sreg</span></tt> as
+the second argument to the <tt class="docutils literal"><span class="pre">ZendOpenId\Provider::handle()</span></tt> method.</p>
+<p class="rubric" id="zendopenid-provider-example-7">Provider with SREG</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOpenId\Provider</span><span class="p">();</span>
+<span class="nv">$sreg</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOpenId\Extension\Sreg</span><span class="p">();</span>
+
+<span class="nb">define</span><span class="p">(</span><span class="s2">&quot;TEST_ID&quot;</span><span class="p">,</span> <span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">absoluteURL</span><span class="p">(</span><span class="s2">&quot;example-10-id.php&quot;</span><span class="p">));</span>
+<span class="nb">define</span><span class="p">(</span><span class="s2">&quot;TEST_PASSWORD&quot;</span><span class="p">,</span> <span class="s2">&quot;123&quot;</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_METHOD&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span> <span class="o">&amp;&amp;</span>
+    <span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+    <span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;login&#39;</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">login</span><span class="p">(</span><span class="nx">TEST_ID</span><span class="p">,</span> <span class="nx">TEST_PASSWORD</span><span class="p">);</span>
+    <span class="nb">unset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">]);</span>
+    <span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">redirect</span><span class="p">(</span><span class="nx">ZendOpenId\OpenId</span><span class="o">::</span><span class="na">selfUrl</span><span class="p">(),</span> <span class="nv">$_GET</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_METHOD&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span> <span class="o">&amp;&amp;</span>
+    <span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">])</span> <span class="o">&amp;&amp;</span>
+    <span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;openid_action&#39;</span><span class="p">]</span> <span class="o">===</span> <span class="s1">&#39;trust&#39;</span><span class="p">)</span> <span class="p">{</span>
+   <span class="k">echo</span> <span class="s2">&quot;UNTRUSTED DATA&quot;</span> <span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nv">$ret</span> <span class="o">=</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="nv">$sreg</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">is_string</span><span class="p">(</span><span class="nv">$ret</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="nv">$ret</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$ret</span> <span class="o">!==</span> <span class="k">true</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">header</span><span class="p">(</span><span class="s1">&#39;HTTP/1.0 403 Forbidden&#39;</span><span class="p">);</span>
+        <span class="k">echo</span> <span class="s1">&#39;Forbidden&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="anything-else">
+<span id="zendopenid-provider-else"></span><h2>Anything Else?<a class="headerlink" href="#anything-else" title="Permalink to this headline">¶</a></h2>
+<p>Building OpenID providers is much less common than building OpenID-enabled sites, so this manual doesn&#8217;t cover all
+<tt class="docutils literal"><span class="pre">ZendOpenId\Provider</span></tt> features exhaustively, as was done for <tt class="docutils literal"><span class="pre">ZendOpenId\Consumer</span></tt>.</p>
+<p>To summamize, <tt class="docutils literal"><span class="pre">ZendOpenId\Provider</span></tt> contains:</p>
+<ul class="simple">
+<li>A set of methods to build an end-user GUI that allows users to register and manage their trusted sites and
+profiles</li>
+<li>An abstract storage layer to store information about users, their sites and their profiles. It also stores
+associations between the provider and OpenID-enabled sites. This layer is very similar to that of the
+<tt class="docutils literal"><span class="pre">ZendOpenId\Consumer</span></tt> class. It also uses file storage by default, but may used with another backend.</li>
+<li>An abstract user-association layer that may associate a user&#8217;s web browser with a logged-in identity</li>
+</ul>
+<p>The <tt class="docutils literal"><span class="pre">ZendOpenId\Provider</span></tt> class doesn&#8217;t attempt to cover all possible features that can be implemented by OpenID
+servers, e.g. digital certificates, but it can be extended easily using <tt class="docutils literal"><span class="pre">ZendOpenId\Extension</span></tt>s or by standard
+object-oriented extension.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ZendOpenIdProvider</a><ul>
+<li><a class="reference internal" href="#quick-start">Quick start</a></li>
+<li><a class="reference internal" href="#combined-provide-scripts">Combined Provide Scripts</a></li>
+<li><a class="reference internal" href="#simple-registration-extension">Simple Registration Extension</a></li>
+<li><a class="reference internal" href="#anything-else">Anything Else?</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendopen-id.provider.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendopen-id.provider.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendopen-id.provider.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendopen-id.provider.rst">
+                ZendOpenIdProvider
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

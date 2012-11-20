@@ -1,0 +1,542 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Layering Decorators &mdash; Zend Framework 2 2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.4 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="layering-decorators">
+<span id="learning-form-decorators-layering"></span><h1>Layering Decorators<a class="headerlink" href="#layering-decorators" title="Permalink to this headline">¶</a></h1>
+<p>If you were following closely in <a class="reference internal" href="form.decorators.simplest.html#learning-form-decorators-simplest"><em>the previous section</em></a>, you may have
+noticed that a decorator&#8217;s <tt class="docutils literal"><span class="pre">render()</span></tt> method takes a single argument, <tt class="docutils literal"><span class="pre">$content</span></tt>. This is expected to be a
+string. <tt class="docutils literal"><span class="pre">render()</span></tt> will then take this string and decide to either replace it, append to it, or prepend it. This
+allows you to have a chain of decorators &#8211; which allows you to create decorators that render only a subset of the
+element&#8217;s metadata, and then layer these decorators to build the full markup for the element.</p>
+<p>Let&#8217;s look at how this works in practice.</p>
+<p>For most form element types, the following decorators are used:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">ViewHelper</span></tt> (render the form input using one of the standard form view helpers).</li>
+<li><tt class="docutils literal"><span class="pre">Errors</span></tt> (render validation errors via an unordered list).</li>
+<li><tt class="docutils literal"><span class="pre">Description</span></tt> (render any description attached to the element; often used for tooltips).</li>
+<li><tt class="docutils literal"><span class="pre">HtmlTag</span></tt> (wrap all of the above in a <strong>&lt;dd&gt;</strong> tag.</li>
+<li><tt class="docutils literal"><span class="pre">Label</span></tt> (render the label preceding the above, wrapped in a <strong>&lt;dt&gt;</strong> tag.</li>
+</ul>
+<p>You&#8217;ll notice that each of these decorators does just one thing, and operates on one specific piece of metadata
+stored in the form element: the <tt class="docutils literal"><span class="pre">Errors</span></tt> decorator pulls validation errors and renders them; the <tt class="docutils literal"><span class="pre">Label</span></tt>
+decorator pulls just the label and renders it. This allows the individual decorators to be very succinct,
+repeatable, and, more importantly, testable.</p>
+<p>It&#8217;s also where that <tt class="docutils literal"><span class="pre">$content</span></tt> argument comes into play: each decorator&#8217;s <tt class="docutils literal"><span class="pre">render()</span></tt> method is designed to
+accept content, and then either replace it (usually by wrapping it), prepend to it, or append to it.</p>
+<p>So, it&#8217;s best to think of the process of decoration as one of building an onion from the inside out.</p>
+<p>To simplify the process, we&#8217;ll take a look at the example from <a class="reference internal" href="form.decorators.simplest.html#learning-form-decorators-simplest"><em>the previous section</em></a>. Recall:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">My_Decorator_SimpleInput</span> <span class="k">extends</span> <span class="nx">Zend\Form_Decorator\Abstract</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$_format</span> <span class="o">=</span> <span class="s1">&#39;&lt;label for=&quot;%s&quot;&gt;%s&lt;/label&gt;&#39;</span>
+                       <span class="o">.</span> <span class="s1">&#39;&lt;input id=&quot;%s&quot; name=&quot;%s&quot; type=&quot;text&quot; value=&quot;%s&quot;/&gt;&#39;</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$content</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$element</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getElement</span><span class="p">();</span>
+        <span class="nv">$name</span>    <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getFullyQualifiedName</span><span class="p">());</span>
+        <span class="nv">$label</span>   <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getLabel</span><span class="p">());</span>
+        <span class="nv">$id</span>      <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">());</span>
+        <span class="nv">$value</span>   <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">());</span>
+
+        <span class="nv">$markup</span>  <span class="o">=</span> <span class="nb">sprintf</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_format</span><span class="p">,</span> <span class="nv">$id</span><span class="p">,</span> <span class="nv">$label</span><span class="p">,</span> <span class="nv">$id</span><span class="p">,</span> <span class="nv">$name</span><span class="p">,</span> <span class="nv">$value</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nv">$markup</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Let&#8217;s now remove the label functionality, and build a separate decorator for that.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">My_Decorator_SimpleInput</span> <span class="k">extends</span> <span class="nx">Zend\Form_Decorator\Abstract</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$_format</span> <span class="o">=</span> <span class="s1">&#39;&lt;input id=&quot;%s&quot; name=&quot;%s&quot; type=&quot;text&quot; value=&quot;%s&quot;/&gt;&#39;</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$content</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$element</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getElement</span><span class="p">();</span>
+        <span class="nv">$name</span>    <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getFullyQualifiedName</span><span class="p">());</span>
+        <span class="nv">$id</span>      <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">());</span>
+        <span class="nv">$value</span>   <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">());</span>
+
+        <span class="nv">$markup</span>  <span class="o">=</span> <span class="nb">sprintf</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_format</span><span class="p">,</span> <span class="nv">$id</span><span class="p">,</span> <span class="nv">$name</span><span class="p">,</span> <span class="nv">$value</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nv">$markup</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">My_Decorator_SimpleLabel</span> <span class="k">extends</span> <span class="nx">Zend\Form_Decorator\Abstract</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$_format</span> <span class="o">=</span> <span class="s1">&#39;&lt;label for=&quot;%s&quot;&gt;%s&lt;/label&gt;&#39;</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$content</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$element</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getElement</span><span class="p">();</span>
+        <span class="nv">$id</span>      <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">());</span>
+        <span class="nv">$label</span>   <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getLabel</span><span class="p">());</span>
+
+        <span class="nv">$markup</span> <span class="o">=</span> <span class="nb">sprintf</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_format</span><span class="p">,</span> <span class="nv">$id</span><span class="p">,</span> <span class="nv">$label</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nv">$markup</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now, this may look all well and good, but here&#8217;s the problem: as written currently, the last decorator to run wins,
+and overwrites everything. You&#8217;ll end up with just the input, or just the label, depending on which you register
+last.</p>
+<p>To overcome this, simply concatenate the passed in <tt class="docutils literal"><span class="pre">$content</span></tt> with the markup somehow:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">return</span> <span class="nv">$content</span> <span class="o">.</span> <span class="nv">$markup</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The problem with the above approach comes when you want to programmatically choose whether the original content
+should precede or append the new markup. Fortunately, there&#8217;s a standard mechanism for this already;
+<tt class="docutils literal"><span class="pre">Zend\Form_Decorator\Abstract</span></tt> has a concept of placement and defines some constants for matching it.
+Additionally, it allows specifying a separator to place between the two. Let&#8217;s make use of those:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">My_Decorator_SimpleInput</span> <span class="k">extends</span> <span class="nx">Zend\Form_Decorator\Abstract</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$_format</span> <span class="o">=</span> <span class="s1">&#39;&lt;input id=&quot;%s&quot; name=&quot;%s&quot; type=&quot;text&quot; value=&quot;%s&quot;/&gt;&#39;</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$content</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$element</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getElement</span><span class="p">();</span>
+        <span class="nv">$name</span>    <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getFullyQualifiedName</span><span class="p">());</span>
+        <span class="nv">$id</span>      <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">());</span>
+        <span class="nv">$value</span>   <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">());</span>
+
+        <span class="nv">$markup</span>  <span class="o">=</span> <span class="nb">sprintf</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_format</span><span class="p">,</span> <span class="nv">$id</span><span class="p">,</span> <span class="nv">$name</span><span class="p">,</span> <span class="nv">$value</span><span class="p">);</span>
+
+        <span class="nv">$placement</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getPlacement</span><span class="p">();</span>
+        <span class="nv">$separator</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getSeparator</span><span class="p">();</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="nv">$placement</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">PREPEND</span><span class="o">:</span>
+                <span class="k">return</span> <span class="nv">$markup</span> <span class="o">.</span> <span class="nv">$separator</span> <span class="o">.</span> <span class="nv">$content</span><span class="p">;</span>
+            <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">APPEND</span><span class="o">:</span>
+            <span class="k">default</span><span class="o">:</span>
+                <span class="k">return</span> <span class="nv">$content</span> <span class="o">.</span> <span class="nv">$separator</span> <span class="o">.</span> <span class="nv">$markup</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">My_Decorator_SimpleLabel</span> <span class="k">extends</span> <span class="nx">Zend\Form_Decorator\Abstract</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$_format</span> <span class="o">=</span> <span class="s1">&#39;&lt;label for=&quot;%s&quot;&gt;%s&lt;/label&gt;&#39;</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$content</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$element</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getElement</span><span class="p">();</span>
+        <span class="nv">$id</span>      <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getId</span><span class="p">());</span>
+        <span class="nv">$label</span>   <span class="o">=</span> <span class="nb">htmlentities</span><span class="p">(</span><span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getLabel</span><span class="p">());</span>
+
+        <span class="nv">$markup</span> <span class="o">=</span> <span class="nx">sprint</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_format</span><span class="p">,</span> <span class="nv">$id</span><span class="p">,</span> <span class="nv">$label</span><span class="p">);</span>
+
+        <span class="nv">$placement</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getPlacement</span><span class="p">();</span>
+        <span class="nv">$separator</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getSeparator</span><span class="p">();</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="nv">$placement</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">APPEND</span><span class="o">:</span>
+                <span class="k">return</span> <span class="nv">$markup</span> <span class="o">.</span> <span class="nv">$separator</span> <span class="o">.</span> <span class="nv">$content</span><span class="p">;</span>
+            <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">PREPEND</span><span class="o">:</span>
+            <span class="k">default</span><span class="o">:</span>
+                <span class="k">return</span> <span class="nv">$content</span> <span class="o">.</span> <span class="nv">$separator</span> <span class="o">.</span> <span class="nv">$markup</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Notice in the above that I&#8217;m switching the default case for each; the assumption will be that labels prepend
+content, and input appends.</p>
+<p>Now, let&#8217;s create a form element that uses these:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$element</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Form\Element</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Foo&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;belongsTo&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;value&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;prefixPath&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;decorator&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;My_Decorator&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;path/to/decorators/&#39;</span><span class="p">,</span>
+    <span class="p">)),</span>
+    <span class="s1">&#39;decorators&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;SimpleInput&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;SimpleLabel&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>How will this work? When we call <tt class="docutils literal"><span class="pre">render()</span></tt>, the element will iterate through the various attached decorators,
+calling <tt class="docutils literal"><span class="pre">render()</span></tt> on each. It will pass an empty string to the very first, and then whatever content is created
+will be passed to the next, and so on:</p>
+<ul class="simple">
+<li>Initial content is an empty string: &#8216;&#8217;.</li>
+<li>&#8216;&#8217; is passed to the <tt class="docutils literal"><span class="pre">SimpleInput</span></tt> decorator, which then generates a form input that it appends to the empty
+string: <strong>&lt;input id=&#8221;bar-foo&#8221; name=&#8221;bar[foo]&#8221; type=&#8221;text&#8221; value=&#8221;test&#8221;/&gt;</strong>.</li>
+<li>The input is then passed as content to the <tt class="docutils literal"><span class="pre">SimpleLabel</span></tt> decorator, which generates a label and prepends it to
+the original content; the default separator is a <tt class="docutils literal"><span class="pre">PHP_EOL</span></tt> character, giving us this: <strong>&lt;label
+for=&#8221;bar-foo&#8221;&gt;n&lt;input id=&#8221;bar-foo&#8221; name=&#8221;bar[foo]&#8221; type=&#8221;text&#8221; value=&#8221;test&#8221;/&gt;</strong>.</li>
+</ul>
+<p>But wait a second! What if you wanted the label to come after the input for some reason? Remember that &#8220;placement&#8221;
+flag? You can pass it as an option to the decorator. The easiest way to do this is to pass an array of options with
+the decorator during element creation:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$element</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Form\Element</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Foo&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;belongsTo&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;value&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;prefixPath&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;decorator&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;My_Decorator&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;path/to/decorators/&#39;</span><span class="p">,</span>
+    <span class="p">)),</span>
+    <span class="s1">&#39;decorators&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;SimpleInput&#39;</span>
+        <span class="k">array</span><span class="p">(</span><span class="s1">&#39;SimpleLabel&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;placement&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;append&#39;</span><span class="p">)),</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>Notice that when passing options, you must wrap the decorator within an array; this hints to the constructor that
+options are available. The decorator name is the first element of the array, and options are passed in an array to
+the second element of the array.</p>
+<p>The above results in the markup <strong>&lt;input id=&#8221;bar-foo&#8221; name=&#8221;bar[foo]&#8221; type=&#8221;text&#8221; value=&#8221;test&#8221;/&gt;n&lt;label
+for=&#8221;bar-foo&#8221;&gt;</strong>.</p>
+<p>Using this technique, you can have decorators that target specific metadata of the element or form and create only
+the markup relevant to that metadata; by using mulitiple decorators, you can then build up the complete element
+markup. Our onion is the result.</p>
+<p>There are pros and cons to this approach. First, the cons:</p>
+<ul class="simple">
+<li>More complex to implement. You have to pay careful attention to the decorators you use and what placement you
+utilize in order to build up the markup in the correct sequence.</li>
+<li>More resource intensive. More decorators means more objects; multiply this by the number of elements you have in
+a form, and you may end up with some serious resource usage. Caching can help here.</li>
+</ul>
+<p>The advantages are compelling, though:</p>
+<ul class="simple">
+<li>Reusable decorators. You can create truly re-usable decorators with this technique, as you don&#8217;t have to worry
+about the complete markup, but only markup for one or a few pieces of element or form metadata.</li>
+<li>Ultimate flexibility. You can theoretically generate any markup combination you want from a small number of
+decorators.</li>
+</ul>
+<p>While the above examples are the intended usage of decorators within <tt class="docutils literal"><span class="pre">Zend_Form</span></tt>, it&#8217;s often hard to wrap your
+head around how the decorators interact with one another to build the final markup. For this reason, some
+flexibility was added in the 1.7 series to make rendering individual decorators possible &#8211; which gives some
+Rails-like simplicity to rendering forms. We&#8217;ll look at that in the next section.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/form.decorators.layering.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/form.decorators.layering.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/form.decorators.layering.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/form.decorators.layering.rst">
+                Layering Decorators
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,590 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction to the MVC Layer &mdash; Zend Framework 2 2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.4 documentation" href="../index.html" />
+    <link rel="next" title="Quick Start" href="zend.mvc.quick-start.html" />
+    <link rel="prev" title="Best Practices when Creating Modules" href="zend.module-manager.best-practices.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.mvc.quick-start.html" title="Quick Start"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.module-manager.best-practices.html" title="Best Practices when Creating Modules"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction-to-the-mvc-layer">
+<span id="zend-mvc-intro"></span><h1>Introduction to the MVC Layer<a class="headerlink" href="#introduction-to-the-mvc-layer" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Mvc</span></tt> is a brand new MVC implementation designed from the ground up for Zend Framework 2,
+focusing on performance and flexibility.</p>
+<p>The MVC layer is built on top of the following components:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\ServiceManager</span></tt> - Zend Framework provides a set of default service definitions set up at
+<tt class="docutils literal"><span class="pre">Zend\Mvc\Service</span></tt>. The <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> creates and configures your application instance and
+workflow.</li>
+<li><tt class="docutils literal"><span class="pre">Zend\EventManager</span></tt> - The MVC is event driven. This component is used everywhere
+from initial bootstrapping of the application, through returning response and request calls,
+to setting and retrieving routes and matched routes, as well as render views.</li>
+<li><tt class="docutils literal"><span class="pre">Zend\Http</span></tt> - specifically the request and response objects, used within:</li>
+<li><tt class="docutils literal"><span class="pre">Zend\Stdlib\DispatchableInterface</span></tt>. All &#8220;controllers&#8221; are simply dispatchable objects.</li>
+</ul>
+<p>Within the MVC layer, several sub-components are exposed:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Mvc\Router</span></tt> contains classes pertaining to routing a request. In other words, it matches
+the request to its respective controller (or dispatchable).</li>
+<li><tt class="docutils literal"><span class="pre">Zend\Http\PhpEnvironment</span></tt> provides a set of decorators for the HTTP <tt class="docutils literal"><span class="pre">Request</span></tt> and
+<tt class="docutils literal"><span class="pre">Response</span></tt> objects that ensure the request is injected with the current environment (including
+query parameters, POST parameters, HTTP headers, etc.)</li>
+<li><tt class="docutils literal"><span class="pre">Zend\Mvc\Controller</span></tt>, a set of abstract &#8220;controller&#8221; classes with basic responsibilities such
+as event wiring, action dispatching, etc.</li>
+<li><tt class="docutils literal"><span class="pre">Zend\Mvc\Service</span></tt> provides a set of <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> factories and definitions for the
+default application workflow.</li>
+<li><tt class="docutils literal"><span class="pre">Zend\Mvc\View</span></tt> provides default wiring for renderer selection, view script resolution, helper
+registration, and more; additionally, it provides a number of listeners that tie into the MVC
+workflow, providing features such as automated template name resolution, automated view model
+creation and injection, and more.</li>
+</ul>
+<p>The gateway to the MVC is the <a class="reference external" href="https://github.com/zendframework/zf2/blob/master/library/Zend/Mvc/Application.php">Zend\Mvc\Application</a> object (referred to as <tt class="docutils literal"><span class="pre">Application</span></tt>
+henceforth).  Its primary responsibilities are to <strong>bootstrap</strong> resources, <strong>route</strong> the request,
+and to retrieve and <strong>dispatch</strong> the controller matched during routing. Once accomplished, it
+will <strong>render</strong> the view, and <strong>finish</strong> the request, returning and sending the response.</p>
+<div class="section" id="basic-application-structure">
+<span id="zend-mvc-intro-basic-application-structure"></span><h2>Basic Application Structure<a class="headerlink" href="#basic-application-structure" title="Permalink to this headline">¶</a></h2>
+<p>The basic application structure follows:</p>
+<div class="highlight-python"><pre>application_root/
+    config/
+        application.config.php
+        autoload/
+            global.php
+            local.php
+            // etc.
+    data/
+    module/
+    vendor/
+    public/
+        .htaccess
+        index.php
+    init_autoloader.php</pre>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">public/index.php</span></tt> marshalls all user requests to your website, retrieving an array of
+configuration located in <tt class="docutils literal"><span class="pre">config/application.config.php</span></tt>. On return, it <tt class="docutils literal"><span class="pre">run()</span></tt>s the <tt class="docutils literal"><span class="pre">Application</span></tt>,
+processing the request and returning a response to the user.</p>
+<p>The <tt class="docutils literal"><span class="pre">config</span></tt> directory as described above contains configuration used by the
+<tt class="docutils literal"><span class="pre">Zend\ModuleManager</span></tt> to load modules and merge configuration (e.g., database configuration and
+credentials); we will detail this more later.</p>
+<p>The <tt class="docutils literal"><span class="pre">vendor</span></tt> sub-directory should contain any third-party modules or libraries on which your
+application depends.  This might include Zend Framework, custom libraries from your organization, or
+other third-party libraries from other projects. Libraries and modules placed in the <tt class="docutils literal"><span class="pre">vendor</span></tt>
+sub-directory should not be modified from their original, distributed state.</p>
+<p>Finally, the <tt class="docutils literal"><span class="pre">module</span></tt> directory will contain one or more modules delivering your application&#8217;s
+functionality.</p>
+<p>Let&#8217;s now turn to modules, as they are the basic units of a web application.</p>
+</div>
+<div class="section" id="basic-module-structure">
+<span id="zend-mvc-intro-basic-module-structure"></span><h2>Basic Module Structure<a class="headerlink" href="#basic-module-structure" title="Permalink to this headline">¶</a></h2>
+<p>A module may contain anything: PHP code, including MVC functionality; library code; view scripts;
+and/or or public assets such as images, CSS, and JavaScript. The only requirement &#8211; and even this
+is optional &#8211; is that a module acts as a PHP namespace and that it contains a <tt class="docutils literal"><span class="pre">Module.php</span></tt> class
+under that namespace. This class is eventually consumed by <tt class="docutils literal"><span class="pre">Zend\ModuleManager</span></tt> to perform a
+number of tasks.</p>
+<p>The recommended module structure follows:</p>
+<div class="highlight-python"><pre>module_root&lt;named-after-module-namespace&gt;/
+    Module.php
+    autoload_classmap.php
+    autoload_function.php
+    autoload_register.php
+    config/
+        module.config.php
+    public/
+        images/
+        css/
+        js/
+    src/
+        &lt;module_namespace&gt;/
+            &lt;code files&gt;
+    test/
+        phpunit.xml
+        bootstrap.php
+        &lt;module_namespace&gt;/
+            &lt;test code files&gt;
+    view/
+        &lt;dir-named-after-module-namespace&gt;/
+            &lt;dir-named-after-a-controller&gt;/
+                &lt;.phtml files&gt;</pre>
+</div>
+<p>Since a module acts as a namespace, the module root directory should be that namespace. This namespace
+could also include a vendor prefix of sorts. As an example a module centered around &#8220;User&#8221; functionality delivered
+by Zend might be named &#8220;ZendUser&#8221;, and this is also what the module root directory will be named.</p>
+<p>The <tt class="docutils literal"><span class="pre">Module.php</span></tt> file directly under the module root directory will be in the module namespace shown below.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">ZendUser</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Module</span>
+<span class="p">{</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>When an <tt class="docutils literal"><span class="pre">init()</span></tt> method is defined, this method will be triggered by a <tt class="docutils literal"><span class="pre">Zend\ModuleManager</span></tt> listener
+when it loads the module class, and passed an instance of the manager by default.  This allows you to perform tasks such as
+setting up module-specific event listeners.  But be cautious, the <tt class="docutils literal"><span class="pre">init()</span></tt> method is called for <strong>every</strong> module on <strong>every</strong> page
+request and should <strong>only</strong> be used for performing <strong>lightweight</strong> tasks such as registering event listeners.
+Similarly, an <tt class="docutils literal"><span class="pre">onBootstrap()</span></tt> method (which accepts an <tt class="docutils literal"><span class="pre">MvcEvent</span></tt> instance) may be defined; it is also
+triggered for every page request, and should be used for lightweight tasks as well.</p>
+<p>The three <tt class="docutils literal"><span class="pre">autoload_*.php</span></tt> files are not required, but recommended. They provide the following:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">autoload_classmap.php</span></tt> should return an array classmap of class name/filename pairs (with the filenames
+resolved via the <tt class="docutils literal"><span class="pre">__DIR__</span></tt> magic constant).</li>
+<li><tt class="docutils literal"><span class="pre">autoload_function.php</span></tt> should return a PHP callback that can be passed to <tt class="docutils literal"><span class="pre">spl_autoload_register()</span></tt>.
+Typically, this callback should utilize the map returned by <tt class="docutils literal"><span class="pre">autoload_classmap.php</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">autoload_register.php</span></tt> should register a PHP callback (is typically returned by <tt class="docutils literal"><span class="pre">autoload_function.php</span></tt>
+with <tt class="docutils literal"><span class="pre">spl_autoload_register()</span></tt>.</li>
+</ul>
+<p>The point of these three files is to provide reasonable default mechanisms for autoloading the classes contained in
+the module, thus providing a trivial way to consume the module without requiring <tt class="docutils literal"><span class="pre">Zend\ModuleManager</span></tt> (e.g., for use
+outside a ZF2 application).</p>
+<p>The <tt class="docutils literal"><span class="pre">config</span></tt> directory should contain any module-specific configuration. These files may be in any format
+<tt class="docutils literal"><span class="pre">Zend\Config</span></tt> supports. We recommend naming the main configuration &#8220;module.format&#8221;, and for PHP-based
+configuration, &#8220;module.config.php&#8221;. Typically, you will create configuration for the router as well as for the
+dependency injector.</p>
+<p>The <tt class="docutils literal"><span class="pre">src</span></tt> directory should be a <a class="reference external" href="https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md">PSR-0 compliant directory structure</a> with your module&#8217;s source code. Typically,
+you should at least have one sub-directory named after your module namespace; however, you can ship code from
+multiple namespaces if desired.</p>
+<p>The <tt class="docutils literal"><span class="pre">test</span></tt> directory should contain your unit tests. Typically, these are written using <a class="reference external" href="http://phpunit.de">PHPUnit</a>, and
+contain artifacts related to its configuration (e.g., <tt class="docutils literal"><span class="pre">phpunit.xml</span></tt>, <tt class="docutils literal"><span class="pre">bootstrap.php</span></tt>).</p>
+<p>The <tt class="docutils literal"><span class="pre">public</span></tt> directory can be used for assets that you may want to expose in your application&#8217;s document root.
+These might include images, CSS files, JavaScript files, etc. How these are exposed is left to the developer.</p>
+<p>The <tt class="docutils literal"><span class="pre">view</span></tt> directory contains view scripts related to your controllers.</p>
+</div>
+<div class="section" id="bootstrapping-an-application">
+<span id="zend-mvc-intro-bootstrapping-an-application"></span><h2>Bootstrapping an Application<a class="headerlink" href="#bootstrapping-an-application" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Application</span></tt> has six basic dependencies.</p>
+<ul class="simple">
+<li><strong>configuration</strong>, usually an array or object implementing <tt class="docutils literal"><span class="pre">Traversable</span></tt>.</li>
+<li><strong>ServiceManager</strong> instance.</li>
+<li><strong>EventManager</strong> instance, which, by default, is pulled from the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>, by the service name
+&#8220;EventManager&#8221;.</li>
+<li><strong>ModuleManager</strong> instance, which, by default, is pulled from the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>, by the service name
+&#8220;ModuleManager&#8221;.</li>
+<li><strong>Request</strong> instance, which, by default, is pulled from the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>, by the service name &#8220;Request&#8221;.</li>
+<li><strong>Response</strong> instance, which, by default, is pulled from the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>, by the service name &#8220;Response&#8221;.</li>
+</ul>
+<p>These may be satisfied at instantiation:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\EventManager\EventManager</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Http\PhpEnvironment</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\ModuleManager\ModuleManager</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Mvc\Application</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\ServiceManager\ServiceManager</span><span class="p">;</span>
+
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">include</span> <span class="s1">&#39;config/application.config.php&#39;</span><span class="p">;</span>
+
+<span class="nv">$serviceManager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ServiceManager</span><span class="p">();</span>
+<span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">setService</span><span class="p">(</span><span class="s1">&#39;EventManager&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">EventManager</span><span class="p">());</span>
+<span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">setService</span><span class="p">(</span><span class="s1">&#39;ModuleManager&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">ModuleManager</span><span class="p">());</span>
+<span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">setService</span><span class="p">(</span><span class="s1">&#39;Request&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">PhpEnvironment\Request</span><span class="p">());</span>
+<span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">setService</span><span class="p">(</span><span class="s1">&#39;Response&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">PhpEnvironment\Response</span><span class="p">());</span>
+
+<span class="nv">$application</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application</span><span class="p">(</span><span class="nv">$config</span><span class="p">,</span> <span class="nv">$serviceManager</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Once you&#8217;ve done this, there are two additional actions you can take. The first is to &#8220;bootstrap&#8221; the application.
+In the default implementation, this does the following:</p>
+<ul class="simple">
+<li>Attaches the default route listener (<tt class="docutils literal"><span class="pre">Zend\Mvc\RouteListener</span></tt>).</li>
+<li>Attaches the default dispatch listener (<tt class="docutils literal"><span class="pre">Zend\Mvc\DispatchListener</span></tt>).</li>
+<li>Attaches the <tt class="docutils literal"><span class="pre">ViewManager</span></tt> listener (<tt class="docutils literal"><span class="pre">Zend\Mvc\View\ViewManager</span></tt>).</li>
+<li>Creates the <tt class="docutils literal"><span class="pre">MvcEvent</span></tt>, and injects it with the application, request, and response; it also retrieves the
+router (<tt class="docutils literal"><span class="pre">Zend\Mvc\Router\Http\TreeRouteStack</span></tt>) at this time and attaches it to the event.</li>
+<li>Triggers the &#8220;bootstrap&#8221; event.</li>
+</ul>
+<p>If you do not want these actions, or want to provide alternatives, you can do so by extending the <tt class="docutils literal"><span class="pre">Application</span></tt>
+class and/or simply coding what actions you want to occur.</p>
+<p>The second action you can take with the configured <tt class="docutils literal"><span class="pre">Application</span></tt> is to <tt class="docutils literal"><span class="pre">run()</span></tt> it. Calling this method simply
+does the following: it triggers the &#8220;route&#8221; event, followed by the &#8220;dispatch&#8221; event, and, depending on execution,
+the &#8220;render&#8221; event; when done, it triggers the &#8220;finish&#8221; event, and then returns the response instance. If an error
+occurs during either the &#8220;route&#8221; or &#8220;dispatch&#8221; event, a &#8220;dispatch.error&#8221; event is triggered as well.</p>
+<p>This is a lot to remember in order to bootstrap the application; in fact, we haven&#8217;t covered all the services
+available by default yet. You can greatly simplify things by using the default <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> configuration
+shipped with the MVC.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Loader\AutoloaderFactory</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Mvc\Service\ServiceManagerConfig</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\ServiceManager\ServiceManager</span><span class="p">;</span>
+
+<span class="c1">// setup autoloader</span>
+<span class="nx">AutoloaderFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">();</span>
+
+<span class="c1">// get application stack configuration</span>
+<span class="nv">$configuration</span> <span class="o">=</span> <span class="k">include</span> <span class="s1">&#39;config/application.config.php&#39;</span><span class="p">;</span>
+
+<span class="c1">// setup service manager</span>
+<span class="nv">$serviceManager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ServiceManager</span><span class="p">(</span><span class="k">new</span> <span class="nx">ServiceManagerConfig</span><span class="p">());</span>
+<span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">setService</span><span class="p">(</span><span class="s1">&#39;ApplicationConfig&#39;</span><span class="p">,</span> <span class="nv">$configuration</span><span class="p">);</span>
+
+<span class="c1">// load modules -- which will provide services, configuration, and more</span>
+<span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;ModuleManager&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">loadModules</span><span class="p">();</span>
+
+<span class="c1">// bootstrap and run application</span>
+<span class="nv">$application</span> <span class="o">=</span> <span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;Application&#39;</span><span class="p">);</span>
+<span class="nv">$application</span><span class="o">-&gt;</span><span class="na">bootstrap</span><span class="p">();</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$application</span><span class="o">-&gt;</span><span class="na">run</span><span class="p">();</span>
+<span class="nv">$response</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>You&#8217;ll note that you have a great amount of control over the workflow. Using the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>, you have
+fine-grained control over what services are available, how they are instantiated, and what dependencies are
+injected into them. Using the <tt class="docutils literal"><span class="pre">EventManager</span></tt>&#8216;s priority system, you can intercept any of the application events
+(&#8220;bootstrap&#8221;, &#8220;route&#8221;, &#8220;dispatch&#8221;, &#8220;dispatch.error&#8221;, &#8220;render&#8221;, and &#8220;finish&#8221;) anywhere during execution, allowing
+you to craft your own application workflows as needed.</p>
+</div>
+<div class="section" id="bootstrapping-a-modular-application">
+<span id="zend-mvc-intro-bootstrapping-a-modular-application"></span><h2>Bootstrapping a Modular Application<a class="headerlink" href="#bootstrapping-a-modular-application" title="Permalink to this headline">¶</a></h2>
+<p>While the previous approach largely works, where does the configuration come from? When we create a modular
+application, the assumption will be that it&#8217;s from the modules themselves. How do we get that information and
+aggregate it, then?</p>
+<p>The answer is via <tt class="docutils literal"><span class="pre">Zend\ModuleManager\ModuleManager</span></tt>. This component allows you to specify where modules exist.
+Then, it will locate each module and initialize it. Module classes can tie into various listeners on the
+<tt class="docutils literal"><span class="pre">ModuleManager</span></tt> in order to provide configuration, services, listeners, and more to the application. Sounds
+complicated? It&#8217;s not.</p>
+<div class="section" id="configuring-the-module-manager">
+<span id="zend-mvc-intro-bootstrapping-a-modular-application-configuring-the-module-manager"></span><h3>Configuring the Module Manager<a class="headerlink" href="#configuring-the-module-manager" title="Permalink to this headline">¶</a></h3>
+<p>The first step is configuring the module manager.  Simply inform the module manager which modules to load, and
+potentially provide configuration for the module listeners.</p>
+<p>Remember the <tt class="docutils literal"><span class="pre">application.config.php</span></tt> from earlier? We&#8217;re going to provide some configuration.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">// config/application.config.php</span>
+<span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;modules&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="cm">/* ... */</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;module_listener_options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;module_paths&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;./module&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;./vendor&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>As we add modules to the system, we&#8217;ll add items to the <tt class="docutils literal"><span class="pre">modules</span></tt> array.</p>
+<p>Each <tt class="docutils literal"><span class="pre">Module</span></tt> class that has configuration it wants the <tt class="docutils literal"><span class="pre">Application</span></tt> to know about should define a
+<tt class="docutils literal"><span class="pre">getConfig()</span></tt> method. That method should return an array or <tt class="docutils literal"><span class="pre">Traversable</span></tt> object such as
+<tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt>. As an example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">ZendUser</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Module</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getConfig</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/config/module.config.php&#39;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>There are a number of other methods you can define for tasks ranging from providing autoloader configuration, to
+providing services to the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>, to listening to the bootstrap event. The <a class="reference internal" href="zend.module-manager.intro.html#zend-module-manager-intro"><em>ModuleManager documentation</em></a> goes into more detail on these.</p>
+</div>
+</div>
+<div class="section" id="conclusion">
+<span id="zend-mvc-intro-conclusion"></span><h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<p>The ZF2 MVC layer is incredibly flexible, offering an opt-in, easy to create modular infrastructure, as well as the
+ability to craft your own application workflows via the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> and <tt class="docutils literal"><span class="pre">EventManager</span></tt>. The <tt class="docutils literal"><span class="pre">ModuleManager</span></tt>
+is a lightweight and simple approach to enforcing a modular architecture that encourages clean separation of
+concerns and code re-use.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction to the MVC Layer</a><ul>
+<li><a class="reference internal" href="#basic-application-structure">Basic Application Structure</a></li>
+<li><a class="reference internal" href="#basic-module-structure">Basic Module Structure</a></li>
+<li><a class="reference internal" href="#bootstrapping-an-application">Bootstrapping an Application</a></li>
+<li><a class="reference internal" href="#bootstrapping-a-modular-application">Bootstrapping a Modular Application</a><ul>
+<li><a class="reference internal" href="#configuring-the-module-manager">Configuring the Module Manager</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.module-manager.best-practices.html"
+                        title="previous chapter">Best Practices when Creating Modules</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.mvc.quick-start.html"
+                        title="next chapter">Quick Start</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.mvc.intro.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.mvc.intro.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.mvc.intro.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.mvc.quick-start.html" title="Quick Start"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.module-manager.best-practices.html" title="Best Practices when Creating Modules"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.mvc.intro.rst">
+                Introduction to the MVC Layer
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

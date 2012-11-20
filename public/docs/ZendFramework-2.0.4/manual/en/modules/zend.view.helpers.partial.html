@@ -1,0 +1,371 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Partial Helper &mdash; Zend Framework 2 2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.4 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="partial-helper">
+<span id="zend-view-helpers-initial-partial"></span><h1>Partial Helper<a class="headerlink" href="#partial-helper" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">Partial</span></tt> view helper is used to render a specified template within its own variable scope. The primary use
+is for reusable template fragments with which you do not need to worry about variable name clashes. Additionally,
+they allow you to specify partial view scripts from specific modules.</p>
+<p>A sibling to the <tt class="docutils literal"><span class="pre">Partial</span></tt>, the <tt class="docutils literal"><span class="pre">PartialLoop</span></tt> view helper allows you to pass iterable data, and render a
+partial for each item.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>PartialLoop Counter</strong></p>
+<p class="last">The <tt class="docutils literal"><span class="pre">PartialLoop</span></tt> view helper assigns a variable to the view named <strong>partialCounter</strong> which passes the current
+position of the array to the view script. This provides an easy way to have alternating colors on table rows for
+example.</p>
+</div>
+<p class="rubric" id="zend-view-helpers-initial-partial-usage">Basic Usage of Partials</p>
+<p>Basic usage of partials is to render a template fragment in its own view scope. Consider the following partial
+script:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="c1">// partial.phtml ?&gt;</span>
+<span class="o">&lt;</span><span class="nx">ul</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="nx">li</span><span class="o">&gt;</span><span class="nx">From</span><span class="o">:</span> <span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escapeHtml</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">from</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x">&lt;/li&gt;</span>
+<span class="x">    &lt;li&gt;Subject: </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escapeHtml</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">subject</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x">&lt;/li&gt;</span>
+<span class="x">&lt;/ul&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>You would then call it from your view script using the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">partial</span><span class="p">(</span><span class="s1">&#39;partial.phtml&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;from&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Team Framework&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;subject&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;view partials&#39;</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<p>Which would then render:</p>
+<div class="highlight-html"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nt">&lt;ul&gt;</span>
+    <span class="nt">&lt;li&gt;</span>From: Team Framework<span class="nt">&lt;/li&gt;</span>
+    <span class="nt">&lt;li&gt;</span>Subject: view partials<span class="nt">&lt;/li&gt;</span>
+<span class="nt">&lt;/ul&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>What is a model?</strong></p>
+<p>A model used with the <tt class="docutils literal"><span class="pre">Partial</span></tt> view helper can be one of the following:</p>
+<ul class="simple">
+<li><strong>Array</strong>. If an array is passed, it should be associative, as its key/value pairs are assigned to the view
+with keys as view variables.</li>
+<li><strong>Object implementing toArray() method</strong>. If an object is passed an has a <tt class="docutils literal"><span class="pre">toArray()</span></tt> method, the results of
+<tt class="docutils literal"><span class="pre">toArray()</span></tt> will be assigned to the view object as view variables.</li>
+<li><strong>Standard object</strong>. Any other object will assign the results of <tt class="docutils literal"><span class="pre">object_get_vars()</span></tt> (essentially all public
+properties of the object) to the view object.</li>
+</ul>
+<p>If your model is an object, you may want to have it passed <strong>as an object</strong> to the partial script, instead of
+serializing it to an array of variables. You can do this by setting the &#8216;objectKey&#8217; property of the appropriate
+helper:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Tell partial to pass objects as &#39;model&#39; variable</span>
+<span class="nv">$view</span><span class="o">-&gt;</span><span class="na">partial</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setObjectKey</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">);</span>
+
+<span class="c1">// Tell partial to pass objects from partialLoop as &#39;model&#39; variable</span>
+<span class="c1">// in final partial view script:</span>
+<span class="nv">$view</span><span class="o">-&gt;</span><span class="na">partialLoop</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setObjectKey</span><span class="p">(</span><span class="s1">&#39;model&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="last">This technique is particularly useful when passing <tt class="docutils literal"><span class="pre">Zend\Db\Table\Rowset</span></tt>s to <tt class="docutils literal"><span class="pre">partialLoop()</span></tt>, as you then
+have full access to your row objects within the view scripts, allowing you to call methods on them (such as
+retrieving values from parent or dependent rows).</p>
+</div>
+<p class="rubric" id="zend-view-helpers-initial-partial-partialloop">Using PartialLoop to Render Iterable Models</p>
+<p>Typically, you&#8217;ll want to use partials in a loop, to render the same content fragment many times; this way you can
+put large blocks of repeated content or complex display logic into a single location. However this has a
+performance impact, as the partial helper needs to be invoked once for each iteration.</p>
+<p>The <tt class="docutils literal"><span class="pre">PartialLoop</span></tt> view helper helps solve this issue. It allows you to pass an iterable item (array or object
+implementing <strong>Iterator</strong>) as the model. It then iterates over this, passing, the items to the partial script as
+the model. Items in the iterator may be any model the <tt class="docutils literal"><span class="pre">Partial</span></tt> view helper allows.</p>
+<p>Let&#8217;s assume the following partial view script:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="c1">// partialLoop.phtml ?&gt;</span>
+    <span class="o">&lt;</span><span class="nx">dt</span><span class="o">&gt;&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">key</span> <span class="cp">?&gt;</span><span class="x">&lt;/dt&gt;</span>
+<span class="x">    &lt;dd&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">value</span> <span class="cp">?&gt;</span><span class="x">&lt;/dd&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>And the following &#8220;model&#8221;:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$model</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Mammal&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Camel&#39;</span><span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Bird&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Penguin&#39;</span><span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Reptile&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Asp&#39;</span><span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;key&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Fish&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Flounder&#39;</span><span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>In your view script, you could then invoke the <tt class="docutils literal"><span class="pre">PartialLoop</span></tt> helper:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;</span><span class="nb">dl</span><span class="o">&gt;</span>
+<span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">partialLoop</span><span class="p">(</span><span class="s1">&#39;partialLoop.phtml&#39;</span><span class="p">,</span> <span class="nv">$model</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/dl&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-html"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="nt">&lt;dl&gt;</span>
+    <span class="nt">&lt;dt&gt;</span>Mammal<span class="nt">&lt;/dt&gt;</span>
+    <span class="nt">&lt;dd&gt;</span>Camel<span class="nt">&lt;/dd&gt;</span>
+
+    <span class="nt">&lt;dt&gt;</span>Bird<span class="nt">&lt;/dt&gt;</span>
+    <span class="nt">&lt;dd&gt;</span>Penguin<span class="nt">&lt;/dd&gt;</span>
+
+    <span class="nt">&lt;dt&gt;</span>Reptile<span class="nt">&lt;/dt&gt;</span>
+    <span class="nt">&lt;dd&gt;</span>Asp<span class="nt">&lt;/dd&gt;</span>
+
+    <span class="nt">&lt;dt&gt;</span>Fish<span class="nt">&lt;/dt&gt;</span>
+    <span class="nt">&lt;dd&gt;</span>Flounder<span class="nt">&lt;/dd&gt;</span>
+<span class="nt">&lt;/dl&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-view-helpers-initial-partial-modules">Rendering Partials in Other Modules</p>
+<p>Sometime a partial will exist in a different module. If you know the name of the module, you can pass it as the
+second argument to either <tt class="docutils literal"><span class="pre">partial()</span></tt> or <tt class="docutils literal"><span class="pre">partialLoop()</span></tt>, moving the <tt class="docutils literal"><span class="pre">$model</span></tt> argument to third position.</p>
+<p>For instance, if there&#8217;s a pager partial you wish to use that&#8217;s in the &#8216;list&#8217; module, you could grab it as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">partial</span><span class="p">(</span><span class="s1">&#39;pager.phtml&#39;</span><span class="p">,</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="nv">$pagerData</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<p>In this way, you can re-use partials created specifically for other modules. That said, it&#8217;s likely a better
+practice to put re-usable partials in shared view script paths.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.view.helpers.partial.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.view.helpers.partial.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.view.helpers.partial.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.view.helpers.partial.rst">
+                Partial Helper
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

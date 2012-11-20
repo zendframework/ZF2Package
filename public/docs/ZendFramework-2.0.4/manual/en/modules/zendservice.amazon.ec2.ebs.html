@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ZendServiceAmazonEc2: Elastic Block Storage (EBS) &mdash; Zend Framework 2 2.0.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.4 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zendserviceamazonec2-elastic-block-storage-ebs">
+<span id="zendservice-amazon-ec2-ebs"></span><h1>ZendServiceAmazonEc2: Elastic Block Storage (EBS)<a class="headerlink" href="#zendserviceamazonec2-elastic-block-storage-ebs" title="Permalink to this headline">¶</a></h1>
+<p>Amazon Elastic Block Store (Amazon EBS) is a new type of storage designed specifically for Amazon EC2 instances.
+Amazon EBS allows you to create volumes that can be mounted as devices by Amazon EC2 instances. Amazon EBS volumes
+behave like raw unformatted external block devices. They have user supplied device names and provide a block device
+interface. You can load a file system on top of Amazon EBS volumes, or use them just as you would use a block
+device.</p>
+<p>You can create up to twenty Amazon EBS volumes of any size (from one GiB up to one TiB). Each Amazon EBS volume can
+be attached to any Amazon EC2 instance in the same Availability Zone or can be left unattached.</p>
+<p>Amazon EBS provides the ability to create snapshots of your Amazon EBS volumes to Amazon S3. You can use these
+snapshots as the starting point for new Amazon EBS volumes and can protect your data for long term durability.</p>
+<div class="section" id="create-ebs-volumes-and-snapshots">
+<span id="zendservice-amazon-ec2-ebs-creating"></span><h2>Create EBS Volumes and Snapshots<a class="headerlink" href="#create-ebs-volumes-and-snapshots" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zendservice-amazon-ec2-ebs-creating-volume">Create a new EBS Volume</p>
+<p>Creating a brand new EBS Volume requires the size and which zone you want the EBS Volume to be in.</p>
+<p><em>createNewVolume</em> will return an array containing information about the new Volume which includes the volumeId,
+size, zone, status and createTime.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_ebs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Amazon\Ec2\Ebs</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span><span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_ebs</span><span class="o">-&gt;</span><span class="na">createNewVolume</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="s1">&#39;us-east-1a&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zendservice-amazon-ec2-ebs-creating-volumesnapshot">Create an EBS Volume from a Snapshot</p>
+<p>Creating an EBS Volume from a snapshot requires the snapshot_id and which zone you want the EBS Volume to be in.</p>
+<p><em>createVolumeFromSnapshot</em> will return an array containing information about the new Volume which includes the
+volumeId, size, zone, status, createTime and snapshotId.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_ebs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Amazon\Ec2\Ebs</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span><span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_ebs</span><span class="o">-&gt;</span><span class="na">createVolumeFromSnapshot</span><span class="p">(</span><span class="s1">&#39;snap-78a54011&#39;</span><span class="p">,</span> <span class="s1">&#39;us-east-1a&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zendservice-amazon-ec2-ebs-creating-snapshot">Create a Snapshot of an EBS Volume</p>
+<p>Creating a Snapshot of an EBS Volume requires the volumeId of the EBS Volume.</p>
+<p><em>createSnapshot</em> will return an array containing information about the new Volume Snapshot which includes the
+snapshotId, volumeId, status, startTime and progress.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_ebs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Amazon\Ec2\Ebs</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span><span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_ebs</span><span class="o">-&gt;</span><span class="na">createSnapshot</span><span class="p">(</span><span class="s1">&#39;volumeId&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="describing-ebs-volumes-and-snapshots">
+<span id="zendservice-amazon-ec2-ebs-describing"></span><h2>Describing EBS Volumes and Snapshots<a class="headerlink" href="#describing-ebs-volumes-and-snapshots" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zendservice-amazon-ec2-ebs-describing-volume">Describing an EBS Volume</p>
+<p><em>describeVolume</em> allows you to get information on an EBS Volume or a set of EBS Volumes. If nothing is passed in
+then it will return all EBS Volumes. If only one EBS Volume needs to be described a string can be passed in while
+an array of EBS Volume Id&#8217;s can be passed in to describe them.</p>
+<p><em>describeVolume</em> will return an array with information about each Volume which includes the volumeId, size, status
+and createTime. If the volume is attached to an instance, an addition value of attachmentSet will be returned. The
+attachment set contains information about the instance that the EBS Volume is attached to, which includes volumeId,
+instanceId, device, status and attachTime.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_ebs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Amazon\Ec2\Ebs</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span><span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_ebs</span><span class="o">-&gt;</span><span class="na">describeVolume</span><span class="p">(</span><span class="s1">&#39;volumeId&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zendservice-amazon-ec2-ebs-describing-attachedvolumes">Describe Attached Volumes</p>
+<p>To return a list of EBS Volumes currently attached to a running instance you can call this method. It will only
+return EBS Volumes attached to the instance with the passed in instanceId.</p>
+<p><em>describeAttachedVolumes</em> returns the same information as the <em>describeVolume</em> but only for the EBS Volumes that
+are currently attached to the specified instanceId.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_ebs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Amazon\Ec2\Ebs</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span><span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_ebs</span><span class="o">-&gt;</span><span class="na">describeAttachedVolumes</span><span class="p">(</span><span class="s1">&#39;instanceId&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zendservice-amazon-ec2-ebs-describing-snapshot">Describe an EBS Volume Snapshot</p>
+<p><em>describeSnapshot</em> allows you to get information on an EBS Volume Snapshot or a set of EBS Volume Snapshots. If
+nothing is passed in then it will return information about all EBS Volume Snapshots. If only one EBS Volume
+Snapshot needs to be described its snapshotId can be passed in while an array of EBS Volume Snapshot Id&#8217;s can be
+passed in to describe them.</p>
+<p><em>describeSnapshot</em> will return an array containing information about each EBS Volume Snapshot which includes the
+snapshotId, volumeId, status, startTime and progress.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_ebs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Amazon\Ec2\Ebs</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span><span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_ebs</span><span class="o">-&gt;</span><span class="na">describeSnapshot</span><span class="p">(</span><span class="s1">&#39;volumeId&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="attach-and-detaching-volumes-from-instances">
+<span id="zendservice-amazon-ec2-ebs-attachdetach"></span><h2>Attach and Detaching Volumes from Instances<a class="headerlink" href="#attach-and-detaching-volumes-from-instances" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zendservice-amazon-ec2-ebs-attachdetach-attach">Attaching an EBS Volume</p>
+<p><em>attachVolume</em> will attach an EBS Volume to a running Instance. To attach a volume you need to specify the
+volumeId, the instanceId and the device <strong>(ex: /dev/sdh)</strong>.</p>
+<p><em>attachVolume</em> will return an array with information about the attach status which contains volumeId, instanceId,
+device, status and attachTime</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_ebs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Amazon\Ec2\Ebs</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span><span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_ebs</span><span class="o">-&gt;</span><span class="na">attachVolume</span><span class="p">(</span><span class="s1">&#39;volumeId&#39;</span><span class="p">,</span> <span class="s1">&#39;instanceid&#39;</span><span class="p">,</span> <span class="s1">&#39;/dev/sdh&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zendservice-amazon-ec2-ebs-attachdetach-detach">Detaching an EBS Volume</p>
+<p><em>detachVolume</em> will detach an EBS Volume from a running Instance. <em>detachVolume</em> requires that you specify the
+volumeId with the optional instanceId and device name that was passed when attaching the volume. If you need to
+force the detachment you can set the fourth parameter to be <tt class="docutils literal"><span class="pre">TRUE</span></tt> and it will force the volume to detach.</p>
+<p><em>detachVolume</em> returns an array containing status information about the EBS Volume which includes volumeId,
+instanceId, device, status and attachTime.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_ebs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Amazon\Ec2\Ebs</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span><span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_ebs</span><span class="o">-&gt;</span><span class="na">detachVolume</span><span class="p">(</span><span class="s1">&#39;volumeId&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Forced Detach</strong></p>
+<p class="last">You should only force a detach if the previous detachment attempt did not occur cleanly (logging into an
+instance, unmounting the volume, and detaching normally). This option can lead to data loss or a corrupted file
+system. Use this option only as a last resort to detach a volume from a failed instance. The instance will not
+have an opportunity to flush file system caches or file system meta data. If you use this option, you must
+perform file system check and repair procedures.</p>
+</div>
+</div>
+<div class="section" id="deleting-ebs-volumes-and-snapshots">
+<span id="zendservice-amazon-ec2-ebs-deleting"></span><h2>Deleting EBS Volumes and Snapshots<a class="headerlink" href="#deleting-ebs-volumes-and-snapshots" title="Permalink to this headline">¶</a></h2>
+<p class="rubric" id="zendservice-amazon-ec2-ebs-deleting-volume">Deleting an EBS Volume</p>
+<p><em>deleteVolume</em> will delete an unattached EBS Volume.</p>
+<p><em>deleteVolume</em> will return boolean <tt class="docutils literal"><span class="pre">TRUE</span></tt> or <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_ebs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Amazon\Ec2\Ebs</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span><span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_ebs</span><span class="o">-&gt;</span><span class="na">deleteVolume</span><span class="p">(</span><span class="s1">&#39;volumeId&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zendservice-amazon-ec2-ebs-deleting-snapshot">Deleting an EBS Volume Snapshot</p>
+<p><em>deleteSnapshot</em> will delete an EBS Volume Snapshot.</p>
+<p><em>deleteSnapshot</em> returns boolean <tt class="docutils literal"><span class="pre">TRUE</span></tt> or <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$ec2_ebs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Amazon\Ec2\Ebs</span><span class="p">(</span><span class="s1">&#39;aws_key&#39;</span><span class="p">,</span><span class="s1">&#39;aws_secret_key&#39;</span><span class="p">);</span>
+<span class="nv">$return</span> <span class="o">=</span> <span class="nv">$ec2_ebs</span><span class="o">-&gt;</span><span class="na">deleteSnapshot</span><span class="p">(</span><span class="s1">&#39;snapshotId&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ZendServiceAmazonEc2: Elastic Block Storage (EBS)</a><ul>
+<li><a class="reference internal" href="#create-ebs-volumes-and-snapshots">Create EBS Volumes and Snapshots</a></li>
+<li><a class="reference internal" href="#describing-ebs-volumes-and-snapshots">Describing EBS Volumes and Snapshots</a></li>
+<li><a class="reference internal" href="#attach-and-detaching-volumes-from-instances">Attach and Detaching Volumes from Instances</a></li>
+<li><a class="reference internal" href="#deleting-ebs-volumes-and-snapshots">Deleting EBS Volumes and Snapshots</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendservice.amazon.ec2.ebs.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendservice.amazon.ec2.ebs.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendservice.amazon.ec2.ebs.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendservice.amazon.ec2.ebs.rst">
+                ZendServiceAmazonEc2: Elastic Block Storage (EBS)
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
