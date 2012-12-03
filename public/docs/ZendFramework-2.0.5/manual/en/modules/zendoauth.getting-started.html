@@ -1,0 +1,432 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Getting Started &mdash; Zend Framework 2 2.0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.5 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="getting-started">
+<span id="zendoauth-introduction-getting-started"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>With the OAuth protocol explained, let&#8217;s show a simple example of it with source code. Our new Consumer will be
+handling Twitter Status submissions. To do so, it will need to be registered with Twitter in order to receive an
+OAuth Consumer Key and Consumer Secret. This are utilised to obtain an Access Token before we use the Twitter <em>API</em>
+to post a status message.</p>
+<p>Assuming we have obtained a key and secret, we can start the OAuth workflow by setting up a <tt class="docutils literal"><span class="pre">ZendOAuth\Consumer</span></tt>
+instance as follows passing it a configuration (either an array or <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object).</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$config</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;callbackUrl&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://example.com/callback.php&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;siteUrl&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://twitter.com/oauth&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;consumerKey&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;gg3DsFTW9OU9eWPnbuPzQ&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;consumerSecret&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;tFB0fyWLSMf74lkEu9FTyoHXcazOWpbrAjTCCK48A&#39;</span>
+<span class="p">);</span>
+<span class="nv">$consumer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOAuth\Consumer</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The callbackUrl is the URI we want Twitter to request from our server when sending information. We&#8217;ll look at this
+later. The siteUrl is the base URI of Twitter&#8217;s OAuth <em>API</em> endpoints. The full list of endpoints include
+<a class="reference external" href="http://twitter.com/oauth/request_token">http://twitter.com/oauth/request_token</a>, <a class="reference external" href="http://twitter.com/oauth/access_token">http://twitter.com/oauth/access_token</a>, and
+<a class="reference external" href="http://twitter.com/oauth/authorize">http://twitter.com/oauth/authorize</a>. The base siteUrl utilises a convention which maps to these three OAuth
+endpoints (as standard) for requesting a request token, access token or authorization. If the actual endpoints of
+any service differ from the standard set, these three URIs can be separately set using the methods
+<tt class="docutils literal"><span class="pre">setRequestTokenUrl()</span></tt>, <tt class="docutils literal"><span class="pre">setAccessTokenUrl()</span></tt>, and <tt class="docutils literal"><span class="pre">setAuthorizeUrl()</span></tt> or the configuration fields
+requestTokenUrl, accessTokenUrl and authorizeUrl.</p>
+<p>The consumerKey and consumerSecret are retrieved from Twitter when your application is registered for OAuth access.
+These also apply to any OAuth enabled service, so each one will provide a key and secret for your application.</p>
+<p>All of these configuration options may be set using method calls simply by converting from, e.g. callbackUrl to
+setCallbackUrl().</p>
+<p>In addition, you should note several other configuration values not explicitly used: requestMethod and
+requestScheme. By default, <tt class="docutils literal"><span class="pre">ZendOAuth\Consumer</span></tt> sends requests as POST (except for a redirect which uses
+<tt class="docutils literal"><span class="pre">GET</span></tt>). The customised client (see later) also includes its authorization by way of a header. Some services may,
+at their discretion, require alternatives. You can reset the requestMethod (which defaults to ZendOAuthOauth::POST) to
+ZendOAuthOauth::GET, for example, and reset the requestScheme from its default of ZendOAuthOauth::REQUEST_SCHEME_HEADER to
+one of ZendOAuthOauth::REQUEST_SCHEME_POSTBODY or ZendOAuthOauth::REQUEST_SCHEME_QUERYSTRING. Typically the defaults should
+work fine apart from some exceptional cases. Please refer to the service provider&#8217;s documentation for more details.</p>
+<p>The second area of customisation is how <em>HMAC</em> operates when calculating/comparing them for all requests. This is
+configured using the signatureMethod configuration field or <tt class="docutils literal"><span class="pre">setSignatureMethod()</span></tt>. By default this is HMAC-SHA1.
+You can set it also to a provider&#8217;s preferred method including RSA-SHA1. For RSA-SHA1, you should also configure
+RSA private and public keys via the rsaPrivateKey and rsaPublicKey configuration fields or the
+<tt class="docutils literal"><span class="pre">setRsaPrivateKey()</span></tt> and <tt class="docutils literal"><span class="pre">setRsaPublicKey()</span></tt> methods.</p>
+<p>The first part of the OAuth workflow is obtaining a request token. This is accomplished using:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$config</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;callbackUrl&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://example.com/callback.php&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;siteUrl&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://twitter.com/oauth&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;consumerKey&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;gg3DsFTW9OU9eWPnbuPzQ&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;consumerSecret&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;tFB0fyWLSMf74lkEu9FTyoHXcazOWpbrAjTCCK48A&#39;</span>
+<span class="p">);</span>
+<span class="nv">$consumer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOAuth\Consumer</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+
+<span class="c1">// fetch a request token</span>
+<span class="nv">$token</span> <span class="o">=</span> <span class="nv">$consumer</span><span class="o">-&gt;</span><span class="na">getRequestToken</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The new request token (an instance of <tt class="docutils literal"><span class="pre">ZendOAuth\Token\Request</span></tt>) is unauthorized. In order to exchange it for an
+authorized token with which we can access the Twitter <em>API</em>, we need the user to authorize it. We accomplish this
+by redirecting the user to Twitter&#8217;s authorize endpoint via:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$config</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;callbackUrl&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://example.com/callback.php&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;siteUrl&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://twitter.com/oauth&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;consumerKey&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;gg3DsFTW9OU9eWPnbuPzQ&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;consumerSecret&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;tFB0fyWLSMf74lkEu9FTyoHXcazOWpbrAjTCCK48A&#39;</span>
+<span class="p">);</span>
+<span class="nv">$consumer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOAuth\Consumer</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+
+<span class="c1">// fetch a request token</span>
+<span class="nv">$token</span> <span class="o">=</span> <span class="nv">$consumer</span><span class="o">-&gt;</span><span class="na">getRequestToken</span><span class="p">();</span>
+
+<span class="c1">// persist the token to storage</span>
+<span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;TWITTER_REQUEST_TOKEN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">serialize</span><span class="p">(</span><span class="nv">$token</span><span class="p">);</span>
+
+<span class="c1">// redirect the user</span>
+<span class="nv">$consumer</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The user will now be redirected to Twitter. They will be asked to authorize the request token attached to the
+redirect URI&#8217;s query string. Assuming they agree, and complete the authorization, they will be again redirected,
+this time to our Callback URL as previously set (note that the callback URL is also registered with Twitter when we
+registered our application).</p>
+<p>Before redirecting the user, we should persist the request token to storage. For simplicity I&#8217;m just using the
+user&#8217;s session, but you can easily use a database for the same purpose, so long as you tie the request token to the
+current user so it can be retrieved when they return to our application.</p>
+<p>The redirect URI from Twitter will contain an authorized Access Token. We can include code to parse out this access
+token as follows - this source code would exist within the executed code of our callback URI. Once parsed we can
+discard the previous request token, and instead persist the access token for future use with the Twitter <em>API</em>.
+Again, we&#8217;re simply persisting to the user session, but in reality an access token can have a long lifetime so it
+should really be stored to a database.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$config</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;callbackUrl&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://example.com/callback.php&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;siteUrl&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://twitter.com/oauth&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;consumerKey&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;gg3DsFTW9OU9eWPnbuPzQ&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;consumerSecret&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;tFB0fyWLSMf74lkEu9FTyoHXcazOWpbrAjTCCK48A&#39;</span>
+<span class="p">);</span>
+<span class="nv">$consumer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendOAuth\Consumer</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;TWITTER_REQUEST_TOKEN&#39;</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="nv">$token</span> <span class="o">=</span> <span class="nv">$consumer</span><span class="o">-&gt;</span><span class="na">getAccessToken</span><span class="p">(</span>
+                 <span class="nv">$_GET</span><span class="p">,</span>
+                 <span class="nb">unserialize</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;TWITTER_REQUEST_TOKEN&#39;</span><span class="p">])</span>
+             <span class="p">);</span>
+    <span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;TWITTER_ACCESS_TOKEN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">serialize</span><span class="p">(</span><span class="nv">$token</span><span class="p">);</span>
+
+    <span class="c1">// Now that we have an Access Token, we can discard the Request Token</span>
+    <span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;TWITTER_REQUEST_TOKEN&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// Mistaken request? Some malfeasant trying something?</span>
+    <span class="k">exit</span><span class="p">(</span><span class="s1">&#39;Invalid callback request. Oops. Sorry.&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Success! We have an authorized access token - so it&#8217;s time to actually use the Twitter <em>API</em>. Since the access
+token must be included with every single <em>API</em> request, <tt class="docutils literal"><span class="pre">ZendOAuth\Consumer</span></tt> offers a ready-to-go <em>HTTP</em> client
+(a subclass of <tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt>) to use either by itself or by passing it as a custom <em>HTTP</em> Client to another
+library or component. Here&#8217;s an example of using it standalone. This can be done from anywhere in your application,
+so long as you can access the OAuth configuration and retrieve the final authorized access token.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$config</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;callbackUrl&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://example.com/callback.php&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;siteUrl&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://twitter.com/oauth&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;consumerKey&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;gg3DsFTW9OU9eWPnbuPzQ&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;consumerSecret&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;tFB0fyWLSMf74lkEu9FTyoHXcazOWpbrAjTCCK48A&#39;</span>
+<span class="p">);</span>
+
+<span class="nv">$statusMessage</span> <span class="o">=</span> <span class="s1">&#39;I\&#39;m posting to Twitter using ZendOAuth!&#39;</span><span class="p">;</span>
+
+<span class="nv">$token</span> <span class="o">=</span> <span class="nb">unserialize</span><span class="p">(</span><span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">&#39;TWITTER_ACCESS_TOKEN&#39;</span><span class="p">]);</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="nv">$token</span><span class="o">-&gt;</span><span class="na">getHttpClient</span><span class="p">(</span><span class="nv">$configuration</span><span class="p">);</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://twitter.com/statuses/update.json&#39;</span><span class="p">);</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setMethod</span><span class="p">(</span><span class="nx">Zend\Http\Client</span><span class="o">::</span><span class="na">POST</span><span class="p">);</span>
+<span class="nv">$client</span><span class="o">-&gt;</span><span class="na">setParameterPost</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">,</span> <span class="nv">$statusMessage</span><span class="p">);</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">();</span>
+
+<span class="nv">$data</span> <span class="o">=</span> <span class="nx">Zend\Json\Json</span><span class="o">::</span><span class="na">decode</span><span class="p">(</span><span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getBody</span><span class="p">());</span>
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getBody</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$data</span><span class="o">-&gt;</span><span class="na">text</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$result</span> <span class="o">=</span> <span class="s1">&#39;true&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">echo</span> <span class="nv">$result</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>As a note on the customised client, this can be passed to most Zend Framework service or other classes using
+<tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt> displacing the default client they would otherwise use.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendoauth.getting-started.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendoauth.getting-started.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendoauth.getting-started.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendoauth.getting-started.rst">
+                Getting Started
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

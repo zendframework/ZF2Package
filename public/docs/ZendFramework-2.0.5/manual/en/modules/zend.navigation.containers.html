@@ -1,0 +1,1628 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Containers &mdash; Zend Framework 2 2.0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.5 documentation" href="../index.html" />
+    <link rel="next" title="Introduction" href="zend.paginator.introduction.html" />
+    <link rel="prev" title="Pages" href="zend.navigation.pages.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.paginator.introduction.html" title="Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.navigation.pages.html" title="Pages"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="containers">
+<span id="zend-navigation-containers"></span><h1>Containers<a class="headerlink" href="#containers" title="Permalink to this headline">¶</a></h1>
+<p>Containers have methods for adding, retrieving, deleting and iterating pages. Containers implement the <a class="reference external" href="http://php.net/spl">SPL</a>
+interfaces <tt class="docutils literal"><span class="pre">RecursiveIterator</span></tt> and <tt class="docutils literal"><span class="pre">Countable</span></tt>, meaning that a container can be iterated using the SPL
+<tt class="docutils literal"><span class="pre">RecursiveIteratorIterator</span></tt> class.</p>
+<div class="section" id="creating-containers">
+<span id="zend-navigation-containers-creating"></span><h2>Creating containers<a class="headerlink" href="#creating-containers" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Navigation\Container</span></tt> is abstract, and can not be instantiated directly. Use <tt class="docutils literal"><span class="pre">Zend\Navigation</span></tt> if you
+want to instantiate a container.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Navigation</span></tt> can be constructed entirely empty, or take an array or a <tt class="docutils literal"><span class="pre">Zend\Config</span></tt> object with pages to
+put in the container. Each page in the given array/config will eventually be passed to the <tt class="docutils literal"><span class="pre">addPage()</span></tt> method of
+the container class, which means that each element in the array/config can be an array or a config object, or a
+<tt class="docutils literal"><span class="pre">Zend\Navigation\Page\AbstractPage</span></tt> instance.</p>
+<p class="rubric" id="zend-navigation-containers-creating-example-array">Creating a container using an array</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166</pre></div></td><td class="code"><div class="highlight"><pre><span class="cm">/*</span>
+<span class="cm"> * Create a container from an array</span>
+<span class="cm"> *</span>
+<span class="cm"> * Each element in the array will be passed to</span>
+<span class="cm"> * Zend\Navigation\Page\AbstractPage::factory() when constructing.</span>
+<span class="cm"> */</span>
+<span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Navigation\Navigation</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;home-link&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://www.zend-project.com/&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;order&#39;</span> <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;page2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 2.1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;page2_1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;page2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;class&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;special-one&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;This element has a special class&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;active&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 2.2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;page2_2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;page2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;class&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;special-two&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;This element has a special class too&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 2 with params&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;page2&#39;</span><span class="p">,</span>
+        <span class="c1">// specify a param or two,</span>
+        <span class="s1">&#39;params&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;format&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;foo&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 2 with params and a route&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;page2&#39;</span><span class="p">,</span>
+        <span class="c1">// specify a route name and a param for the route</span>
+        <span class="s1">&#39;route&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;nav-route-example&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;params&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;format&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;json&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 3&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;module&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;mymodule&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;reset_params&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 4&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 4.1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/page4&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 4 using uri&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;pages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 4.1.1&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 4 using mvc params&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;page4&#39;</span><span class="p">,</span>
+                        <span class="c1">// let&#39;s say this page is active</span>
+                        <span class="s1">&#39;active&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 0?&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/setting/the/order/option&#39;</span><span class="p">,</span>
+        <span class="c1">// setting order to -1 should make it appear first</span>
+        <span class="s1">&#39;order&#39;</span> <span class="o">=&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 5&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+        <span class="c1">// this page should not be visible</span>
+        <span class="s1">&#39;visible&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+        <span class="s1">&#39;pages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 5.1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;pages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 5.1.1&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;pages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                            <span class="k">array</span><span class="p">(</span>
+                                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 5.1.2&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+                                <span class="c1">// let&#39;s say this page is active</span>
+                                <span class="s1">&#39;active&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                            <span class="p">),</span>
+                        <span class="p">),</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ACL page 1 (guest)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;#acl-guest&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;resource&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;nav-guest&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ACL page 1.1 (foo)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;#acl-foo&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;resource&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;nav-foo&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ACL page 1.2 (bar)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;#acl-bar&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;resource&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;nav-bar&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ACL page 1.3 (baz)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;#acl-baz&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;resource&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;nav-baz&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ACL page 1.4 (bat)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;#acl-bat&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;resource&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;nav-bat&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ACL page 2 (member)&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;#acl-member&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;resource&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;nav-member&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ACL page 3 (admin&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;#acl-admin&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;resource&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;nav-admin&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;ACL page 3.1 (nothing)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;#acl-nada&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend Framework&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;route&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;zf-route&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-navigation-containers-creating-example-config">Creating a container using a config object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189</pre></div></td><td class="code"><div class="highlight"><pre><span class="cm">/* CONTENTS OF /path/to/navigation.xml:</span>
+<span class="cm">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="cm">&lt;config&gt;</span>
+<span class="cm">    &lt;nav&gt;</span>
+
+<span class="cm">        &lt;zend&gt;</span>
+<span class="cm">            &lt;label&gt;Zend&lt;/label&gt;</span>
+<span class="cm">            &lt;uri&gt;http://www.zend-project.com/&lt;/uri&gt;</span>
+<span class="cm">            &lt;order&gt;100&lt;/order&gt;</span>
+<span class="cm">        &lt;/zend&gt;</span>
+
+<span class="cm">        &lt;page1&gt;</span>
+<span class="cm">            &lt;label&gt;Page 1&lt;/label&gt;</span>
+<span class="cm">            &lt;uri&gt;page1&lt;/uri&gt;</span>
+<span class="cm">            &lt;pages&gt;</span>
+
+<span class="cm">                &lt;page1_1&gt;</span>
+<span class="cm">                    &lt;label&gt;Page 1.1&lt;/label&gt;</span>
+<span class="cm">                    &lt;uri&gt;page1/page1_1&lt;/uri&gt;</span>
+<span class="cm">                &lt;/page1_1&gt;</span>
+
+<span class="cm">            &lt;/pages&gt;</span>
+<span class="cm">        &lt;/page1&gt;</span>
+
+<span class="cm">        &lt;page2&gt;</span>
+<span class="cm">            &lt;label&gt;Page 2&lt;/label&gt;</span>
+<span class="cm">            &lt;uri&gt;page2&lt;/uri&gt;</span>
+<span class="cm">            &lt;pages&gt;</span>
+
+<span class="cm">                &lt;page2_1&gt;</span>
+<span class="cm">                    &lt;label&gt;Page 2.1&lt;/label&gt;</span>
+<span class="cm">                    &lt;uri&gt;page2/page2_1&lt;/uri&gt;</span>
+<span class="cm">                &lt;/page2_1&gt;</span>
+
+<span class="cm">                &lt;page2_2&gt;</span>
+<span class="cm">                    &lt;label&gt;Page 2.2&lt;/label&gt;</span>
+<span class="cm">                    &lt;uri&gt;page2/page2_2&lt;/uri&gt;</span>
+<span class="cm">                    &lt;pages&gt;</span>
+
+<span class="cm">                        &lt;page2_2_1&gt;</span>
+<span class="cm">                            &lt;label&gt;Page 2.2.1&lt;/label&gt;</span>
+<span class="cm">                            &lt;uri&gt;page2/page2_2/page2_2_1&lt;/uri&gt;</span>
+<span class="cm">                        &lt;/page2_2_1&gt;</span>
+
+<span class="cm">                        &lt;page2_2_2&gt;</span>
+<span class="cm">                            &lt;label&gt;Page 2.2.2&lt;/label&gt;</span>
+<span class="cm">                            &lt;uri&gt;page2/page2_2/page2_2_2&lt;/uri&gt;</span>
+<span class="cm">                            &lt;active&gt;1&lt;/active&gt;</span>
+<span class="cm">                        &lt;/page2_2_2&gt;</span>
+
+<span class="cm">                    &lt;/pages&gt;</span>
+<span class="cm">                &lt;/page2_2&gt;</span>
+
+<span class="cm">                &lt;page2_3&gt;</span>
+<span class="cm">                    &lt;label&gt;Page 2.3&lt;/label&gt;</span>
+<span class="cm">                    &lt;uri&gt;page2/page2_3&lt;/uri&gt;</span>
+<span class="cm">                    &lt;pages&gt;</span>
+
+<span class="cm">                        &lt;page2_3_1&gt;</span>
+<span class="cm">                            &lt;label&gt;Page 2.3.1&lt;/label&gt;</span>
+<span class="cm">                            &lt;uri&gt;page2/page2_3/page2_3_1&lt;/uri&gt;</span>
+<span class="cm">                        &lt;/page2_3_1&gt;</span>
+
+<span class="cm">                        &lt;page2_3_2&gt;</span>
+<span class="cm">                            &lt;label&gt;Page 2.3.2&lt;/label&gt;</span>
+<span class="cm">                            &lt;uri&gt;page2/page2_3/page2_3_2&lt;/uri&gt;</span>
+<span class="cm">                            &lt;visible&gt;0&lt;/visible&gt;</span>
+<span class="cm">                            &lt;pages&gt;</span>
+
+<span class="cm">                                    &lt;page2_3_2_1&gt;</span>
+<span class="cm">                                        &lt;label&gt;Page 2.3.2.1&lt;/label&gt;</span>
+<span class="cm">                                        &lt;uri&gt;page2/page2_3/page2_3_2/1&lt;/uri&gt;</span>
+<span class="cm">                                        &lt;active&gt;1&lt;/active&gt;</span>
+<span class="cm">                                    &lt;/page2_3_2_1&gt;</span>
+
+<span class="cm">                                    &lt;page2_3_2_2&gt;</span>
+<span class="cm">                                        &lt;label&gt;Page 2.3.2.2&lt;/label&gt;</span>
+<span class="cm">                                        &lt;uri&gt;page2/page2_3/page2_3_2/2&lt;/uri&gt;</span>
+<span class="cm">                                        &lt;active&gt;1&lt;/active&gt;</span>
+
+<span class="cm">                                        &lt;pages&gt;</span>
+<span class="cm">                                            &lt;page_2_3_2_2_1&gt;</span>
+<span class="cm">                                                &lt;label&gt;Ignore&lt;/label&gt;</span>
+<span class="cm">                                                &lt;uri&gt;#&lt;/uri&gt;</span>
+<span class="cm">                                                &lt;active&gt;1&lt;/active&gt;</span>
+<span class="cm">                                            &lt;/page_2_3_2_2_1&gt;</span>
+<span class="cm">                                        &lt;/pages&gt;</span>
+<span class="cm">                                    &lt;/page2_3_2_2&gt;</span>
+
+<span class="cm">                            &lt;/pages&gt;</span>
+<span class="cm">                        &lt;/page2_3_2&gt;</span>
+
+<span class="cm">                        &lt;page2_3_3&gt;</span>
+<span class="cm">                            &lt;label&gt;Page 2.3.3&lt;/label&gt;</span>
+<span class="cm">                            &lt;uri&gt;page2/page2_3/page2_3_3&lt;/uri&gt;</span>
+<span class="cm">                            &lt;resource&gt;admin&lt;/resource&gt;</span>
+<span class="cm">                            &lt;pages&gt;</span>
+
+<span class="cm">                                    &lt;page2_3_3_1&gt;</span>
+<span class="cm">                                        &lt;label&gt;Page 2.3.3.1&lt;/label&gt;</span>
+<span class="cm">                                        &lt;uri&gt;page2/page2_3/page2_3_3/1&lt;/uri&gt;</span>
+<span class="cm">                                        &lt;active&gt;1&lt;/active&gt;</span>
+<span class="cm">                                    &lt;/page2_3_3_1&gt;</span>
+
+<span class="cm">                                    &lt;page2_3_3_2&gt;</span>
+<span class="cm">                                        &lt;label&gt;Page 2.3.3.2&lt;/label&gt;</span>
+<span class="cm">                                        &lt;uri&gt;page2/page2_3/page2_3_3/2&lt;/uri&gt;</span>
+<span class="cm">                                        &lt;resource&gt;guest&lt;/resource&gt;</span>
+<span class="cm">                                        &lt;active&gt;1&lt;/active&gt;</span>
+<span class="cm">                                    &lt;/page2_3_3_2&gt;</span>
+
+<span class="cm">                            &lt;/pages&gt;</span>
+<span class="cm">                        &lt;/page2_3_3&gt;</span>
+
+<span class="cm">                    &lt;/pages&gt;</span>
+<span class="cm">                &lt;/page2_3&gt;</span>
+
+<span class="cm">            &lt;/pages&gt;</span>
+<span class="cm">        &lt;/page2&gt;</span>
+
+<span class="cm">        &lt;page3&gt;</span>
+<span class="cm">            &lt;label&gt;Page 3&lt;/label&gt;</span>
+<span class="cm">            &lt;uri&gt;page3&lt;/uri&gt;</span>
+<span class="cm">            &lt;pages&gt;</span>
+
+<span class="cm">                &lt;page3_1&gt;</span>
+<span class="cm">                    &lt;label&gt;Page 3.1&lt;/label&gt;</span>
+<span class="cm">                    &lt;uri&gt;page3/page3_1&lt;/uri&gt;</span>
+<span class="cm">                    &lt;resource&gt;guest&lt;/resource&gt;</span>
+<span class="cm">                &lt;/page3_1&gt;</span>
+
+<span class="cm">                &lt;page3_2&gt;</span>
+<span class="cm">                    &lt;label&gt;Page 3.2&lt;/label&gt;</span>
+<span class="cm">                    &lt;uri&gt;page3/page3_2&lt;/uri&gt;</span>
+<span class="cm">                    &lt;resource&gt;member&lt;/resource&gt;</span>
+<span class="cm">                    &lt;pages&gt;</span>
+
+<span class="cm">                        &lt;page3_2_1&gt;</span>
+<span class="cm">                            &lt;label&gt;Page 3.2.1&lt;/label&gt;</span>
+<span class="cm">                            &lt;uri&gt;page3/page3_2/page3_2_1&lt;/uri&gt;</span>
+<span class="cm">                        &lt;/page3_2_1&gt;</span>
+
+<span class="cm">                        &lt;page3_2_2&gt;</span>
+<span class="cm">                            &lt;label&gt;Page 3.2.2&lt;/label&gt;</span>
+<span class="cm">                            &lt;uri&gt;page3/page3_2/page3_2_2&lt;/uri&gt;</span>
+<span class="cm">                            &lt;resource&gt;admin&lt;/resource&gt;</span>
+<span class="cm">                        &lt;/page3_2_2&gt;</span>
+
+<span class="cm">                    &lt;/pages&gt;</span>
+<span class="cm">                &lt;/page3_2&gt;</span>
+
+<span class="cm">                &lt;page3_3&gt;</span>
+<span class="cm">                    &lt;label&gt;Page 3.3&lt;/label&gt;</span>
+<span class="cm">                    &lt;uri&gt;page3/page3_3&lt;/uri&gt;</span>
+<span class="cm">                    &lt;resource&gt;special&lt;/resource&gt;</span>
+<span class="cm">                    &lt;pages&gt;</span>
+
+<span class="cm">                        &lt;page3_3_1&gt;</span>
+<span class="cm">                            &lt;label&gt;Page 3.3.1&lt;/label&gt;</span>
+<span class="cm">                            &lt;uri&gt;page3/page3_3/page3_3_1&lt;/uri&gt;</span>
+<span class="cm">                            &lt;visible&gt;0&lt;/visible&gt;</span>
+<span class="cm">                        &lt;/page3_3_1&gt;</span>
+
+<span class="cm">                        &lt;page3_3_2&gt;</span>
+<span class="cm">                            &lt;label&gt;Page 3.3.2&lt;/label&gt;</span>
+<span class="cm">                            &lt;uri&gt;page3/page3_3/page3_3_2&lt;/uri&gt;</span>
+<span class="cm">                            &lt;resource&gt;admin&lt;/resource&gt;</span>
+<span class="cm">                        &lt;/page3_3_2&gt;</span>
+
+<span class="cm">                    &lt;/pages&gt;</span>
+<span class="cm">                &lt;/page3_3&gt;</span>
+
+<span class="cm">            &lt;/pages&gt;</span>
+<span class="cm">        &lt;/page3&gt;</span>
+
+<span class="cm">        &lt;home&gt;</span>
+<span class="cm">            &lt;label&gt;Home&lt;/label&gt;</span>
+<span class="cm">            &lt;order&gt;-100&lt;/order&gt;</span>
+<span class="cm">            &lt;module&gt;default&lt;/module&gt;</span>
+<span class="cm">            &lt;controller&gt;index&lt;/controller&gt;</span>
+<span class="cm">            &lt;action&gt;index&lt;/action&gt;</span>
+<span class="cm">        &lt;/home&gt;</span>
+
+<span class="cm">    &lt;/nav&gt;</span>
+<span class="cm">&lt;/config&gt;</span>
+<span class="cm"> */</span>
+
+<span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Xml</span><span class="p">(</span><span class="s1">&#39;/path/to/navigation.xml&#39;</span><span class="p">,</span> <span class="s1">&#39;nav&#39;</span><span class="p">);</span>
+<span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Navigation\Navigation</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="adding-pages">
+<span id="zend-navigation-containers-adding"></span><h2>Adding pages<a class="headerlink" href="#adding-pages" title="Permalink to this headline">¶</a></h2>
+<p>Adding pages to a container can be done with the methods <tt class="docutils literal"><span class="pre">addPage()</span></tt>, <tt class="docutils literal"><span class="pre">addPages()</span></tt>, or <tt class="docutils literal"><span class="pre">setPages()</span></tt>. See
+examples below for explanation.</p>
+<p class="rubric" id="zend-navigation-containers-adding-example">Adding pages to a container</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// create container</span>
+<span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Navigation\Navigation</span><span class="p">();</span>
+
+<span class="c1">// add page by giving a page instance</span>
+<span class="nv">$container</span><span class="o">-&gt;</span><span class="na">addPage</span><span class="p">(</span>
+    <span class="nx">Zend\Navigation\Page\AbstractPage</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://www.example.com/&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// add page by giving an array</span>
+<span class="nv">$container</span><span class="o">-&gt;</span><span class="na">addPage</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://www.example.com/&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// add page by giving a config object</span>
+<span class="nv">$container</span><span class="o">-&gt;</span><span class="na">addPage</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">Zend\Config</span><span class="p">(</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;uri&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://www.example.com/&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="nv">$pages</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;Save&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;save&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span>  <span class="s1">&#39;Delete&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;delete&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// add two pages</span>
+<span class="nv">$container</span><span class="o">-&gt;</span><span class="na">addPages</span><span class="p">(</span><span class="nv">$pages</span><span class="p">);</span>
+
+<span class="c1">// remove existing pages and add the given pages</span>
+<span class="nv">$container</span><span class="o">-&gt;</span><span class="na">setPages</span><span class="p">(</span><span class="nv">$pages</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="removing-pages">
+<span id="zend-navigation-containers-removing"></span><h2>Removing pages<a class="headerlink" href="#removing-pages" title="Permalink to this headline">¶</a></h2>
+<p>Removing pages can be done with <tt class="docutils literal"><span class="pre">removePage()</span></tt> or <tt class="docutils literal"><span class="pre">removePages()</span></tt>. The first method accepts a an instance of a
+page, or an integer. The integer corresponds to the <tt class="docutils literal"><span class="pre">order</span></tt> a page has. The latter method will remove all pages
+in the container.</p>
+<p class="rubric" id="zend-navigation-containers-removing-example">Removing pages from a container</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Navigation\Navigation</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;Page 1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;page1&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;Page 2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;page2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;order&#39;</span>  <span class="o">=&gt;</span> <span class="mi">200</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;Page 3&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;page3&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">));</span>
+
+<span class="c1">// remove page by implicit page order</span>
+<span class="nv">$container</span><span class="o">-&gt;</span><span class="na">removePage</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>      <span class="c1">// removes Page 1</span>
+
+<span class="c1">// remove page by instance</span>
+<span class="nv">$page3</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findOneByAction</span><span class="p">(</span><span class="s1">&#39;page3&#39;</span><span class="p">);</span>
+<span class="nv">$container</span><span class="o">-&gt;</span><span class="na">removePage</span><span class="p">(</span><span class="nv">$page3</span><span class="p">);</span> <span class="c1">// removes Page 3</span>
+
+<span class="c1">// remove page by explicit page order</span>
+<span class="nv">$container</span><span class="o">-&gt;</span><span class="na">removePage</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>    <span class="c1">// removes Page 2</span>
+
+<span class="c1">// remove all pages</span>
+<span class="nv">$container</span><span class="o">-&gt;</span><span class="na">removePages</span><span class="p">();</span>      <span class="c1">// removes all pages</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="finding-pages">
+<span id="zend-navigation-containers-finding"></span><h2>Finding pages<a class="headerlink" href="#finding-pages" title="Permalink to this headline">¶</a></h2>
+<p>Containers have finder methods for retrieving pages. They are <tt class="docutils literal"><span class="pre">findOneBy($property,</span> <span class="pre">$value)</span></tt>,
+<tt class="docutils literal"><span class="pre">findAllBy($property,</span> <span class="pre">$value)</span></tt>, and <tt class="docutils literal"><span class="pre">findBy($property,</span> <span class="pre">$value,</span> <span class="pre">$all</span> <span class="pre">=</span> <span class="pre">false)</span></tt>. Those methods will recursively
+search the container for pages matching the given <tt class="docutils literal"><span class="pre">$page-&gt;$property</span> <span class="pre">==</span> <span class="pre">$value</span></tt>. The first method,
+<tt class="docutils literal"><span class="pre">findOneBy()</span></tt>, will return a single page matching the property with the given value, or <tt class="docutils literal"><span class="pre">NULL</span></tt> if it cannot be
+found. The second method will return all pages with a property matching the given value. The third method will call
+one of the two former methods depending on the <tt class="docutils literal"><span class="pre">$all</span></tt> flag.</p>
+<p>The finder methods can also be used magically by appending the property name to <tt class="docutils literal"><span class="pre">findBy</span></tt>, <tt class="docutils literal"><span class="pre">findOneBy</span></tt>, or
+<tt class="docutils literal"><span class="pre">findAllBy</span></tt>, e.g. <tt class="docutils literal"><span class="pre">findOneByLabel('Home')</span></tt> to return the first matching page with label &#8216;Home&#8217;. Other
+combinations are <tt class="docutils literal"><span class="pre">findByLabel(...)</span></tt>, <tt class="docutils literal"><span class="pre">findOnyByTitle(...)</span></tt>, <tt class="docutils literal"><span class="pre">findAllByController(...)</span></tt>, etc. Finder methods
+also work on custom properties, such as <tt class="docutils literal"><span class="pre">findByFoo('bar')</span></tt>.</p>
+<p class="rubric" id="zend-navigation-containers-finding-example">Finding pages in a container</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Navigation\Navigation</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;page-1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;foo&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 1.1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;page-1.1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;foo&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 1.2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;page-1.2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;class&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;my-class&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;uri&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;label&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;Page 1.3&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;page-1.3&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;about&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Page 2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;id&#39;</span>         <span class="o">=&gt;</span> <span class="s1">&#39;page_2_and_3&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;class&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;my-class&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;page2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;page1&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Page 3&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;id&#39;</span>         <span class="o">=&gt;</span> <span class="s1">&#39;page_2_and_3&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;module&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;page3&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+
+<span class="c1">// The &#39;id&#39; is not required to be unique, but be aware that</span>
+<span class="c1">// having two pages with the same id will render the same id attribute</span>
+<span class="c1">// in menus and breadcrumbs.</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findBy</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;page_2_and_3&#39;</span><span class="p">);</span>      <span class="c1">// returns Page 2</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findOneBy</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;page_2_and_3&#39;</span><span class="p">);</span>   <span class="c1">// returns Page 2</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findBy</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;page_2_and_3&#39;</span><span class="p">,</span>
+                            <span class="k">true</span><span class="p">);</span>                <span class="c1">// returns Page 2 and Page 3</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findById</span><span class="p">(</span><span class="s1">&#39;page_2_and_3&#39;</span><span class="p">);</span>    <span class="c1">// returns Page 2</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findOneById</span><span class="p">(</span><span class="s1">&#39;page_2_and_3&#39;</span><span class="p">);</span> <span class="c1">// returns Page 2</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findAllById</span><span class="p">(</span><span class="s1">&#39;page_2_and_3&#39;</span><span class="p">);</span> <span class="c1">// returns Page 2 and Page 3</span>
+
+<span class="c1">// Find all matching CSS class my-class</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findAllBy</span><span class="p">(</span><span class="s1">&#39;class&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;my-class&#39;</span><span class="p">);</span>       <span class="c1">// returns Page 1.2 and Page 2</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findAllByClass</span><span class="p">(</span><span class="s1">&#39;my-class&#39;</span><span class="p">);</span>  <span class="c1">// returns Page 1.2 and Page 2</span>
+
+<span class="c1">// Find first matching CSS class my-class</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findOneByClass</span><span class="p">(</span><span class="s1">&#39;my-class&#39;</span><span class="p">);</span>  <span class="c1">// returns Page 1.2</span>
+
+<span class="c1">// Find all matching CSS class non-existant</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findAllByClass</span><span class="p">(</span><span class="s1">&#39;non-existant&#39;</span><span class="p">);</span> <span class="c1">// returns array()</span>
+
+<span class="c1">// Find first matching CSS class non-existant</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findOneByClass</span><span class="p">(</span><span class="s1">&#39;non-existant&#39;</span><span class="p">);</span> <span class="c1">// returns null</span>
+
+<span class="c1">// Find all pages with custom property &#39;foo&#39; = &#39;bar&#39;</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findAllBy</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">);</span> <span class="c1">// returns Page 1 and Page 1.1</span>
+
+<span class="c1">// To achieve the same magically, &#39;foo&#39; must be in lowercase.</span>
+<span class="c1">// This is because &#39;foo&#39; is a custom property, and thus the</span>
+<span class="c1">// property name is not normalized to &#39;Foo&#39;</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findAllByfoo</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">);</span>
+
+<span class="c1">// Find all with controller = &#39;index&#39;</span>
+<span class="nv">$found</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">findAllByController</span><span class="p">(</span><span class="s1">&#39;index&#39;</span><span class="p">);</span> <span class="c1">// returns Page 2 and Page 3</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="iterating-containers">
+<span id="zend-navigation-containers-iterating"></span><h2>Iterating containers<a class="headerlink" href="#iterating-containers" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Navigation\Container</span></tt> implements <tt class="docutils literal"><span class="pre">RecursiveIteratorIterator</span></tt>, and can be iterated using any <tt class="docutils literal"><span class="pre">Iterator</span></tt>
+class. To iterate a container recursively, use the <tt class="docutils literal"><span class="pre">RecursiveIteratorIterator</span></tt> class.</p>
+<p class="rubric" id="zend-navigation-containers-iterating-example">Iterating a container</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</pre></div></td><td class="code"><div class="highlight"><pre><span class="cm">/*</span>
+<span class="cm"> * Create a container from an array</span>
+<span class="cm"> */</span>
+<span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Navigation\Navigation</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 2.1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 2.2&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 3&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+
+<span class="c1">// Iterate flat using regular foreach:</span>
+<span class="c1">// Output: Page 1, Page 2, Page 3</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$container</span> <span class="k">as</span> <span class="nv">$page</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$page</span><span class="o">-&gt;</span><span class="na">label</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// Iterate recursively using RecursiveIteratorIterator</span>
+<span class="nv">$it</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RecursiveIteratorIterator</span><span class="p">(</span>
+        <span class="nv">$container</span><span class="p">,</span> <span class="nx">RecursiveIteratorIterator</span><span class="o">::</span><span class="na">SELF_FIRST</span><span class="p">);</span>
+
+<span class="c1">// Output: Page 1, Page 2, Page 2.1, Page 2.2, Page 3</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$it</span> <span class="k">as</span> <span class="nv">$page</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$page</span><span class="o">-&gt;</span><span class="na">label</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="other-operations">
+<span id="zend-navigation-containers-other"></span><h2>Other operations<a class="headerlink" href="#other-operations" title="Permalink to this headline">¶</a></h2>
+<p>The method <tt class="docutils literal"><span class="pre">hasPage(Zend\Navigation\Page\AbstractPage</span> <span class="pre">$page)</span></tt> checks if the container has the given page. The
+method <tt class="docutils literal"><span class="pre">hasPages()</span></tt> checks if there are any pages in the container, and is equivalent to
+<tt class="docutils literal"><span class="pre">count($container)</span> <span class="pre">&gt;</span> <span class="pre">1</span></tt>.</p>
+<p>The <tt class="docutils literal"><span class="pre">toArray()</span></tt> method converts the container and the pages in it to an array. This can be useful for serializing
+and debugging.</p>
+<p class="rubric" id="zend-navigation-containers-other-example-toarray">Converting a container to an array</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
+ 37
+ 38
+ 39
+ 40
+ 41
+ 42
+ 43
+ 44
+ 45
+ 46
+ 47
+ 48
+ 49
+ 50
+ 51
+ 52
+ 53
+ 54
+ 55
+ 56
+ 57
+ 58
+ 59
+ 60
+ 61
+ 62
+ 63
+ 64
+ 65
+ 66
+ 67
+ 68
+ 69
+ 70
+ 71
+ 72
+ 73
+ 74
+ 75
+ 76
+ 77
+ 78
+ 79
+ 80
+ 81
+ 82
+ 83
+ 84
+ 85
+ 86
+ 87
+ 88
+ 89
+ 90
+ 91
+ 92
+ 93
+ 94
+ 95
+ 96
+ 97
+ 98
+ 99
+100
+101
+102
+103
+104
+105
+106
+107
+108</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Navigation\Navigation</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;pages&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 2.1&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Page 2.2&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;uri&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;#&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$container</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">());</span>
+
+<span class="cm">/* Output:</span>
+<span class="cm">array(2) {</span>
+<span class="cm">  [0]=&gt; array(15) {</span>
+<span class="cm">    [&quot;label&quot;]=&gt; string(6) &quot;Page 1&quot;</span>
+<span class="cm">    [&quot;id&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;class&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;title&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;target&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;rel&quot;]=&gt; array(0) {</span>
+<span class="cm">    }</span>
+<span class="cm">    [&quot;rev&quot;]=&gt; array(0) {</span>
+<span class="cm">    }</span>
+<span class="cm">    [&quot;order&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;resource&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;privilege&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;active&quot;]=&gt; bool(false)</span>
+<span class="cm">    [&quot;visible&quot;]=&gt; bool(true)</span>
+<span class="cm">    [&quot;type&quot;]=&gt; string(23) &quot;Zend\Navigation\Page\Uri&quot;</span>
+<span class="cm">    [&quot;pages&quot;]=&gt; array(0) {</span>
+<span class="cm">    }</span>
+<span class="cm">    [&quot;uri&quot;]=&gt; string(1) &quot;#&quot;</span>
+<span class="cm">  }</span>
+<span class="cm">  [1]=&gt; array(15) {</span>
+<span class="cm">    [&quot;label&quot;]=&gt; string(6) &quot;Page 2&quot;</span>
+<span class="cm">    [&quot;id&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;class&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;title&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;target&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;rel&quot;]=&gt; array(0) {</span>
+<span class="cm">    }</span>
+<span class="cm">    [&quot;rev&quot;]=&gt; array(0) {</span>
+<span class="cm">    }</span>
+<span class="cm">    [&quot;order&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;resource&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;privilege&quot;]=&gt; NULL</span>
+<span class="cm">    [&quot;active&quot;]=&gt; bool(false)</span>
+<span class="cm">    [&quot;visible&quot;]=&gt; bool(true)</span>
+<span class="cm">    [&quot;type&quot;]=&gt; string(23) &quot;Zend\Navigation\Page\Uri&quot;</span>
+<span class="cm">    [&quot;pages&quot;]=&gt; array(2) {</span>
+<span class="cm">      [0]=&gt; array(15) {</span>
+<span class="cm">        [&quot;label&quot;]=&gt; string(8) &quot;Page 2.1&quot;</span>
+<span class="cm">        [&quot;id&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;class&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;title&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;target&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;rel&quot;]=&gt; array(0) {</span>
+<span class="cm">        }</span>
+<span class="cm">        [&quot;rev&quot;]=&gt; array(0) {</span>
+<span class="cm">        }</span>
+<span class="cm">        [&quot;order&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;resource&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;privilege&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;active&quot;]=&gt; bool(false)</span>
+<span class="cm">        [&quot;visible&quot;]=&gt; bool(true)</span>
+<span class="cm">        [&quot;type&quot;]=&gt; string(23) &quot;Zend\Navigation\Page\Uri&quot;</span>
+<span class="cm">        [&quot;pages&quot;]=&gt; array(0) {</span>
+<span class="cm">        }</span>
+<span class="cm">        [&quot;uri&quot;]=&gt; string(1) &quot;#&quot;</span>
+<span class="cm">      }</span>
+<span class="cm">      [1]=&gt;</span>
+<span class="cm">      array(15) {</span>
+<span class="cm">        [&quot;label&quot;]=&gt; string(8) &quot;Page 2.2&quot;</span>
+<span class="cm">        [&quot;id&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;class&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;title&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;target&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;rel&quot;]=&gt; array(0) {</span>
+<span class="cm">        }</span>
+<span class="cm">        [&quot;rev&quot;]=&gt; array(0) {</span>
+<span class="cm">        }</span>
+<span class="cm">        [&quot;order&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;resource&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;privilege&quot;]=&gt; NULL</span>
+<span class="cm">        [&quot;active&quot;]=&gt; bool(false)</span>
+<span class="cm">        [&quot;visible&quot;]=&gt; bool(true)</span>
+<span class="cm">        [&quot;type&quot;]=&gt; string(23) &quot;Zend\Navigation\Page\Uri&quot;</span>
+<span class="cm">        [&quot;pages&quot;]=&gt; array(0) {</span>
+<span class="cm">        }</span>
+<span class="cm">        [&quot;uri&quot;]=&gt; string(1) &quot;#&quot;</span>
+<span class="cm">      }</span>
+<span class="cm">    }</span>
+<span class="cm">    [&quot;uri&quot;]=&gt; string(1) &quot;#&quot;</span>
+<span class="cm">  }</span>
+<span class="cm">}</span>
+<span class="cm">*/</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Containers</a><ul>
+<li><a class="reference internal" href="#creating-containers">Creating containers</a></li>
+<li><a class="reference internal" href="#adding-pages">Adding pages</a></li>
+<li><a class="reference internal" href="#removing-pages">Removing pages</a></li>
+<li><a class="reference internal" href="#finding-pages">Finding pages</a></li>
+<li><a class="reference internal" href="#iterating-containers">Iterating containers</a></li>
+<li><a class="reference internal" href="#other-operations">Other operations</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.navigation.pages.html"
+                        title="previous chapter">Pages</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.paginator.introduction.html"
+                        title="next chapter">Introduction</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.navigation.containers.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.navigation.containers.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.navigation.containers.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.paginator.introduction.html" title="Introduction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.navigation.pages.html" title="Pages"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.navigation.containers.rst">
+                Containers
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

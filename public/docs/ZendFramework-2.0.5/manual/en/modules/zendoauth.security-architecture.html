@@ -1,0 +1,266 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Security Architecture &mdash; Zend Framework 2 2.0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.5 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="security-architecture">
+<span id="zendoauth-introduction-security-architecture"></span><h1>Security Architecture<a class="headerlink" href="#security-architecture" title="Permalink to this headline">¶</a></h1>
+<p>OAuth was designed specifically to operate over an insecure <em>HTTP</em> connection and so the use of <em>HTTPS</em> is not
+required though obviously it would be desireable if available. Should a <em>HTTPS</em> connection be feasible, OAuth
+offers a signature method implementation called PLAINTEXT which may be utilised. Over a typical unsecured <em>HTTP</em>
+connection, the use of PLAINTEXT must be avoided and an alternate scheme using. The OAuth specification defines two
+such signature methods: HMAC-SHA1 and RSA-SHA1. Both are fully supported by <tt class="docutils literal"><span class="pre">ZendOAuth</span></tt>.</p>
+<p>These signature methods are quite easy to understand. As you can imagine, a PLAINTEXT signature method does nothing
+that bears mentioning since it relies on <em>HTTPS</em>. If you were to use PLAINTEXT over <em>HTTP</em>, you are left with a
+significant problem: there&#8217;s no way to be sure that the content of any OAuth enabled request (which would include
+the OAuth Access Token) was altered en route. This is because unsecured <em>HTTP</em> requests are always at risk of
+eavesdropping, Man In The Middle (MITM) attacks, or other risks whereby a request can be retooled so to speak to
+perform tasks on behalf of the attacker by masquerading as the origin application without being noticed by the
+service provider.</p>
+<p>HMAC-SHA1 and RSA-SHA1 alleviate this risk by digitally signing all OAuth requests with the original application&#8217;s
+registered Consumer Secret. Assuming only the Consumer and the Provider know what this secret is, a middle-man can
+alter requests all they wish - but they will not be able to validly sign them and unsigned or invalidly signed
+requests would be discarded by both parties. Digital signatures therefore offer a guarantee that validly signed
+requests do come from the expected party and have not been altered en route. This is the core of why OAuth can
+operate over an unsecure connection.</p>
+<p>How these digital signatures operate depends on the method used, i.e. HMAC-SHA1, RSA-SHA1 or perhaps another method
+defined by the service provider. HMAC-SHA1 is a simple mechanism which generates a Message Authentication Code
+(MAC) using a cryptographic hash function (i.e. SHA1) in combination with a secret key known only to the message
+sender and receiver (i.e. the OAuth Consumer Secret and the authorized Access Key combined). This hashing mechanism
+is applied to the parameters and content of any OAuth requests which are concatenated into a &#8220;base signature
+string&#8221; as defined by the OAuth specification.</p>
+<p>RSA-SHA1 operates on similar principles except that the shared secret is, as you would expect, each parties&#8217; RSA
+private key. Both sides would have the other&#8217;s public key with which to verify digital signatures. This does pose a
+level of risk compared to HMAC-SHA1 since the RSA method does not use the Access Key as part of the shared secret.
+This means that if the RSA private key of any Consumer is compromised, then all Access Tokens assigned to that
+Consumer are also. RSA imposes an all or nothing scheme. In general, the majority of service providers offering
+OAuth authorization have therefore tended to use HMAC-SHA1 by default, and those who offer RSA-SHA1 may offer
+fallback support to HMAC-SHA1.</p>
+<p>While digital signatures add to OAuth&#8217;s security they are still vulnerable to other forms of attack, such as replay
+attacks which copy earlier requests which were intercepted and validly signed at that time. An attacker can now
+resend the exact same request to a Provider at will at any time and intercept its results. This poses a significant
+risk but it is quiet simple to defend against - add a unique string (i.e. a nonce) to all requests which changes
+per request (thus continually changing the signature string) but which can never be reused because Providers
+actively track used nonces within the a certain window defined by the timestamp also attached to a request. You
+might first suspect that once you stop tracking a particular nonce, the replay could work but this ignore the
+timestamp which can be used to determine a request&#8217;s age at the time it was validly signed. One can assume that a
+week old request used in an attempted replay should be summarily discarded!</p>
+<p>As a final point, this is not an exhaustive look at the security architecture in OAuth. For example, what if <em>HTTP</em>
+requests which contain both the Access Token and the Consumer Secret are eavesdropped? The system relies on at one
+in the clear transmission of each unless <em>HTTPS</em> is active, so the obvious conclusion is that where feasible
+<em>HTTPS</em> is to be preferred leaving unsecured <em>HTTP</em> in place only where it is not possible or affordable to do so.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendoauth.security-architecture.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendoauth.security-architecture.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendoauth.security-architecture.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendoauth.security-architecture.rst">
+                Security Architecture
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

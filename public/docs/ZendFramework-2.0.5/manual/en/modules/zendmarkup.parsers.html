@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ZendMarkup Parsers &mdash; Zend Framework 2 2.0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.5 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zendmarkup-parsers">
+<span id="id1"></span><h1>ZendMarkup Parsers<a class="headerlink" href="#zendmarkup-parsers" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">ZendMarkup</span></tt> is currently shipped with two parsers, a BBCode parser and a Textile parser.</p>
+<div class="section" id="theory-of-parsing">
+<span id="zendmarkup-parsers-theory"></span><h2>Theory of Parsing<a class="headerlink" href="#theory-of-parsing" title="Permalink to this headline">¶</a></h2>
+<p>The parsers of <tt class="docutils literal"><span class="pre">ZendMarkup</span></tt> are classes that convert text with markup to a token tree. Although we are using the
+BBCode parser as example here, the idea of the token tree remains the same across all parsers. We will start with
+this piece of BBCode for example:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>[b]foo[i]bar[/i][/b]baz
+</pre></div>
+</td></tr></table></div>
+<p>Then the BBCode parser will take that value, tear it apart and create the following tree:</p>
+<ul class="simple">
+<li>[b]<ul>
+<li>foo</li>
+<li>[i]<ul>
+<li>bar</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>baz</li>
+</ul>
+<p>You will notice that the closing tags are gone, they don&#8217;t show up as content in the tree structure. This is
+because the closing tag isn&#8217;t part of the actual content. Although, this does not mean that the closing tag is just
+lost, it is stored inside the tag information for the tag itself. Also, please note that this is just a simplified
+view of the tree itself. The actual tree contains a lot more information, like the tag&#8217;s attributes and its name.</p>
+</div>
+<div class="section" id="the-bbcode-parser">
+<span id="zendmarkup-parsers-bbcode"></span><h2>The BBCode parser<a class="headerlink" href="#the-bbcode-parser" title="Permalink to this headline">¶</a></h2>
+<p>The BBCode parser is a <tt class="docutils literal"><span class="pre">ZendMarkup</span></tt> parser that converts BBCode to a token tree. The syntax of all BBCode tags
+is:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>[name(=(value|&quot;value&quot;))( attribute=(value|&quot;value&quot;))*]
+</pre></div>
+</td></tr></table></div>
+<p>Some examples of valid BBCode tags are:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre>[b]
+[list=1]
+[code file=Zend/Markup.php]
+[url=&quot;http://framework.zend.com/&quot; title=&quot;Zend Framework!&quot;]
+</pre></div>
+</td></tr></table></div>
+<p>By default, all tags are closed by using the format &#8216;[/tagname]&#8217;.</p>
+</div>
+<div class="section" id="the-textile-parser">
+<span id="zendmarkup-parsers-textile"></span><h2>The Textile parser<a class="headerlink" href="#the-textile-parser" title="Permalink to this headline">¶</a></h2>
+<p>The Textile parser is a <tt class="docutils literal"><span class="pre">ZendMarkup</span></tt> parser that converts Textile to a token tree. Because Textile doesn&#8217;t have
+a tag structure, the following is a list of example tags:</p>
+<table border="1" class="docutils" id="zendmarkup-parsers-textile-tags">
+<caption>List of basic Textile tags</caption>
+<colgroup>
+<col width="43%" />
+<col width="57%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Sample input</th>
+<th class="head">Sample output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>*foo*</td>
+<td>&lt;strong&gt;foo&lt;/strong&gt;</td>
+</tr>
+<tr class="row-odd"><td>_foo_</td>
+<td>&lt;em&gt;foo&lt;/em&gt;</td>
+</tr>
+<tr class="row-even"><td>??foo??</td>
+<td>&lt;cite&gt;foo&lt;/cite&gt;</td>
+</tr>
+<tr class="row-odd"><td>-foo-</td>
+<td>&lt;del&gt;foo&lt;/del&gt;</td>
+</tr>
+<tr class="row-even"><td>+foo+</td>
+<td>&lt;ins&gt;foo&lt;/ins&gt;</td>
+</tr>
+<tr class="row-odd"><td>^foo^</td>
+<td>&lt;sup&gt;foo&lt;/sup&gt;</td>
+</tr>
+<tr class="row-even"><td>~foo~</td>
+<td>&lt;sub&gt;foo&lt;/sub&gt;</td>
+</tr>
+<tr class="row-odd"><td>%foo%</td>
+<td>&lt;span&gt;foo&lt;/span&gt;</td>
+</tr>
+<tr class="row-even"><td>PHP(PHP Hypertext Preprocessor)</td>
+<td>&lt;acronym title=&#8221;PHP Hypertext Preprocessor&#8221;&gt;PHP&lt;/acronym&gt;</td>
+</tr>
+<tr class="row-odd"><td>&#8220;Zend Framework&#8221;:<a class="reference external" href="http://framework.zend.com/">http://framework.zend.com/</a></td>
+<td>&lt;a href=&#8221;<a class="reference external" href="http://framework.zend.com/">http://framework.zend.com/</a>&#8220;&gt;Zend Framework&lt;/a&gt;</td>
+</tr>
+<tr class="row-even"><td>h1. foobar</td>
+<td>&lt;h1&gt;foobar&lt;/h1&gt;</td>
+</tr>
+<tr class="row-odd"><td>h6. foobar</td>
+<td>&lt;h6&gt;foobar&lt;/h6&gt;</td>
+</tr>
+<tr class="row-even"><td>!http://framework.zend.com/images/logo.gif!</td>
+<td>&lt;img src=&#8221;<a class="reference external" href="http://framework.zend.com/images/logo.gif">http://framework.zend.com/images/logo.gif</a>&#8221; /&gt;</td>
+</tr>
+</tbody>
+</table>
+<p>Also, the Textile parser wraps all tags into paragraphs; a paragraph ends with two newlines, and if there are more
+tags, a new paragraph will be added.</p>
+<div class="section" id="lists">
+<span id="zendmarkup-parsers-textile-lists"></span><h3>Lists<a class="headerlink" href="#lists" title="Permalink to this headline">¶</a></h3>
+<p>The Textile parser also supports two types of lists. The numeric type, using the &#8220;#&#8221; character and bullit-lists
+using the &#8220;*&#8221; character. An example of both lists:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre># Item 1
+# Item 2
+
+* Item 1
+* Item 2
+</pre></div>
+</td></tr></table></div>
+<p>The above will generate two lists: the first, numbered; and the second, bulleted. Inside list items, you can use
+normal tags like strong (*), and emphasized (_). Tags that need to start on a new line (like &#8216;h1&#8217; etc.) cannot be
+used inside lists.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ZendMarkup Parsers</a><ul>
+<li><a class="reference internal" href="#theory-of-parsing">Theory of Parsing</a></li>
+<li><a class="reference internal" href="#the-bbcode-parser">The BBCode parser</a></li>
+<li><a class="reference internal" href="#the-textile-parser">The Textile parser</a><ul>
+<li><a class="reference internal" href="#lists">Lists</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendmarkup.parsers.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendmarkup.parsers.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendmarkup.parsers.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendmarkup.parsers.rst">
+                ZendMarkup Parsers
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

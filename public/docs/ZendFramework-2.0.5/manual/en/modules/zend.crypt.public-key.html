@@ -1,0 +1,535 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Public key cryptography &mdash; Zend Framework 2 2.0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.5 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Db\Adapter" href="zend.db.adapter.html" />
+    <link rel="prev" title="Secure Password Storing" href="zend.crypt.password.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.db.adapter.html" title="Zend\Db\Adapter"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.crypt.password.html" title="Secure Password Storing"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="public-key-cryptography">
+<span id="zend-crypt-public-key"></span><h1>Public key cryptography<a class="headerlink" href="#public-key-cryptography" title="Permalink to this headline">¶</a></h1>
+<p>Public-key cryptography refers to a cryptographic system requiring two separate keys, one of which is secret and
+one of which is public. Although different, the two parts of the key pair are mathematically linked. One key locks
+or encrypts the plaintext, and the other unlocks or decrypts the cyphertext. Neither key can perform both
+functions. One of these keys is published or public, while the other is kept private.</p>
+<p>In Zend Framework we implemented two public key algorithms: <a class="reference external" href="http://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">Diffie-Hellman</a> key exchange and <a class="reference external" href="http://en.wikipedia.org/wiki/RSA_%28algorithm%29">RSA</a>.</p>
+<div class="section" id="diffie-hellman">
+<span id="zend-crypt-public-key-diffie-hellman"></span><h2>Diffie-Hellman<a class="headerlink" href="#diffie-hellman" title="Permalink to this headline">¶</a></h2>
+<p>The Diffie-Hellman algorithm is a specific method of exchanging cryptographic keys. It is one of the earliest
+practical examples of key exchange implemented within the field of cryptography. The Diffie–Hellman key exchange
+method allows two parties that have no prior knowledge of each other to jointly establish a shared secret key
+over an insecure communications channel. This key can then be used to encrypt subsequent communications using a
+symmetric key cipher.</p>
+<p>The diagram of operation of the Diffie-Hellman algorithm can be defined by the following picture
+(taken by the <a class="reference external" href="http://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange">Diffie-Hellman</a> Wikipedia page):</p>
+<div class="figure align-center">
+<img alt="../_images/zend.crypt.public-key.diffie-hellman.png" src="../_images/zend.crypt.public-key.diffie-hellman.png" />
+</div>
+<p>The schema&#8217;s colors represent the parameters of the algorithm. Here is reported an example of usage
+using the <tt class="docutils literal"><span class="pre">Zend\Crypt\PublicKey\DiffieHellman</span></tt> class:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Crypt\PublicKey\DiffieHellman</span><span class="p">;</span>
+
+<span class="nv">$aliceOptions</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;prime&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;155172898181473697471232257763715539915724801966915404479707795314057629378541917580651227&#39;</span> <span class="o">.</span>
+                  <span class="s1">&#39;423698188993727816152646631438561595825688188889951272158842675419950341258706556549803580&#39;</span> <span class="o">.</span>
+                  <span class="s1">&#39;104870537681476726513255747040765857479291291572334510643245094715007229621094194349783925&#39;</span> <span class="o">.</span>
+                  <span class="s1">&#39;984760375594985848253359305585439638443&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;generator&#39;</span><span class="o">=&gt;</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;private&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;992093140665725952364085695919679885571412495614942674862518080355353963322786201435363176&#39;</span> <span class="o">.</span>
+                 <span class="s1">&#39;813127128916726230726309951803243888416814918577455156967890911274095150092503589658166661&#39;</span> <span class="o">.</span>
+                 <span class="s1">&#39;463420498381785213791321533481399080168191962194483101070726325157493390557981225386151351&#39;</span> <span class="o">.</span>
+                 <span class="s1">&#39;04828702523796951800575031871051678091&#39;</span>
+<span class="p">);</span>
+
+<span class="nv">$bobOptions</span>   <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;prime&#39;</span>    <span class="o">=&gt;</span> <span class="nv">$aliceOptions</span><span class="p">[</span><span class="s1">&#39;prime&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;generator&#39;</span><span class="o">=&gt;</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;private&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;334117357926395586257336357178925636125481806504021611510774783148414637079488997861035889&#39;</span> <span class="o">.</span>
+                  <span class="s1">&#39;123256347304105519467727528801778689728169635518217403867000760342134081539246925625431179&#39;</span> <span class="o">.</span>
+                  <span class="s1">&#39;634647331566005454845108330724270034742070646507148310833044977371603820970833568760781462&#39;</span> <span class="o">.</span>
+                  <span class="s1">&#39;31616972608703322302585471319261275664&#39;</span>
+<span class="p">);</span>
+
+<span class="nv">$alice</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DiffieHellman</span><span class="p">(</span><span class="nv">$aliceOptions</span><span class="p">[</span><span class="s1">&#39;prime&#39;</span><span class="p">],</span> <span class="nv">$aliceOptions</span><span class="p">[</span><span class="s1">&#39;generator&#39;</span><span class="p">],</span> <span class="nv">$aliceOptions</span><span class="p">[</span><span class="s1">&#39;private&#39;</span><span class="p">]);</span>
+<span class="nv">$bob</span>   <span class="o">=</span> <span class="k">new</span> <span class="nx">DiffieHellman</span><span class="p">(</span><span class="nv">$bobOptions</span><span class="p">[</span><span class="s1">&#39;prime&#39;</span><span class="p">],</span> <span class="nv">$bobOptions</span><span class="p">[</span><span class="s1">&#39;generator&#39;</span><span class="p">],</span> <span class="nv">$bobOptions</span><span class="p">[</span><span class="s1">&#39;private&#39;</span><span class="p">]);</span>
+
+<span class="nv">$alice</span><span class="o">-&gt;</span><span class="na">generateKeys</span><span class="p">();</span>
+<span class="nv">$bob</span><span class="o">-&gt;</span><span class="na">generateKeys</span><span class="p">();</span>
+
+<span class="nv">$aliceSecretKey</span> <span class="o">=</span> <span class="nv">$alice</span><span class="o">-&gt;</span><span class="na">computeSecretKey</span><span class="p">(</span><span class="nv">$bob</span><span class="o">-&gt;</span><span class="na">getPublicKey</span><span class="p">(</span><span class="nx">DiffieHellman</span><span class="o">::</span><span class="na">FORMAT_BINARY</span><span class="p">),</span>
+                                           <span class="nx">DiffieHellman</span><span class="o">::</span><span class="na">FORMAT_BINARY</span><span class="p">,</span>
+                                           <span class="nx">DiffieHellman</span><span class="o">::</span><span class="na">FORMAT_BINARY</span><span class="p">);</span>
+
+<span class="nv">$bobSecretKey</span>   <span class="o">=</span> <span class="nv">$bob</span><span class="o">-&gt;</span><span class="na">computeSecretKey</span><span class="p">(</span><span class="nv">$alice</span><span class="o">-&gt;</span><span class="na">getPublicKey</span><span class="p">(</span><span class="nx">DiffieHellman</span><span class="o">::</span><span class="na">FORMAT_BINARY</span><span class="p">),</span>
+                                         <span class="nx">DiffieHellman</span><span class="o">::</span><span class="na">FORMAT_BINARY</span><span class="p">,</span>
+                                         <span class="nx">DiffieHellman</span><span class="o">::</span><span class="na">FORMAT_BINARY</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$aliceSecretKey</span> <span class="o">!==</span> <span class="nv">$bobSecretKey</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;ERROR!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nb">printf</span><span class="p">(</span><span class="s2">&quot;The secret key is: %s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">base64_encode</span><span class="p">(</span><span class="nv">$aliceSecretKey</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The parameters of the Diffie-Hellman class are: a prime number (p), a generator (g) that is a primitive root mod p
+and a private integer number. The security of the Diffie-Hellman exchange algorithm is related to the choice of
+these parameters. To know how to choose secure numbers you can read the <a class="reference external" href="http://tools.ietf.org/html/rfc3526">RFC 3526</a> document.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">Zend\Crypt\PublicKey\DiffieHellman</span></tt> class use by default the <a class="reference external" href="http://php.net/manual/en/book.openssl.php">OpenSSL</a> extension of PHP to generate the
+parameters. If you want don&#8217;t want to use the OpenSSL library you have to set the <tt class="docutils literal"><span class="pre">useOpensslExtension</span></tt> static
+method to <tt class="docutils literal"><span class="pre">false</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="rsa">
+<span id="zend-crypt-public-key-rsa"></span><h2>RSA<a class="headerlink" href="#rsa" title="Permalink to this headline">¶</a></h2>
+<p>RSA is an algorithm for public-key cryptography that is based on the presumed difficulty of factoring large
+integers, the <a class="reference external" href="http://en.wikipedia.org/wiki/Factoring_problem">factoring problem</a>.
+A user of RSA creates and then publishes the product of two large prime numbers, along with an auxiliary value,
+as their public key. The prime factors must be kept secret. Anyone can use the public key to encrypt a message,
+but with currently published methods, if the public key is large enough, only someone with knowledge of the prime
+factors can feasibly decode the message. Whether breaking RSA encryption is as hard as factoring is an open
+question known as the RSA problem.</p>
+<p>The RSA algorithm can be used to encrypt/decrypt message and also to provide authenticity and integrity generating
+a digital signature of a message. Suppose that Alice wants to send an encrypted message to Bob. Alice must use the
+public key of Bob to encrypt the message. Bob can decrypt the message using his private key. Because Bob he is the
+only one that can access to his private key, he is the only one that can decrypt the message.
+If Alice wants to provide authenticity and integrity of a message to Bob she can use her private key to sign the
+message. Bob can check the correctness of the digital signature using the public key of Alice.
+Alice can provide encryption, authenticity and integrity of a message to Bob using the previous schemas in
+sequence, applying the encryption first and the digital signature after.</p>
+<p>Below we reported some examples of usage of the <tt class="docutils literal"><span class="pre">Zend\Crypt\PublicKey\Rsa</span></tt> class in order to:</p>
+<blockquote>
+<div><ul class="simple">
+<li>generate a public key and a private key;</li>
+<li>encrypt/decrypt a string;</li>
+<li>generate a digital signature of a file.</li>
+</ul>
+</div></blockquote>
+<div class="section" id="generate-a-public-key-and-a-private-key">
+<span id="zend-crypt-public-key-rsa-keys"></span><h3>Generate a public key and a private key<a class="headerlink" href="#generate-a-public-key-and-a-private-key" title="Permalink to this headline">¶</a></h3>
+<p>In order to generate a public and private key you can use the following code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Crypt\PublicKey\RsaOptions</span><span class="p">;</span>
+
+<span class="nv">$rsaOptions</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RsaOptions</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;pass_phrase&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span>
+<span class="p">));</span>
+
+<span class="nv">$rsaOptions</span><span class="o">-&gt;</span><span class="na">generateKeys</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;private_key_bits&#39;</span> <span class="o">=&gt;</span> <span class="mi">2048</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="nb">file_put_contents</span><span class="p">(</span><span class="s1">&#39;private_key.pem&#39;</span><span class="p">,</span> <span class="nv">$rsaOptions</span><span class="o">-&gt;</span><span class="na">getPrivateKey</span><span class="p">());</span>
+<span class="nb">file_put_contents</span><span class="p">(</span><span class="s1">&#39;public_key.pub&#39;</span><span class="p">,</span> <span class="nv">$rsaOptions</span><span class="o">-&gt;</span><span class="na">getPublicKey</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>This example generates a public and privat key of 2048 bit storing the keys in two separate files,
+the <tt class="docutils literal"><span class="pre">private_key.pem</span></tt> for the private key and the <tt class="docutils literal"><span class="pre">public_key.pub</span></tt> for the public key.
+You can also generate the public and private key using OpenSSL from the command line (Unix style syntax):</p>
+<div class="highlight-bash"><div class="highlight"><pre>ssh-keygen -t rsa
+</pre></div>
+</div>
+</div>
+<div class="section" id="encrypt-and-decrypt-a-string">
+<span id="zend-crypt-public-key-rsa-encrypt"></span><h3>Encrypt and decrypt a string<a class="headerlink" href="#encrypt-and-decrypt-a-string" title="Permalink to this headline">¶</a></h3>
+<p>Below is reported an example on how to encrypt and decrypt a string using the RSA algorithm. You can encrypt
+only small strings. The maximum size of encryption is given by the length of the public/private key - 88 bits.
+For instance, if we use a size of 2048 bit you can encrypt string with a maximum size of 1960 bit
+(245 characters). This limitation is related to the OpenSSL implementation for a security reason related to the
+nature of the RSA algorithm.</p>
+<p>The normal application of a public key encryption algorithm is to store a key or a hash of the data you want to
+respectively encrypt or sign. A hash is typically 128-256 bits (the PHP sha1() function returns a 160 bit hash).
+An AES encryption key is 128 to 256 bits. So either of those will comfortably fit inside a single RSA encryption.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Crypt\PublicKey\Rsa</span><span class="p">;</span>
+
+<span class="nv">$rsa</span> <span class="o">=</span> <span class="nx">Rsa</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;public_key&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;public_key.pub&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;private_key&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;private_key.pem&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pass_phrase&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;binary_output&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span>
+<span class="p">));</span>
+
+<span class="nv">$text</span> <span class="o">=</span> <span class="s1">&#39;This is the message to encrypt&#39;</span><span class="p">;</span>
+
+<span class="nv">$encrypt</span> <span class="o">=</span> <span class="nv">$rsa</span><span class="o">-&gt;</span><span class="na">encrypt</span><span class="p">(</span><span class="nv">$text</span><span class="p">);</span>
+<span class="nb">printf</span><span class="p">(</span><span class="s2">&quot;Encrypted message:</span><span class="se">\n</span><span class="s2">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nv">$encrypt</span><span class="p">);</span>
+
+<span class="nv">$decrypt</span> <span class="o">=</span> <span class="nv">$rsa</span><span class="o">-&gt;</span><span class="na">decrypt</span><span class="p">(</span><span class="nv">$encrypt</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$text</span> <span class="o">!==</span> <span class="nv">$decrypt</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;ERROR</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Encryption and decryption performed successfully!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="generate-a-digital-signature-of-a-file">
+<span id="zend-crypt-public-key-signature"></span><h3>Generate a digital signature of a file<a class="headerlink" href="#generate-a-digital-signature-of-a-file" title="Permalink to this headline">¶</a></h3>
+<p>Below is reported an example of how to generate a digital signature of a file.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Crypt\PublicKey\Rsa</span><span class="p">;</span>
+
+<span class="nv">$rsa</span> <span class="o">=</span> <span class="nx">Rsa</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;private_key&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;path/to/private_key&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pass_phrase&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;passphrase of the private key&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;binary_output&#39;</span> <span class="o">=&gt;</span> <span class="k">false</span>
+<span class="p">));</span>
+
+<span class="nv">$file</span> <span class="o">=</span> <span class="nb">file_get_contents</span><span class="p">(</span><span class="s1">&#39;path/file/to/sign&#39;</span><span class="p">);</span>
+
+<span class="nv">$signature</span> <span class="o">=</span> <span class="nv">$rsa</span><span class="o">-&gt;</span><span class="na">sign</span><span class="p">(</span><span class="nv">$file</span><span class="p">,</span> <span class="nv">$rsa</span><span class="o">-&gt;</span><span class="na">getOptions</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getPrivateKey</span><span class="p">());</span>
+<span class="nv">$verify</span>    <span class="o">=</span> <span class="nv">$rsa</span><span class="o">-&gt;</span><span class="na">verify</span><span class="p">(</span><span class="nv">$file</span><span class="p">,</span> <span class="nv">$signature</span><span class="p">,</span> <span class="nv">$rsa</span><span class="o">-&gt;</span><span class="na">getOptions</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getPublicKey</span><span class="p">());</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$verify</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;The signature is OK</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="nb">file_put_contents</span><span class="p">(</span><span class="nv">$filename</span> <span class="o">.</span> <span class="s1">&#39;.sig&#39;</span><span class="p">,</span> <span class="nv">$signature</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="s2">&quot;Signature save in </span><span class="si">$filename</span><span class="s2">.sig</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+     <span class="k">echo</span> <span class="s2">&quot;The signature is not valid!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>In this example we used the Base64 format to encode the digital signature of the file (<tt class="docutils literal"><span class="pre">binary_output</span></tt> is false).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The implementation of <tt class="docutils literal"><span class="pre">Zend\Crypt\PublicKey\Rsa</span></tt> algorithm uses the OpenSSL extension of PHP.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Public key cryptography</a><ul>
+<li><a class="reference internal" href="#diffie-hellman">Diffie-Hellman</a></li>
+<li><a class="reference internal" href="#rsa">RSA</a><ul>
+<li><a class="reference internal" href="#generate-a-public-key-and-a-private-key">Generate a public key and a private key</a></li>
+<li><a class="reference internal" href="#encrypt-and-decrypt-a-string">Encrypt and decrypt a string</a></li>
+<li><a class="reference internal" href="#generate-a-digital-signature-of-a-file">Generate a digital signature of a file</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.crypt.password.html"
+                        title="previous chapter">Secure Password Storing</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.db.adapter.html"
+                        title="next chapter">Zend\Db\Adapter</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.crypt.public-key.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.crypt.public-key.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.crypt.public-key.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.db.adapter.html" title="Zend\Db\Adapter"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.crypt.password.html" title="Secure Password Storing"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.crypt.public-key.rst">
+                Public key cryptography
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,279 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Theory of Operation &mdash; Zend Framework 2 2.0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.5 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Config\Reader" href="zend.config.reader.html" />
+    <link rel="prev" title="Introduction" href="zend.config.introduction.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.config.reader.html" title="Zend\Config\Reader"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.config.introduction.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="theory-of-operation">
+<span id="zend-config-theory-of-operation"></span><h1>Theory of Operation<a class="headerlink" href="#theory-of-operation" title="Permalink to this headline">¶</a></h1>
+<p>Configuration data are made accessible to <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt>&#8216;s constructor with an associative array,
+which may be multi-dimensional, so data can be organized from general to specific. Concrete adapter
+classes adapt configuration data from storage to produce the associative array for <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt>&#8216;s
+constructor. If needed, user scripts may provide such arrays directly to <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt>&#8216;s constructor, without using
+a reader class.</p>
+<p>Each value in the configuration data array becomes a property of the <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object. The key is used as the
+property name. If a value is itself an array, then the resulting object property is created as a new
+<tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object, loaded with the array data. This occurs recursively, such that a hierarchy of
+configuration data may be created with any number of levels.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> implements the <a class="reference external" href="http://php.net/manual/en/class.countable.php">Countable</a> and <a class="reference external" href="http://php.net/manual/en/class.iterator.php">Iterator</a> interfaces in order to facilitate simple
+access to configuration data. Thus, <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> objects support the <a class="reference external" href="http://php.net/count">count()</a> function and
+<em>PHP</em> constructs such as <a class="reference external" href="http://php.net/foreach">foreach</a>.</p>
+<p>By default, configuration data made available through <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> are read-only, and an assignment
+(e.g. <tt class="docutils literal"><span class="pre">$config-&gt;database-&gt;host</span> <span class="pre">=</span> <span class="pre">'example.com';</span></tt>) results in a thrown exception. This default behavior may be
+overridden through the constructor, allowing modification of data values. Also, when modifications are
+allowed, <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> supports unsetting of values (i.e. <tt class="docutils literal"><span class="pre">unset($config-&gt;database-&gt;host)</span></tt>). The
+<tt class="docutils literal"><span class="pre">isReadOnly()</span></tt> method can be used to determine if modifications to a given <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object are
+allowed and the <tt class="docutils literal"><span class="pre">setReadOnly()</span></tt> method can be used to stop any further modifications to a <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt>
+object that was created allowing modifications.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Modifying Config does not save changes</strong></p>
+<p class="last">It is important not to confuse such in-memory modifications with saving configuration data out to specific
+storage media. Tools for creating and modifying configuration data for various storage media are out of scope
+with respect to <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt>. Third-party open source solutions are readily available for the purpose
+of creating and modifying configuration data for various storage media.</p>
+</div>
+<p>If you have two <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> objects, you can merge them into a single object using the <tt class="docutils literal"><span class="pre">merge()</span></tt>
+function. For example, given <tt class="docutils literal"><span class="pre">$config</span></tt> and <tt class="docutils literal"><span class="pre">$localConfig</span></tt>, you can merge data from <tt class="docutils literal"><span class="pre">$localConfig</span></tt> to
+<tt class="docutils literal"><span class="pre">$config</span></tt> using <tt class="docutils literal"><span class="pre">$config-&gt;merge($localConfig);</span></tt>. The items in <tt class="docutils literal"><span class="pre">$localConfig</span></tt> will override any items with the
+same name in <tt class="docutils literal"><span class="pre">$config</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">Zend\Config\Config</span></tt> object that is performing the merge must have been constructed to allow
+modifications, by passing <tt class="docutils literal"><span class="pre">TRUE</span></tt> as the second parameter of the constructor. The <tt class="docutils literal"><span class="pre">setReadOnly()</span></tt> method can
+then be used to prevent any further modifications after the merge is complete.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.config.introduction.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.config.reader.html"
+                        title="next chapter">Zend\Config\Reader</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.config.theory-of-operation.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.config.theory-of-operation.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.config.theory-of-operation.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.config.reader.html" title="Zend\Config\Reader"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.config.introduction.html" title="Introduction"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.config.theory-of-operation.rst">
+                Theory of Operation
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

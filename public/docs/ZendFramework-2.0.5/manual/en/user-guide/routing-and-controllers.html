@@ -1,0 +1,611 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Routing and controllers &mdash; Zend Framework 2 2.0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.5 documentation" href="../index.html" />
+    <link rel="next" title="Database and models" href="database-and-models.html" />
+    <link rel="prev" title="Modules" href="modules.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="database-and-models.html" title="Database and models"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="Modules"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="routing-and-controllers">
+<span id="user-guide-routing-and-controllers"></span><h1>Routing and controllers<a class="headerlink" href="#routing-and-controllers" title="Permalink to this headline">¶</a></h1>
+<p>We will build a very simple inventory system to display our album
+collection. The home page will list our collection and allow us to add, edit and
+delete albums. Hence the following pages are required:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="80%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Page</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Home</td>
+<td>This will display the list of albums and provide links to
+edit and delete them. Also, a link to enable adding new
+albums will be provided.</td>
+</tr>
+<tr class="row-odd"><td>Add new album</td>
+<td>This page will provide a form for adding a new album.</td>
+</tr>
+<tr class="row-even"><td>Edit album</td>
+<td>This page will provide a form for editing an album.</td>
+</tr>
+<tr class="row-odd"><td>Delete album</td>
+<td>This page will confirm that we want to delete an album and
+then delete it.</td>
+</tr>
+</tbody>
+</table>
+<p>Before we set up our files, it’s important to understand how the framework
+expects the pages to be organised. Each page of the application is known as an
+<em>action</em> and actions are grouped into <em>controllers</em> within <em>modules</em>. Hence, you
+would generally group related actions into a controller; for instance, a news
+controller might have actions of <tt class="docutils literal"><span class="pre">current</span></tt>, <tt class="docutils literal"><span class="pre">archived</span></tt> and <tt class="docutils literal"><span class="pre">view</span></tt>.</p>
+<p>As we have four pages that all apply to albums, we will group them in a single
+controller <tt class="docutils literal"><span class="pre">AlbumController</span></tt> within our <tt class="docutils literal"><span class="pre">Album</span></tt> module as four actions. The
+four actions will be:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="44%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Page</th>
+<th class="head">Controller</th>
+<th class="head">Action</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Home</td>
+<td><tt class="docutils literal"><span class="pre">AlbumController</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">index</span></tt></td>
+</tr>
+<tr class="row-odd"><td>Add new album</td>
+<td><tt class="docutils literal"><span class="pre">AlbumController</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">add</span></tt></td>
+</tr>
+<tr class="row-even"><td>Edit album</td>
+<td><tt class="docutils literal"><span class="pre">AlbumController</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">edit</span></tt></td>
+</tr>
+<tr class="row-odd"><td>Delete album</td>
+<td><tt class="docutils literal"><span class="pre">AlbumController</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">delete</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>The mapping of a URL to a particular action is done using routes that are defined
+in the module’s <tt class="docutils literal"><span class="pre">module.config.php</span></tt> file. We will add a route for our album
+actions. This is the updated module config file with the new code highlighted.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;controllers&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;invokables&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;Album\Controller\Album&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Album\Controller\AlbumController&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+
+<span class="hll">    <span class="c1">// The following section is new and should be added to your file</span>
+</span><span class="hll">    <span class="s1">&#39;router&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class="hll">        <span class="s1">&#39;routes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class="hll">            <span class="s1">&#39;album&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class="hll">                <span class="s1">&#39;type&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;segment&#39;</span><span class="p">,</span>
+</span><span class="hll">                <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class="hll">                    <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;/album[/:action][/:id]&#39;</span><span class="p">,</span>
+</span><span class="hll">                    <span class="s1">&#39;constraints&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class="hll">                        <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;[a-zA-Z][a-zA-Z0-9_-]*&#39;</span><span class="p">,</span>
+</span><span class="hll">                        <span class="s1">&#39;id&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;[0-9]+&#39;</span><span class="p">,</span>
+</span><span class="hll">                    <span class="p">),</span>
+</span><span class="hll">                    <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+</span><span class="hll">                        <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Album\Controller\Album&#39;</span><span class="p">,</span>
+</span><span class="hll">                        <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+</span><span class="hll">                    <span class="p">),</span>
+</span><span class="hll">                <span class="p">),</span>
+</span><span class="hll">            <span class="p">),</span>
+</span><span class="hll">        <span class="p">),</span>
+</span><span class="hll">    <span class="p">),</span>
+</span>
+    <span class="s1">&#39;view_manager&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;template_path_stack&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;album&#39;</span> <span class="o">=&gt;</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../view&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The name of the route is ‘album’ and has a type of ‘segment’. The segment route
+allows us to specify placeholders in the URL pattern (route) that will be mapped
+to named parameters in the matched route. In this case, the route is
+<strong>``/album[/:action][/:id]``</strong> which will match any URL that starts with
+<tt class="docutils literal"><span class="pre">/album</span></tt>. The next segment will be an optional action name, and then finally
+the next segment will be mapped to an optional id. The square brackets indicate
+that a segment is optional. The constraints section allows us to ensure that the
+characters within a segment are as expected, so we have limited actions to
+starting with a letter and then subsequent characters only being alphanumeric,
+underscore or hyphen. We also limit the id to a number.</p>
+<p>This route allows us to have the following URLs:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="33%" />
+<col width="48%" />
+<col width="19%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">URL</th>
+<th class="head">Page</th>
+<th class="head">Action</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">/album</span></tt></td>
+<td>Home (list of albums)</td>
+<td><tt class="docutils literal"><span class="pre">index</span></tt></td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">/album/add</span></tt></td>
+<td>Add new album</td>
+<td><tt class="docutils literal"><span class="pre">add</span></tt></td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">/album/edit/2</span></tt></td>
+<td>Edit album with an id of 2</td>
+<td><tt class="docutils literal"><span class="pre">edit</span></tt></td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">/album/delete/4</span></tt></td>
+<td>Delete album with an id of 4</td>
+<td><tt class="docutils literal"><span class="pre">delete</span></tt></td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="create-the-controller">
+<h2>Create the controller<a class="headerlink" href="#create-the-controller" title="Permalink to this headline">¶</a></h2>
+<p>We are now ready to set up our controller. In Zend Framework 2, the controller
+is a class that is generally called <tt class="docutils literal"><span class="pre">{Controller</span> <span class="pre">name}Controller</span></tt>. Note that
+<tt class="docutils literal"><span class="pre">{Controller</span> <span class="pre">name}</span></tt> must start with a capital letter.  This class lives in a file
+called <tt class="docutils literal"><span class="pre">{Controller</span> <span class="pre">name}Controller.php</span></tt> within the <tt class="docutils literal"><span class="pre">Controller</span></tt> directory for the
+module. In our case that is <tt class="docutils literal"><span class="pre">module/Album/src/Album/Controller</span></tt>. Each action is
+a public method within the controller class that is named <tt class="docutils literal"><span class="pre">{action</span> <span class="pre">name}Action</span></tt>.
+In this case <tt class="docutils literal"><span class="pre">{action</span> <span class="pre">name}</span></tt> should start with a lower case letter.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This is by convention. Zend Framework 2 doesn’t provide many
+restrictions on controllers other than that they must implement the
+<tt class="docutils literal"><span class="pre">Zend\Stdlib\Dispatchable</span></tt> interface. The framework provides two abstract
+classes that do this for us: <tt class="docutils literal"><span class="pre">Zend\Mvc\Controller\AbstractActionController</span></tt>
+and <tt class="docutils literal"><span class="pre">Zend\Mvc\Controller\AbstractRestfulController</span></tt>. We’ll be using the
+standard <tt class="docutils literal"><span class="pre">AbstractActionController</span></tt>, but if you’re intending to write a
+RESTful web service, <tt class="docutils literal"><span class="pre">AbstractRestfulController</span></tt> may be useful.</p>
+</div>
+<p>Let’s go ahead and create our controller class <tt class="docutils literal"><span class="pre">AlbumController.php</span></tt> at <tt class="docutils literal"><span class="pre">zf2-tutorials/module/Album/src/Album/Controller</span></tt> :</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">namespace</span> <span class="nx">Album\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Mvc\Controller\AbstractActionController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Model\ViewModel</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AlbumController</span> <span class="k">extends</span> <span class="nx">AbstractActionController</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">indexAction</span><span class="p">()</span>
+    <span class="p">{</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">addAction</span><span class="p">()</span>
+    <span class="p">{</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">editAction</span><span class="p">()</span>
+    <span class="p">{</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">deleteAction</span><span class="p">()</span>
+    <span class="p">{</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We have already informed the module about our controller in the
+‘controller’ section of <tt class="docutils literal"><span class="pre">module/Album/config/module.config.php</span></tt>.</p>
+</div>
+<p>We have now set up the four actions that we want to use. They won’t work yet
+until we set up the views. The URLs for each action are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="46%" />
+<col width="54%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">URL</th>
+<th class="head">Method called</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><a class="reference external" href="http://zf2-tutorial.localhost/album">http://zf2-tutorial.localhost/album</a></td>
+<td><tt class="docutils literal"><span class="pre">Album\Controller\AlbumController::indexAction</span></tt></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="http://zf2-tutorial.localhost/album/add">http://zf2-tutorial.localhost/album/add</a></td>
+<td><tt class="docutils literal"><span class="pre">Album\Controller\AlbumController::addAction</span></tt></td>
+</tr>
+<tr class="row-even"><td><a class="reference external" href="http://zf2-tutorial.localhost/album/edit">http://zf2-tutorial.localhost/album/edit</a></td>
+<td><tt class="docutils literal"><span class="pre">Album\Controller\AlbumController::editAction</span></tt></td>
+</tr>
+<tr class="row-odd"><td><a class="reference external" href="http://zf2-tutorial.localhost/album/delete">http://zf2-tutorial.localhost/album/delete</a></td>
+<td><tt class="docutils literal"><span class="pre">Album\Controller\AlbumController::deleteAction</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>We now have a working router and the actions are set up for each page of our
+application.</p>
+<p>It’s time to build the view and the model layer.</p>
+<div class="section" id="initialise-the-view-scripts">
+<h3>Initialise the view scripts<a class="headerlink" href="#initialise-the-view-scripts" title="Permalink to this headline">¶</a></h3>
+<p>To integrate the view into our application all we need to do is create some view
+script files. These files will be executed by the <tt class="docutils literal"><span class="pre">DefaultViewStrategy</span></tt> and will be
+passed any variables or view models that are returned from the controller action
+method. These view scripts are stored in our module’s views directory within a
+directory named after the controller. Create these four empty files now:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">module/Album/view/album/album/index.phtml</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">module/Album/view/album/album/add.phtml</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">module/Album/view/album/album/edit.phtml</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">module/Album/view/album/album/delete.phtml</span></tt></li>
+</ul>
+<p>We can now start filling everything in, starting with our database and models.</p>
+</div>
+<div class="section" id="write-the-tests">
+<h3>Write the tests<a class="headerlink" href="#write-the-tests" title="Permalink to this headline">¶</a></h3>
+<p>Our Album controller doesn&#8217;t do much yet, so it should be easy to test.</p>
+<p>Create a directory structure like described in the previous section <a href="#id1"><span class="problematic" id="id2">`</span></a>Unit Testing&lt;<a class="reference external" href="http://framework.zend.com/manual/2.0/en/user-guide/routing-and-controllers.html/">http://framework.zend.com/manual/2.0/en/user-guide/routing-and-controllers.html/</a>&gt;</p>
+<p>Create the follwing subdirectories:</p>
+<div class="highlight-text"><div class="highlight"><pre>zf2-tutorial/
+    /module
+        /Album
+            /test
+                /AlbumTest
+                    /Controller
+</pre></div>
+</div>
+<p>Add the 3 files as described in unit Testing to <tt class="docutils literal"><span class="pre">module/Album/test</span>
+<span class="pre">*</span> <span class="pre">``Bootstrap.php</span></tt>
+* <tt class="docutils literal"><span class="pre">phpunit.xml.dist</span></tt>
+* <tt class="docutils literal"><span class="pre">TestConfig.php.dist</span></tt></p>
+<p>Remeber here to change the namespace in <tt class="docutils literal"><span class="pre">Bootstrap.php</span></tt> and change the Module <tt class="docutils literal"><span class="pre">Application</span></tt> to <tt class="docutils literal"><span class="pre">Album</span> <span class="pre">in</span> <span class="pre">the</span> <span class="pre">``TestConfig.php.dist</span></tt>.
+In phpunit.xml change the directory to point at <cite>AlbumTest</cite></p>
+<p>Create <tt class="docutils literal"><span class="pre">zf2-tutorial/Album/module/Album/test/AlbumTest/Controller/AlbumControllerTest.php`</span></tt>
+with the following contents:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">AlbumTest\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">AlbumTest\Bootstrap</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Album\Controller\AlbumController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Http\Request</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Http\Response</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Mvc\MvcEvent</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Mvc\Router\RouteMatch</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Mvc\Router\Http\TreeRouteStack</span> <span class="k">as</span> <span class="nx">HttpRouter</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">PHPUnit_Framework_TestCase</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AlbumControllerTest</span> <span class="k">extends</span> <span class="nx">PHPUnit_Framework_TestCase</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$controller</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$request</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$response</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$routeMatch</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$event</span><span class="p">;</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">setUp</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$serviceManager</span> <span class="o">=</span> <span class="nx">Bootstrap</span><span class="o">::</span><span class="na">getServiceManager</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlbumController</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span>    <span class="o">=</span> <span class="k">new</span> <span class="nx">Request</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RouteMatch</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">event</span>      <span class="o">=</span> <span class="k">new</span> <span class="nx">MvcEvent</span><span class="p">();</span>
+        <span class="nv">$config</span> <span class="o">=</span> <span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;Config&#39;</span><span class="p">);</span>
+        <span class="nv">$routerConfig</span> <span class="o">=</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;router&#39;</span><span class="p">])</span> <span class="o">?</span> <span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;router&#39;</span><span class="p">]</span> <span class="o">:</span> <span class="k">array</span><span class="p">();</span>
+        <span class="nv">$router</span> <span class="o">=</span> <span class="nx">HttpRouter</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="nv">$routerConfig</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">event</span><span class="o">-&gt;</span><span class="na">setRouter</span><span class="p">(</span><span class="nv">$router</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">event</span><span class="o">-&gt;</span><span class="na">setRouteMatch</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">setEvent</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">event</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">setServiceLocator</span><span class="p">(</span><span class="nv">$serviceManager</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testAddActionCanBeAccessed</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="s1">&#39;add&#39;</span><span class="p">);</span>
+
+        <span class="nv">$result</span>   <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">);</span>
+        <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">getResponse</span><span class="p">();</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertEquals</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getStatusCode</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testDeleteActionCanBeAccessed</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="s1">&#39;delete&#39;</span><span class="p">);</span>
+
+        <span class="nv">$result</span>   <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">);</span>
+        <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">getResponse</span><span class="p">();</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertEquals</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getStatusCode</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testEditActionCanBeAccessed</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="s1">&#39;edit&#39;</span><span class="p">);</span>
+
+        <span class="nv">$result</span>   <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">);</span>
+        <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">getResponse</span><span class="p">();</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertEquals</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getStatusCode</span><span class="p">());</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testIndexActionCanBeAccessed</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">);</span>
+
+        <span class="nv">$result</span>   <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">);</span>
+        <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">getResponse</span><span class="p">();</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertEquals</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getStatusCode</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>And execute <tt class="docutils literal"><span class="pre">phpunit</span></tt> from <tt class="docutils literal"><span class="pre">module/Album/test</span></tt>.</p>
+<div class="highlight-text"><div class="highlight"><pre>PHPUnit 3.5.15 by Sebastian Bergmann.
+
+.....
+
+Time: 0 seconds, Memory: 5.75Mb
+
+OK (5 tests, 10 assertions)
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Routing and controllers</a><ul>
+<li><a class="reference internal" href="#create-the-controller">Create the controller</a><ul>
+<li><a class="reference internal" href="#initialise-the-view-scripts">Initialise the view scripts</a></li>
+<li><a class="reference internal" href="#write-the-tests">Write the tests</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="modules.html"
+                        title="previous chapter">Modules</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="database-and-models.html"
+                        title="next chapter">Database and models</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/user-guide/routing-and-controllers.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/user-guide/routing-and-controllers.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/user-guide/routing-and-controllers.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="database-and-models.html" title="Database and models"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="Modules"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/user-guide/routing-and-controllers.rst">
+                Routing and controllers
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,642 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ZendHttpCookie and ZendHttpCookieJar &mdash; Zend Framework 2 2.0.5 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.5 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zendhttpcookie-and-zendhttpcookiejar">
+<span id="zend-http-cookies"></span><h1>ZendHttpCookie and ZendHttpCookieJar<a class="headerlink" href="#zendhttpcookie-and-zendhttpcookiejar" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-http-cookies-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Http\Cookie</span></tt>, as expected, is a class that represents an <em>HTTP</em> cookie. It provides methods for parsing
+<em>HTTP</em> response strings, collecting cookies, and easily accessing their properties. It also allows checking if a
+cookie matches against a specific scenario, IE a request <em>URL</em>, expiration time, secure connection, etc.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Http\CookieJar</span></tt> is an object usually used by <tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt> to hold a set of <tt class="docutils literal"><span class="pre">Zend\Http\Cookie</span></tt>
+objects. The idea is that if a <tt class="docutils literal"><span class="pre">Zend\Http\CookieJar</span></tt> object is attached to a <tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt> object, all
+cookies going from and into the client through <em>HTTP</em> requests and responses will be stored by the CookieJar
+object. Then, when the client will send another request, it will first ask the CookieJar object for all cookies
+matching the request. These will be added to the request headers automatically. This is highly useful in cases
+where you need to maintain a user session over consecutive <em>HTTP</em> requests, automatically sending the session ID
+cookies when required. Additionally, the <tt class="docutils literal"><span class="pre">Zend\Http\CookieJar</span></tt> object can be serialized and stored in $_SESSION
+when needed.</p>
+</div>
+<div class="section" id="instantiating-zendhttpcookie-objects">
+<span id="zend-http-cookies-cookie-instantiating"></span><h2>Instantiating ZendHttpCookie Objects<a class="headerlink" href="#instantiating-zendhttpcookie-objects" title="Permalink to this headline">¶</a></h2>
+<p>Instantiating a Cookie object can be done in two ways:</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Through the constructor, using the following syntax: <tt class="docutils literal"><span class="pre">new</span> <span class="pre">Zend\Http\Cookie(string</span> <span class="pre">$name,</span> <span class="pre">string</span> <span class="pre">$value,</span>
+<span class="pre">string</span> <span class="pre">$domain,</span> <span class="pre">[int</span> <span class="pre">$expires,</span> <span class="pre">[string</span> <span class="pre">$path,</span> <span class="pre">[boolean</span> <span class="pre">$secure]]]);</span></tt></p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">$name</span></tt>: The name of the cookie (eg. &#8216;PHPSESSID&#8217;) (required)</li>
+<li><tt class="docutils literal"><span class="pre">$value</span></tt>: The value of the cookie (required)</li>
+<li><tt class="docutils literal"><span class="pre">$domain</span></tt>: The cookie&#8217;s domain (eg. &#8216;.example.com&#8217;) (required)</li>
+<li><tt class="docutils literal"><span class="pre">$expires</span></tt>: Cookie expiration time, as UNIX time stamp (optional, defaults to <tt class="docutils literal"><span class="pre">NULL</span></tt>). If not set,
+cookie will be treated as a &#8216;session cookie&#8217; with no expiration time.</li>
+<li><tt class="docutils literal"><span class="pre">$path</span></tt>: Cookie path, eg. &#8216;/foo/bar/&#8217; (optional, defaults to &#8216;/&#8217;)</li>
+<li><tt class="docutils literal"><span class="pre">$secure</span></tt>: Boolean, Whether the cookie is to be sent over secure (HTTPS) connections only (optional,
+defaults to boolean <tt class="docutils literal"><span class="pre">FALSE</span></tt>)</li>
+</ul>
+</li>
+<li><p class="first">By calling the fromString($cookieStr, [$refUri, [$encodeValue]]) static method, with a cookie string as
+represented in the &#8216;Set-Cookie &#8216;<em>HTTP</em> response header or &#8216;Cookie&#8217;<em>HTTP</em> request header. In this case, the
+cookie value must already be encoded. When the cookie string does not contain a &#8216;domain&#8217; part, you must
+provide a reference <em>URI</em> according to which the cookie&#8217;s domain and path will be set.</p>
+<p>The <tt class="docutils literal"><span class="pre">fromString()</span></tt> method accepts the following parameters:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">$cookieStr</span></tt>: a cookie string as represented in the &#8216;Set-Cookie&#8217;<em>HTTP</em> response header or &#8216;Cookie&#8217;<em>HTTP</em>
+request header (required)</li>
+<li><tt class="docutils literal"><span class="pre">$refUri</span></tt>: a reference <em>URI</em> according to which the cookie&#8217;s domain and path will be set. (optional,
+defaults to parsing the value from the $cookieStr)</li>
+<li><tt class="docutils literal"><span class="pre">$encodeValue</span></tt>: If the value should be passed through urldecode. Also effects the cookie&#8217;s behavior when
+being converted back to a cookie string. (optional, defaults to true)</li>
+</ul>
+<blockquote>
+<div><p class="rubric" id="zend-http-cookies-cookie-instantiating-example-1">Instantiating a ZendHttpCookie object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// First, using the constructor. This cookie will expire in 2 hours</span>
+<span class="nv">$cookie</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Http\Cookie</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;bar&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;.example.com&#39;</span><span class="p">,</span>
+                               <span class="nb">time</span><span class="p">()</span> <span class="o">+</span> <span class="mi">7200</span><span class="p">,</span>
+                               <span class="s1">&#39;/path&#39;</span><span class="p">);</span>
+
+<span class="c1">// You can also take the HTTP response Set-Cookie header and use it.</span>
+<span class="c1">// This cookie is similar to the previous one, only it will not expire, and</span>
+<span class="c1">// will only be sent over secure connections</span>
+<span class="nv">$cookie</span> <span class="o">=</span> <span class="nx">Zend\Http\Cookie</span><span class="o">::</span><span class="na">fromString</span><span class="p">(</span><span class="s1">&#39;foo=bar; domain=.example.com; &#39;</span> <span class="o">.</span>
+                                       <span class="s1">&#39;path=/path; secure&#39;</span><span class="p">);</span>
+
+<span class="c1">// If the cookie&#39;s domain is not set, you have to manually specify it</span>
+<span class="nv">$cookie</span> <span class="o">=</span> <span class="nx">Zend\Http\Cookie</span><span class="o">::</span><span class="na">fromString</span><span class="p">(</span><span class="s1">&#39;foo=bar; secure;&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;http://www.example.com/path&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">When instantiating a cookie object using the <tt class="docutils literal"><span class="pre">Zend\Http\Cookie</span></tt>::fromString() method, the cookie value is
+expected to be <em>URL</em> encoded, as cookie strings should be. However, when using the constructor, the cookie
+value string is expected to be the real, decoded value.</p>
+</div>
+</div></blockquote>
+<p>A cookie object can be transferred back into a string, using the __toString() magic method. This method will
+produce a <em>HTTP</em> request &#8220;Cookie&#8221; header string, showing the cookie&#8217;s name and value, and terminated by a semicolon
+(&#8216;;&#8217;). The value will be URL encoded, as expected in a Cookie header:</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-cookies-cookie-instantiating-example-2">Stringifying a ZendHttpCookie object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create a new cookie</span>
+<span class="nv">$cookie</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Http\Cookie</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;two words&#39;</span><span class="p">,</span>
+                               <span class="s1">&#39;.example.com&#39;</span><span class="p">,</span>
+                               <span class="nb">time</span><span class="p">()</span> <span class="o">+</span> <span class="mi">7200</span><span class="p">,</span>
+                               <span class="s1">&#39;/path&#39;</span><span class="p">);</span>
+
+<span class="c1">// Will print out &#39;foo=two+words;&#39; :</span>
+<span class="k">echo</span> <span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">__toString</span><span class="p">();</span>
+
+<span class="c1">// This is actually the same:</span>
+<span class="k">echo</span> <span class="p">(</span><span class="nx">string</span><span class="p">)</span> <span class="nv">$cookie</span><span class="p">;</span>
+
+<span class="c1">// In PHP 5.2 and higher, this also works:</span>
+<span class="k">echo</span> <span class="nv">$cookie</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+</div>
+<div class="section" id="zendhttpcookie-getter-methods">
+<span id="zend-http-cookies-cookie-accessors"></span><h2>ZendHttpCookie getter methods<a class="headerlink" href="#zendhttpcookie-getter-methods" title="Permalink to this headline">¶</a></h2>
+<p>Once a <tt class="docutils literal"><span class="pre">Zend\Http\Cookie</span></tt> class is instantiated, it provides several getter methods to get the different
+properties of the <em>HTTP</em> cookie:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">getName()</span></tt>: Get the name of the cookie</li>
+<li><tt class="docutils literal"><span class="pre">getValue()</span></tt>: Get the real, decoded value of the cookie</li>
+<li><tt class="docutils literal"><span class="pre">getDomain()</span></tt>: Get the cookie&#8217;s domain</li>
+<li><tt class="docutils literal"><span class="pre">getPath()</span></tt>: Get the cookie&#8217;s path, which defaults to &#8216;/&#8217;</li>
+<li><tt class="docutils literal"><span class="pre">getExpiryTime()</span></tt>: Get the cookie&#8217;s expiration time, as UNIX time stamp. If the cookie has no expiration
+time set, will return <tt class="docutils literal"><span class="pre">NULL</span></tt>.</li>
+</ul>
+</div></blockquote>
+<p>Additionally, several boolean tester methods are provided:</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">isSecure()</span></tt>: Check whether the cookie is set to be sent over secure connections only. Generally speaking,
+if <tt class="docutils literal"><span class="pre">TRUE</span></tt> the cookie should only be sent over <em>HTTPS</em>.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">isExpired(int</span> <span class="pre">$time</span> <span class="pre">=</span> <span class="pre">null)</span></tt>: Check whether the cookie is expired or not. If the cookie has no expiration
+time, will always return <tt class="docutils literal"><span class="pre">TRUE</span></tt>. If $time is provided, it will override the current time stamp as the time
+to check the cookie against.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">isSessionCookie()</span></tt>: Check whether the cookie is a &#8220;session cookie&#8221; - that is a cookie with no expiration
+time, which is meant to expire when the session ends.</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-cookies-cookie-accessors-example-1">Using getter methods with ZendHttpCookie</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// First, create the cookie</span>
+<span class="nv">$cookie</span> <span class="o">=</span>
+    <span class="nx">Zend\Http\Cookie</span><span class="o">::</span><span class="na">fromString</span><span class="p">(</span><span class="s1">&#39;foo=two+words; &#39;</span> <span class="o">+</span>
+                                 <span class="s1">&#39;domain=.example.com; &#39;</span> <span class="o">+</span>
+                                 <span class="s1">&#39;path=/somedir; &#39;</span> <span class="o">+</span>
+                                 <span class="s1">&#39;secure; &#39;</span> <span class="o">+</span>
+                                 <span class="s1">&#39;expires=Wednesday, 28-Feb-05 20:41:22 UTC&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">();</span>   <span class="c1">// Will echo &#39;foo&#39;</span>
+<span class="k">echo</span> <span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">();</span>  <span class="c1">// will echo &#39;two words&#39;</span>
+<span class="k">echo</span> <span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">getDomain</span><span class="p">();</span> <span class="c1">// Will echo &#39;.example.com&#39;</span>
+<span class="k">echo</span> <span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">getPath</span><span class="p">();</span>   <span class="c1">// Will echo &#39;/&#39;</span>
+
+<span class="k">echo</span> <span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y-m-d&#39;</span><span class="p">,</span> <span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">getExpiryTime</span><span class="p">());</span>
+<span class="c1">// Will echo &#39;2005-02-28&#39;</span>
+
+<span class="k">echo</span> <span class="p">(</span><span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">isExpired</span><span class="p">()</span> <span class="o">?</span> <span class="s1">&#39;Yes&#39;</span> <span class="o">:</span> <span class="s1">&#39;No&#39;</span><span class="p">);</span>
+<span class="c1">// Will echo &#39;Yes&#39;</span>
+
+<span class="k">echo</span> <span class="p">(</span><span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">isExpired</span><span class="p">(</span><span class="nb">strtotime</span><span class="p">(</span><span class="s1">&#39;2005-01-01&#39;</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39;Yes&#39;</span> <span class="o">:</span> <span class="s1">&#39;No&#39;</span><span class="p">);</span>
+<span class="c1">// Will echo &#39;No&#39;</span>
+
+<span class="k">echo</span> <span class="p">(</span><span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">isSessionCookie</span><span class="p">()</span> <span class="o">?</span> <span class="s1">&#39;Yes&#39;</span> <span class="o">:</span> <span class="s1">&#39;No&#39;</span><span class="p">);</span>
+<span class="c1">// Will echo &#39;No&#39;</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="zendhttpcookie-matching-against-a-scenario">
+<span id="zend-http-cookies-cookie-matching"></span><h2>ZendHttpCookie: Matching against a scenario<a class="headerlink" href="#zendhttpcookie-matching-against-a-scenario" title="Permalink to this headline">¶</a></h2>
+<p>The only real logic contained in a <tt class="docutils literal"><span class="pre">Zend\Http\Cookie</span></tt> object, is in the match() method. This method is used to
+test a cookie against a given <em>HTTP</em> request scenario, in order to tell whether the cookie should be sent in this
+request or not. The method has the following syntax and parameters: <tt class="docutils literal"><span class="pre">Zend\Http\Cookie-&gt;match(mixed</span> <span class="pre">$uri,</span> <span class="pre">[boolean</span>
+<span class="pre">$matchSessionCookies,</span> <span class="pre">[int</span> <span class="pre">$now]]);</span></tt></p>
+<blockquote>
+<div><ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">$uri</span></tt>: A <tt class="docutils literal"><span class="pre">Zend\Uri\Http</span></tt> object with a domain name and path to be checked. Optionally, a string
+representing a valid <em>HTTP</em> <em>URL</em> can be passed instead. The cookie will match if the <em>URL</em>&#8216;s scheme (HTTP or
+<em>HTTPS</em>), domain and path all match.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">$matchSessionCookies</span></tt>: Whether session cookies should be matched or not. Defaults to <tt class="docutils literal"><span class="pre">TRUE</span></tt>. If set to
+<tt class="docutils literal"><span class="pre">FALSE</span></tt>, cookies with no expiration time will never match.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">$now</span></tt>: Time (represented as UNIX time stamp) to check a cookie against for expiration. If not specified,
+will default to the current time.</p>
+<blockquote>
+<div><p class="rubric" id="zend-http-cookies-cookie-matching-example-1">Matching cookies</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create the cookie object - first, a secure session cookie</span>
+<span class="nv">$cookie</span> <span class="o">=</span> <span class="nx">Zend\Http\Cookie</span><span class="o">::</span><span class="na">fromString</span><span class="p">(</span><span class="s1">&#39;foo=two+words; &#39;</span> <span class="o">+</span>
+                                       <span class="s1">&#39;domain=.example.com; &#39;</span> <span class="o">+</span>
+                                       <span class="s1">&#39;path=/somedir; &#39;</span> <span class="o">+</span>
+                                       <span class="s1">&#39;secure;&#39;</span><span class="p">);</span>
+
+<span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="s1">&#39;https://www.example.com/somedir/foo.php&#39;</span><span class="p">);</span>
+<span class="c1">// Will return true</span>
+
+<span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="s1">&#39;http://www.example.com/somedir/foo.php&#39;</span><span class="p">);</span>
+<span class="c1">// Will return false, because the connection is not secure</span>
+
+<span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="s1">&#39;https://otherexample.com/somedir/foo.php&#39;</span><span class="p">);</span>
+<span class="c1">// Will return false, because the domain is wrong</span>
+
+<span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="s1">&#39;https://example.com/foo.php&#39;</span><span class="p">);</span>
+<span class="c1">// Will return false, because the path is wrong</span>
+
+<span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="s1">&#39;https://www.example.com/somedir/foo.php&#39;</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+<span class="c1">// Will return false, because session cookies are not matched</span>
+
+<span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="s1">&#39;https://sub.domain.example.com/somedir/otherdir/foo.php&#39;</span><span class="p">);</span>
+<span class="c1">// Will return true</span>
+
+<span class="c1">// Create another cookie object - now, not secure, with expiration time</span>
+<span class="c1">// in two hours</span>
+<span class="nv">$cookie</span> <span class="o">=</span> <span class="nx">Zend\Http\Cookie</span><span class="o">::</span><span class="na">fromString</span><span class="p">(</span><span class="s1">&#39;foo=two+words; &#39;</span> <span class="o">+</span>
+                                       <span class="s1">&#39;domain=www.example.com; &#39;</span> <span class="o">+</span>
+                                       <span class="s1">&#39;expires=&#39;</span>
+                                       <span class="o">.</span> <span class="nb">date</span><span class="p">(</span><span class="nx">DATE_COOKIE</span><span class="p">,</span> <span class="nb">time</span><span class="p">()</span> <span class="o">+</span> <span class="mi">7200</span><span class="p">));</span>
+
+<span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="s1">&#39;http://www.example.com/&#39;</span><span class="p">);</span>
+<span class="c1">// Will return true</span>
+
+<span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="s1">&#39;https://www.example.com/&#39;</span><span class="p">);</span>
+<span class="c1">// Will return true - non secure cookies can go over secure connections</span>
+<span class="c1">// as well!</span>
+
+<span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="s1">&#39;http://subdomain.example.com/&#39;</span><span class="p">);</span>
+<span class="c1">// Will return false, because the domain is wrong</span>
+
+<span class="nv">$cookie</span><span class="o">-&gt;</span><span class="na">match</span><span class="p">(</span><span class="s1">&#39;http://www.example.com/&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="nb">time</span><span class="p">()</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="mi">3600</span><span class="p">));</span>
+<span class="c1">// Will return false, because we added a time offset of +3 hours to</span>
+<span class="c1">// current time</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="the-zendhttpcookiejar-class-instantiation">
+<span id="zend-http-cookies-cookiejar"></span><h2>The ZendHttpCookieJar Class: Instantiation<a class="headerlink" href="#the-zendhttpcookiejar-class-instantiation" title="Permalink to this headline">¶</a></h2>
+<p>In most cases, there is no need to directly instantiate a <tt class="docutils literal"><span class="pre">Zend\Http\CookieJar</span></tt> class. If you want to attach a
+new cookie jar to your <tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt> object, just call the ZendHttpClient-&gt;setCookieJar() method, and a
+new, empty cookie jar will be attached to your client. You could later get this cookie jar using
+ZendHttpClient-&gt;getCookieJar().</p>
+<p>If you still wish to manually instantiate a CookieJar class, you can do so by calling &#8220;new ZendHttpCookieJar()&#8221;
+directly - the constructor method does not take any parameters. Another way to instantiate a CookieJar class is to
+use the static ZendHttpCookieJar::fromResponse() method. This method takes two parameters: a
+<tt class="docutils literal"><span class="pre">Zend\Http\Response</span></tt> object, and a reference <em>URI</em>, as either a string or a <tt class="docutils literal"><span class="pre">Zend\Uri\Http</span></tt> object. This method
+will return a new <tt class="docutils literal"><span class="pre">Zend\Http\CookieJar</span></tt> object, already containing the cookies set by the passed <em>HTTP</em> response.
+The reference <em>URI</em> will be used to set the cookie&#8217;s domain and path, if they are not defined in the Set-Cookie
+headers.</p>
+</div>
+<div class="section" id="adding-cookies-to-a-zendhttpcookiejar-object">
+<span id="zend-http-cookies-cookiejar-adding-cookies"></span><h2>Adding Cookies to a ZendHttpCookieJar object<a class="headerlink" href="#adding-cookies-to-a-zendhttpcookiejar-object" title="Permalink to this headline">¶</a></h2>
+<p>Usually, the <tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt> object you attached your CookieJar object to will automatically add cookies set
+by <em>HTTP</em> responses to your jar. if you wish to manually add cookies to your jar, this can be done by using two
+methods:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Http\CookieJar-&gt;addCookie($cookie[,</span> <span class="pre">$ref_uri])</span></tt>: Add a single cookie to the jar. $cookie can be either
+a <tt class="docutils literal"><span class="pre">Zend\Http\Cookie</span></tt> object or a string, which will be converted automatically into a Cookie object. If a
+string is provided, you should also provide $ref_uri - which is a reference <em>URI</em> either as a string or
+<tt class="docutils literal"><span class="pre">Zend\Uri\Http</span></tt> object, to use as the cookie&#8217;s default domain and path.</li>
+<li><tt class="docutils literal"><span class="pre">Zend\Http\CookieJar-&gt;addCookiesFromResponse($response,</span> <span class="pre">$ref_uri)</span></tt>: Add all cookies set in a single <em>HTTP</em>
+response to the jar. $response is expected to be a <tt class="docutils literal"><span class="pre">Zend\Http\Response</span></tt> object with Set-Cookie headers.
+$ref_uri is the request <em>URI</em>, either as a string or a <tt class="docutils literal"><span class="pre">Zend\Uri\Http</span></tt> object, according to which the
+cookies&#8217; default domain and path will be set.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="retrieving-cookies-from-a-zendhttpcookiejar-object">
+<span id="zend-http-cookies-cookiejar-getting-cookies"></span><h2>Retrieving Cookies From a ZendHttpCookieJar object<a class="headerlink" href="#retrieving-cookies-from-a-zendhttpcookiejar-object" title="Permalink to this headline">¶</a></h2>
+<p>Just like with adding cookies, there is usually no need to manually fetch cookies from a CookieJar object. Your
+<tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt> object will automatically fetch the cookies required for an <em>HTTP</em> request for you. However,
+you can still use 3 provided methods to fetch cookies from the jar object: <tt class="docutils literal"><span class="pre">getCookie()</span></tt>, <tt class="docutils literal"><span class="pre">getAllCookies()</span></tt>,
+and <tt class="docutils literal"><span class="pre">getMatchingCookies()</span></tt>. Additionnaly, iterating over the CookieJar will let you retrieve all the
+<tt class="docutils literal"><span class="pre">Zend\Http\Cookie</span></tt> objects from it.</p>
+<p>It is important to note that each one of these methods takes a special parameter, which sets the return type of the
+method. This parameter can have 3 values:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Http\CookieJar::COOKIE_OBJECT</span></tt>: Return a <tt class="docutils literal"><span class="pre">Zend\Http\Cookie</span></tt> object. If the method returns more than
+one cookie, an array of objects will be returned.</li>
+<li><tt class="docutils literal"><span class="pre">Zend\Http\CookieJar::COOKIE_STRING_ARRAY</span></tt>: Return cookies as strings, in a &#8220;foo=bar&#8221; format, suitable for
+sending in a <em>HTTP</em> request &#8220;Cookie&#8221; header. If more than one cookie is returned, an array of strings is
+returned.</li>
+<li><tt class="docutils literal"><span class="pre">Zend\Http\CookieJar::COOKIE_STRING_CONCAT</span></tt>: Similar to COOKIE_STRING_ARRAY, but if more than one cookie is
+returned, this method will concatenate all cookies into a single, long string separated by semicolons (;), and
+return it. This is especially useful if you want to directly send all matching cookies in a single <em>HTTP</em>
+request &#8220;Cookie&#8221; header.</li>
+</ul>
+</div></blockquote>
+<p>The structure of the different cookie-fetching methods is described below:</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Zend\Http\CookieJar-&gt;getCookie($uri,</span> <span class="pre">$cookie_name[,</span> <span class="pre">$ret_as])</span></tt>: Get a single cookie from the jar, according
+to its <em>URI</em> (domain and path) and name. $uri is either a string or a <tt class="docutils literal"><span class="pre">Zend\Uri\Http</span></tt> object representing
+the <em>URI</em>. $cookie_name is a string identifying the cookie name. $ret_as specifies the return type as
+described above. $ret_type is optional, and defaults to COOKIE_OBJECT.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Zend\Http\CookieJar-&gt;getAllCookies($ret_as)</span></tt>: Get all cookies from the jar. $ret_as specifies the return
+type as described above. If not specified, $ret_type defaults to COOKIE_OBJECT.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">Zend\Http\CookieJar-&gt;getMatchingCookies($uri[,</span> <span class="pre">$matchSessionCookies[,</span> <span class="pre">$ret_as[,</span> <span class="pre">$now]]])</span></tt>: Get all cookies
+from the jar that match a specified scenario, that is a <em>URI</em> and expiration time.</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">$uri</span></tt> is either a <tt class="docutils literal"><span class="pre">Zend\Uri\Http</span></tt> object or a string specifying the connection type (secure or
+non-secure), domain and path to match against.</li>
+<li><tt class="docutils literal"><span class="pre">$matchSessionCookies</span></tt> is a boolean telling whether to match session cookies or not. Session cookies
+are cookies that have no specified expiration time. Defaults to <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">$ret_as</span></tt> specifies the return type as described above. If not specified, defaults to COOKIE_OBJECT.</li>
+<li><tt class="docutils literal"><span class="pre">$now</span></tt> is an integer representing the UNIX time stamp to consider as &#8220;now&#8221; - that is any cookies who
+are set to expire before this time will not be matched. If not specified, defaults to the current time.</li>
+</ul>
+</div></blockquote>
+<p>You can read more about cookie matching here: <a class="reference internal" href="#zend-http-cookies-cookie-matching"><em>this section</em></a>.</p>
+</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ZendHttpCookie and ZendHttpCookieJar</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#instantiating-zendhttpcookie-objects">Instantiating ZendHttpCookie Objects</a></li>
+<li><a class="reference internal" href="#zendhttpcookie-getter-methods">ZendHttpCookie getter methods</a></li>
+<li><a class="reference internal" href="#zendhttpcookie-matching-against-a-scenario">ZendHttpCookie: Matching against a scenario</a></li>
+<li><a class="reference internal" href="#the-zendhttpcookiejar-class-instantiation">The ZendHttpCookieJar Class: Instantiation</a></li>
+<li><a class="reference internal" href="#adding-cookies-to-a-zendhttpcookiejar-object">Adding Cookies to a ZendHttpCookieJar object</a></li>
+<li><a class="reference internal" href="#retrieving-cookies-from-a-zendhttpcookiejar-object">Retrieving Cookies From a ZendHttpCookieJar object</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.http.cookie.handling.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.http.cookie.handling.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.http.cookie.handling.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.http.cookie.handling.rst">
+                ZendHttpCookie and ZendHttpCookieJar
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
