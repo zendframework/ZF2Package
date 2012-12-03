@@ -38,12 +38,12 @@ foreach ($di as $file) {
     $composer_index_in_root = $zip->locateName('composer.json');
     if ($composer_index_in_root !== false) {
         $fp = $zip->getStream($zip->getNameIndex($composer_index_in_root));
-        $composer_content = json_decode(stream_get_contents($fp), true);
+        $composer_content = getJsonFromStream($fp);
     } else {
         $composer_index_anywhere = $zip->locateName('composer.json', ZIPARCHIVE::FL_NODIR);
         if ($composer_index_anywhere) {
             $fp = $zip->getStream($zip->getNameIndex($composer_index_anywhere));
-            $composer_content = json_decode(stream_get_contents($fp), true);
+            $composer_content = getJsonFromStream($fp);
         } else {
             $composer_content = create_composer_json_stub($file->getBasename());
         }
@@ -217,3 +217,10 @@ $packages['zendframework/zendframework'] = $zf2_metapackage;
 $packages = array('packages' => $packages);
 
 file_put_contents(ROOT . '/public/packages.json', json_encode($packages, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
+
+function getJsonFromStream($stream)
+{
+    $json = stream_get_contents($stream);
+    $json = str_replace('self-version', 'self.version', $json);
+    return json_decode($json, true);
+}
