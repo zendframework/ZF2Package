@@ -158,18 +158,38 @@ $zf2_metapackage_template = [
     ],
 ];
 
+$dev_master_commit_ref = getLastCommitByBranch('master');
 $dev_master_package = $zf2_metapackage_template;
 $dev_master_package['version'] = 'dev-master';
-$dev_master_package['require']['zendframework/zf2'] = 'master';
-$dev_master_package['source']['reference'] = 'master';
-unset($dev_master_package['dist']);
+$dev_master_package['require']['zendframework/zf2'] = 'dev-master';
+$dev_master_package['source']['reference'] = $dev_master_commit_ref['sha'];
+$dev_master_package['source']['time'] = $dev_master_commit_ref['time'];
+$dev_master_package['dist'] = array(
+    'type' => 'zip',
+    'url' => 'https://github.com/zendframework/zf2/zipball/master',
+);
+$dev_master_package['extra'] = array(
+    'branch_alias' => array(
+        'dev-master' => '2.0.x-dev',
+    ),
+);
 $zf2_metapackage = ['dev-master' => $dev_master_package];
 
+$dev_develop_commit_ref = getLastCommitByBranch('develop');
 $dev_develop_package = $zf2_metapackage_template;
 $dev_develop_package['version'] = 'dev-develop';
-$dev_develop_package['require']['zendframework/zf2'] = 'develop';
-$dev_develop_package['source']['reference'] = 'develop';
-unset($dev_develop_package['dist']);
+$dev_develop_package['require']['zendframework/zf2'] = 'dev-develop';
+$dev_develop_package['source']['reference'] = $dev_develop_commit_ref['sha'];
+$dev_develop_package['source']['time'] = $dev_develop_commit_ref['time'];
+$dev_develop_package['dist'] = array(
+    'type' => 'zip',
+    'url' => 'https://github.com/zendframework/zf2/zipball/develop',
+);
+$dev_develop_package['extra'] = array(
+    'branch_alias' => array(
+        'dev-develop' => '2.1.x-dev',
+    ),
+);
 $zf2_metapackage = ['dev-develop' => $dev_develop_package];
 
 $packages = [];
@@ -223,4 +243,23 @@ function getJsonFromStream($stream)
     $json = stream_get_contents($stream);
     $json = str_replace('self-version', 'self.version', $json);
     return json_decode($json, true);
+}
+
+function getLastCommitByBranch($branch)
+{
+    $uri = sprintf('https://api.github.com/repos/zendframework/zf2/commits?sha=%&per_page=1', $branch);
+    $ch  = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $uri);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+    $json = curl_exec($ch);
+    curl_close($ch);
+    $data       = json_decode($json);
+    $commitData = array_shift($data);
+    $time       = $commitData->commit->author->date;
+    $dateTime   = new \DateTime($time);
+    return array(
+        'sha'  => $commitData->sha,
+        'time' => $dateTime->format('Y-m-d H:i:s'),
+    );
 }
