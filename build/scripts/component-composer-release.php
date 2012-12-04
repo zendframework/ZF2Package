@@ -233,7 +233,8 @@ foreach ($composers as $filename => $composer) {
     }
 }
 
-$packages['zendframework/zendframework'] = $zf2_metapackage;
+$packages['zendframework/zendframework']        = $zf2_metapackage;
+$packages['zendframework/skeleton-application'] = getSkeletonApplicationReleases();
 $packages = array('packages' => $packages);
 
 file_put_contents(ROOT . '/public/packages.json', json_encode($packages, JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES));
@@ -245,16 +246,22 @@ function getJsonFromStream($stream)
     return json_decode($json, true);
 }
 
-function getLastCommitByBranch($branch)
+function getGithubData($uri)
 {
-    $uri = sprintf('https://api.github.com/repos/zendframework/zf2/commits?sha=%&per_page=1', $branch);
+    $uri = 'https://api.github.com' . $uri;
     $ch  = curl_init();
     curl_setopt($ch, CURLOPT_URL, $uri);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
     $json = curl_exec($ch);
     curl_close($ch);
-    $data       = json_decode($json);
+    return json_decode($json);
+}
+
+function getLastCommitByBranch($branch, $repository = 'zf2')
+{
+    $uri        = sprintf('/repos/zendframework/%s/commits?sha=%&per_page=1', $repository, $branch);
+    $data       = getGithubData($uri);
     $commitData = array_shift($data);
     $time       = $commitData->commit->author->date;
     $dateTime   = new \DateTime($time);
@@ -262,4 +269,60 @@ function getLastCommitByBranch($branch)
         'sha'  => $commitData->sha,
         'time' => $dateTime->format('Y-m-d H:i:s'),
     );
+}
+
+function getSkeletonApplicationReleases()
+{
+    $releases = array();
+    $template = array(
+        'name' => 'zendframework/skeleton-application',
+        'description' => 'Skeleton Application for ZF2',
+        'homepage' => 'http://framework.zend.com/',
+        'license' => 'BSD-3-Clause',
+        'version' => '%s',
+        'keywords' => array('framework', 'zf2'),
+        'source' => array(
+            'type' => 'git',
+            'url' => 'git://github.com/zendframework/ZendSkeletonApplication.git',
+            'reference' => '%s',
+        ),
+        'dist' => array(
+            'type' => 'zip',
+            'url' => '%s',
+        ),
+        'require' => array(
+            'php' => '>=5.3.3',
+            'zendframework/zendframework' => '2.*',
+        ),
+    );
+
+    // Get list of tags
+    $uri     = '/repos/zendframework/ZendSkeletonApplication/tags';
+    $tagData = getGithubData($uri);
+    //    apply each to template
+    foreach ($tagData as $tagDatum) {
+        $tag                               = $tagDatum->name;
+        $definition                        = $template;
+        $definition['version']             = $tag;
+        $definition['source']['reference'] = $tag;
+        $definition['dist']['url']         = $tagDatum->zipball_url;
+        $releases[$tag]                    = $definition;
+    }
+
+    // Add in branch "master"
+    //    get last commit sha/time by branch
+    $masterMetadata = getLastCommitByBranch('master', 'ZendSkeletonApplication');
+    $releases['dev-master']                        = $template;
+    $releases['dev-master']['version']             = 'dev-master';
+    $releases['dev-master']['source']['reference'] = $masterMetadata['sha'];
+    $releases['dev-master']['source']['time']      = $masterMetadata['time'];
+    $releases['dev-master']['dist']['url']         = 'https://github.com/zendframework/ZendSkeletonApplication/zipball/master';
+    $releases['extra'] = array(
+        'branch-alias' => array(
+            'dev-master' => '2.0.x-dev',
+        ),
+    );
+
+    // Return full list
+    return $releases;
 }
