@@ -158,12 +158,9 @@ $zf2_metapackage_template = [
     ],
 ];
 
-$dev_master_commit_ref = getLastCommitByBranch('master');
 $dev_master_package = $zf2_metapackage_template;
 $dev_master_package['version'] = 'dev-master';
 $dev_master_package['require']['zendframework/zf2'] = 'dev-master';
-$dev_master_package['source']['reference'] = $dev_master_commit_ref['sha'];
-$dev_master_package['source']['time'] = $dev_master_commit_ref['time'];
 $dev_master_package['dist'] = array(
     'type' => 'zip',
     'url' => 'https://github.com/zendframework/zf2/zipball/master',
@@ -173,14 +170,20 @@ $dev_master_package['extra'] = array(
         'dev-master' => '2.0.x-dev',
     ),
 );
+$dev_master_commit_ref = getLastCommitByBranch('master');
+if (null === $dev_master_commit_ref) {
+    echo "\n\nFAILED to retrieve last commit for master branch of zf2\n\n";
+}
+if (null !== $dev_master_commit_ref) {
+    $dev_master_package['source']['reference'] = $dev_master_commit_ref['sha'];
+    $dev_master_package['source']['time'] = $dev_master_commit_ref['time'];
+}
+echo "Adding dev-master to ZF2 metapackage\n";
 $zf2_metapackage = ['dev-master' => $dev_master_package];
 
-$dev_develop_commit_ref = getLastCommitByBranch('develop');
 $dev_develop_package = $zf2_metapackage_template;
 $dev_develop_package['version'] = 'dev-develop';
 $dev_develop_package['require']['zendframework/zf2'] = 'dev-develop';
-$dev_develop_package['source']['reference'] = $dev_develop_commit_ref['sha'];
-$dev_develop_package['source']['time'] = $dev_develop_commit_ref['time'];
 $dev_develop_package['dist'] = array(
     'type' => 'zip',
     'url' => 'https://github.com/zendframework/zf2/zipball/develop',
@@ -190,7 +193,16 @@ $dev_develop_package['extra'] = array(
         'dev-develop' => '2.1.x-dev',
     ),
 );
-$zf2_metapackage = ['dev-develop' => $dev_develop_package];
+$dev_develop_commit_ref = getLastCommitByBranch('develop');
+if (null === $dev_develop_commit_ref) {
+    echo "\n\nFAILED to retrieve last commit for develop branch of zf2\n\n";
+}
+if (null !== $dev_develop_commit_ref) {
+    $dev_develop_package['source']['reference'] = $dev_develop_commit_ref['sha'];
+    $dev_develop_package['source']['time'] = $dev_develop_commit_ref['time'];
+}
+echo "Adding dev-develop to ZF2 metapackage\n";
+$zf2_metapackage['dev-develop'] = $dev_develop_package;
 
 $packages = [];
 foreach ($composers as $filename => $composer) {
@@ -233,6 +245,9 @@ foreach ($composers as $filename => $composer) {
     }
 }
 
+echo "\nAdding zendframework/zendframework metapackage; contains following versions:\n"
+    . '    ' . implode("\n    ", array_keys($zf2_metapackage)) . "\n\n";
+
 $packages['zendframework/zendframework']        = $zf2_metapackage;
 $packages['zendframework/skeleton-application'] = getSkeletonApplicationReleases();
 $packages = array('packages' => $packages);
@@ -260,8 +275,11 @@ function getGithubData($uri)
 
 function getLastCommitByBranch($branch, $repository = 'zf2')
 {
-    $uri        = sprintf('/repos/zendframework/%s/commits?sha=%&per_page=1', $repository, $branch);
+    $uri        = sprintf('/repos/zendframework/%s/commits?sha=%s&per_page=1', $repository, $branch);
     $data       = getGithubData($uri);
+    if (!is_array($data)) {
+        return null;
+    }
     $commitData = array_shift($data);
     $time       = $commitData->commit->author->date;
     $dateTime   = new \DateTime($time);
@@ -284,7 +302,6 @@ function getSkeletonApplicationReleases()
         'source' => array(
             'type' => 'git',
             'url' => 'git://github.com/zendframework/ZendSkeletonApplication.git',
-            'reference' => '%s',
         ),
         'dist' => array(
             'type' => 'zip',
@@ -299,6 +316,10 @@ function getSkeletonApplicationReleases()
     // Get list of tags
     $uri     = '/repos/zendframework/ZendSkeletonApplication/tags';
     $tagData = getGithubData($uri);
+    if (!is_array($tagData)) {
+        echo "\n\nFAILED to retrieve tag data for ZendSkeletonApplication\n\n";
+        $tagData = array();
+    }
     //    apply each to template
     foreach ($tagData as $tagDatum) {
         $tag                               = $tagDatum->name;
@@ -314,9 +335,14 @@ function getSkeletonApplicationReleases()
     $masterMetadata = getLastCommitByBranch('master', 'ZendSkeletonApplication');
     $releases['dev-master']                        = $template;
     $releases['dev-master']['version']             = 'dev-master';
-    $releases['dev-master']['source']['reference'] = $masterMetadata['sha'];
-    $releases['dev-master']['source']['time']      = $masterMetadata['time'];
     $releases['dev-master']['dist']['url']         = 'https://github.com/zendframework/ZendSkeletonApplication/zipball/master';
+    if (null === $masterMetadata) {
+        echo "\n\nFAILED to retrieve last commit for master branch of ZendSkeletonApplication\n\n";
+    }
+    if (null !== $masterMetadata) {
+        $releases['dev-master']['source']['reference'] = $masterMetadata['sha'];
+        $releases['dev-master']['source']['time']      = $masterMetadata['time'];
+    }
     $releases['extra'] = array(
         'branch-alias' => array(
             'dev-master' => '2.0.x-dev',
