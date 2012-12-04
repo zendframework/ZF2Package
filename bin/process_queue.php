@@ -80,9 +80,10 @@ $worker->addFunction('process_composer', function (GearmanJob $job) use ($git) {
     }
 
     fwrite($log, "Committing changes\n");
-    $output = '';
-    $return = null;
-    exec($git . ' commit -m "Updated packages.json to $ref at $sha"', $output, $return);
+    $output  = '';
+    $return  = null;
+    $command = sprintf('%s commit -m "Updated packages.json to %s at %s"', $git, $ref, $sha);
+    exec($command, $output, $return);
     if (0 !== $return) {
         fwrite($log, "Failed to commit changes\n");
         fclose($log);
