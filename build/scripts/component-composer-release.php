@@ -343,7 +343,7 @@ function getSkeletonApplicationReleases()
         $releases['dev-master']['source']['reference'] = $masterMetadata['sha'];
         $releases['dev-master']['source']['time']      = $masterMetadata['time'];
     }
-    $releases['extra'] = array(
+    $releases['dev-master']['extra'] = array(
         'branch-alias' => array(
             'dev-master' => '2.0.x-dev',
         ),
