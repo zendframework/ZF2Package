@@ -1,0 +1,876 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Forms and actions &mdash; Zend Framework 2 2.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.6 documentation" href="../index.html" />
+    <link rel="next" title="Conclusion" href="conclusion.html" />
+    <link rel="prev" title="Styling and Translations" href="styling-and-translations.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="conclusion.html" title="Conclusion"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="styling-and-translations.html" title="Styling and Translations"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="forms-and-actions">
+<span id="user-guide-forms-and-actions"></span><h1>Forms and actions<a class="headerlink" href="#forms-and-actions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="adding-new-albums">
+<h2>Adding new albums<a class="headerlink" href="#adding-new-albums" title="Permalink to this headline">¶</a></h2>
+<p>We can now code up the functionality to add new albums. There are two bits to
+this part:</p>
+<ul class="simple">
+<li>Display a form for user to provide details</li>
+<li>Process the form submission and store to database</li>
+</ul>
+<p>We use <tt class="docutils literal"><span class="pre">Zend\Form</span></tt> to do this. The <tt class="docutils literal"><span class="pre">Zend\Form</span></tt> component manages the form
+and for validation, we add a <tt class="docutils literal"><span class="pre">Zend\InputFilter</span></tt> to our <tt class="docutils literal"><span class="pre">Album</span></tt> entity. We
+start by creating a new class <tt class="docutils literal"><span class="pre">Album\Form\AlbumForm</span></tt> that extends from
+<tt class="docutils literal"><span class="pre">Zend\Form\Form</span></tt> to define our form.
+Create a file called <tt class="docutils literal"><span class="pre">AlbumForm.php</span></tt> in <tt class="docutils literal"><span class="pre">module/Album/src/Album/Form</span></tt>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">namespace</span> <span class="nx">Album\Form</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Form\Form</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AlbumForm</span> <span class="k">extends</span> <span class="nx">Form</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$name</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// we want to ignore the name passed</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;method&#39;</span><span class="p">,</span> <span class="s1">&#39;post&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;hidden&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;artist&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Artist&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;title&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;label&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Title&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;attributes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;type&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;value&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Go&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;submitbutton&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Within the constructor of <tt class="docutils literal"><span class="pre">AlbumForm</span></tt>, we set the name when we call the parent’s
+constructor and then set the method and then create four form elements for the
+id, artist, title, and submit button. For each item we set various attributes
+and options, including the label to be displayed.</p>
+<p>We also need to set up validation for this form. In Zend Framework 2 this is
+done using an input filter which can either be standalone or within any class
+that implements <tt class="docutils literal"><span class="pre">InputFilterAwareInterface</span></tt>, such as a model entity. We are
+going to add the input filter to our <tt class="docutils literal"><span class="pre">Album.php</span></tt> file in <tt class="docutils literal"><span class="pre">module/Album/src/Album/Model</span></tt>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">namespace</span> <span class="nx">Album\Model</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\InputFilter\Factory</span> <span class="k">as</span> <span class="nx">InputFactory</span><span class="p">;</span>     <span class="c1">// &lt;-- Add this import</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilter</span><span class="p">;</span>                 <span class="c1">// &lt;-- Add this import</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilterAwareInterface</span><span class="p">;</span>   <span class="c1">// &lt;-- Add this import</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilterInterface</span><span class="p">;</span>        <span class="c1">// &lt;-- Add this import</span>
+
+<span class="k">class</span> <span class="nc">Album</span> <span class="k">implements</span> <span class="nx">InputFilterAwareInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$id</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$artist</span><span class="p">;</span>
+    <span class="k">public</span> <span class="nv">$title</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$inputFilter</span><span class="p">;</span>                       <span class="c1">// &lt;-- Add this variable</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">exchangeArray</span><span class="p">(</span><span class="nv">$data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span>     <span class="o">=</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>     <span class="o">?</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>     <span class="o">:</span> <span class="k">null</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">artist</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]))</span> <span class="o">?</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]</span> <span class="o">:</span> <span class="k">null</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">title</span>  <span class="o">=</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]))</span>  <span class="o">?</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>  <span class="o">:</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Add content to this method:</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setInputFilter</span><span class="p">(</span><span class="nx">InputFilterInterface</span> <span class="nv">$inputFilter</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nx">\Exception</span><span class="p">(</span><span class="s2">&quot;Not used&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getInputFilter</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">inputFilter</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$inputFilter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InputFilter</span><span class="p">();</span>
+            <span class="nv">$factory</span>     <span class="o">=</span> <span class="k">new</span> <span class="nx">InputFactory</span><span class="p">();</span>
+
+            <span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">createInput</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;name&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;id&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                <span class="s1">&#39;filters&#39;</span>  <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Int&#39;</span><span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">)));</span>
+
+            <span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">createInput</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;name&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;artist&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                <span class="s1">&#39;filters&#39;</span>  <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;StripTags&#39;</span><span class="p">),</span>
+                    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;StringTrim&#39;</span><span class="p">),</span>
+                <span class="p">),</span>
+                <span class="s1">&#39;validators&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;name&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;StringLength&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                            <span class="s1">&#39;encoding&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;UTF-8&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;min&#39;</span>      <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
+                            <span class="s1">&#39;max&#39;</span>      <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">,</span>
+                        <span class="p">),</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">)));</span>
+
+            <span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">createInput</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;name&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;title&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                <span class="s1">&#39;filters&#39;</span>  <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;StripTags&#39;</span><span class="p">),</span>
+                    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;StringTrim&#39;</span><span class="p">),</span>
+                <span class="p">),</span>
+                <span class="s1">&#39;validators&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span>
+                        <span class="s1">&#39;name&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;StringLength&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                            <span class="s1">&#39;encoding&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;UTF-8&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;min&#39;</span>      <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
+                            <span class="s1">&#39;max&#39;</span>      <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">,</span>
+                        <span class="p">),</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">)));</span>
+
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">inputFilter</span> <span class="o">=</span> <span class="nv">$inputFilter</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">inputFilter</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">InputFilterAwareInterface</span></tt> defines two methods: <tt class="docutils literal"><span class="pre">setInputFilter()</span></tt> and
+<tt class="docutils literal"><span class="pre">getInputFilter()</span></tt>. We only need to implement <tt class="docutils literal"><span class="pre">getInputFilter()</span></tt> so we
+simply throw an exception  in <tt class="docutils literal"><span class="pre">setInputFilter()</span></tt>.</p>
+<p>Within <tt class="docutils literal"><span class="pre">getInputFilter()</span></tt>, we instantiate an <tt class="docutils literal"><span class="pre">InputFilter</span></tt> and then add the
+inputs that we require. We add one input for each property that we wish to
+filter or validate. For the <tt class="docutils literal"><span class="pre">id</span></tt> field we add an <tt class="docutils literal"><span class="pre">Int</span></tt> filter as we only
+need integers. For the text elements, we add two filters, <tt class="docutils literal"><span class="pre">StripTags</span></tt> and
+<tt class="docutils literal"><span class="pre">StringTrim</span></tt> to remove unwanted HTML and unnecessary white space. We also set
+them to be <em>required</em> and add a <tt class="docutils literal"><span class="pre">StringLength</span></tt> validator to ensure that the
+user doesn’t enter more characters than we can store into the database.</p>
+<p>We now need to get the form to display and then process it on submission. This
+is done within the <tt class="docutils literal"><span class="pre">AlbumController</span></tt>’s <tt class="docutils literal"><span class="pre">addAction()</span></tt>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// module/Album/src/Album/Controller/AlbumController.php:</span>
+
+<span class="c1">//...</span>
+<span class="k">use</span> <span class="nx">Zend\Mvc\Controller\AbstractActionController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\View\Model\ViewModel</span><span class="p">;</span>
+<span class="hll"><span class="k">use</span> <span class="nx">Album\Model\Album</span><span class="p">;</span>          <span class="c1">// &lt;-- Add this import</span>
+</span><span class="hll"><span class="k">use</span> <span class="nx">Album\Form\AlbumForm</span><span class="p">;</span>       <span class="c1">// &lt;-- Add this import</span>
+</span><span class="c1">//...</span>
+
+<span class="hll">    <span class="c1">// Add content to this method:</span>
+</span><span class="hll">    <span class="k">public</span> <span class="k">function</span> <span class="nf">addAction</span><span class="p">()</span>
+</span><span class="hll">    <span class="p">{</span>
+</span><span class="hll">        <span class="nv">$form</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlbumForm</span><span class="p">();</span>
+</span><span class="hll">        <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setValue</span><span class="p">(</span><span class="s1">&#39;Add&#39;</span><span class="p">);</span>
+</span><span class="hll">
+</span><span class="hll">        <span class="nv">$request</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+</span><span class="hll">        <span class="k">if</span> <span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">isPost</span><span class="p">())</span> <span class="p">{</span>
+</span><span class="hll">            <span class="nv">$album</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Album</span><span class="p">();</span>
+</span><span class="hll">            <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setInputFilter</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">getInputFilter</span><span class="p">());</span>
+</span><span class="hll">            <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getPost</span><span class="p">());</span>
+</span><span class="hll">
+</span><span class="hll">            <span class="k">if</span> <span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+</span><span class="hll">                <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">exchangeArray</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getData</span><span class="p">());</span>
+</span><span class="hll">                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getAlbumTable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">saveAlbum</span><span class="p">(</span><span class="nv">$album</span><span class="p">);</span>
+</span><span class="hll">
+</span><span class="hll">                <span class="c1">// Redirect to list of albums</span>
+</span><span class="hll">                <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toRoute</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">);</span>
+</span><span class="hll">            <span class="p">}</span>
+</span><span class="hll">        <span class="p">}</span>
+</span><span class="hll">        <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;form&#39;</span> <span class="o">=&gt;</span> <span class="nv">$form</span><span class="p">);</span>
+</span><span class="hll">    <span class="p">}</span>
+</span><span class="c1">//...</span>
+</pre></div>
+</div>
+<p>After adding the <tt class="docutils literal"><span class="pre">AlbumForm</span></tt> to the use list, we implement <tt class="docutils literal"><span class="pre">addAction()</span></tt>.
+Let’s look at the <tt class="docutils literal"><span class="pre">addAction()</span></tt> code in a little more detail:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="nv">$form</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlbumForm</span><span class="p">();</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setValue</span><span class="p">(</span><span class="s1">&#39;Add&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>We instantiate <tt class="docutils literal"><span class="pre">AlbumForm</span></tt> and set the label on the submit button to “Add”. We
+do this here as we’ll want to re-use the form when editing an album and will use
+a different label.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="nv">$request</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">isPost</span><span class="p">())</span> <span class="p">{</span>
+    <span class="nv">$album</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Album</span><span class="p">();</span>
+    <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setInputFilter</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">getInputFilter</span><span class="p">());</span>
+    <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getPost</span><span class="p">());</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+</pre></div>
+</div>
+<p>If the <tt class="docutils literal"><span class="pre">Request</span></tt> object’s <tt class="docutils literal"><span class="pre">isPost()</span></tt> method is true, then the form has been
+submitted and so we set the form’s input filter from an album instance. We then
+set the posted data to the form and check to see if it is valid using the
+<tt class="docutils literal"><span class="pre">isValid()</span></tt> member function of the form.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">exchangeArray</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getData</span><span class="p">());</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getAlbumTable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">saveAlbum</span><span class="p">(</span><span class="nv">$album</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If the form is valid, then we  grab the data from the form and store to the
+model using <tt class="docutils literal"><span class="pre">saveAlbum()</span></tt>.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// Redirect to list of albums</span>
+<span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toRoute</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>After we have saved the new album row, we redirect back to the list of albums
+using the <tt class="docutils literal"><span class="pre">Redirect</span></tt> controller plugin.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;form&#39;</span> <span class="o">=&gt;</span> <span class="nv">$form</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Finally, we return the variables that we want assigned to the view. In this
+case, just the form object. Note that Zend Framework 2 also allows you to simply
+return an array containing the variables to be assigned to the view and it will
+create a <tt class="docutils literal"><span class="pre">ViewModel</span></tt> behind the scenes for you. This saves a little typing.</p>
+<p>We now need to render the form in the add.phtml view script:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">// module/Album/view/album/album/add.phtml:</span>
+
+<span class="nv">$title</span> <span class="o">=</span> <span class="s1">&#39;Add new album&#39;</span><span class="p">;</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headTitle</span><span class="p">(</span><span class="nv">$title</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;h1&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escapeHtml</span><span class="p">(</span><span class="nv">$title</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x">&lt;/h1&gt;</span>
+<span class="cp">&lt;?php</span>
+<span class="nv">$form</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">;</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;add&#39;</span><span class="p">)));</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">prepare</span><span class="p">();</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">openTag</span><span class="p">(</span><span class="nv">$form</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formHidden</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formSubmit</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">closeTag</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>Again, we display a title as before and then we render the form. Zend Framework
+provides some view helpers to make this a little easier. The <tt class="docutils literal"><span class="pre">form()</span></tt> view
+helper has an <tt class="docutils literal"><span class="pre">openTag()</span></tt> and <tt class="docutils literal"><span class="pre">closeTag()</span></tt> method which we use to open and
+close the form.  Then for each element with a label, we can use <tt class="docutils literal"><span class="pre">formRow()</span></tt>,
+but for the two elements that are standalone, we use <tt class="docutils literal"><span class="pre">formHidden()</span></tt> and
+<tt class="docutils literal"><span class="pre">formSubmit()</span></tt>.</p>
+<img alt="../_images/user-guide.forms-and-actions.add-album-form.png" src="../_images/user-guide.forms-and-actions.add-album-form.png" style="width: 940px;" />
+<p>Alternatively, the process of rendering the form can be simplified by using the
+bundled <tt class="docutils literal"><span class="pre">formCollection</span></tt> view helper.  For example, in the view script above replace
+all the form-rendering echo statements with:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formCollection</span><span class="p">(</span><span class="nv">$form</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>This will iterate over the form structure, calling the appropriate label, element
+and error view helpers for each element, but you still have to wrap formCollection($form) with the open and close form tags.
+This helps reduce the complexity of your view script in situations where the default
+HTML rendering of the form is acceptable.</p>
+<p>You should now be able to use the “Add new album” link on the home page of the
+application to add a new album record.</p>
+<p>And execute <tt class="docutils literal"><span class="pre">phpunit</span></tt> from <tt class="docutils literal"><span class="pre">module/Album/test</span></tt>.</p>
+<div class="highlight-text"><div class="highlight"><pre>PHPUnit 3.5.15 by Sebastian Bergmann.
+
+..............
+
+Time: 1 seconds, Memory: 12.25Mb
+
+OK (14 tests, 23 assertions)
+</pre></div>
+</div>
+</div>
+<div class="section" id="editing-an-album">
+<h2>Editing an album<a class="headerlink" href="#editing-an-album" title="Permalink to this headline">¶</a></h2>
+<p>Editing an album is almost identical to adding one, so the code is very similar.
+This time we use <tt class="docutils literal"><span class="pre">editAction()</span></tt> in the <tt class="docutils literal"><span class="pre">AlbumController</span></tt>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// module/Album/src/Album/Controller/AlbumController.php:</span>
+<span class="c1">//...</span>
+
+    <span class="c1">// Add content to this method:</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">editAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$id</span> <span class="o">=</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">fromRoute</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$id</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toRoute</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;add&#39;</span>
+            <span class="p">));</span>
+        <span class="p">}</span>
+        <span class="nv">$album</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getAlbumTable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getAlbum</span><span class="p">(</span><span class="nv">$id</span><span class="p">);</span>
+
+        <span class="nv">$form</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">AlbumForm</span><span class="p">();</span>
+        <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">bind</span><span class="p">(</span><span class="nv">$album</span><span class="p">);</span>
+        <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;Edit&#39;</span><span class="p">);</span>
+
+        <span class="nv">$request</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">isPost</span><span class="p">())</span> <span class="p">{</span>
+            <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setInputFilter</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">getInputFilter</span><span class="p">());</span>
+            <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getPost</span><span class="p">());</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getAlbumTable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">saveAlbum</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getData</span><span class="p">());</span>
+
+                <span class="c1">// Redirect to list of albums</span>
+                <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toRoute</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="nv">$id</span><span class="p">,</span>
+            <span class="s1">&#39;form&#39;</span> <span class="o">=&gt;</span> <span class="nv">$form</span><span class="p">,</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="c1">//...</span>
+</pre></div>
+</div>
+<p>This code should look comfortably familiar. Let’s look at the differences from
+adding an album. Firstly, we look for the <tt class="docutils literal"><span class="pre">id</span></tt> that is in the matched route
+and use it to load the album to be edited:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="nv">$id</span> <span class="o">=</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">fromRoute</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$id</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toRoute</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;add&#39;</span>
+    <span class="p">));</span>
+<span class="p">}</span>
+<span class="nv">$album</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getAlbumTable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getAlbum</span><span class="p">(</span><span class="nv">$id</span><span class="p">);</span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">params</span></tt> is a controller plugin that provides a convenient way to retrieve
+parameters from the matched route.  We use it to retrieve the <tt class="docutils literal"><span class="pre">id</span></tt> from the
+route we created in the modules’ <tt class="docutils literal"><span class="pre">module.config.php</span></tt>. If the <tt class="docutils literal"><span class="pre">id</span></tt> is zero,
+then we redirect to the add action, otherwise, we continue by getting the album
+entity from the database.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="nv">$form</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlbumForm</span><span class="p">();</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">bind</span><span class="p">(</span><span class="nv">$album</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="s1">&#39;Edit&#39;</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>The form’s <tt class="docutils literal"><span class="pre">bind()</span></tt> method attaches the model to the form. This is used in two
+ways:</p>
+<ul class="simple">
+<li>When displaying the form, the initial values for each element are extracted
+from the model.</li>
+<li>After successful validation in isValid(), the data from the form is put back
+into the model.</li>
+</ul>
+<p>These operations are done using a hydrator object. There are a number of
+hydrators, but the default one is <tt class="docutils literal"><span class="pre">Zend\Stdlib\Hydrator\ArraySerializable</span></tt>
+which expects to find two methods in the model: <tt class="docutils literal"><span class="pre">getArrayCopy()</span></tt> and
+<tt class="docutils literal"><span class="pre">exchangeArray()</span></tt>. We have already written <tt class="docutils literal"><span class="pre">exchangeArray()</span></tt> in our
+<tt class="docutils literal"><span class="pre">Album</span></tt> entity, so just need to write <tt class="docutils literal"><span class="pre">getArrayCopy()</span></tt>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// module/Album/src/Album/Model/Album.php:</span>
+<span class="c1">// ...</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">exchangeArray</span><span class="p">(</span><span class="nv">$data</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span>     <span class="o">=</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>     <span class="o">?</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>     <span class="o">:</span> <span class="k">null</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">artist</span> <span class="o">=</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]))</span> <span class="o">?</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">]</span> <span class="o">:</span> <span class="k">null</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">title</span>  <span class="o">=</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]))</span>  <span class="o">?</span> <span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>  <span class="o">:</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="hll">    <span class="c1">// Add the following method:</span>
+</span><span class="hll">    <span class="k">public</span> <span class="k">function</span> <span class="nf">getArrayCopy</span><span class="p">()</span>
+</span><span class="hll">    <span class="p">{</span>
+</span><span class="hll">        <span class="k">return</span> <span class="nb">get_object_vars</span><span class="p">(</span><span class="nv">$this</span><span class="p">);</span>
+</span><span class="hll">    <span class="p">}</span>
+</span><span class="c1">// ...</span>
+</pre></div>
+</div>
+<p>As a result of using <tt class="docutils literal"><span class="pre">bind()</span></tt> with its hydrator, we do not need to populate the
+form’s data back into the <tt class="docutils literal"><span class="pre">$album</span></tt> as that’s already been done, so we can just
+call the mappers’ <tt class="docutils literal"><span class="pre">saveAlbum()</span></tt> to store the changes back to the database.</p>
+<p>The view template, <tt class="docutils literal"><span class="pre">edit.phtml</span></tt>, looks very similar to the one for adding an
+album:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">// module/Album/view/album/album/edit.phtml:</span>
+
+<span class="nv">$title</span> <span class="o">=</span> <span class="s1">&#39;Edit album&#39;</span><span class="p">;</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headTitle</span><span class="p">(</span><span class="nv">$title</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;h1&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escapeHtml</span><span class="p">(</span><span class="nv">$title</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x">&lt;/h1&gt;</span>
+
+<span class="cp">&lt;?php</span>
+<span class="nv">$form</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">;</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span>
+    <span class="s1">&#39;album&#39;</span><span class="p">,</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;edit&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;id&#39;</span>     <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="p">));</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">prepare</span><span class="p">();</span>
+
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">openTag</span><span class="p">(</span><span class="nv">$form</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formHidden</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formRow</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formSubmit</span><span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">));</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">closeTag</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The only changes are to use the ‘Edit Album’ title and set the form’s action to
+the ‘edit’ action too.</p>
+<p>You should now be able to edit albums.</p>
+<p>And execute <tt class="docutils literal"><span class="pre">phpunit</span></tt> from <tt class="docutils literal"><span class="pre">module/Album/test</span></tt>.</p>
+<div class="highlight-text"><div class="highlight"><pre>PHPUnit 3.5.15 by Sebastian Bergmann.
+
+...F...........
+
+Time: 1 second, Memory: 13.00Mb
+
+There was 1 failure:
+
+1) AlbumTest\Controller\AlbumControllerTest::testEditActionCanBeAccessed
+Failed asserting that 302 matches expected 200.
+
+/var/www/tutorial/module/Album/test/AlbumTest/Controller/AlbumControllerTest.php:65
+
+FAILURES!
+Tests: 14, Assertions: 23, Failures: 1.
+</pre></div>
+</div>
+<p>We need to change the test for edit &#8216;AlbumControllerTest&#8217;  in <tt class="docutils literal"><span class="pre">module/Album/test/AlbumTest/Controller</span></tt> :</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="o">...</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">testAddActionCanBeAccessed</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="s1">&#39;add&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">);</span><span class="c1">//Add this Row</span>
+
+    <span class="nv">$result</span>   <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">);</span>
+    <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">getResponse</span><span class="p">();</span>
+
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertEquals</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getStatusCode</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>If we do not send any <tt class="docutils literal"><span class="pre">id</span></tt> parameter the Controller will redirect us to the <tt class="docutils literal"><span class="pre">album</span></tt> route which returns the HTTP Status Code <tt class="docutils literal"><span class="pre">302</span></tt></p>
+<p>We will also add another test to check if the redirection works.
+Add the following also to <tt class="docutils literal"><span class="pre">AlbumControllerTest.php</span></tt></p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="o">...</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">testEditActionRedirect</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="s1">&#39;edit&#39;</span><span class="p">);</span>
+
+    <span class="nv">$result</span>   <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">);</span>
+    <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">getResponse</span><span class="p">();</span>
+
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertEquals</span><span class="p">(</span><span class="mi">302</span><span class="p">,</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getStatusCode</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>And execute <tt class="docutils literal"><span class="pre">phpunit</span></tt> from <tt class="docutils literal"><span class="pre">module/Album/test</span></tt>.</p>
+<div class="highlight-text"><div class="highlight"><pre>PHPUnit 3.5.15 by Sebastian Bergmann.
+
+...............
+
+Time: 1 second, Memory: 13.00Mb
+
+
+OK (15 tests, 24 assertions)
+</pre></div>
+</div>
+</div>
+<div class="section" id="deleting-an-album">
+<h2>Deleting an album<a class="headerlink" href="#deleting-an-album" title="Permalink to this headline">¶</a></h2>
+<p>To round out our application, we need to add deletion. We have a Delete link
+next to each album on our list page and the naïve approach would be to do a
+delete when it’s clicked. This would be wrong. Remembering our HTTP spec, we
+recall that you shouldn’t do an irreversible action using GET and should use
+POST instead.</p>
+<p>We shall show a confirmation form when the user clicks delete and if they then
+click “yes”, we will do the deletion. As the form is trivial, we’ll code it
+directly into our view (<tt class="docutils literal"><span class="pre">Zend\Form</span></tt> is, after all, optional!).</p>
+<p>Let’s start with the action code in <tt class="docutils literal"><span class="pre">AlbumController::deleteAction()</span></tt>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// module/Album/src/Album/Controller/AlbumController.php:</span>
+<span class="c1">//...</span>
+    <span class="c1">// Add content to the following method:</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">deleteAction</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$id</span> <span class="o">=</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">fromRoute</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$id</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toRoute</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="nv">$request</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">isPost</span><span class="p">())</span> <span class="p">{</span>
+            <span class="nv">$del</span> <span class="o">=</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getPost</span><span class="p">(</span><span class="s1">&#39;del&#39;</span><span class="p">,</span> <span class="s1">&#39;No&#39;</span><span class="p">);</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$del</span> <span class="o">==</span> <span class="s1">&#39;Yes&#39;</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nv">$id</span> <span class="o">=</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span> <span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getPost</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">);</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getAlbumTable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">deleteAlbum</span><span class="p">(</span><span class="nv">$id</span><span class="p">);</span>
+            <span class="p">}</span>
+
+            <span class="c1">// Redirect to list of albums</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toRoute</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;id&#39;</span>    <span class="o">=&gt;</span> <span class="nv">$id</span><span class="p">,</span>
+            <span class="s1">&#39;album&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getAlbumTable</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getAlbum</span><span class="p">(</span><span class="nv">$id</span><span class="p">)</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="c1">//...</span>
+</pre></div>
+</div>
+<p>As before, we get the <tt class="docutils literal"><span class="pre">id</span></tt> from the matched route,and check the request
+object’s <tt class="docutils literal"><span class="pre">isPost()</span></tt> to determine whether to show the confirmation page or to
+delete the album. We use the table object to delete the row using the
+<tt class="docutils literal"><span class="pre">deleteAlbum()</span></tt> method and then redirect back the list of albums. If the
+request is not a POST, then we retrieve the correct database record and assign
+to the view, along with the <tt class="docutils literal"><span class="pre">id</span></tt>.</p>
+<p>The view script is a simple form:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">// module/Album/view/album/album/delete.phtml:</span>
+
+<span class="nv">$title</span> <span class="o">=</span> <span class="s1">&#39;Delete album&#39;</span><span class="p">;</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headTitle</span><span class="p">(</span><span class="nv">$title</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;h1&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escapeHtml</span><span class="p">(</span><span class="nv">$title</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x">&lt;/h1&gt;</span>
+
+<span class="x">&lt;p&gt;Are you sure that you want to delete</span>
+<span class="x">    &#39;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escapeHtml</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">title</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x">&#39; by</span>
+<span class="x">    &#39;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escapeHtml</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">artist</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x">&#39;?</span>
+<span class="x">&lt;/p&gt;</span>
+<span class="cp">&lt;?php</span>
+<span class="nv">$url</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;delete&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;id&#39;</span>     <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span>
+<span class="p">));</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;form action=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$url</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x">&quot; method=&quot;post&quot;&gt;</span>
+<span class="x">&lt;div&gt;</span>
+<span class="x">    &lt;input type=&quot;hidden&quot; name=&quot;id&quot; value=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span> <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x">&quot; /&gt;</span>
+<span class="x">    &lt;input type=&quot;submit&quot; name=&quot;del&quot; value=&quot;Yes&quot; /&gt;</span>
+<span class="x">    &lt;input type=&quot;submit&quot; name=&quot;del&quot; value=&quot;No&quot; /&gt;</span>
+<span class="x">&lt;/div&gt;</span>
+<span class="x">&lt;/form&gt;</span>
+</pre></div>
+</div>
+<p>In this script, we display a confirmation message to the user and then a form
+with &#8220;Yes&#8221; and &#8220;No&#8221; buttons. In the action, we checked specifically for the “Yes”
+value when doing the deletion.</p>
+<p>Modify the tests in <tt class="docutils literal"><span class="pre">AlbumControllerTest.php</span></tt> in <tt class="docutils literal"><span class="pre">module/Album/test/AlbumTest/Controller</span></tt>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">testDeleteActionCanBeAccessed</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="s1">&#39;delete&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">);</span>
+
+    <span class="nv">$result</span>   <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">);</span>
+    <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">getResponse</span><span class="p">();</span>
+
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertEquals</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getStatusCode</span><span class="p">());</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">testDeleteActionRedirect</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="s1">&#39;delete&#39;</span><span class="p">);</span>
+
+    <span class="nv">$result</span>   <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">);</span>
+    <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">getResponse</span><span class="p">();</span>
+
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertEquals</span><span class="p">(</span><span class="mi">302</span><span class="p">,</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getStatusCode</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="ensuring-that-the-home-page-displays-the-list-of-albums">
+<h2>Ensuring that the home page displays the list of albums<a class="headerlink" href="#ensuring-that-the-home-page-displays-the-list-of-albums" title="Permalink to this headline">¶</a></h2>
+<p>One final point. At the moment, the home page, <a class="reference external" href="http://zf2-tutorial.localhost/">http://zf2-tutorial.localhost/</a>
+doesn’t display the list of albums.</p>
+<p>This is due to a route set up in the <tt class="docutils literal"><span class="pre">Application</span></tt> module’s
+<tt class="docutils literal"><span class="pre">module.config.php</span></tt>. To change it, open
+<tt class="docutils literal"><span class="pre">module/Application/config/module.config.php</span></tt> and find the home route:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="s1">&#39;home&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Mvc\Router\Http\Literal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Application\Controller\Index&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">),</span>
+</pre></div>
+</div>
+<p>Change the <tt class="docutils literal"><span class="pre">controller</span></tt> from <tt class="docutils literal"><span class="pre">Application\Controller\Index</span></tt> to
+<tt class="docutils literal"><span class="pre">Album\Controller\Album</span></tt>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="s1">&#39;home&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\Mvc\Router\Http\Literal&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;route&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">            <span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Album\Controller\Album&#39;</span><span class="p">,</span> <span class="c1">// &lt;-- change here</span>
+</span>            <span class="s1">&#39;action&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">),</span>
+</pre></div>
+</div>
+<p>That’s it - you now have a fully working application!</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Forms and actions</a><ul>
+<li><a class="reference internal" href="#adding-new-albums">Adding new albums</a></li>
+<li><a class="reference internal" href="#editing-an-album">Editing an album</a></li>
+<li><a class="reference internal" href="#deleting-an-album">Deleting an album</a></li>
+<li><a class="reference internal" href="#ensuring-that-the-home-page-displays-the-list-of-albums">Ensuring that the home page displays the list of albums</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="styling-and-translations.html"
+                        title="previous chapter">Styling and Translations</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="conclusion.html"
+                        title="next chapter">Conclusion</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/user-guide/forms-and-actions.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/user-guide/forms-and-actions.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/user-guide/forms-and-actions.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="conclusion.html" title="Conclusion"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="styling-and-translations.html" title="Styling and Translations"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/user-guide/forms-and-actions.rst">
+                Forms and actions
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

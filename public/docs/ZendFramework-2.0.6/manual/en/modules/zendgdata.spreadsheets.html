@@ -1,0 +1,486 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Google Spreadsheets &mdash; Zend Framework 2 2.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.6 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-google-spreadsheets">
+<span id="zendgdata-spreadsheets"></span><h1>Using Google Spreadsheets<a class="headerlink" href="#using-google-spreadsheets" title="Permalink to this headline">¶</a></h1>
+<p>The Google Spreadsheets data <em>API</em> allows client applications to view and update Spreadsheets content in the form
+of Google data <em>API</em> feeds. Your client application can request a list of a user&#8217;s spreadsheets, edit or delete
+content in an existing Spreadsheets worksheet, and query the content in an existing Spreadsheets worksheet.</p>
+<p>See <a class="reference external" href="http://code.google.com/apis/spreadsheets/overview.html">http://code.google.com/apis/spreadsheets/overview.html</a> for more information about the Google Spreadsheets
+<em>API</em>.</p>
+<div class="section" id="create-a-spreadsheet">
+<span id="zendgdata-spreadsheets-creating"></span><h2>Create a Spreadsheet<a class="headerlink" href="#create-a-spreadsheet" title="Permalink to this headline">¶</a></h2>
+<p>The Spreadsheets data <em>API</em> does not currently provide a way to programmatically create or delete a spreadsheet.</p>
+</div>
+<div class="section" id="get-a-list-of-spreadsheets">
+<span id="zendgdata-spreadsheets-listspreadsheets"></span><h2>Get a List of Spreadsheets<a class="headerlink" href="#get-a-list-of-spreadsheets" title="Permalink to this headline">¶</a></h2>
+<p>You can get a list of spreadsheets for a particular user by using the <tt class="docutils literal"><span class="pre">getSpreadsheetFeed()</span></tt> method of the
+Spreadsheets service. The service will return a <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\SpreadsheetFeed</span></tt> object containing a
+list of spreadsheets associated with the authenticated user.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$service</span> <span class="o">=</span> <span class="nx">ZendGData\Spreadsheets</span><span class="o">::</span><span class="na">AUTH_SERVICE_NAME</span><span class="p">;</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="nx">ZendGData\ClientLogin</span><span class="o">::</span><span class="na">getHttpClient</span><span class="p">(</span><span class="nv">$user</span><span class="p">,</span> <span class="nv">$pass</span><span class="p">,</span> <span class="nv">$service</span><span class="p">);</span>
+<span class="nv">$spreadsheetService</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendGData\Spreadsheets</span><span class="p">(</span><span class="nv">$client</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$spreadsheetService</span><span class="o">-&gt;</span><span class="na">getSpreadsheetFeed</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="get-a-list-of-worksheets">
+<span id="zendgdata-spreadsheets-listworksheets"></span><h2>Get a List of Worksheets<a class="headerlink" href="#get-a-list-of-worksheets" title="Permalink to this headline">¶</a></h2>
+<p>A given spreadsheet may contain multiple worksheets. For each spreadsheet, there&#8217;s a worksheets metafeed listing
+all the worksheets in that spreadsheet.</p>
+<p>Given the spreadsheet key from the &lt;id&gt; of a <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\SpreadsheetEntry</span></tt> object you&#8217;ve already
+retrieved, you can fetch a feed containing a list of worksheets associated with that spreadsheet.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendGData\Spreadsheets\DocumentQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setSpreadsheetKey</span><span class="p">(</span><span class="nv">$spreadsheetKey</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$spreadsheetService</span><span class="o">-&gt;</span><span class="na">getWorksheetFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The resulting <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\WorksheetFeed</span></tt> object feed represents the response from the server. Among
+other things, this feed contains a list of <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\WorksheetEntry</span></tt> objects (<tt class="docutils literal"><span class="pre">$feed-&gt;entries</span></tt>),
+each of which represents a single worksheet.</p>
+</div>
+<div class="section" id="interacting-with-list-based-feeds">
+<span id="zendgdata-spreadsheets-listfeeds"></span><h2>Interacting With List-based Feeds<a class="headerlink" href="#interacting-with-list-based-feeds" title="Permalink to this headline">¶</a></h2>
+<p>A given worksheet generally contains multiple rows, each containing multiple cells. You can request data from the
+worksheet either as a list-based feed, in which each entry represents a row, or as a cell-based feed, in which each
+entry represents a single cell. For information on cell-based feeds, see <a class="reference internal" href="#zendgdata-spreadsheets-cellfeeds"><em>Interacting with cell-based feeds</em></a>.</p>
+<p>The following sections describe how to get a list-based feed, add a row to a worksheet, and send queries with
+various query parameters.</p>
+<p>The list feed makes some assumptions about how the data is laid out in the spreadsheet.</p>
+<p>In particular, the list feed treats the first row of the worksheet as a header row; Spreadsheets dynamically
+creates <em>XML</em> elements named after the contents of header-row cells. Users who want to provide Gdata feeds should
+not put any data other than column headers in the first row of a worksheet.</p>
+<p>The list feed contains all rows after the first row up to the first blank row. The first blank row terminates the
+data set. If expected data isn&#8217;t appearing in a feed, check the worksheet manually to see whether there&#8217;s an
+unexpected blank row in the middle of the data. In particular, if the second row of the spreadsheet is blank, then
+the list feed will contain no data.</p>
+<p>A row in a list feed is as many columns wide as the worksheet itself.</p>
+<div class="section" id="get-a-list-based-feed">
+<span id="zendgdata-spreadsheets-listfeeds-get"></span><h3>Get a List-based Feed<a class="headerlink" href="#get-a-list-based-feed" title="Permalink to this headline">¶</a></h3>
+<p>To retrieve a worksheet&#8217;s list feed, use the <tt class="docutils literal"><span class="pre">getListFeed()</span></tt> method of the Spreadsheets service.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendGData\Spreadsheets\ListQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setSpreadsheetKey</span><span class="p">(</span><span class="nv">$spreadsheetKey</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setWorksheetId</span><span class="p">(</span><span class="nv">$worksheetId</span><span class="p">);</span>
+<span class="nv">$listFeed</span> <span class="o">=</span> <span class="nv">$spreadsheetService</span><span class="o">-&gt;</span><span class="na">getListFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The resulting <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\ListFeed</span></tt> object <tt class="docutils literal"><span class="pre">$listfeed</span></tt> represents a response from the server.
+Among other things, this feed contains an array of <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\ListEntry</span></tt> objects
+(<tt class="docutils literal"><span class="pre">$listFeed-&gt;entries</span></tt>), each of which represents a single row in a worksheet.</p>
+<p>Each <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\ListEntry</span></tt> contains an array, <tt class="docutils literal"><span class="pre">custom</span></tt>, which contains the data for that row. You
+can extract and display this array:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$rowData</span> <span class="o">=</span> <span class="nv">$listFeed</span><span class="o">-&gt;</span><span class="na">entries</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-&gt;</span><span class="na">getCustom</span><span class="p">();</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$rowData</span> <span class="k">as</span> <span class="nv">$customEntry</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">echo</span> <span class="nv">$customEntry</span><span class="o">-&gt;</span><span class="na">getColumnName</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&quot; = &quot;</span> <span class="o">.</span> <span class="nv">$customEntry</span><span class="o">-&gt;</span><span class="na">getText</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>An alternate version of this array, <tt class="docutils literal"><span class="pre">customByName</span></tt>, allows direct access to an entry&#8217;s cells by name. This is
+convenient when trying to access a specific header:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$customEntry</span> <span class="o">=</span> <span class="nv">$listFeed</span><span class="o">-&gt;</span><span class="na">entries</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-&gt;</span><span class="na">getCustomByName</span><span class="p">(</span><span class="s1">&#39;my_heading&#39;</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$customEntry</span><span class="o">-&gt;</span><span class="na">getColumnName</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&quot; = &quot;</span> <span class="o">.</span> <span class="nv">$customEntry</span><span class="o">-&gt;</span><span class="na">getText</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="reverse-sort-rows">
+<span id="zendgdata-spreadsheets-listfeeds-reverse"></span><h3>Reverse-sort Rows<a class="headerlink" href="#reverse-sort-rows" title="Permalink to this headline">¶</a></h3>
+<p>By default, rows in the feed appear in the same order as the corresponding rows in the GUI; that is, they&#8217;re in
+order by row number. To get rows in reverse order, set the reverse properties of the
+<tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\ListQuery</span></tt> object to <tt class="docutils literal"><span class="pre">TRUE</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendGData\Spreadsheets\ListQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setSpreadsheetKey</span><span class="p">(</span><span class="nv">$spreadsheetKey</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setWorksheetId</span><span class="p">(</span><span class="nv">$worksheetId</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setReverse</span><span class="p">(</span><span class="s1">&#39;true&#39;</span><span class="p">);</span>
+<span class="nv">$listFeed</span> <span class="o">=</span> <span class="nv">$spreadsheetService</span><span class="o">-&gt;</span><span class="na">getListFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that if you want to order (or reverse sort) by a particular column, rather than by position in the worksheet,
+you can set the <tt class="docutils literal"><span class="pre">orderby</span></tt> value of the <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\ListQuery</span></tt> object to <strong>column:&lt;the header of
+that column&gt;</strong>.</p>
+</div>
+<div class="section" id="send-a-structured-query">
+<span id="zendgdata-spreadsheets-listfeeds-sq"></span><h3>Send a Structured Query<a class="headerlink" href="#send-a-structured-query" title="Permalink to this headline">¶</a></h3>
+<p>You can set a <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\ListQuery</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">sq</span></tt> value to produce a feed with entries that meet the
+specified criteria. For example, suppose you have a worksheet containing personnel data, in which each row
+represents information about a single person. You wish to retrieve all rows in which the person&#8217;s name is &#8220;John&#8221;
+and the person&#8217;s age is over 25. To do so, you would set <tt class="docutils literal"><span class="pre">sq</span></tt> as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendGData\Spreadsheets\ListQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setSpreadsheetKey</span><span class="p">(</span><span class="nv">$spreadsheetKey</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setWorksheetId</span><span class="p">(</span><span class="nv">$worksheetId</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setSpreadsheetQuery</span><span class="p">(</span><span class="s1">&#39;name=John and age&gt;25&#39;</span><span class="p">);</span>
+<span class="nv">$listFeed</span> <span class="o">=</span> <span class="nv">$spreadsheetService</span><span class="o">-&gt;</span><span class="na">getListFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="add-a-row">
+<span id="zendgdata-spreadsheets-listfeeds-addrow"></span><h3>Add a Row<a class="headerlink" href="#add-a-row" title="Permalink to this headline">¶</a></h3>
+<p>Rows can be added to a spreadsheet by using the <tt class="docutils literal"><span class="pre">insertRow()</span></tt> method of the Spreadsheet service.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$insertedListEntry</span> <span class="o">=</span> <span class="nv">$spreadsheetService</span><span class="o">-&gt;</span><span class="na">insertRow</span><span class="p">(</span><span class="nv">$rowData</span><span class="p">,</span>
+                                                    <span class="nv">$spreadsheetKey</span><span class="p">,</span>
+                                                    <span class="nv">$worksheetId</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">$rowData</span></tt> parameter contains an array of column keys to data values. The method returns a
+<tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\SpreadsheetsEntry</span></tt> object which represents the inserted row.</p>
+<p>Spreadsheets inserts the new row immediately after the last row that appears in the list-based feed, which is to
+say immediately before the first entirely blank row.</p>
+</div>
+<div class="section" id="edit-a-row">
+<span id="zendgdata-spreadsheets-listfeeds-editrow"></span><h3>Edit a Row<a class="headerlink" href="#edit-a-row" title="Permalink to this headline">¶</a></h3>
+<p>Once a <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\ListEntry</span></tt> object is fetched, its rows can be updated by using the
+<tt class="docutils literal"><span class="pre">updateRow()</span></tt> method of the Spreadsheet service.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$updatedListEntry</span> <span class="o">=</span> <span class="nv">$spreadsheetService</span><span class="o">-&gt;</span><span class="na">updateRow</span><span class="p">(</span><span class="nv">$oldListEntry</span><span class="p">,</span>
+                                                   <span class="nv">$newRowData</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">$oldListEntry</span></tt> parameter contains the list entry to be updated. <tt class="docutils literal"><span class="pre">$newRowData</span></tt> contains an array of column
+keys to data values, to be used as the new row data. The method returns a
+<tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\SpreadsheetsEntry</span></tt> object which represents the updated row.</p>
+</div>
+<div class="section" id="delete-a-row">
+<span id="zendgdata-spreadsheets-listfeeds-deleterow"></span><h3>Delete a Row<a class="headerlink" href="#delete-a-row" title="Permalink to this headline">¶</a></h3>
+<p>To delete a row, simply invoke <tt class="docutils literal"><span class="pre">deleteRow()</span></tt> on the <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets</span></tt> object with the existing entry to
+be deleted:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$spreadsheetService</span><span class="o">-&gt;</span><span class="na">deleteRow</span><span class="p">(</span><span class="nv">$listEntry</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Alternatively, you can call the <tt class="docutils literal"><span class="pre">delete()</span></tt> method of the entry itself:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$listEntry</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="interacting-with-cell-based-feeds">
+<span id="zendgdata-spreadsheets-cellfeeds"></span><h2>Interacting With Cell-based Feeds<a class="headerlink" href="#interacting-with-cell-based-feeds" title="Permalink to this headline">¶</a></h2>
+<p>In a cell-based feed, each entry represents a single cell.</p>
+<p>Note that we don&#8217;t recommend interacting with both a cell-based feed and a list-based feed for the same worksheet
+at the same time.</p>
+<div class="section" id="get-a-cell-based-feed">
+<span id="zendgdata-spreadsheets-cellfeeds-get"></span><h3>Get a Cell-based Feed<a class="headerlink" href="#get-a-cell-based-feed" title="Permalink to this headline">¶</a></h3>
+<p>To retrieve a worksheet&#8217;s cell feed, use the <tt class="docutils literal"><span class="pre">getCellFeed()</span></tt> method of the Spreadsheets service.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendGData\Spreadsheets\CellQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setSpreadsheetKey</span><span class="p">(</span><span class="nv">$spreadsheetKey</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setWorksheetId</span><span class="p">(</span><span class="nv">$worksheetId</span><span class="p">);</span>
+<span class="nv">$cellFeed</span> <span class="o">=</span> <span class="nv">$spreadsheetService</span><span class="o">-&gt;</span><span class="na">getCellFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The resulting <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\CellFeed</span></tt> object <tt class="docutils literal"><span class="pre">$cellFeed</span></tt> represents a response from the server.
+Among other things, this feed contains an array of <tt class="docutils literal"><span class="pre">ZendGData\Spreadsheets\CellEntry</span></tt> objects
+(<tt class="docutils literal"><span class="pre">$cellFeed&gt;entries</span></tt>), each of which represents a single cell in a worksheet. You can display this information:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">foreach</span> <span class="p">(</span><span class="nv">$cellFeed</span> <span class="k">as</span> <span class="nv">$cellEntry</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">$row</span> <span class="o">=</span> <span class="nv">$cellEntry</span><span class="o">-&gt;</span><span class="na">cell</span><span class="o">-&gt;</span><span class="na">getRow</span><span class="p">();</span>
+  <span class="nv">$col</span> <span class="o">=</span> <span class="nv">$cellEntry</span><span class="o">-&gt;</span><span class="na">cell</span><span class="o">-&gt;</span><span class="na">getColumn</span><span class="p">();</span>
+  <span class="nv">$val</span> <span class="o">=</span> <span class="nv">$cellEntry</span><span class="o">-&gt;</span><span class="na">cell</span><span class="o">-&gt;</span><span class="na">getText</span><span class="p">();</span>
+  <span class="k">echo</span> <span class="s2">&quot;</span><span class="si">$row</span><span class="s2">, </span><span class="si">$col</span><span class="s2"> = </span><span class="si">$val</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="send-a-cell-range-query">
+<span id="zendgdata-spreadsheets-cellfeeds-cellrangequery"></span><h3>Send a Cell Range Query<a class="headerlink" href="#send-a-cell-range-query" title="Permalink to this headline">¶</a></h3>
+<p>Suppose you wanted to retrieve the cells in the first column of a worksheet. You can request a cell feed containing
+only this column as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendGData\Spreadsheets\CellQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setMinCol</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setMaxCol</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setMinRow</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$spreadsheetService</span><span class="o">-&gt;</span><span class="na">getCellsFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>This requests all the data in column 1, starting with row 2.</p>
+</div>
+<div class="section" id="change-contents-of-a-cell">
+<span id="zendgdata-spreadsheets-cellfeeds-updatecell"></span><h3>Change Contents of a Cell<a class="headerlink" href="#change-contents-of-a-cell" title="Permalink to this headline">¶</a></h3>
+<p>To modify the contents of a cell, call <tt class="docutils literal"><span class="pre">updateCell()</span></tt> with the row, column, and new value of the cell.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$updatedCell</span> <span class="o">=</span> <span class="nv">$spreadsheetService</span><span class="o">-&gt;</span><span class="na">updateCell</span><span class="p">(</span><span class="nv">$row</span><span class="p">,</span>
+                                               <span class="nv">$col</span><span class="p">,</span>
+                                               <span class="nv">$inputValue</span><span class="p">,</span>
+                                               <span class="nv">$spreadsheetKey</span><span class="p">,</span>
+                                               <span class="nv">$worksheetId</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The new data is placed in the specified cell in the worksheet. If the specified cell contains data already, it will
+be overwritten. Note: Use <tt class="docutils literal"><span class="pre">updateCell()</span></tt> to change the data in a cell, even if the cell is empty.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using Google Spreadsheets</a><ul>
+<li><a class="reference internal" href="#create-a-spreadsheet">Create a Spreadsheet</a></li>
+<li><a class="reference internal" href="#get-a-list-of-spreadsheets">Get a List of Spreadsheets</a></li>
+<li><a class="reference internal" href="#get-a-list-of-worksheets">Get a List of Worksheets</a></li>
+<li><a class="reference internal" href="#interacting-with-list-based-feeds">Interacting With List-based Feeds</a><ul>
+<li><a class="reference internal" href="#get-a-list-based-feed">Get a List-based Feed</a></li>
+<li><a class="reference internal" href="#reverse-sort-rows">Reverse-sort Rows</a></li>
+<li><a class="reference internal" href="#send-a-structured-query">Send a Structured Query</a></li>
+<li><a class="reference internal" href="#add-a-row">Add a Row</a></li>
+<li><a class="reference internal" href="#edit-a-row">Edit a Row</a></li>
+<li><a class="reference internal" href="#delete-a-row">Delete a Row</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interacting-with-cell-based-feeds">Interacting With Cell-based Feeds</a><ul>
+<li><a class="reference internal" href="#get-a-cell-based-feed">Get a Cell-based Feed</a></li>
+<li><a class="reference internal" href="#send-a-cell-range-query">Send a Cell Range Query</a></li>
+<li><a class="reference internal" href="#change-contents-of-a-cell">Change Contents of a Cell</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendgdata.spreadsheets.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendgdata.spreadsheets.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendgdata.spreadsheets.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendgdata.spreadsheets.rst">
+                Using Google Spreadsheets
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

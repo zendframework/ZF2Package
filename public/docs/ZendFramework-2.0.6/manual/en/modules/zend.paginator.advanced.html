@@ -1,0 +1,403 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Advanced usage &mdash; Zend Framework 2 2.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.6 documentation" href="../index.html" />
+    <link rel="next" title="Introduction" href="zend.permissions.acl.intro.html" />
+    <link rel="prev" title="Configuration" href="zend.paginator.configuration.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.permissions.acl.intro.html" title="Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.paginator.configuration.html" title="Configuration"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="advanced-usage">
+<span id="zend-paginator-advanced"></span><h1>Advanced usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="custom-data-source-adapters">
+<span id="zend-paginator-advanced-adapters"></span><h2>Custom data source adapters<a class="headerlink" href="#custom-data-source-adapters" title="Permalink to this headline">¶</a></h2>
+<p>At some point you may run across a data type that is not covered by the packaged adapters. In this case, you will
+need to write your own.</p>
+<p>To do so, you must implement <tt class="docutils literal"><span class="pre">Zend\Paginator\Adapter\AdapterInterface</span></tt>. There are two methods required to do this:</p>
+<ul class="simple">
+<li>count()</li>
+<li>getItems($offset, $itemCountPerPage)</li>
+</ul>
+<p>Additionally, you&#8217;ll want to implement a constructor that takes your data source as a parameter and stores it as a
+protected or private property. How you wish to go about doing this specifically is up to you.</p>
+<p>If you&#8217;ve ever used the SPL interface <a class="reference external" href="http://www.php.net/~helly/php/ext/spl/interfaceCountable.html">Countable</a>, you&#8217;re familiar with <tt class="docutils literal"><span class="pre">count()</span></tt>. As used with
+<tt class="docutils literal"><span class="pre">Zend\Paginator</span></tt>, this is the total number of items in the data collection. Additionally, the <tt class="docutils literal"><span class="pre">Zend\Paginator\Paginator</span></tt>
+instance provides a method <tt class="docutils literal"><span class="pre">countAllItems()</span></tt> that proxies to the adapter <tt class="docutils literal"><span class="pre">count()</span></tt> method.</p>
+<p>The <tt class="docutils literal"><span class="pre">getItems()</span></tt> method is only slightly more complicated. For this, your adapter is supplied with an offset and
+the number of items to display per page. You must return the appropriate slice of data. For an array, that would
+be:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">return</span> <span class="nb">array_slice</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_array</span><span class="p">,</span> <span class="nv">$offset</span><span class="p">,</span> <span class="nv">$itemCountPerPage</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Take a look at the packaged adapters (all of which implement the <tt class="docutils literal"><span class="pre">Zend\Paginator\Adapter\AdapterInterface</span></tt>) for ideas of
+how you might go about implementing your own.</p>
+</div>
+<div class="section" id="custom-scrolling-styles">
+<span id="zend-paginator-advanced-scrolling-styles"></span><h2>Custom scrolling styles<a class="headerlink" href="#custom-scrolling-styles" title="Permalink to this headline">¶</a></h2>
+<p>Creating your own scrolling style requires that you implement <tt class="docutils literal"><span class="pre">Zend\Paginator\ScrollingStyle\ScrollingStyleInterface</span></tt>, which
+defines a single method, <tt class="docutils literal"><span class="pre">getPages()</span></tt>. Specifically,</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">getPages</span><span class="p">(</span><span class="nx">Zend\Paginator\Paginator</span> <span class="nv">$paginator</span><span class="p">,</span> <span class="nv">$pageRange</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>This method should calculate a lower and upper bound for page numbers within the range of so-called &#8220;local&#8221; pages
+(that is, pages that are nearby the current page).</p>
+<p>Unless it extends another scrolling style (see <tt class="docutils literal"><span class="pre">Zend\Paginator\ScrollingStyle\Elastic</span></tt> for an example), your
+custom scrolling style will inevitably end with something similar to the following line of code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">return</span> <span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">getPagesInRange</span><span class="p">(</span><span class="nv">$lowerBound</span><span class="p">,</span> <span class="nv">$upperBound</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>There&#8217;s nothing special about this call; it&#8217;s merely a convenience method to check the validity of the lower and
+upper bound and return an array of the range to the paginator.</p>
+<p>When you&#8217;re ready to use your new scrolling style, you&#8217;ll need to tell <tt class="docutils literal"><span class="pre">Zend\Paginator\Paginator</span></tt> what directory to look
+in. To do that, do the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$manager</span> <span class="o">=</span> <span class="nx">Zend\Paginator\Paginator</span><span class="o">::</span><span class="na">getScrollingStyleManager</span><span class="p">();</span>
+<span class="nv">$manager</span><span class="o">-&gt;</span><span class="na">setInvokableClass</span><span class="p">(</span><span class="s1">&#39;my-style&#39;</span><span class="p">,</span> <span class="s1">&#39;My\Paginator\ScrollingStyle&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="caching-features">
+<span id="zend-paginator-advanced-caching"></span><h2>Caching features<a class="headerlink" href="#caching-features" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Paginator\Paginator</span></tt> can be told to cache the data it has already passed on, preventing the adapter from fetching
+them each time they are used. To tell paginator to automatically cache the adapter&#8217;s data, just pass to its
+<tt class="docutils literal"><span class="pre">setCache()</span></tt> method a pre-configured cache object implementing the <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\StorageInterface</span></tt> interface.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$cache</span> <span class="o">=</span> <span class="nx">StorageFactory</span><span class="o">::</span><span class="na">adapterFactory</span><span class="p">(</span><span class="s1">&#39;filesystem&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;cache_dir&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/tmp&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;ttl&#39;</span>       <span class="o">=&gt;</span> <span class="mi">3600</span><span class="p">,</span>
+    <span class="s1">&#39;plugins&#39;</span>   <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;serializer&#39;</span> <span class="p">),</span>
+<span class="p">));</span>
+<span class="nx">Zend\Paginator\Paginator</span><span class="o">::</span><span class="na">setCache</span><span class="p">(</span><span class="nv">$cache</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>As long as <tt class="docutils literal"><span class="pre">Zend\Paginator\Paginator</span></tt> has been seeded with a cache storage object the data it generates will be cached.
+Sometimes you would like not to cache data even if you already passed a cache instance. You should then use <tt class="docutils literal"><span class="pre">setCacheEnable()</span></tt> for that.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// $cache is a Zend\Cache\Storage\StorageInterface instance</span>
+<span class="nx">Zend\Paginator\Paginator</span><span class="o">::</span><span class="na">setCache</span><span class="p">(</span><span class="nv">$cache</span><span class="p">);</span>
+<span class="c1">// ... later on the script</span>
+<span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">setCacheEnable</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
+<span class="c1">// cache is now disabled</span>
+</pre></div>
+</td></tr></table></div>
+<p>When a cache is set, data are automatically stored in it and pulled out from it. It then can be useful to empty the
+cache manually. You can get this done by calling <tt class="docutils literal"><span class="pre">clearPageItemCache($pageNumber)</span></tt>. If you don&#8217;t pass any
+parameter, the whole cache will be empty. You can optionally pass a parameter representing the page number to empty
+in the cache:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// $cache is a Zend\Cache\Storage\StorageInterface instance</span>
+<span class="nx">Zend\Paginator\Paginator</span><span class="o">::</span><span class="na">setCache</span><span class="p">(</span><span class="nv">$cache</span><span class="p">);</span>
+<span class="c1">// $paginator is a fully configured Zend\Paginator\Paginator instance</span>
+<span class="nv">$items</span> <span class="o">=</span> <span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">getCurrentItems</span><span class="p">();</span>
+<span class="c1">// page 1 is now in cache</span>
+<span class="nv">$page3Items</span> <span class="o">=</span> <span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">getItemsByPage</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<span class="c1">// page 3 is now in cache</span>
+
+<span class="c1">// clear the cache of the results for page 3</span>
+<span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">clearPageItemCache</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+
+<span class="c1">// clear all the cache data</span>
+<span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">clearPageItemCache</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>Changing the item count per page will empty the whole cache as it would have become invalid:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// $cache is a Zend\Cache\Storage\StorageInterface instance</span>
+<span class="nx">Zend\Paginator\Paginator</span><span class="o">::</span><span class="na">setCache</span><span class="p">(</span><span class="nv">$cache</span><span class="p">);</span>
+<span class="c1">// fetch some items</span>
+<span class="c1">// $paginator is a fully configured Zend\Paginator\Paginator instance</span>
+<span class="nv">$items</span> <span class="o">=</span> <span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">getCurrentItems</span><span class="p">();</span>
+
+<span class="c1">// all the cache data will be flushed:</span>
+<span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">setItemCountPerPage</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>It is also possible to see the data in cache and ask for them directly. <tt class="docutils literal"><span class="pre">getPageItemCache()</span></tt> can be used for
+that:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// $cache is a Zend\Cache\Storage\StorageInterface instance</span>
+<span class="nx">Zend\Paginator\Paginator</span><span class="o">::</span><span class="na">setCache</span><span class="p">(</span><span class="nv">$cache</span><span class="p">);</span>
+<span class="c1">// $paginator is a fully configured Zend\Paginator\Paginator instance</span>
+<span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">setItemCountPerPage</span><span class="p">(</span><span class="mi">3</span><span class="p">);</span>
+<span class="c1">// fetch some items</span>
+<span class="nv">$items</span> <span class="o">=</span> <span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">getCurrentItems</span><span class="p">();</span>
+<span class="nv">$otherItems</span> <span class="o">=</span> <span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">getItemsPerPage</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span>
+
+<span class="c1">// see the cached items as a two-dimension array:</span>
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">getPageItemCache</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Advanced usage</a><ul>
+<li><a class="reference internal" href="#custom-data-source-adapters">Custom data source adapters</a></li>
+<li><a class="reference internal" href="#custom-scrolling-styles">Custom scrolling styles</a></li>
+<li><a class="reference internal" href="#caching-features">Caching features</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.paginator.configuration.html"
+                        title="previous chapter">Configuration</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.permissions.acl.intro.html"
+                        title="next chapter">Introduction</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.paginator.advanced.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.paginator.advanced.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.paginator.advanced.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.permissions.acl.intro.html" title="Introduction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.paginator.configuration.html" title="Configuration"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.paginator.advanced.rst">
+                Advanced usage
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

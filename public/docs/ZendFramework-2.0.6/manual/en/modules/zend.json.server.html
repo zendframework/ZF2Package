@@ -1,0 +1,670 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Json\Server - JSON-RPC server &mdash; Zend Framework 2 2.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.6 documentation" href="../index.html" />
+    <link rel="next" title="Introduction" href="zend.ldap.introduction.html" />
+    <link rel="prev" title="XML to JSON conversion" href="zend.json.xml2json.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.ldap.introduction.html" title="Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.json.xml2json.html" title="XML to JSON conversion"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-json-server-json-rpc-server">
+<span id="zend-json-server"></span><h1>Zend\Json\Server - JSON-RPC server<a class="headerlink" href="#zend-json-server-json-rpc-server" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Json\Server</span></tt> is a <a class="reference external" href="http://groups.google.com/group/json-rpc/">JSON-RPC</a> server implementation. It supports both the <a class="reference external" href="http://json-rpc.org/wiki/specification">JSON-RPC version 1
+specification</a> as well as the <a class="reference external" href="http://groups.google.com/group/json-rpc/web/json-rpc-1-2-proposal">version 2 specification</a>; additionally, it provides a <em>PHP</em> implementation of the
+<a class="reference external" href="http://groups.google.com/group/json-schema/web/service-mapping-description-proposal">Service Mapping Description (SMD) specification</a> for providing service metadata to service consumers.</p>
+<p>JSON-RPC is a lightweight Remote Procedure Call protocol that utilizes <em>JSON</em> for its messaging envelopes. This
+JSON-RPC implementation follows <em>PHP</em>&#8216;s <a class="reference external" href="http://www.php.net/manual/en/class.soapserver.php">SoapServer</a> <em>API</em>. This means, in a typical situation, you will simply:</p>
+<ul class="simple">
+<li>Instantiate the server object</li>
+<li>Attach one or more functions and/or classes/objects to the server object</li>
+<li>handle() the request</li>
+</ul>
+<p><tt class="docutils literal"><span class="pre">Zend\Json\Server</span></tt> utilizes <a class="reference internal" href="zend.server.reflection.html#zend-server-reflection"><em>Zend\Server\Reflection</em></a> to perform reflection on any
+attached classes or functions, and uses that information to build both the SMD and enforce method call signatures.
+As such, it is imperative that any attached functions and/or class methods have full <em>PHP</em> docblocks documenting,
+minimally:</p>
+<ul class="simple">
+<li>All parameters and their expected variable types</li>
+<li>The return value variable type</li>
+</ul>
+<p><tt class="docutils literal"><span class="pre">Zend\Json\Server</span></tt> listens for POST requests only at this time; fortunately, most JSON-RPC client implementations
+in the wild at the time of this writing will only POST requests as it is. This makes it simple to utilize the same
+server end point to both handle requests as well as to deliver the service SMD, as is shown in the next example.</p>
+<p class="rubric" id="zend-json-server-usage">Zend\Json\Server Usage</p>
+<p>First, let&#8217;s define a class we wish to expose via the JSON-RPC server. We&#8217;ll call the class &#8216;Calculator&#8217;, and
+define methods for &#8216;add&#8217;, &#8216;subtract&#8217;, &#8216;multiply&#8217;, and &#8216;divide&#8217;:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">/**</span>
+<span class="sd"> * Calculator - sample class to expose via JSON-RPC</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Calculator</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * Return sum of two variables</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param  int $x</span>
+<span class="sd">     * @param  int $y</span>
+<span class="sd">     * @return int</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">add</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="nv">$y</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$x</span> <span class="o">+</span> <span class="nv">$y</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Return difference of two variables</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param  int $x</span>
+<span class="sd">     * @param  int $y</span>
+<span class="sd">     * @return int</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">subtract</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="nv">$y</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$x</span> <span class="o">-</span> <span class="nv">$y</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Return product of two variables</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param  int $x</span>
+<span class="sd">     * @param  int $y</span>
+<span class="sd">     * @return int</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">multiply</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="nv">$y</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$x</span> <span class="o">*</span> <span class="nv">$y</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Return the division of two variables</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param  int $x</span>
+<span class="sd">     * @param  int $y</span>
+<span class="sd">     * @return float</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">divide</span><span class="p">(</span><span class="nv">$x</span><span class="p">,</span> <span class="nv">$y</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$x</span> <span class="o">/</span> <span class="nv">$y</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that each method has a docblock with entries indicating each parameter and its type, as well as an entry for
+the return value. This is <strong>absolutely critical</strong> when utilizing <tt class="docutils literal"><span class="pre">Zend\Json\Server</span></tt> or any other server component
+in Zend Framework, for that matter.</p>
+<p>Now we&#8217;ll create a script to handle the requests:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Json\Server\Server</span><span class="p">();</span>
+
+<span class="c1">// Indicate what functionality is available:</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Calculator&#39;</span><span class="p">);</span>
+
+<span class="c1">// Handle the request:</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>However, this will not address the issue of returning an SMD so that the JSON-RPC client can autodiscover methods.
+That can be accomplished by determining the <em>HTTP</em> request method, and then specifying some server metadata:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Json\Server\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Calculator&#39;</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="s1">&#39;GET&#39;</span> <span class="o">==</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_METHOD&#39;</span><span class="p">])</span> <span class="p">{</span>
+    <span class="c1">// Indicate the URL endpoint, and the JSON-RPC version used:</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setTarget</span><span class="p">(</span><span class="s1">&#39;/json-rpc.php&#39;</span><span class="p">)</span>
+           <span class="o">-&gt;</span><span class="na">setEnvelope</span><span class="p">(</span><span class="nx">Zend\Json\Server\Smd</span><span class="o">::</span><span class="na">ENV_JSONRPC_2</span><span class="p">);</span>
+
+    <span class="c1">// Grab the SMD</span>
+    <span class="nv">$smd</span> <span class="o">=</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">getServiceMap</span><span class="p">();</span>
+
+    <span class="c1">// Return the SMD to the client</span>
+    <span class="nx">header</span><span class="p">(</span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$smd</span><span class="p">;</span>
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>If utilizing the JSON-RPC server with Dojo toolkit, you will also need to set a special compatibility flag to
+ensure that the two interoperate properly:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Json\Server\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Calculator&#39;</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="s1">&#39;GET&#39;</span> <span class="o">==</span> <span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">&#39;REQUEST_METHOD&#39;</span><span class="p">])</span> <span class="p">{</span>
+    <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setTarget</span><span class="p">(</span><span class="s1">&#39;/json-rpc.php&#39;</span><span class="p">)</span>
+           <span class="o">-&gt;</span><span class="na">setEnvelope</span><span class="p">(</span><span class="nx">Zend\Json\Server\Smd</span><span class="o">::</span><span class="na">ENV_JSONRPC_2</span><span class="p">);</span>
+    <span class="nv">$smd</span> <span class="o">=</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">getServiceMap</span><span class="p">();</span>
+
+    <span class="c1">// Set Dojo compatibility:</span>
+    <span class="nv">$smd</span><span class="o">-&gt;</span><span class="na">setDojoCompatible</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+
+    <span class="nx">header</span><span class="p">(</span><span class="s1">&#39;Content-Type: application/json&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$smd</span><span class="p">;</span>
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="advanced-details">
+<span id="zend-json-server-details"></span><h2>Advanced Details<a class="headerlink" href="#advanced-details" title="Permalink to this headline">¶</a></h2>
+<p>While most functionality for <tt class="docutils literal"><span class="pre">Zend\Json\Server</span></tt> is spelled out in <a class="reference internal" href="#zend-json-server-usage"><em>this section</em></a>,
+more advanced functionality is available.</p>
+<div class="section" id="zend-json-server-server">
+<span id="zend-json-server-details-zendjsonserver"></span><h3>Zend\Json\Server\Server<a class="headerlink" href="#zend-json-server-server" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">Zend\Json\Server\Server</span></tt> is the core class in the JSON-RPC offering; it handles all requests and returns the
+response payload. It has the following methods:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">addFunction($function)</span></tt>: Specify a userland function to attach to the server.</li>
+<li><tt class="docutils literal"><span class="pre">setClass($class)</span></tt>: Specify a class or object to attach to the server; all public methods of that item will be
+exposed as JSON-RPC methods.</li>
+<li><tt class="docutils literal"><span class="pre">fault($fault</span> <span class="pre">=</span> <span class="pre">null,</span> <span class="pre">$code</span> <span class="pre">=</span> <span class="pre">404,</span> <span class="pre">$data</span> <span class="pre">=</span> <span class="pre">null)</span></tt>: Create and return a <tt class="docutils literal"><span class="pre">Zend\Json\Server\Error</span></tt> object.</li>
+<li><tt class="docutils literal"><span class="pre">handle($request</span> <span class="pre">=</span> <span class="pre">false)</span></tt>: Handle a JSON-RPC request; optionally, pass a <tt class="docutils literal"><span class="pre">Zend\Json\Server\Request</span></tt> object
+to utilize (creates one by default).</li>
+<li><tt class="docutils literal"><span class="pre">getFunctions()</span></tt>: Return a list of all attached methods.</li>
+<li><tt class="docutils literal"><span class="pre">setRequest(Zend\Json\Server\Request</span> <span class="pre">$request)</span></tt>: Specify a request object for the server to utilize.</li>
+<li><tt class="docutils literal"><span class="pre">getRequest()</span></tt>: Retrieve the request object used by the server.</li>
+<li><tt class="docutils literal"><span class="pre">setResponse(Zend\Json\Server\Response</span> <span class="pre">$response)</span></tt>: Set the response object for the server to utilize.</li>
+<li><tt class="docutils literal"><span class="pre">getResponse()</span></tt>: Retrieve the response object used by the server.</li>
+<li><tt class="docutils literal"><span class="pre">setAutoEmitResponse($flag)</span></tt>: Indicate whether the server should automatically emit the response and all
+headers; by default, this is <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">autoEmitResponse()</span></tt>: Determine if auto-emission of the response is enabled.</li>
+<li><tt class="docutils literal"><span class="pre">getServiceMap()</span></tt>: Retrieve the service map description in the form of a <tt class="docutils literal"><span class="pre">Zend\Json\Server\Smd</span></tt> object</li>
+</ul>
+</div>
+<div class="section" id="zend-json-server-request">
+<span id="zend-json-server-details-zendjsonserverrequest"></span><h3>Zend\Json\Server\Request<a class="headerlink" href="#zend-json-server-request" title="Permalink to this headline">¶</a></h3>
+<p>The JSON-RPC request environment is encapsulated in the <tt class="docutils literal"><span class="pre">Zend\Json\Server\Request</span></tt> object. This object allows you
+to set necessary portions of the JSON-RPC request, including the request ID, parameters, and JSON-RPC specification
+version. It has the ability to load itself via <em>JSON</em> or a set of options, and can render itself as <em>JSON</em> via the
+<tt class="docutils literal"><span class="pre">toJson()</span></tt> method.</p>
+<p>The request object has the following methods available:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">setOptions(array</span> <span class="pre">$options)</span></tt>: Specify object configuration. <tt class="docutils literal"><span class="pre">$options</span></tt> may contain keys matching any &#8216;set&#8217;
+method: <tt class="docutils literal"><span class="pre">setParams()</span></tt>, <tt class="docutils literal"><span class="pre">setMethod()</span></tt>, <tt class="docutils literal"><span class="pre">setId()</span></tt>, and <tt class="docutils literal"><span class="pre">setVersion()</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">addParam($value,</span> <span class="pre">$key</span> <span class="pre">=</span> <span class="pre">null)</span></tt>: Add a parameter to use with the method call. Parameters can be just the
+values, or can optionally include the parameter name.</li>
+<li><tt class="docutils literal"><span class="pre">addParams(array</span> <span class="pre">$params)</span></tt>: Add multiple parameters at once; proxies to <tt class="docutils literal"><span class="pre">addParam()</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">setParams(array</span> <span class="pre">$params)</span></tt>: Set all parameters at once; overwrites any existing parameters.</li>
+<li><tt class="docutils literal"><span class="pre">getParam($index)</span></tt>: Retrieve a parameter by position or name.</li>
+<li><tt class="docutils literal"><span class="pre">getParams()</span></tt>: Retrieve all parameters at once.</li>
+<li><tt class="docutils literal"><span class="pre">setMethod($name)</span></tt>: Set the method to call.</li>
+<li><tt class="docutils literal"><span class="pre">getMethod()</span></tt>: Retrieve the method that will be called.</li>
+<li><tt class="docutils literal"><span class="pre">isMethodError()</span></tt>: Determine whether or not the request is malformed and would result in an error.</li>
+<li><tt class="docutils literal"><span class="pre">setId($name)</span></tt>: Set the request identifier (used by the client to match requests to responses).</li>
+<li><tt class="docutils literal"><span class="pre">getId()</span></tt>: Retrieve the request identifier.</li>
+<li><tt class="docutils literal"><span class="pre">setVersion($version)</span></tt>: Set the JSON-RPC specification version the request conforms to. May be either &#8216;1.0&#8217; or
+&#8216;2.0&#8217;.</li>
+<li><tt class="docutils literal"><span class="pre">getVersion()</span></tt>: Retrieve the JSON-RPC specification version used by the request.</li>
+<li><tt class="docutils literal"><span class="pre">loadJson($json)</span></tt>: Load the request object from a <em>JSON</em> string.</li>
+<li><tt class="docutils literal"><span class="pre">toJson()</span></tt>: Render the request as a <em>JSON</em> string.</li>
+</ul>
+<p>An <em>HTTP</em> specific version is available via <tt class="docutils literal"><span class="pre">Zend\Json\Server\Request\Http</span></tt>. This class will retrieve the request
+via <tt class="docutils literal"><span class="pre">php://input</span></tt>, and allows access to the raw <em>JSON</em> via the <tt class="docutils literal"><span class="pre">getRawJson()</span></tt> method.</p>
+</div>
+<div class="section" id="zend-json-server-response">
+<span id="zend-json-server-details-zendjsonserverresponse"></span><h3>Zend\Json\Server\Response<a class="headerlink" href="#zend-json-server-response" title="Permalink to this headline">¶</a></h3>
+<p>The JSON-RPC response payload is encapsulated in the <tt class="docutils literal"><span class="pre">Zend\Json\Server\Response</span></tt> object. This object allows you
+to set the return value of the request, whether or not the response is an error, the request identifier, the
+JSON-RPC specification version the response conforms to, and optionally the service map.</p>
+<p>The response object has the following methods available:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">setResult($value)</span></tt>: Set the response result.</li>
+<li><tt class="docutils literal"><span class="pre">getResult()</span></tt>: Retrieve the response result.</li>
+<li><tt class="docutils literal"><span class="pre">setError(Zend\Json\Server\Error</span> <span class="pre">$error)</span></tt>: Set an error object. If set, this will be used as the response when
+serializing to <em>JSON</em>.</li>
+<li><tt class="docutils literal"><span class="pre">getError()</span></tt>: Retrieve the error object, if any.</li>
+<li><tt class="docutils literal"><span class="pre">isError()</span></tt>: Whether or not the response is an error response.</li>
+<li><tt class="docutils literal"><span class="pre">setId($name)</span></tt>: Set the request identifier (so the client may match the response with the original request).</li>
+<li><tt class="docutils literal"><span class="pre">getId()</span></tt>: Retrieve the request identifier.</li>
+<li><tt class="docutils literal"><span class="pre">setVersion($version)</span></tt>: Set the JSON-RPC version the response conforms to.</li>
+<li><tt class="docutils literal"><span class="pre">getVersion()</span></tt>: Retrieve the JSON-RPC version the response conforms to.</li>
+<li><tt class="docutils literal"><span class="pre">toJson()</span></tt>: Serialize the response to <em>JSON</em>. If the response is an error response, serializes the error
+object.</li>
+<li><tt class="docutils literal"><span class="pre">setServiceMap($serviceMap)</span></tt>: Set the service map object for the response.</li>
+<li><tt class="docutils literal"><span class="pre">getServiceMap()</span></tt>: Retrieve the service map object, if any.</li>
+</ul>
+<p>An <em>HTTP</em> specific version is available via <tt class="docutils literal"><span class="pre">Zend\Json\Server\Response\Http</span></tt>. This class will send the
+appropriate <em>HTTP</em> headers as well as serialize the response as <em>JSON</em>.</p>
+</div>
+<div class="section" id="zend-json-server-error">
+<span id="zend-json-server-details-zendjsonservererror"></span><h3>Zend\Json\Server\Error<a class="headerlink" href="#zend-json-server-error" title="Permalink to this headline">¶</a></h3>
+<p>JSON-RPC has a special format for reporting error conditions. All errors need to provide, minimally, an error
+message and error code; optionally, they can provide additional data, such as a backtrace.</p>
+<p>Error codes are derived from those recommended by <a class="reference external" href="http://xmlrpc-epi.sourceforge.net/specs/rfc.fault_codes.php">the XML-RPC EPI project</a>. <tt class="docutils literal"><span class="pre">Zend\Json\Server</span></tt> appropriately
+assigns the code based on the error condition. For application exceptions, the code &#8216;-32000&#8217; is used.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Json\Server\Error</span></tt> exposes the following methods:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">setCode($code)</span></tt>: Set the error code; if the code is not in the accepted XML-RPC error code range, -32000 will
+be assigned.</li>
+<li><tt class="docutils literal"><span class="pre">getCode()</span></tt>: Retrieve the current error code.</li>
+<li><tt class="docutils literal"><span class="pre">setMessage($message)</span></tt>: Set the error message.</li>
+<li><tt class="docutils literal"><span class="pre">getMessage()</span></tt>: Retrieve the current error message.</li>
+<li><tt class="docutils literal"><span class="pre">setData($data)</span></tt>: Set auxiliary data further qualifying the error, such as a backtrace.</li>
+<li><tt class="docutils literal"><span class="pre">getData()</span></tt>: Retrieve any current auxiliary error data.</li>
+<li><tt class="docutils literal"><span class="pre">toArray()</span></tt>: Cast the error to an array. The array will contain the keys &#8216;code&#8217;, &#8216;message&#8217;, and &#8216;data&#8217;.</li>
+<li><tt class="docutils literal"><span class="pre">toJson()</span></tt>: Cast the error to a JSON-RPC error representation.</li>
+</ul>
+</div>
+<div class="section" id="zend-json-server-smd">
+<span id="zend-json-server-details-zendjsonserversmd"></span><h3>Zend\Json\Server\Smd<a class="headerlink" href="#zend-json-server-smd" title="Permalink to this headline">¶</a></h3>
+<p>SMD stands for Service Mapping Description, a <em>JSON</em> schema that defines how a client can interact with a
+particular web service. At the time of this writing, the <a class="reference external" href="http://groups.google.com/group/json-schema/web/service-mapping-description-proposal">specification</a> has not yet been formally ratified, but
+it is in use already within Dojo toolkit as well as other JSON-RPC consumer clients.</p>
+<p>At its most basic, a Service Mapping Description indicates the method of transport (POST, <tt class="docutils literal"><span class="pre">GET</span></tt>, <em>TCP</em>/IP, etc),
+the request envelope type (usually based on the protocol of the server), the target <em>URL</em> of the service provider,
+and a map of services available. In the case of JSON-RPC, the service map is a list of available methods, which
+each method documenting the available parameters and their types, as well as the expected return value type.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Json\Server\Smd</span></tt> provides an object oriented way to build service maps. At its most basic, you pass it
+metadata describing the service using mutators, and specify services (methods and functions).</p>
+<p>The service descriptions themselves are typically instances of <tt class="docutils literal"><span class="pre">Zend\Json\Server\Smd\Service</span></tt>; you can also pass
+all information as an array to the various service mutators in <tt class="docutils literal"><span class="pre">Zend\Json\Server\Smd</span></tt>, and it will instantiate a
+service for you. The service objects contain information such as the name of the service (typically the
+function or method name), the parameters (names, types, and position), and the return value type. Optionally, each
+service can have its own target and envelope, though this functionality is rarely used.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Json\Server\Server</span></tt> actually does all of this behind the scenes for you, by using reflection on the attached
+classes and functions; you should create your own service maps only if you need to provide custom functionality
+that class and function introspection cannot offer.</p>
+<p>Methods available in <tt class="docutils literal"><span class="pre">Zend\Json\Server\Smd</span></tt> include:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">setOptions(array</span> <span class="pre">$options)</span></tt>: Setup an SMD object from an array of options. All mutators (methods beginning
+with &#8216;set&#8217;) can be used as keys.</li>
+<li><tt class="docutils literal"><span class="pre">setTransport($transport)</span></tt>: Set the transport used to access the service; only POST is currently supported.</li>
+<li><tt class="docutils literal"><span class="pre">getTransport()</span></tt>: Get the current service transport.</li>
+<li><tt class="docutils literal"><span class="pre">setEnvelope($envelopeType)</span></tt>: Set the request envelope that should be used to access the service. Currently,
+supports the constants <tt class="docutils literal"><span class="pre">Zend\Json\Server\Smd::ENV_JSONRPC_1</span></tt> and <tt class="docutils literal"><span class="pre">Zend\Json\Server\Smd::ENV_JSONRPC_2</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">getEnvelope()</span></tt>: Get the current request envelope.</li>
+<li><tt class="docutils literal"><span class="pre">setContentType($type)</span></tt>: Set the content type requests should use (by default, this is &#8216;application/json&#8217;).</li>
+<li><tt class="docutils literal"><span class="pre">getContentType()</span></tt>: Get the current content type for requests to the service.</li>
+<li><tt class="docutils literal"><span class="pre">setTarget($target)</span></tt>: Set the <em>URL</em> endpoint for the service.</li>
+<li><tt class="docutils literal"><span class="pre">getTarget()</span></tt>: Get the <em>URL</em> endpoint for the service.</li>
+<li><tt class="docutils literal"><span class="pre">setId($id)</span></tt>: Typically, this is the <em>URL</em> endpoint of the service (same as the target).</li>
+<li><tt class="docutils literal"><span class="pre">getId()</span></tt>: Retrieve the service ID (typically the <em>URL</em> endpoint of the service).</li>
+<li><tt class="docutils literal"><span class="pre">setDescription($description)</span></tt>: Set a service description (typically narrative information describing the
+purpose of the service).</li>
+<li><tt class="docutils literal"><span class="pre">getDescription()</span></tt>: Get the service description.</li>
+<li><tt class="docutils literal"><span class="pre">setDojoCompatible($flag)</span></tt>: Set a flag indicating whether or not the SMD is compatible with Dojo toolkit. When
+<tt class="docutils literal"><span class="pre">TRUE</span></tt>, the generated <em>JSON</em> SMD will be formatted to comply with the format that Dojo&#8217;s JSON-RPC client
+expects.</li>
+<li><tt class="docutils literal"><span class="pre">isDojoCompatible()</span></tt>: Returns the value of the Dojo compatibility flag (<tt class="docutils literal"><span class="pre">FALSE</span></tt>, by default).</li>
+<li><tt class="docutils literal"><span class="pre">addService($service)</span></tt>: Add a service to the map. May be an array of information to pass to the constructor of
+<tt class="docutils literal"><span class="pre">Zend\Json\Server\Smd\Service</span></tt>, or an instance of that class.</li>
+<li><tt class="docutils literal"><span class="pre">addServices(array</span> <span class="pre">$services)</span></tt>: Add multiple services at once.</li>
+<li><tt class="docutils literal"><span class="pre">setServices(array</span> <span class="pre">$services)</span></tt>: Add multiple services at once, overwriting any previously set services.</li>
+<li><tt class="docutils literal"><span class="pre">getService($name)</span></tt>: Get a service by its name.</li>
+<li><tt class="docutils literal"><span class="pre">getServices()</span></tt>: Get all attached services.</li>
+<li><tt class="docutils literal"><span class="pre">removeService($name)</span></tt>: Remove a service from the map.</li>
+<li><tt class="docutils literal"><span class="pre">toArray()</span></tt>: Cast the service map to an array.</li>
+<li><tt class="docutils literal"><span class="pre">toDojoArray()</span></tt>: Cast the service map to an array compatible with Dojo Toolkit.</li>
+<li><tt class="docutils literal"><span class="pre">toJson()</span></tt>: Cast the service map to a <em>JSON</em> representation.</li>
+</ul>
+<p><tt class="docutils literal"><span class="pre">Zend\Json\Server\Smd\Service</span></tt> has the following methods:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">setOptions(array</span> <span class="pre">$options)</span></tt>: Set object state from an array. Any mutator (methods beginning with &#8216;set&#8217;) may be
+used as a key and set via this method.</li>
+<li><tt class="docutils literal"><span class="pre">setName($name)</span></tt>: Set the service name (typically, the function or method name).</li>
+<li><tt class="docutils literal"><span class="pre">getName()</span></tt>: Retrieve the service name.</li>
+<li><tt class="docutils literal"><span class="pre">setTransport($transport)</span></tt>: Set the service transport (currently, only transports supported by
+<tt class="docutils literal"><span class="pre">Zend\Json\Server\Smd</span></tt> are allowed).</li>
+<li><tt class="docutils literal"><span class="pre">getTransport()</span></tt>: Retrieve the current transport.</li>
+<li><tt class="docutils literal"><span class="pre">setTarget($target)</span></tt>: Set the <em>URL</em> endpoint of the service (typically, this will be the same as the overall
+SMD to which the service is attached).</li>
+<li><tt class="docutils literal"><span class="pre">getTarget()</span></tt>: Get the <em>URL</em> endpoint of the service.</li>
+<li><tt class="docutils literal"><span class="pre">setEnvelope($envelopeType)</span></tt>: Set the service envelope (currently, only envelopes supported by
+<tt class="docutils literal"><span class="pre">Zend\Json\Server\Smd</span></tt> are allowed).</li>
+<li><tt class="docutils literal"><span class="pre">getEnvelope()</span></tt>: Retrieve the service envelope type.</li>
+<li><tt class="docutils literal"><span class="pre">addParam($type,</span> <span class="pre">array</span> <span class="pre">$options</span> <span class="pre">=</span> <span class="pre">array(),</span> <span class="pre">$order</span> <span class="pre">=</span> <span class="pre">null)</span></tt>: Add a parameter to the service. By default, only
+the parameter type is necessary. However, you may also specify the order, as well as options such as:<ul>
+<li><strong>name</strong>: the parameter name</li>
+<li><strong>optional</strong>: whether or not the parameter is optional</li>
+<li><strong>default</strong>: a default value for the parameter</li>
+<li><strong>description</strong>: text describing the parameter</li>
+</ul>
+</li>
+<li><tt class="docutils literal"><span class="pre">addParams(array</span> <span class="pre">$params)</span></tt>: Add several parameters at once; each param should be an assoc array containing
+minimally the key &#8216;type&#8217; describing the parameter type, and optionally the key &#8216;order&#8217;; any other keys will be
+passed as <tt class="docutils literal"><span class="pre">$options</span></tt> to <tt class="docutils literal"><span class="pre">addOption()</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">setParams(array</span> <span class="pre">$params)</span></tt>: Set many parameters at once, overwriting any existing parameters.</li>
+<li><tt class="docutils literal"><span class="pre">getParams()</span></tt>: Retrieve all currently set parameters.</li>
+<li><tt class="docutils literal"><span class="pre">setReturn($type)</span></tt>: Set the return value type of the service.</li>
+<li><tt class="docutils literal"><span class="pre">getReturn()</span></tt>: Get the return value type of the service.</li>
+<li><tt class="docutils literal"><span class="pre">toArray()</span></tt>: Cast the service to an array.</li>
+<li><tt class="docutils literal"><span class="pre">toJson()</span></tt>: Cast the service to a <em>JSON</em> representation.</li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Json\Server - JSON-RPC server</a><ul>
+<li><a class="reference internal" href="#advanced-details">Advanced Details</a><ul>
+<li><a class="reference internal" href="#zend-json-server-server">Zend\Json\Server\Server</a></li>
+<li><a class="reference internal" href="#zend-json-server-request">Zend\Json\Server\Request</a></li>
+<li><a class="reference internal" href="#zend-json-server-response">Zend\Json\Server\Response</a></li>
+<li><a class="reference internal" href="#zend-json-server-error">Zend\Json\Server\Error</a></li>
+<li><a class="reference internal" href="#zend-json-server-smd">Zend\Json\Server\Smd</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.json.xml2json.html"
+                        title="previous chapter">XML to JSON conversion</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.ldap.introduction.html"
+                        title="next chapter">Introduction</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.json.server.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.json.server.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.json.server.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.ldap.introduction.html" title="Introduction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.json.xml2json.html" title="XML to JSON conversion"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.json.server.rst">
+                Zend\Json\Server - JSON-RPC server
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

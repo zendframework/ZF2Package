@@ -1,0 +1,416 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Class Loading &mdash; Zend Framework 2 2.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.6 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="class-loading">
+<span id="performance-classloading"></span><h1>Class Loading<a class="headerlink" href="#class-loading" title="Permalink to this headline">¶</a></h1>
+<p>Anyone who ever performs profiling of a Zend Framework application will immediately recognize that class loading is
+relatively expensive in Zend Framework. Between the sheer number of class files that need to be loaded for many
+components, to the use of plugins that do not have a 1:1 relationship between their class name and the file system,
+the various calls to <tt class="docutils literal"><span class="pre">include_once()</span></tt> and <tt class="docutils literal"><span class="pre">require_once()</span></tt> can be problematic. This chapter intends to provide
+some concrete solutions to these issues.</p>
+<div class="section" id="how-can-i-optimize-my-include-path">
+<span id="performance-classloading-includepath"></span><h2>How can I optimize my include_path?<a class="headerlink" href="#how-can-i-optimize-my-include-path" title="Permalink to this headline">¶</a></h2>
+<p>One trivial optimization you can do to increase the speed of class loading is to pay careful attention to your
+include_path. In particular, you should do four things: use absolute paths (or paths relative to absolute paths),
+reduce the number of include paths you define, have your Zend Framework include_path as early as possible, and only
+include the current directory path at the end of your include_path.</p>
+<div class="section" id="use-absolute-paths">
+<span id="performance-classloading-includepath-abspath"></span><h3>Use absolute paths<a class="headerlink" href="#use-absolute-paths" title="Permalink to this headline">¶</a></h3>
+<p>While this may seem a micro-optimization, the fact is that if you don&#8217;t, you&#8217;ll get very little benefit from
+<em>PHP</em>&#8216;s realpath cache, and as a result, opcode caching will not perform nearly as you may expect.</p>
+<p>There are two easy ways to ensure this. First, you can hardcode the paths in your <tt class="docutils literal"><span class="pre">php.ini</span></tt>, <tt class="docutils literal"><span class="pre">httpd.conf</span></tt>, or
+<tt class="docutils literal"><span class="pre">.htaccess</span></tt>. Second, you can use <em>PHP</em>&#8216;s <tt class="docutils literal"><span class="pre">realpath()</span></tt> function when setting your include_path:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$paths</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="nb">realpath</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/../library&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;.&#39;</span><span class="p">,</span>
+<span class="p">);</span>
+<span class="nb">set_include_path</span><span class="p">(</span><span class="nb">implode</span><span class="p">(</span><span class="nx">PATH_SEPARATOR</span><span class="p">,</span> <span class="nv">$paths</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>You <strong>can</strong> use relative paths &#8211; so long as they are relative to an absolute path:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nb">define</span><span class="p">(</span><span class="s1">&#39;APPLICATION_PATH&#39;</span><span class="p">,</span> <span class="nb">realpath</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)));</span>
+<span class="nv">$paths</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="nx">APPLICATION_PATH</span> <span class="o">.</span> <span class="s1">&#39;/../library&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;.&#39;</span><span class="p">,</span>
+<span class="p">);</span>
+<span class="nb">set_include_path</span><span class="p">(</span><span class="nb">implode</span><span class="p">(</span><span class="nx">PATH_SEPARATOR</span><span class="p">,</span> <span class="nv">$paths</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>However, even so, it&#8217;s typically a trivial task to simply pass the path to <tt class="docutils literal"><span class="pre">realpath()</span></tt>.</p>
+</div>
+<div class="section" id="reduce-the-number-of-include-paths-you-define">
+<span id="performance-classloading-includepath-reduce"></span><h3>Reduce the number of include paths you define<a class="headerlink" href="#reduce-the-number-of-include-paths-you-define" title="Permalink to this headline">¶</a></h3>
+<p>Include paths are scanned in the order in which they appear in the include_path. Obviously, this means that you&#8217;ll
+get a result faster if the file is found on the first scan rather than the last. Thus, a rather obvious enhancement
+is to simply reduce the number of paths in your include_path to only what you need. Look through each include_path
+you&#8217;ve defined, and determine if you actually have any functionality in that path that is used in your application;
+if not, remove it.</p>
+<p>Another optimization is to combine paths. For instance, Zend Framework follows <em>PEAR</em> naming conventions; thus, if
+you are using <em>PEAR</em> libraries (or libraries from another framework or component library that follows <em>PEAR</em> CS),
+try to put all of these libraries on the same include_path. This can often be achieved by something as simple as
+symlinking one or more libraries into a common directory.</p>
+</div>
+<div class="section" id="define-your-zend-framework-include-path-as-early-as-possible">
+<span id="performance-classloading-includepath-early"></span><h3>Define your Zend Framework include_path as early as possible<a class="headerlink" href="#define-your-zend-framework-include-path-as-early-as-possible" title="Permalink to this headline">¶</a></h3>
+<p>Continuing from the previous suggestion, another obvious optimization is to define your Zend Framework include_path
+as early as possible in your include_path. In most cases, it should be the first path in the list. This ensures
+that files included from Zend Framework are found on the first scan.</p>
+</div>
+<div class="section" id="define-the-current-directory-last-or-not-at-all">
+<span id="performance-classloading-includepath-currentdir"></span><h3>Define the current directory last, or not at all<a class="headerlink" href="#define-the-current-directory-last-or-not-at-all" title="Permalink to this headline">¶</a></h3>
+<p>Most include_path examples show using the current directory, or &#8216;.&#8217;. This is convenient for ensuring that scripts
+in the same directory as the file requiring them can be loaded. However, these same examples typically show this
+path item as the first item in the include_path &#8211; which means that the current directory tree is always scanned
+first. In most cases, with Zend Framework applications, this is not desired, and the path may be safely pushed to
+the last item in the list.</p>
+<p class="rubric" id="performance-classloading-includepath-example">Example: Optimized include_path</p>
+<p>Let&#8217;s put all of these suggestions together. Our assumption will be that you are using one or more <em>PEAR</em> libraries
+in conjunction with Zend Framework &#8211; perhaps the PHPUnit and <tt class="docutils literal"><span class="pre">Archive_Tar</span></tt> libraries &#8211; and that you
+occasionally need to include files relative to the current file.</p>
+<p>First, we&#8217;ll create a library directory in our project. Inside that directory, we&#8217;ll symlink our Zend Framework&#8217;s
+<tt class="docutils literal"><span class="pre">library/Zend</span></tt> directory, as well as the necessary directories from our <em>PEAR</em> installation:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">library</span>
+    <span class="nx">Archive</span><span class="o">/</span>
+    <span class="nx">PEAR</span><span class="o">/</span>
+    <span class="nx">PHPUnit</span><span class="o">/</span>
+    <span class="nx">Zend</span><span class="o">/</span>
+</pre></div>
+</td></tr></table></div>
+<p>This allows us to add our own library code if necessary, while keeping shared libraries intact.</p>
+<p>Next, we&#8217;ll opt to create our include_path programmatically within our <tt class="docutils literal"><span class="pre">public/index.php</span></tt> file. This allows us to
+move our code around on the file system, without needing to edit the include_path every time.</p>
+<p>We&#8217;ll borrow ideas from each of the suggestions above: we&#8217;ll use absolute paths, as determined using
+<tt class="docutils literal"><span class="pre">realpath()</span></tt>; we&#8217;ll include Zend Framework&#8217;s include path early; we&#8217;ve already consolidated include_paths; and
+we&#8217;ll put the current directory as the last path. In fact, we&#8217;re doing really well here &#8211; we&#8217;re going to end up
+with only two paths.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$paths</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="nb">realpath</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;/../library&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;.&#39;</span>
+<span class="p">);</span>
+<span class="nb">set_include_path</span><span class="p">(</span><span class="nb">implode</span><span class="p">(</span><span class="nx">PATH_SEPARATOR</span><span class="p">,</span> <span class="nv">$paths</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="how-can-i-eliminate-unnecessary-require-once-statements">
+<span id="performance-classloading-striprequires"></span><h2>How can I eliminate unnecessary require_once statements?<a class="headerlink" href="#how-can-i-eliminate-unnecessary-require-once-statements" title="Permalink to this headline">¶</a></h2>
+<p>Lazy loading is an optimization technique designed to push the expensive operation of loading a class file until
+the last possible moment &#8211; i.e., when instantiating an object of that class, calling a static class method, or
+referencing a class constant or static property. <em>PHP</em> supports this via autoloading, which allows you to define
+one or more callbacks to execute in order to map a class name to a file.</p>
+<p>However, most benefits you may reap from autoloading are negated if your library code is still performing
+<tt class="docutils literal"><span class="pre">require_once()</span></tt> calls &#8211; which is precisely the case with Zend Framework. So, the question is: how can you
+eliminate those <tt class="docutils literal"><span class="pre">require_once()</span></tt> calls in order to maximize autoloader performance?</p>
+<div class="section" id="strip-require-once-calls-with-find-and-sed">
+<span id="performance-classloading-striprequires-sed"></span><h3>Strip require_once calls with find and sed<a class="headerlink" href="#strip-require-once-calls-with-find-and-sed" title="Permalink to this headline">¶</a></h3>
+<p>An easy way to strip <tt class="docutils literal"><span class="pre">require_once()</span></tt> calls is to use the <em>UNIX</em> utilities &#8216;find&#8217; and &#8216;sed&#8217; in conjunction to
+comment out each call. Try executing the following statements (where &#8216;%&#8217; indicates the shell prompt):</p>
+<div class="highlight-console"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="gp">%</span> <span class="nb">cd </span>path/to/ZendFramework/library
+<span class="gp">%</span> find . -name <span class="s1">&#39;*.php&#39;</span> -not -wholename <span class="s1">&#39;*/Loader/Autoloader.php&#39;</span> <span class="se">\</span>
+<span class="go">  -not -wholename &#39;*/Application.php&#39; -print0 | \</span>
+<span class="go">  xargs -0 sed --regexp-extended --in-place &#39;s/(require_once)/\/\/ \1/g&#39;</span>
+</pre></div>
+</td></tr></table></div>
+<p>This one-liner (broken into two lines for readability) iterates through each <em>PHP</em> file and tells it to replace
+each instance of &#8216;require_once&#8217; with &#8216;// require_once&#8217;, effectively commenting out each such statement. (It
+selectively keeps <tt class="docutils literal"><span class="pre">require_once()</span></tt> calls within <tt class="docutils literal"><span class="pre">Zend_Application</span></tt> and <tt class="docutils literal"><span class="pre">Zend\Loader\Autoloader</span></tt>, as these
+classes will fail without them.)</p>
+<p>This command could be added to an automated build or release process trivially, helping boost performance in your
+production application. It should be noted, however, that if you use this technique, you <strong>must</strong> utilize
+autoloading; you can do that from your &#8220;<tt class="docutils literal"><span class="pre">public/index.php</span></tt>&#8221; file with the following code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">require_once</span> <span class="s1">&#39;Zend/Loader/Autoloader.php&#39;</span><span class="p">;</span>
+<span class="nx">Zend\Loader\Autoloader</span><span class="o">::</span><span class="na">getInstance</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="how-can-i-speed-up-plugin-loading">
+<span id="performance-classloading-pluginloader"></span><h2>How can I speed up plugin loading?<a class="headerlink" href="#how-can-i-speed-up-plugin-loading" title="Permalink to this headline">¶</a></h2>
+<p>Many components have plugins, which allow you to create your own classes to utilize with the component, as well as
+to override existing, standard plugins shipped with Zend Framework. This provides important flexibility to the
+framework, but at a price: plugin loading is a fairly expensive task.</p>
+<p>The plugin loader allows you to register class prefix / path pairs, allowing you to specify class files in
+non-standard paths. Each prefix can have multiple paths associated with it. Internally, the plugin loader loops
+through each prefix, and then through each path attached to it, testing to see if the file exists and is readable
+on that path. It then loads it, and tests to see that the class it is looking for is available. As you might
+imagine, this can lead to many stat calls on the file system.</p>
+<p>Multiply this by the number of components that use the PluginLoader, and you get an idea of the scope of this
+issue. At the time of this writing, the following components made use of the PluginLoader:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Controller_Action\HelperBroker</span></tt>: helpers</li>
+<li><tt class="docutils literal"><span class="pre">Zend\File\Transfer</span></tt>: adapters</li>
+<li><tt class="docutils literal"><span class="pre">Zend\Filter\Inflector</span></tt>: filters (used by the ViewRenderer action helper and <tt class="docutils literal"><span class="pre">Zend_Layout</span></tt>)</li>
+<li><tt class="docutils literal"><span class="pre">Zend\Filter\Input</span></tt>: filters and validators</li>
+<li><tt class="docutils literal"><span class="pre">Zend_Form</span></tt>: elements, validators, filters, decorators, captcha and file transfer adapters</li>
+<li><tt class="docutils literal"><span class="pre">Zend_Paginator</span></tt>: adapters</li>
+<li><tt class="docutils literal"><span class="pre">Zend_View</span></tt>: helpers, filters</li>
+</ul>
+<p>How can you reduce the number of such calls made?</p>
+<div class="section" id="use-the-pluginloader-include-file-cache">
+<span id="performance-classloading-pluginloader-includefilecache"></span><h3>Use the PluginLoader include file cache<a class="headerlink" href="#use-the-pluginloader-include-file-cache" title="Permalink to this headline">¶</a></h3>
+<p>Zend Framework 1.7.0 adds an include file cache to the PluginLoader. This functionality writes &#8220;<tt class="docutils literal"><span class="pre">include_once()</span></tt>&#8221;
+calls to a file, which you can then include in your bootstrap. While this introduces extra <tt class="docutils literal"><span class="pre">include_once()</span></tt> calls
+to your code, it also ensures that the PluginLoader returns as early as possible.</p>
+<p>The PluginLoader documentation <em class="xref std std-ref">includes a complete example of its use</em>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Class Loading</a><ul>
+<li><a class="reference internal" href="#how-can-i-optimize-my-include-path">How can I optimize my include_path?</a><ul>
+<li><a class="reference internal" href="#use-absolute-paths">Use absolute paths</a></li>
+<li><a class="reference internal" href="#reduce-the-number-of-include-paths-you-define">Reduce the number of include paths you define</a></li>
+<li><a class="reference internal" href="#define-your-zend-framework-include-path-as-early-as-possible">Define your Zend Framework include_path as early as possible</a></li>
+<li><a class="reference internal" href="#define-the-current-directory-last-or-not-at-all">Define the current directory last, or not at all</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-can-i-eliminate-unnecessary-require-once-statements">How can I eliminate unnecessary require_once statements?</a><ul>
+<li><a class="reference internal" href="#strip-require-once-calls-with-find-and-sed">Strip require_once calls with find and sed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#how-can-i-speed-up-plugin-loading">How can I speed up plugin loading?</a><ul>
+<li><a class="reference internal" href="#use-the-pluginloader-include-file-cache">Use the PluginLoader include file cache</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/ref/performance.classloading.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/ref/performance.classloading.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/ref/performance.classloading.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/ref/performance.classloading.rst">
+                Class Loading
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

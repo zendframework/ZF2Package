@@ -1,0 +1,445 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Basic Placeholder Usage &mdash; Zend Framework 2 2.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.6 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="basic-placeholder-usage">
+<span id="learning-view-placeholders-basics"></span><h1>Basic Placeholder Usage<a class="headerlink" href="#basic-placeholder-usage" title="Permalink to this headline">¶</a></h1>
+<p>Zend Framework defines a generic <tt class="docutils literal"><span class="pre">placeholder()</span></tt> view helper that you may use for as many custom placeholders you
+need. It also provides a variety of specific placeholder implementations for often-needed functionality, such as
+specifying the <strong>DocType</strong> declaration, document title, and more.</p>
+<p>All placeholders operate in roughly the same way. They are containers, and thus allow you to operate on them as
+collections. With them you can:</p>
+<ul class="simple">
+<li><strong>Append</strong> or <strong>prepend</strong> items to the collection.</li>
+<li><strong>Replace</strong> the entire collection with a single value.</li>
+<li>Specify a string with which to <strong>prepend output</strong> of the collection when rendering.</li>
+<li>Specify a string with which to <strong>append output</strong> of the collection when rendering.</li>
+<li>Specify a string with which to <strong>separate items</strong> of the collection when rendering.</li>
+<li><strong>Capture content</strong> into the collection.</li>
+<li><strong>Render</strong> the aggregated content.</li>
+</ul>
+<p>Typically, you will call the helper with no arguments, which will return a container on which you may operate. You
+will then either echo this container to render it, or call methods on it to configure or populate it. If the
+container is empty, rendering it will simply return an empty string; otherwise, the content will be aggregated
+according to the rules by which you configure it.</p>
+<p>As an example, let&#8217;s create a sidebar that consists of a number of &#8220;blocks&#8221; of content. You&#8217;ll likely know up-front
+the structure of each block; let&#8217;s assume for this example that it might look like this:</p>
+<div class="highlight-html"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;sidebar&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;block&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;p&gt;</span>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus
+            consectetur aliquet odio ac consectetur. Nulla quis eleifend
+            tortor. Pellentesque varius, odio quis bibendum consequat, diam
+            lectus porttitor quam, et aliquet mauris orci eu augue.
+        <span class="nt">&lt;/p&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;block&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;ul&gt;</span>
+            <span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/some/target&quot;</span><span class="nt">&gt;</span>Link<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+            <span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/some/target&quot;</span><span class="nt">&gt;</span>Link<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="nt">&lt;/ul&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The content will vary based on the controller and action, but the structure will be the same. Let&#8217;s first setup the
+sidebar in a resource method of our bootstrap:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Bootstrap</span> <span class="k">extends</span> <span class="nx">Zend\Application_Bootstrap\Bootstrap</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">_initSidebar</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">bootstrap</span><span class="p">(</span><span class="s1">&#39;View&#39;</span><span class="p">);</span>
+        <span class="nv">$view</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getResource</span><span class="p">(</span><span class="s1">&#39;View&#39;</span><span class="p">);</span>
+
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">placeholder</span><span class="p">(</span><span class="s1">&#39;sidebar&#39;</span><span class="p">)</span>
+             <span class="c1">// &quot;prefix&quot; -&gt; markup to emit once before all items in collection</span>
+             <span class="o">-&gt;</span><span class="na">setPrefix</span><span class="p">(</span><span class="s2">&quot;&lt;div class=</span><span class="se">\&quot;</span><span class="s2">sidebar</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="se">\n</span><span class="s2">    &lt;div class=</span><span class="se">\&quot;</span><span class="s2">block</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+             <span class="c1">// &quot;separator&quot; -&gt; markup to emit between items in a collection</span>
+             <span class="o">-&gt;</span><span class="na">setSeparator</span><span class="p">(</span><span class="s2">&quot;&lt;/div&gt;</span><span class="se">\n</span><span class="s2">    &lt;div class=</span><span class="se">\&quot;</span><span class="s2">block</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+             <span class="c1">// &quot;postfix&quot; -&gt; markup to emit once after all items in a collection</span>
+             <span class="o">-&gt;</span><span class="na">setPostfix</span><span class="p">(</span><span class="s2">&quot;&lt;/div&gt;</span><span class="se">\n</span><span class="s2">&lt;/div&gt;&quot;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above defines a placeholder, &#8220;sidebar&#8221;, that has no items. It configures the basic markup structure of that
+placeholder, however, per our requirements.</p>
+<p>Now, let&#8217;s assume for the &#8220;user&#8221; controller that for all actions we&#8217;ll want a block at the top containing some
+information. We could accomplish this in two ways: (a) we could add the content to the placeholder directly in the
+controller&#8217;s <tt class="docutils literal"><span class="pre">preDispatch()</span></tt> method, or (b) we could render a view script from within the <tt class="docutils literal"><span class="pre">preDispatch()</span></tt>
+method. We&#8217;ll use (b), as it follows a more proper separation of concerns (leaving view-related logic and
+functionality within a view script).</p>
+<p>We&#8217;ll name the view script &#8220;<tt class="docutils literal"><span class="pre">user/_sidebar.phtml</span></tt>&#8221;, and populate it as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">placeholder</span><span class="p">(</span><span class="s1">&#39;sidebar&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">captureStart</span><span class="p">()</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;h4&gt;User Administration&lt;/h4&gt;</span>
+<span class="x">&lt;ul&gt;</span>
+<span class="x">    &lt;li&gt;&lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;list&#39;</span><span class="p">))</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="x">        List&lt;/a&gt;&lt;/li&gt;</span>
+<span class="x">    &lt;li&gt;&lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;action&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;create&#39;</span><span class="p">))</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="x">        Create&lt;/a&gt;&lt;/a&gt;&lt;/li&gt;</span>
+<span class="x">&lt;/ul&gt;</span>
+<span class="cp">&lt;?php</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">placeholder</span><span class="p">(</span><span class="s1">&#39;sidebar&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">captureEnd</span><span class="p">()</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<p>The above example makes use of the content capturing feature of placeholders. By default, content is appended as a
+new item in the container, allowing us to aggregate content. This example makes use of view helpers and static
+<em>HTML</em> in order to generate markup, and the content is then captured and appended into the placeholder itself.</p>
+<p>To invoke the above view script, we would write the following in our <tt class="docutils literal"><span class="pre">preDispatch()</span></tt> method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">UserController</span> <span class="k">extends</span> <span class="nx">Zend\Controller\Action</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">preDispatch</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// ...</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">view</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">&#39;user/_sidebar.phtml&#39;</span><span class="p">);</span>
+
+        <span class="c1">// ...</span>
+    <span class="p">}</span>
+
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that we&#8217;re not capturing the rendered value; there&#8217;s no need, as the entierty of that view is being captured
+into a placeholder.</p>
+<p>Now, let&#8217;s assume our &#8220;view&#8221; action in that same controller needs to present some information. Within the
+&#8220;<tt class="docutils literal"><span class="pre">user/view.phtml</span></tt>&#8221; view script, we might have the following snippet of content:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">placeholder</span><span class="p">(</span><span class="s1">&#39;sidebar&#39;</span><span class="p">)</span>
+     <span class="o">-&gt;</span><span class="na">append</span><span class="p">(</span><span class="s1">&#39;&lt;p&gt;User: &#39;</span> <span class="o">.</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">escape</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">username</span><span class="p">)</span> <span class="o">.</span>  <span class="s1">&#39;&lt;/p&gt;&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>This example makes use of the <tt class="docutils literal"><span class="pre">append()</span></tt> method, and passes it some simple markup to aggregate.</p>
+<p>Finally, let&#8217;s modify our layout view script, and have it render the placeholder.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;</span><span class="nx">html</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nx">head</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="nx">title</span><span class="o">&gt;</span><span class="nx">My</span> <span class="nx">Site</span><span class="o">&lt;/</span><span class="nx">title</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="nx">head</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nx">body</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">class</span><span class="o">=</span><span class="s2">&quot;content&quot;</span><span class="o">&gt;</span>
+        <span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">layout</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">content</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    &lt;/div&gt;</span>
+<span class="x">    </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">placeholder</span><span class="p">(</span><span class="s1">&#39;sidebar&#39;</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>For controllers and actions that do not populate the &#8220;sidebar&#8221; placeholder, no content will be rendered; for those
+that do, however, echoing the placeholder will render the content according to the rules we created in our
+bootstrap, and the content we aggregated throughout the application. In the case of the &#8220;<tt class="docutils literal"><span class="pre">/user/view</span></tt>&#8221; action,
+and assuming a username of &#8220;matthew&#8221;, we would get content for the sidebar as follows (formatted for readability):</p>
+<div class="highlight-html"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;sidebar&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;block&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;h4&gt;</span>User Administration<span class="nt">&lt;/h4&gt;</span>
+        <span class="nt">&lt;ul&gt;</span>
+            <span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/user/list&quot;</span><span class="nt">&gt;</span>List<span class="nt">&lt;/a&gt;&lt;/li&gt;</span>
+            <span class="nt">&lt;li&gt;&lt;a</span> <span class="na">href=</span><span class="s">&quot;/user/create&quot;</span><span class="nt">&gt;</span>Create<span class="nt">&lt;/a&gt;&lt;/a&gt;&lt;/li&gt;</span>
+        <span class="nt">&lt;/ul&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;block&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;p&gt;</span>User: matthew<span class="nt">&lt;/p&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>There are a large number of things you can do by combining placeholders and layout scripts; experiment with them,
+and read the <a class="reference internal" href="../modules/zend.view.helpers.placeholder.html#zend-view-helpers-initial-placeholder"><em>relevant manual sections</em></a> for more information.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/view.placeholders.basics.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/view.placeholders.basics.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/view.placeholders.basics.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/view.placeholders.basics.rst">
+                Basic Placeholder Usage
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

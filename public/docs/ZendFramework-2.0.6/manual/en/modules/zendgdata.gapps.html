@@ -1,0 +1,1218 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Google Apps Provisioning &mdash; Zend Framework 2 2.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.6 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-google-apps-provisioning">
+<span id="zendgdata-gapps"></span><h1>Using Google Apps Provisioning<a class="headerlink" href="#using-google-apps-provisioning" title="Permalink to this headline">¶</a></h1>
+<p>Google Apps is a service which allows domain administrators to offer their users managed access to Google services
+such as Mail, Calendar, and Docs &amp; Spreadsheets. The Provisioning <em>API</em> offers a programmatic interface to
+configure this service. Specifically, this <em>API</em> allows administrators the ability to create, retrieve, update, and
+delete user accounts, nicknames, groups, and email lists.</p>
+<p>This library implements version 2.0 of the Provisioning <em>API</em>. Access to your account via the Provisioning <em>API</em>
+must be manually enabled for each domain using the Google Apps control panel. Only certain account types are able
+to enable this feature.</p>
+<p>For more information on the Google Apps Provisioning <em>API</em>, including instructions for enabling <em>API</em> access, refer
+to the <a class="reference external" href="http://code.google.com/apis/apps/gdata_provisioning_api_v2.0_reference.html">Provisioning API V2.0 Reference</a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Authentication</strong></p>
+<p class="last">The Provisioning <em>API</em> does not support authentication via AuthSub and anonymous access is not permitted. All
+<em>HTTP</em> connections must be authenticated using ClientAuth authentication.</p>
+</div>
+<div class="section" id="setting-the-current-domain">
+<span id="zendgdata-gapps-domain"></span><h2>Setting the current domain<a class="headerlink" href="#setting-the-current-domain" title="Permalink to this headline">¶</a></h2>
+<p>In order to use the Provisioning <em>API</em>, the domain being administered needs to be specified in all request <em>URI</em>s. In order to ease development, this information is stored within both the Gapps service and query classes to use
+when constructing requests.</p>
+<div class="section" id="setting-the-domain-for-the-service-class">
+<span id="zendgdata-gapps-domain-service"></span><h3>Setting the domain for the service class<a class="headerlink" href="#setting-the-domain-for-the-service-class" title="Permalink to this headline">¶</a></h3>
+<p>To set the domain for requests made by the service class, either call <tt class="docutils literal"><span class="pre">setDomain()</span></tt> or specify the domain when
+instantiating the service class. For example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$domain</span> <span class="o">=</span> <span class="s2">&quot;example.com&quot;</span><span class="p">;</span>
+<span class="nv">$gdata</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendGData\Gapps</span><span class="p">(</span><span class="nv">$client</span><span class="p">,</span> <span class="nv">$domain</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="setting-the-domain-for-query-classes">
+<span id="zendgdata-gapps-domain-query"></span><h3>Setting the domain for query classes<a class="headerlink" href="#setting-the-domain-for-query-classes" title="Permalink to this headline">¶</a></h3>
+<p>Setting the domain for requests made by query classes is similar to setting it for the service class-either call
+<tt class="docutils literal"><span class="pre">setDomain()</span></tt> or specify the domain when creating the query. For example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$domain</span> <span class="o">=</span> <span class="s2">&quot;example.com&quot;</span><span class="p">;</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendGData\Gapps\UserQuery</span><span class="p">(</span><span class="nv">$domain</span><span class="p">,</span> <span class="nv">$arg</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>When using a service class factory method to create a query, the service class will automatically set the query&#8217;s
+domain to match its own domain. As a result, it is not necessary to specify the domain as part of the constructor
+arguments.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$domain</span> <span class="o">=</span> <span class="s2">&quot;example.com&quot;</span><span class="p">;</span>
+<span class="nv">$gdata</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendGData\Gapps</span><span class="p">(</span><span class="nv">$client</span><span class="p">,</span> <span class="nv">$domain</span><span class="p">);</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newUserQuery</span><span class="p">(</span><span class="nv">$arg</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="interacting-with-users">
+<span id="zendgdata-gapps-users"></span><h2>Interacting with users<a class="headerlink" href="#interacting-with-users" title="Permalink to this headline">¶</a></h2>
+<p>Each user account on a Google Apps hosted domain is represented as an instance of <tt class="docutils literal"><span class="pre">ZendGData\Gapps\UserEntry</span></tt>.
+This class provides access to all account properties including name, username, password, access rights, and current
+quota.</p>
+<div class="section" id="creating-a-user-account">
+<span id="zendgdata-gapps-users-creating"></span><h3>Creating a user account<a class="headerlink" href="#creating-a-user-account" title="Permalink to this headline">¶</a></h3>
+<p>User accounts can be created by calling the <tt class="docutils literal"><span class="pre">createUser()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">createUser</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;Random&#39;</span><span class="p">,</span> <span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="s1">&#39;••••••••&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Users can also be created by instantiating UserEntry, providing a username, given name, family name, and password,
+then calling <tt class="docutils literal"><span class="pre">insertUser()</span></tt> on a service object to upload the entry to the server.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newUserEntry</span><span class="p">();</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newLogin</span><span class="p">();</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">=</span> <span class="s1">&#39;foo&#39;</span><span class="p">;</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">password</span> <span class="o">=</span> <span class="s1">&#39;••••••••&#39;</span><span class="p">;</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newName</span><span class="p">();</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span><span class="o">-&gt;</span><span class="na">givenName</span> <span class="o">=</span> <span class="s1">&#39;Random&#39;</span><span class="p">;</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span><span class="o">-&gt;</span><span class="na">familyName</span> <span class="o">=</span> <span class="s1">&#39;User&#39;</span><span class="p">;</span>
+<span class="nv">$user</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">insertUser</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The user&#8217;s password should normally be provided as cleartext. Optionally, the password can be provided as an
+<em>SHA-1</em> digest if <tt class="docutils literal"><span class="pre">login-&gt;passwordHashFunction</span></tt> is set to &#8216;<tt class="docutils literal"><span class="pre">SHA-1</span></tt>&#8216;.</p>
+</div>
+<div class="section" id="retrieving-a-user-account">
+<span id="zendgdata-gapps-users-retrieving"></span><h3>Retrieving a user account<a class="headerlink" href="#retrieving-a-user-account" title="Permalink to this headline">¶</a></h3>
+<p>Individual user accounts can be retrieved by calling the <tt class="docutils literal"><span class="pre">retrieveUser()</span></tt> convenience method. If the user is not
+found, <tt class="docutils literal"><span class="pre">NULL</span></tt> will be returned.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveUser</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="s1">&#39;Username: &#39;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">userName</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Given Name: &#39;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span><span class="o">-&gt;</span><span class="na">givenName</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Family Name: &#39;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span><span class="o">-&gt;</span><span class="na">familyName</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Suspended: &#39;</span> <span class="o">.</span> <span class="p">(</span><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">suspended</span> <span class="o">?</span> <span class="s1">&#39;Yes&#39;</span> <span class="o">:</span> <span class="s1">&#39;No&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Admin: &#39;</span> <span class="o">.</span> <span class="p">(</span><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">admin</span> <span class="o">?</span> <span class="s1">&#39;Yes&#39;</span> <span class="o">:</span> <span class="s1">&#39;No&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="k">echo</span> <span class="s1">&#39;Must Change Password: &#39;</span> <span class="o">.</span>
+     <span class="p">(</span><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">changePasswordAtNextLogin</span> <span class="o">?</span> <span class="s1">&#39;Yes&#39;</span> <span class="o">:</span> <span class="s1">&#39;No&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Has Agreed To Terms: &#39;</span> <span class="o">.</span>
+     <span class="p">(</span><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">agreedToTerms</span> <span class="o">?</span> <span class="s1">&#39;Yes&#39;</span> <span class="o">:</span> <span class="s1">&#39;No&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Users can also be retrieved by creating an instance of <tt class="docutils literal"><span class="pre">ZendGData\Gapps\UserQuery</span></tt>, setting its username
+property to equal the username of the user that is to be retrieved, and calling <tt class="docutils literal"><span class="pre">getUserEntry()</span></tt> on a service
+object with that query.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newUserQuery</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$user</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getUserEntry</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="s1">&#39;Username: &#39;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">userName</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Given Name: &#39;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">givenName</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Family Name: &#39;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">familyName</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Suspended: &#39;</span> <span class="o">.</span> <span class="p">(</span><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">suspended</span> <span class="o">?</span> <span class="s1">&#39;Yes&#39;</span> <span class="o">:</span> <span class="s1">&#39;No&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Admin: &#39;</span> <span class="o">.</span> <span class="p">(</span><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">admin</span> <span class="o">?</span> <span class="s1">&#39;Yes&#39;</span> <span class="o">:</span> <span class="s1">&#39;No&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+<span class="k">echo</span> <span class="s1">&#39;Must Change Password: &#39;</span> <span class="o">.</span>
+     <span class="p">(</span><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">changePasswordAtNextLogin</span> <span class="o">?</span> <span class="s1">&#39;Yes&#39;</span> <span class="o">:</span> <span class="s1">&#39;No&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Has Agreed To Terms: &#39;</span> <span class="o">.</span>
+     <span class="p">(</span><span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">agreedToTerms</span> <span class="o">?</span> <span class="s1">&#39;Yes&#39;</span> <span class="o">:</span> <span class="s1">&#39;No&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>If the specified user cannot be located a ServiceException will be thrown with an error code of
+<tt class="docutils literal"><span class="pre">ZendGData\Gapps\Error::ENTITY_DOES_NOT_EXIST</span></tt>. ServiceExceptions will be covered in <a class="reference internal" href="#zendgdata-gapps-exceptions"><em>the exceptions
+chapter</em></a>.</p>
+</div>
+<div class="section" id="retrieving-all-users-in-a-domain">
+<span id="zendgdata-gapps-users-retrievingall"></span><h3>Retrieving all users in a domain<a class="headerlink" href="#retrieving-all-users-in-a-domain" title="Permalink to this headline">¶</a></h3>
+<p>To retrieve all users in a domain, call the <tt class="docutils literal"><span class="pre">retrieveAllUsers()</span></tt> convenience method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveAllUsers</span><span class="p">();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;  * &quot;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">.</span> <span class="s1">&#39; (&#39;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span><span class="o">-&gt;</span><span class="na">givenName</span> <span class="o">.</span>
+        <span class="s1">&#39; &#39;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span><span class="o">-&gt;</span><span class="na">familyName</span> <span class="o">.</span> <span class="s2">&quot;)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a <tt class="docutils literal"><span class="pre">ZendGData\Gapps\UserFeed</span></tt> object which holds each user on the domain.</p>
+<p>Alternatively, call <tt class="docutils literal"><span class="pre">getUserFeed()</span></tt> with no options. Keep in mind that on larger domains this feed may be paged
+by the server. For more information on paging, see <a class="reference internal" href="zendgdata.introduction.html#zendgdata-introduction-paging"><em>the paging chapter</em></a>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getUserFeed</span><span class="p">();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$user</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;  * &quot;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">.</span> <span class="s1">&#39; (&#39;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span><span class="o">-&gt;</span><span class="na">givenName</span> <span class="o">.</span>
+        <span class="s1">&#39; &#39;</span> <span class="o">.</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span><span class="o">-&gt;</span><span class="na">familyName</span> <span class="o">.</span> <span class="s2">&quot;)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="updating-a-user-account">
+<span id="zendgdata-gapps-users-updating"></span><h3>Updating a user account<a class="headerlink" href="#updating-a-user-account" title="Permalink to this headline">¶</a></h3>
+<p>The easiest way to update a user account is to retrieve the user as described in the previous sections, make any
+desired changes, then call <tt class="docutils literal"><span class="pre">save()</span></tt> on that user. Any changes made will be propagated to the server.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveUser</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span><span class="o">-&gt;</span><span class="na">givenName</span> <span class="o">=</span> <span class="s1">&#39;Foo&#39;</span><span class="p">;</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">name</span><span class="o">-&gt;</span><span class="na">familyName</span> <span class="o">=</span> <span class="s1">&#39;Bar&#39;</span><span class="p">;</span>
+<span class="nv">$user</span> <span class="o">=</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="resetting-a-user-s-password">
+<span id="zendgdata-gapps-users-updating-resettingpassword"></span><h3>Resetting a user&#8217;s password<a class="headerlink" href="#resetting-a-user-s-password" title="Permalink to this headline">¶</a></h3>
+<p>A user&#8217;s password can be reset to a new value by updating the <tt class="docutils literal"><span class="pre">login-&gt;password</span></tt> property.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveUser</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">password</span> <span class="o">=</span> <span class="s1">&#39;••••••••&#39;</span><span class="p">;</span>
+<span class="nv">$user</span> <span class="o">=</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that it is not possible to recover a password in this manner as stored passwords are not made available via
+the Provisioning <em>API</em> for security reasons.</p>
+</div>
+<div class="section" id="forcing-a-user-to-change-their-password">
+<span id="zendgdata-gapps-users-updating-forcingpasswordchange"></span><h3>Forcing a user to change their password<a class="headerlink" href="#forcing-a-user-to-change-their-password" title="Permalink to this headline">¶</a></h3>
+<p>A user can be forced to change their password at their next login by setting the
+<tt class="docutils literal"><span class="pre">login-&gt;changePasswordAtNextLogin</span></tt> property to <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveUser</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">changePasswordAtNextLogin</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="nv">$user</span> <span class="o">=</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>Similarly, this can be undone by setting the <tt class="docutils literal"><span class="pre">login-&gt;changePasswordAtNextLogin</span></tt> property to <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+</div>
+<div class="section" id="suspending-a-user-account">
+<span id="zendgdata-gapps-users-updating-suspendingaccount"></span><h3>Suspending a user account<a class="headerlink" href="#suspending-a-user-account" title="Permalink to this headline">¶</a></h3>
+<p>Users can be restricted from logging in without deleting their user account by instead <strong>suspending</strong> their user
+account. Accounts can be suspended or restored by using the <tt class="docutils literal"><span class="pre">suspendUser()</span></tt> and <tt class="docutils literal"><span class="pre">restoreUser()</span></tt> convenience
+methods:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">suspendUser</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">restoreUser</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Alternatively, you can set the UserEntry&#8217;s <tt class="docutils literal"><span class="pre">login-&gt;suspended</span></tt> property to <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveUser</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">suspended</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="nv">$user</span> <span class="o">=</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>To restore the user&#8217;s access, set the <tt class="docutils literal"><span class="pre">login-&gt;suspended</span></tt> property to <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</p>
+</div>
+<div class="section" id="granting-administrative-rights">
+<span id="zendgdata-gapps-users-updating-grantingadminrights"></span><h3>Granting administrative rights<a class="headerlink" href="#granting-administrative-rights" title="Permalink to this headline">¶</a></h3>
+<p>Users can be granted the ability to administer your domain by setting their <tt class="docutils literal"><span class="pre">login-&gt;admin</span></tt> property to <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveUser</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">admin</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="nv">$user</span> <span class="o">=</span> <span class="nv">$user</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>And as expected, setting a user&#8217;s <tt class="docutils literal"><span class="pre">login-&gt;admin</span></tt> property to <tt class="docutils literal"><span class="pre">FALSE</span></tt> revokes their administrative rights.</p>
+</div>
+<div class="section" id="deleting-user-accounts">
+<span id="zendgdata-gapps-users-deleting"></span><h3>Deleting user accounts<a class="headerlink" href="#deleting-user-accounts" title="Permalink to this headline">¶</a></h3>
+<p>Deleting a user account to which you already hold a UserEntry is a simple as calling <tt class="docutils literal"><span class="pre">delete()</span></tt> on that entry.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$user</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveUser</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$user</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you do not have access to a UserEntry object for an account, use the <tt class="docutils literal"><span class="pre">deleteUser()</span></tt> convenience method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">deleteUser</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="interacting-with-nicknames">
+<span id="zendgdata-gapps-nicknames"></span><h2>Interacting with nicknames<a class="headerlink" href="#interacting-with-nicknames" title="Permalink to this headline">¶</a></h2>
+<p>Nicknames serve as email aliases for existing users. Each nickname contains precisely two key properties: its name
+and its owner. Any email addressed to a nickname is forwarded to the user who owns that nickname.</p>
+<p>Nicknames are represented as an instances of <tt class="docutils literal"><span class="pre">ZendGData\Gapps\NicknameEntry</span></tt>.</p>
+<div class="section" id="creating-a-nickname">
+<span id="zendgdata-gapps-nicknames-creating"></span><h3>Creating a nickname<a class="headerlink" href="#creating-a-nickname" title="Permalink to this headline">¶</a></h3>
+<p>Nicknames can be created by calling the <tt class="docutils literal"><span class="pre">createNickname()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">createNickname</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Nicknames can also be created by instantiating NicknameEntry, providing the nickname with a name and an owner, then
+calling <tt class="docutils literal"><span class="pre">insertNickname()</span></tt> on a service object to upload the entry to the server.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$nickname</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newNicknameEntry</span><span class="p">();</span>
+<span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">login</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newLogin</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">nickname</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newNickname</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">);</span>
+<span class="nv">$nickname</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">insertNickname</span><span class="p">(</span><span class="nv">$nickname</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-a-nickname">
+<span id="zendgdata-gapps-nicknames-retrieving"></span><h3>Retrieving a nickname<a class="headerlink" href="#retrieving-a-nickname" title="Permalink to this headline">¶</a></h3>
+<p>Nicknames can be retrieved by calling the <tt class="docutils literal"><span class="pre">retrieveNickname()</span></tt> convenience method. This will return <tt class="docutils literal"><span class="pre">NULL</span></tt> if a
+user is not found.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$nickname</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveNickname</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="s1">&#39;Nickname: &#39;</span> <span class="o">.</span> <span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">nickname</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Owner: &#39;</span> <span class="o">.</span> <span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Individual nicknames can also be retrieved by creating an instance of <tt class="docutils literal"><span class="pre">ZendGData\Gapps\NicknameQuery</span></tt>, setting
+its nickname property to equal the nickname that is to be retrieved, and calling <tt class="docutils literal"><span class="pre">getNicknameEntry()</span></tt> on a
+service object with that query.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newNicknameQuery</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">);</span>
+<span class="nv">$nickname</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getNicknameEntry</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="s1">&#39;Nickname: &#39;</span> <span class="o">.</span> <span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">nickname</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Owner: &#39;</span> <span class="o">.</span> <span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>As with users, if no corresponding nickname is found a ServiceException will be thrown with an error code of
+<tt class="docutils literal"><span class="pre">ZendGData\Gapps\Error::ENTITY_DOES_NOT_EXIST</span></tt>. Again, these will be discussed in <a class="reference internal" href="#zendgdata-gapps-exceptions"><em>the exceptions chapter</em></a>.</p>
+</div>
+<div class="section" id="retrieving-all-nicknames-for-a-user">
+<span id="zendgdata-gapps-nicknames-retrievinguser"></span><h3>Retrieving all nicknames for a user<a class="headerlink" href="#retrieving-all-nicknames-for-a-user" title="Permalink to this headline">¶</a></h3>
+<p>To retrieve all nicknames associated with a given user, call the convenience method <tt class="docutils literal"><span class="pre">retrieveNicknames()</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveNicknames</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$nickname</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;  * &#39;</span> <span class="o">.</span> <span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">nickname</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a <tt class="docutils literal"><span class="pre">ZendGData\Gapps\NicknameFeed</span></tt> object which holds each nickname associated with the specified
+user.</p>
+<p>Alternatively, create a new <tt class="docutils literal"><span class="pre">ZendGData\Gapps\NicknameQuery</span></tt>, set its username property to the desired user, and
+submit the query by calling <tt class="docutils literal"><span class="pre">getNicknameFeed()</span></tt> on a service object.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newNicknameQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setUsername</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getNicknameFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$nickname</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;  * &#39;</span> <span class="o">.</span> <span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">nickname</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-all-nicknames-in-a-domain">
+<span id="zendgdata-gapps-nicknames-retrievingall"></span><h3>Retrieving all nicknames in a domain<a class="headerlink" href="#retrieving-all-nicknames-in-a-domain" title="Permalink to this headline">¶</a></h3>
+<p>To retrieve all nicknames in a feed, simply call the convenience method <tt class="docutils literal"><span class="pre">retrieveAllNicknames()</span></tt></p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveAllNicknames</span><span class="p">();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$nickname</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;  * &#39;</span> <span class="o">.</span> <span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">nickname</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">.</span> <span class="s1">&#39; =&gt; &#39;</span> <span class="o">.</span>
+        <span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a <tt class="docutils literal"><span class="pre">ZendGData\Gapps\NicknameFeed</span></tt> object which holds each nickname on the domain.</p>
+<p>Alternatively, call <tt class="docutils literal"><span class="pre">getNicknameFeed()</span></tt> on a service object with no arguments.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getNicknameFeed</span><span class="p">();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$nickname</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;  * &#39;</span> <span class="o">.</span> <span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">nickname</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">.</span> <span class="s1">&#39; =&gt; &#39;</span> <span class="o">.</span>
+        <span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">login</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="deleting-a-nickname">
+<span id="zendgdata-gapps-nicknames-deleting"></span><h3>Deleting a nickname<a class="headerlink" href="#deleting-a-nickname" title="Permalink to this headline">¶</a></h3>
+<p>Deleting a nickname to which you already hold a NicknameEntry for is a simple as calling <tt class="docutils literal"><span class="pre">delete()</span></tt> on that
+entry.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$nickname</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveNickname</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">);</span>
+<span class="nv">$nickname</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>For nicknames which you do not hold a NicknameEntry for, use the <tt class="docutils literal"><span class="pre">deleteNickname()</span></tt> convenience method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">deleteNickname</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="interacting-with-groups">
+<span id="zendgdata-gapps-groups"></span><h2>Interacting with groups<a class="headerlink" href="#interacting-with-groups" title="Permalink to this headline">¶</a></h2>
+<p>Google Groups allows people to post messages like an email list. Google is depreciating the Email List <em>API</em>.
+Google Groups provides some neat features like nested groups and group owners. If you want to start a new email
+lst, it is advisable to use Google Groups instead. Google&#8217;s Email List is not compatible with Google Groups. So if
+you create an email list, it will not show up as a group. The opposite is true as well.</p>
+<p>Each group on a domain is represented as an instance of <tt class="docutils literal"><span class="pre">ZendGData\Gapps\GroupEntry</span></tt>.</p>
+<div class="section" id="creating-a-group">
+<span id="zendgdata-gapps-groups-creating"></span><h3>Creating a group<a class="headerlink" href="#creating-a-group" title="Permalink to this headline">¶</a></h3>
+<p>Groups can be created by calling the <tt class="docutils literal"><span class="pre">createGroup()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">createGroup</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">,</span> <span class="s1">&#39;The Friends Group&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Groups can also be created by instantiating GroupEntry, providing a group id and name for the group, then calling
+<tt class="docutils literal"><span class="pre">insertGroup()</span></tt> on a service object to upload the entry to the server.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$group</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newGroupEntry</span><span class="p">();</span>
+
+<span class="nv">$properties</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">newProperty</span><span class="p">();</span>
+<span class="nv">$properties</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="s1">&#39;groupId&#39;</span><span class="p">;</span>
+<span class="nv">$properties</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-&gt;</span><span class="na">value</span> <span class="o">=</span> <span class="s1">&#39;friends&#39;</span><span class="p">;</span>
+<span class="nv">$properties</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">newProperty</span><span class="p">();</span>
+<span class="nv">$properties</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">=</span> <span class="s1">&#39;groupName&#39;</span><span class="p">;</span>
+<span class="nv">$properties</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-&gt;</span><span class="na">value</span> <span class="o">=</span> <span class="s1">&#39;The Friends Group&#39;</span><span class="p">;</span>
+
+<span class="nv">$group</span><span class="o">-&gt;</span><span class="na">property</span> <span class="o">=</span> <span class="nv">$properties</span><span class="p">;</span>
+
+<span class="nv">$group</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">insertGroup</span><span class="p">(</span><span class="nv">$group</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-an-individual-group">
+<span id="zendgdata-gapps-groups-retrievegroup"></span><h3>Retrieving an individual group<a class="headerlink" href="#retrieving-an-individual-group" title="Permalink to this headline">¶</a></h3>
+<p>To retrieve an individual group, call the <tt class="docutils literal"><span class="pre">retrieveGroup()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$entry</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveGroup</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">property</span> <span class="k">as</span> <span class="nv">$p</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Property Name: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Property Value: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">value</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a <tt class="docutils literal"><span class="pre">ZendGData\Gapps\GroupEntry</span></tt> object which holds the properties about the group.</p>
+<p>Alternatively, create a new <tt class="docutils literal"><span class="pre">ZendGData\Gapps\GroupQuery</span></tt>, set its groupId property to the desired group id, and
+submit the query by calling <tt class="docutils literal"><span class="pre">getGroupEntry()</span></tt> on a service object.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newGroupQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setGroupId</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+<span class="nv">$entry</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getGroupEntry</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">property</span> <span class="k">as</span> <span class="nv">$p</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Property Name: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Property Value: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">value</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-all-groups-in-a-domain">
+<span id="zendgdata-gapps-groups-retrievingall"></span><h3>Retrieving all groups in a domain<a class="headerlink" href="#retrieving-all-groups-in-a-domain" title="Permalink to this headline">¶</a></h3>
+<p>To retrieve all groups in a domain, call the convenience method <tt class="docutils literal"><span class="pre">retrieveAllGroups()</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveAllGroups</span><span class="p">();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">entry</span> <span class="k">as</span> <span class="nv">$entry</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">property</span> <span class="k">as</span> <span class="nv">$p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;Property Name: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Property Value: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">value</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a <tt class="docutils literal"><span class="pre">ZendGData\Gapps\GroupFeed</span></tt> object which holds each group on the domain.</p>
+<p>Alternatively, call <tt class="docutils literal"><span class="pre">getGroupFeed()</span></tt> on a service object with no arguments.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getGroupFeed</span><span class="p">();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">entry</span> <span class="k">as</span> <span class="nv">$entry</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">property</span> <span class="k">as</span> <span class="nv">$p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;Property Name: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Property Value: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">value</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="deleting-a-group">
+<span id="zendgdata-gapps-groups-deleting"></span><h3>Deleting a group<a class="headerlink" href="#deleting-a-group" title="Permalink to this headline">¶</a></h3>
+<p>To delete a group, call the <tt class="docutils literal"><span class="pre">deleteGroup()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">deleteGroup</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="updating-a-group">
+<span id="zendgdata-gapps-groups-updating"></span><h3>Updating a group<a class="headerlink" href="#updating-a-group" title="Permalink to this headline">¶</a></h3>
+<p>Groups can be updated by calling the <tt class="docutils literal"><span class="pre">updateGroup()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">updateGroup</span><span class="p">(</span><span class="s1">&#39;group-id-here&#39;</span><span class="p">,</span> <span class="s1">&#39;Group Name Here&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The first parameter is required. The second, third and fourth parameter, representing the group name, group
+descscription, and email permission, respectively are optional. Setting any of these optional parameters to null
+will not update that item.</p>
+</div>
+<div class="section" id="retrieving-all-groups-to-which-a-person-is-a-member">
+<span id="zendgdata-gapps-groups-retrieve"></span><h3>Retrieving all groups to which a person is a member<a class="headerlink" href="#retrieving-all-groups-to-which-a-person-is-a-member" title="Permalink to this headline">¶</a></h3>
+<p>To retrieve all groups to which a particular person is a member, call the <tt class="docutils literal"><span class="pre">retrieveGroups()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveGroups</span><span class="p">(</span><span class="s1">&#39;baz@somewhere.com&#39;</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">entry</span> <span class="k">as</span> <span class="nv">$entry</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">property</span> <span class="k">as</span> <span class="nv">$p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;Property Name: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Property Value: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">value</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a <tt class="docutils literal"><span class="pre">ZendGData\Gapps\GroupFeed</span></tt> object which holds each group associated with the specified
+member.</p>
+<p>Alternatively, create a new <tt class="docutils literal"><span class="pre">ZendGData\Gapps\GroupQuery</span></tt>, set its member property to the desired email address,
+and submit the query by calling <tt class="docutils literal"><span class="pre">getGroupFeed()</span></tt> on a service object.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newGroupQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setMember</span><span class="p">(</span><span class="s1">&#39;baz@somewhere.com&#39;</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getGroupFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span><span class="o">-&gt;</span><span class="na">entry</span> <span class="k">as</span> <span class="nv">$entry</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$entry</span><span class="o">-&gt;</span><span class="na">property</span> <span class="k">as</span> <span class="nv">$p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;Property Name: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Property Value: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">value</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="interacting-with-group-members">
+<span id="zendgdata-gapps-groupmembers"></span><h2>Interacting with group members<a class="headerlink" href="#interacting-with-group-members" title="Permalink to this headline">¶</a></h2>
+<p>Each member subscribed to a group is represented by an instance of <tt class="docutils literal"><span class="pre">ZendGData\Gapps\MemberEntry</span></tt>. Through this
+class, individual recipients can be added and removed from groups.</p>
+<div class="section" id="adding-a-member-to-a-group">
+<span id="zendgdata-gapps-groupmembers-adding"></span><h3>Adding a member to a group<a class="headerlink" href="#adding-a-member-to-a-group" title="Permalink to this headline">¶</a></h3>
+<p>To add a member to a group, simply call the <tt class="docutils literal"><span class="pre">addMemberToGroup()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">addMemberToGroup</span><span class="p">(</span><span class="s1">&#39;bar@somewhere.com&#39;</span><span class="p">,</span> <span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="check-to-see-if-member-belongs-to-group">
+<span id="zendgdata-gapps-groupmembers-check"></span><h3>Check to see if member belongs to group<a class="headerlink" href="#check-to-see-if-member-belongs-to-group" title="Permalink to this headline">¶</a></h3>
+<p>To check to see if member belongs to group, simply call the <tt class="docutils literal"><span class="pre">isMember()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$isMember</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">isMember</span><span class="p">(</span><span class="s1">&#39;bar@somewhere.com&#39;</span><span class="p">,</span> <span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$isMember</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The method returns a boolean value. If the member belongs to the group specified, the method returns true, else it
+returns false.</p>
+</div>
+<div class="section" id="removing-a-member-from-a-group">
+<span id="zendgdata-gapps-groupmembers-removing"></span><h3>Removing a member from a group<a class="headerlink" href="#removing-a-member-from-a-group" title="Permalink to this headline">¶</a></h3>
+<p>To remove a member from a group, call the <tt class="docutils literal"><span class="pre">removeMemberFromGroup()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">removeMemberFromGroup</span><span class="p">(</span><span class="s1">&#39;baz&#39;</span><span class="p">,</span> <span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-the-list-of-members-to-a-group">
+<span id="zendgdata-gapps-groupmembers-retrieving"></span><h3>Retrieving the list of members to a group<a class="headerlink" href="#retrieving-the-list-of-members-to-a-group" title="Permalink to this headline">¶</a></h3>
+<p>The convenience method <tt class="docutils literal"><span class="pre">retrieveAllMembers()</span></tt> can be used to retrieve the list of members of a group:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveAllMembers</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$member</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$member</span><span class="o">-&gt;</span><span class="na">property</span> <span class="k">as</span> <span class="nv">$p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;Property Name: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Property Value: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">value</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Alternatively, construct a new MemberQuery, set its groupId property to match the desired group id, and call
+<tt class="docutils literal"><span class="pre">getMemberFeed()</span></tt> on a service object.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newMemberQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setGroupId</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getMemberFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$member</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$member</span><span class="o">-&gt;</span><span class="na">property</span> <span class="k">as</span> <span class="nv">$p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;Property Name: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Property Value: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">value</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a <tt class="docutils literal"><span class="pre">ZendGData\Gapps\MemberFeed</span></tt> object which holds each member for the selected group.</p>
+</div>
+</div>
+<div class="section" id="interacting-with-group-owners">
+<span id="zendgdata-gapps-groupowners"></span><h2>Interacting with group owners<a class="headerlink" href="#interacting-with-group-owners" title="Permalink to this headline">¶</a></h2>
+<p>Each owner associated with a group is represented by an instance of <tt class="docutils literal"><span class="pre">ZendGData\Gapps\OwnerEntry</span></tt>. Through this
+class, individual owners can be added and removed from groups.</p>
+<div class="section" id="adding-an-owner-to-a-group">
+<span id="zendgdata-gapps-groupowners-adding"></span><h3>Adding an owner to a group<a class="headerlink" href="#adding-an-owner-to-a-group" title="Permalink to this headline">¶</a></h3>
+<p>To add an owner to a group, simply call the <tt class="docutils literal"><span class="pre">addOwnerToGroup()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">addOwnerToGroup</span><span class="p">(</span><span class="s1">&#39;bar@somewhere.com&#39;</span><span class="p">,</span> <span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-the-list-of-the-owner-of-a-group">
+<span id="zendgdata-gapps-groupowners-retrieving"></span><h3>Retrieving the list of the owner of a group<a class="headerlink" href="#retrieving-the-list-of-the-owner-of-a-group" title="Permalink to this headline">¶</a></h3>
+<p>The convenience method <tt class="docutils literal"><span class="pre">retrieveGroupOwners()</span></tt> can be used to retrieve the list of the owners of a group:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveGroupOwners</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$owner</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$owner</span><span class="o">-&gt;</span><span class="na">property</span> <span class="k">as</span> <span class="nv">$p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;Property Name: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Property Value: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">value</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Alternatively, construct a new OwnerQuery, set its groupId property to match the desired group id, and call
+<tt class="docutils literal"><span class="pre">getOwnerFeed()</span></tt> on a service object.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newOwnerQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setGroupId</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getOwnerFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$owner</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$owner</span><span class="o">-&gt;</span><span class="na">property</span> <span class="k">as</span> <span class="nv">$p</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;Property Name: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">name</span><span class="p">;</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Property Value: &quot;</span> <span class="o">.</span> <span class="nv">$p</span><span class="o">-&gt;</span><span class="na">value</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a <tt class="docutils literal"><span class="pre">ZendGData\Gapps\OwnerFeed</span></tt> object which holds each member for the selected group.</p>
+</div>
+<div class="section" id="check-to-see-if-an-email-is-the-owner-of-a-group">
+<span id="zendgdata-gapps-groupowners-check"></span><h3>Check to see if an email is the owner of a group<a class="headerlink" href="#check-to-see-if-an-email-is-the-owner-of-a-group" title="Permalink to this headline">¶</a></h3>
+<p>To check to see if an email is the owner of a group, simply call the <tt class="docutils literal"><span class="pre">isOwner()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$isOwner</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">isOwner</span><span class="p">(</span><span class="s1">&#39;bar@somewhere.com&#39;</span><span class="p">,</span> <span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+<span class="nb">var_dump</span><span class="p">(</span><span class="nv">$isOwner</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The method returns a boolean value. If the email is the owner of the group specified, the method returns true, else
+it returns false.</p>
+</div>
+<div class="section" id="removing-an-owner-from-a-group">
+<span id="zendgdata-gapps-groupowners-removing"></span><h3>Removing an owner from a group<a class="headerlink" href="#removing-an-owner-from-a-group" title="Permalink to this headline">¶</a></h3>
+<p>To remove an owner from a group, call the <tt class="docutils literal"><span class="pre">removeOwnerFromGroup()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">removeOwnerFromGroup</span><span class="p">(</span><span class="s1">&#39;baz@somewhere.com&#39;</span><span class="p">,</span> <span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="interacting-with-email-lists">
+<span id="zendgdata-gapps-emaillists"></span><h2>Interacting with email lists<a class="headerlink" href="#interacting-with-email-lists" title="Permalink to this headline">¶</a></h2>
+<p>Email lists allow several users to retrieve email addressed to a single email address. Users do not need to be a
+member of this domain in order to subscribe to an email list provided their complete email address (including
+domain) is used.</p>
+<p>Each email list on a domain is represented as an instance of <tt class="docutils literal"><span class="pre">ZendGData\Gapps\EmailListEntry</span></tt>.</p>
+<div class="section" id="creating-an-email-list">
+<span id="zendgdata-gapps-emaillists-creating"></span><h3>Creating an email list<a class="headerlink" href="#creating-an-email-list" title="Permalink to this headline">¶</a></h3>
+<p>Email lists can be created by calling the <tt class="docutils literal"><span class="pre">createEmailList()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">createEmailList</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Email lists can also be created by instantiating EmailListEntry, providing a name for the list, then calling
+<tt class="docutils literal"><span class="pre">insertEmailList()</span></tt> on a service object to upload the entry to the server.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$list</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newEmailListEntry</span><span class="p">();</span>
+<span class="nv">$list</span><span class="o">-&gt;</span><span class="na">emailList</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newEmailList</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+<span class="nv">$list</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">insertEmailList</span><span class="p">(</span><span class="nv">$list</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-all-email-lists-to-which-a-recipient-is-subscribed">
+<span id="zendgdata-gapps-emaillist-retrieve"></span><h3>Retrieving all email lists to which a recipient is subscribed<a class="headerlink" href="#retrieving-all-email-lists-to-which-a-recipient-is-subscribed" title="Permalink to this headline">¶</a></h3>
+<p>To retrieve all email lists to which a particular recipient is subscribed, call the <tt class="docutils literal"><span class="pre">retrieveEmailLists()</span></tt>
+convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveEmailLists</span><span class="p">(</span><span class="s1">&#39;baz@somewhere.com&#39;</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$list</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;  * &#39;</span> <span class="o">.</span> <span class="nv">$list</span><span class="o">-&gt;</span><span class="na">emailList</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a <tt class="docutils literal"><span class="pre">ZendGData\Gapps\EmailListFeed</span></tt> object which holds each email list associated with the
+specified recipient.</p>
+<p>Alternatively, create a new <tt class="docutils literal"><span class="pre">ZendGData\Gapps\EmailListQuery</span></tt>, set its recipient property to the desired email
+address, and submit the query by calling <tt class="docutils literal"><span class="pre">getEmailListFeed()</span></tt> on a service object.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newEmailListQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setRecipient</span><span class="p">(</span><span class="s1">&#39;baz@somewhere.com&#39;</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getEmailListFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$list</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;  * &#39;</span> <span class="o">.</span> <span class="nv">$list</span><span class="o">-&gt;</span><span class="na">emailList</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-all-email-lists-in-a-domain">
+<span id="zendgdata-gapps-emaillists-retrievingall"></span><h3>Retrieving all email lists in a domain<a class="headerlink" href="#retrieving-all-email-lists-in-a-domain" title="Permalink to this headline">¶</a></h3>
+<p>To retrieve all email lists in a domain, call the convenience method <tt class="docutils literal"><span class="pre">retrieveAllEmailLists()</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveAllEmailLists</span><span class="p">();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$list</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;  * &#39;</span> <span class="o">.</span> <span class="nv">$list</span><span class="o">-&gt;</span><span class="na">emailList</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a <tt class="docutils literal"><span class="pre">ZendGData\Gapps\EmailListFeed</span></tt> object which holds each email list on the domain.</p>
+<p>Alternatively, call <tt class="docutils literal"><span class="pre">getEmailListFeed()</span></tt> on a service object with no arguments.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getEmailListFeed</span><span class="p">();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$list</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;  * &#39;</span> <span class="o">.</span> <span class="nv">$list</span><span class="o">-&gt;</span><span class="na">emailList</span><span class="o">-&gt;</span><span class="na">name</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="deleting-an-email-list">
+<span id="zendgdata-gapps-emaillist-deleting"></span><h3>Deleting an email list<a class="headerlink" href="#deleting-an-email-list" title="Permalink to this headline">¶</a></h3>
+<p>To delete an email list, call the <tt class="docutils literal"><span class="pre">deleteEmailList()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">deleteEmailList</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="interacting-with-email-list-recipients">
+<span id="zendgdata-gapps-emaillistrecipients"></span><h2>Interacting with email list recipients<a class="headerlink" href="#interacting-with-email-list-recipients" title="Permalink to this headline">¶</a></h2>
+<p>Each recipient subscribed to an email list is represented by an instance of
+<tt class="docutils literal"><span class="pre">ZendGData\Gapps\EmailListRecipient</span></tt>. Through this class, individual recipients can be added and removed from
+email lists.</p>
+<div class="section" id="adding-a-recipient-to-an-email-list">
+<span id="zendgdata-gapps-emaillistrecipients-adding"></span><h3>Adding a recipient to an email list<a class="headerlink" href="#adding-a-recipient-to-an-email-list" title="Permalink to this headline">¶</a></h3>
+<p>To add a recipient to an email list, simply call the <tt class="docutils literal"><span class="pre">addRecipientToEmailList()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">addRecipientToEmailList</span><span class="p">(</span><span class="s1">&#39;bar@somewhere.com&#39;</span><span class="p">,</span> <span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="retrieving-the-list-of-subscribers-to-an-email-list">
+<span id="zendgdata-gapps-emaillistrecipients-retrieving"></span><h3>Retrieving the list of subscribers to an email list<a class="headerlink" href="#retrieving-the-list-of-subscribers-to-an-email-list" title="Permalink to this headline">¶</a></h3>
+<p>The convenience method <tt class="docutils literal"><span class="pre">retrieveAllRecipients()</span></tt> can be used to retrieve the list of subscribers to an email
+list:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">retrieveAllRecipients</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$recipient</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;  * &#39;</span> <span class="o">.</span> <span class="nv">$recipient</span><span class="o">-&gt;</span><span class="na">who</span><span class="o">-&gt;</span><span class="na">email</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Alternatively, construct a new EmailListRecipientQuery, set its emailListName property to match the desired email
+list, and call <tt class="docutils literal"><span class="pre">getEmailListRecipientFeed()</span></tt> on a service object.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newEmailListRecipientQuery</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setEmailListName</span><span class="p">(</span><span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getEmailListRecipientFeed</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$feed</span> <span class="k">as</span> <span class="nv">$recipient</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;  * &#39;</span> <span class="o">.</span> <span class="nv">$recipient</span><span class="o">-&gt;</span><span class="na">who</span><span class="o">-&gt;</span><span class="na">email</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will create a <tt class="docutils literal"><span class="pre">ZendGData\Gapps\EmailListRecipientFeed</span></tt> object which holds each recipient for the selected
+email list.</p>
+</div>
+<div class="section" id="removing-a-recipient-from-an-email-list">
+<span id="zendgdata-gapps-emaillistrecipients-removing"></span><h3>Removing a recipient from an email list<a class="headerlink" href="#removing-a-recipient-from-an-email-list" title="Permalink to this headline">¶</a></h3>
+<p>To remove a recipient from an email list, call the <tt class="docutils literal"><span class="pre">removeRecipientFromEmailList()</span></tt> convenience method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">removeRecipientFromEmailList</span><span class="p">(</span><span class="s1">&#39;baz@somewhere.com&#39;</span><span class="p">,</span> <span class="s1">&#39;friends&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="handling-errors">
+<span id="zendgdata-gapps-exceptions"></span><h2>Handling errors<a class="headerlink" href="#handling-errors" title="Permalink to this headline">¶</a></h2>
+<p>In addition to the standard suite of exceptions thrown by <tt class="docutils literal"><span class="pre">ZendGData</span></tt>, requests using the Provisioning <em>API</em> may
+also throw a <tt class="docutils literal"><span class="pre">ZendGData\Gapps\ServiceException</span></tt>. These exceptions indicate that a <em>API</em> specific error occurred
+which prevents the request from completing.</p>
+<p>Each ServiceException instance may hold one or more Error objects. Each of these objects contains an error code,
+reason, and (optionally) the input which triggered the exception. A complete list of known error codes is provided
+in Zend Framework&#8217;s <em>API</em> documentation under <tt class="docutils literal"><span class="pre">ZendGData\Gapps\Error</span></tt>. Additionally, the authoritative error
+list is available online at <a class="reference external" href="http://code.google.com/apis/apps/gdata_provisioning_api_v2.0_reference.html#appendix_d">Google Apps Provisioning API V2.0 Reference: Appendix D</a>.</p>
+<p>While the complete list of errors received is available within ServiceException as an array by calling
+<tt class="docutils literal"><span class="pre">getErrors()</span></tt>, often it is convenient to know if one specific error occurred. For these cases the presence of an
+error can be determined by calling <tt class="docutils literal"><span class="pre">hasError()</span></tt>.</p>
+<p>The following example demonstrates how to detect if a requested resource doesn&#8217;t exist and handle the fault
+gracefully:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">function</span> <span class="nf">retrieveUser</span> <span class="p">(</span><span class="nv">$username</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$query</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">newUserQuery</span><span class="p">(</span><span class="nv">$username</span><span class="p">);</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="nv">$user</span> <span class="o">=</span> <span class="nv">$gdata</span><span class="o">-&gt;</span><span class="na">getUserEntry</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">ZendGData\Gapps\ServiceException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Set the user to null if not found</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$e</span><span class="o">-&gt;</span><span class="na">hasError</span><span class="p">(</span><span class="nx">ZendGData\Gapps\Error</span><span class="o">::</span><span class="na">ENTITY_DOES_NOT_EXIST</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$user</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="nv">$e</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nv">$user</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using Google Apps Provisioning</a><ul>
+<li><a class="reference internal" href="#setting-the-current-domain">Setting the current domain</a><ul>
+<li><a class="reference internal" href="#setting-the-domain-for-the-service-class">Setting the domain for the service class</a></li>
+<li><a class="reference internal" href="#setting-the-domain-for-query-classes">Setting the domain for query classes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interacting-with-users">Interacting with users</a><ul>
+<li><a class="reference internal" href="#creating-a-user-account">Creating a user account</a></li>
+<li><a class="reference internal" href="#retrieving-a-user-account">Retrieving a user account</a></li>
+<li><a class="reference internal" href="#retrieving-all-users-in-a-domain">Retrieving all users in a domain</a></li>
+<li><a class="reference internal" href="#updating-a-user-account">Updating a user account</a></li>
+<li><a class="reference internal" href="#resetting-a-user-s-password">Resetting a user&#8217;s password</a></li>
+<li><a class="reference internal" href="#forcing-a-user-to-change-their-password">Forcing a user to change their password</a></li>
+<li><a class="reference internal" href="#suspending-a-user-account">Suspending a user account</a></li>
+<li><a class="reference internal" href="#granting-administrative-rights">Granting administrative rights</a></li>
+<li><a class="reference internal" href="#deleting-user-accounts">Deleting user accounts</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interacting-with-nicknames">Interacting with nicknames</a><ul>
+<li><a class="reference internal" href="#creating-a-nickname">Creating a nickname</a></li>
+<li><a class="reference internal" href="#retrieving-a-nickname">Retrieving a nickname</a></li>
+<li><a class="reference internal" href="#retrieving-all-nicknames-for-a-user">Retrieving all nicknames for a user</a></li>
+<li><a class="reference internal" href="#retrieving-all-nicknames-in-a-domain">Retrieving all nicknames in a domain</a></li>
+<li><a class="reference internal" href="#deleting-a-nickname">Deleting a nickname</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interacting-with-groups">Interacting with groups</a><ul>
+<li><a class="reference internal" href="#creating-a-group">Creating a group</a></li>
+<li><a class="reference internal" href="#retrieving-an-individual-group">Retrieving an individual group</a></li>
+<li><a class="reference internal" href="#retrieving-all-groups-in-a-domain">Retrieving all groups in a domain</a></li>
+<li><a class="reference internal" href="#deleting-a-group">Deleting a group</a></li>
+<li><a class="reference internal" href="#updating-a-group">Updating a group</a></li>
+<li><a class="reference internal" href="#retrieving-all-groups-to-which-a-person-is-a-member">Retrieving all groups to which a person is a member</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interacting-with-group-members">Interacting with group members</a><ul>
+<li><a class="reference internal" href="#adding-a-member-to-a-group">Adding a member to a group</a></li>
+<li><a class="reference internal" href="#check-to-see-if-member-belongs-to-group">Check to see if member belongs to group</a></li>
+<li><a class="reference internal" href="#removing-a-member-from-a-group">Removing a member from a group</a></li>
+<li><a class="reference internal" href="#retrieving-the-list-of-members-to-a-group">Retrieving the list of members to a group</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interacting-with-group-owners">Interacting with group owners</a><ul>
+<li><a class="reference internal" href="#adding-an-owner-to-a-group">Adding an owner to a group</a></li>
+<li><a class="reference internal" href="#retrieving-the-list-of-the-owner-of-a-group">Retrieving the list of the owner of a group</a></li>
+<li><a class="reference internal" href="#check-to-see-if-an-email-is-the-owner-of-a-group">Check to see if an email is the owner of a group</a></li>
+<li><a class="reference internal" href="#removing-an-owner-from-a-group">Removing an owner from a group</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interacting-with-email-lists">Interacting with email lists</a><ul>
+<li><a class="reference internal" href="#creating-an-email-list">Creating an email list</a></li>
+<li><a class="reference internal" href="#retrieving-all-email-lists-to-which-a-recipient-is-subscribed">Retrieving all email lists to which a recipient is subscribed</a></li>
+<li><a class="reference internal" href="#retrieving-all-email-lists-in-a-domain">Retrieving all email lists in a domain</a></li>
+<li><a class="reference internal" href="#deleting-an-email-list">Deleting an email list</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#interacting-with-email-list-recipients">Interacting with email list recipients</a><ul>
+<li><a class="reference internal" href="#adding-a-recipient-to-an-email-list">Adding a recipient to an email list</a></li>
+<li><a class="reference internal" href="#retrieving-the-list-of-subscribers-to-an-email-list">Retrieving the list of subscribers to an email list</a></li>
+<li><a class="reference internal" href="#removing-a-recipient-from-an-email-list">Removing a recipient from an email list</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#handling-errors">Handling errors</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendgdata.gapps.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendgdata.gapps.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendgdata.gapps.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendgdata.gapps.rst">
+                Using Google Apps Provisioning
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

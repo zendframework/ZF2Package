@@ -1,0 +1,681 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Creating and Rendering Composite Elements &mdash; Zend Framework 2 2.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.6 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="creating-and-rendering-composite-elements">
+<span id="learning-form-decorators-composite"></span><h1>Creating and Rendering Composite Elements<a class="headerlink" href="#creating-and-rendering-composite-elements" title="Permalink to this headline">¶</a></h1>
+<p>In <a class="reference internal" href="form.decorators.individual.html#learning-form-decorators-individual"><em>the last section</em></a>, we had an example showing a &#8220;date of birth
+element&#8221;:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">class</span><span class="o">=</span><span class="s2">&quot;element&quot;</span><span class="o">&gt;</span>
+    <span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">dateOfBirth</span><span class="o">-&gt;</span><span class="na">renderLabel</span><span class="p">()</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formText</span><span class="p">(</span><span class="s1">&#39;dateOfBirth[day]&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;size&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;maxlength&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">))</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    /</span>
+<span class="x">    </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formText</span><span class="p">(</span><span class="s1">&#39;dateOfBirth[month]&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;size&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;maxlength&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">))</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    /</span>
+<span class="x">    </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formText</span><span class="p">(</span><span class="s1">&#39;dateOfBirth[year]&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;size&#39;</span> <span class="o">=&gt;</span> <span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;maxlength&#39;</span> <span class="o">=&gt;</span> <span class="mi">4</span><span class="p">))</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/div&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>How might you represent this element as a <tt class="docutils literal"><span class="pre">Zend\Form\Element</span></tt>? How might you write a decorator to render it?</p>
+<div class="section" id="the-element">
+<span id="learning-form-decorators-composite-element"></span><h2>The Element<a class="headerlink" href="#the-element" title="Permalink to this headline">¶</a></h2>
+<p>The questions about how the element would work include:</p>
+<ul class="simple">
+<li>How would you set and retrieve the value?</li>
+<li>How would you validate the value?</li>
+<li>Regardless, how would you then allow for discrete form inputs for the three segments (day, month, year)?</li>
+</ul>
+<p>The first two questions center around the form element itself: how would <tt class="docutils literal"><span class="pre">setValue()</span></tt> and <tt class="docutils literal"><span class="pre">getValue()</span></tt> work?
+There&#8217;s actually another question implied by the question about the decorator: how would you retrieve the discrete
+date segments from the element and/or set them?</p>
+<p>The solution is to override the <tt class="docutils literal"><span class="pre">setValue()</span></tt> method of your element to provide some custom logic. In this
+particular case, our element should have three discrete behaviors:</p>
+<ul class="simple">
+<li>If an integer timestamp is provided, it should be used to determine and store the day, month, and year.</li>
+<li>If a textual string is provided, it should be cast to a timestamp, and then that value used to determine and
+store the day, month, and year.</li>
+<li>If an array containing keys for date, month, and year is provided, those values should be stored.</li>
+</ul>
+<p>Internally, the day, month, and year will be stored discretely. When the value of the element is retrieved, it will
+be done so in a normalized string format. We&#8217;ll override <tt class="docutils literal"><span class="pre">getValue()</span></tt> as well to assemble the discrete date
+segments into a final string.</p>
+<p>Here&#8217;s what the class would look like:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">My_Form_Element_Date</span> <span class="k">extends</span> <span class="nx">Zend\Form_Element\Xhtml</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$_dateFormat</span> <span class="o">=</span> <span class="s1">&#39;%year%-%month%-%day%&#39;</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$_day</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$_month</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$_year</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setDay</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_day</span> <span class="o">=</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span> <span class="nv">$value</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getDay</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_day</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setMonth</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_month</span> <span class="o">=</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span> <span class="nv">$value</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getMonth</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_month</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setYear</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_year</span> <span class="o">=</span> <span class="p">(</span><span class="nx">int</span><span class="p">)</span> <span class="nv">$value</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getYear</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_year</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setValue</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">is_int</span><span class="p">(</span><span class="nv">$value</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setDay</span><span class="p">(</span><span class="nb">date</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="nv">$value</span><span class="p">))</span>
+                 <span class="o">-&gt;</span><span class="na">setMonth</span><span class="p">(</span><span class="nb">date</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="nv">$value</span><span class="p">))</span>
+                 <span class="o">-&gt;</span><span class="na">setYear</span><span class="p">(</span><span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="nv">$value</span><span class="p">));</span>
+        <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nb">is_string</span><span class="p">(</span><span class="nv">$value</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$date</span> <span class="o">=</span> <span class="nb">strtotime</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setDay</span><span class="p">(</span><span class="nb">date</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="nv">$date</span><span class="p">))</span>
+                 <span class="o">-&gt;</span><span class="na">setMonth</span><span class="p">(</span><span class="nb">date</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="nv">$date</span><span class="p">))</span>
+                 <span class="o">-&gt;</span><span class="na">setYear</span><span class="p">(</span><span class="nb">date</span><span class="p">(</span><span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="nv">$date</span><span class="p">));</span>
+        <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nb">is_array</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+                  <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$value</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">])</span>
+                      <span class="o">&amp;&amp;</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$value</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">])</span>
+                      <span class="o">&amp;&amp;</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$value</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">])</span>
+                  <span class="p">)</span>
+        <span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setDay</span><span class="p">(</span><span class="nv">$value</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">])</span>
+                 <span class="o">-&gt;</span><span class="na">setMonth</span><span class="p">(</span><span class="nv">$value</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">])</span>
+                 <span class="o">-&gt;</span><span class="na">setYear</span><span class="p">(</span><span class="nv">$value</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">]);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">Exception</span><span class="p">(</span><span class="s1">&#39;Invalid date value provided&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getValue</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">str_replace</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span><span class="s1">&#39;%year%&#39;</span><span class="p">,</span> <span class="s1">&#39;%month%&#39;</span><span class="p">,</span> <span class="s1">&#39;%day%&#39;</span><span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getYear</span><span class="p">(),</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getMonth</span><span class="p">(),</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getDay</span><span class="p">()),</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_dateFormat</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This class gives some nice flexibility &#8211; we can set default values from our database, and be certain that the
+value will be stored and represented correctly. Additionally, we can allow for the value to be set from an array
+passed via form input. Finally, we have discrete accessors for each date segment, which we can now use in a
+decorator to create a composite element.</p>
+</div>
+<div class="section" id="the-decorator">
+<span id="learning-form-decorators-composite-decorator"></span><h2>The Decorator<a class="headerlink" href="#the-decorator" title="Permalink to this headline">¶</a></h2>
+<p>Revisiting the example from the last section, let&#8217;s assume that we want users to input each of the year, month, and
+day separately. <em>PHP</em> fortunately allows us to use array notation when creating elements, so it&#8217;s still possible to
+capture these three entities into a single value &#8211; and we&#8217;ve now created a <tt class="docutils literal"><span class="pre">Zend_Form</span></tt> element that can handle
+such an array value.</p>
+<p>The decorator is relatively simple: it will grab the day, month, and year from the element, and pass each to a
+discrete view helper to render individual form inputs; these will then be aggregated to form the final markup.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">My_Form_Decorator_Date</span> <span class="k">extends</span> <span class="nx">Zend\Form_Decorator\Abstract</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">render</span><span class="p">(</span><span class="nv">$content</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$element</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getElement</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$element</span> <span class="nx">instanceof</span> <span class="nx">My_Form_Element_Date</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// only want to render Date elements</span>
+            <span class="k">return</span> <span class="nv">$content</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nv">$view</span> <span class="o">=</span> <span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getView</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$view</span> <span class="nx">instanceof</span> <span class="nx">Zend\View\Interface</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// using view helpers, so do nothing if no view present</span>
+            <span class="k">return</span> <span class="nv">$content</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nv">$day</span>   <span class="o">=</span> <span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getDay</span><span class="p">();</span>
+        <span class="nv">$month</span> <span class="o">=</span> <span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getMonth</span><span class="p">();</span>
+        <span class="nv">$year</span>  <span class="o">=</span> <span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getYear</span><span class="p">();</span>
+        <span class="nv">$name</span>  <span class="o">=</span> <span class="nv">$element</span><span class="o">-&gt;</span><span class="na">getFullyQualifiedName</span><span class="p">();</span>
+
+        <span class="nv">$params</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;size&#39;</span>      <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s1">&#39;maxlength&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="p">);</span>
+        <span class="nv">$yearParams</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;size&#39;</span>      <span class="o">=&gt;</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s1">&#39;maxlength&#39;</span> <span class="o">=&gt;</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="p">);</span>
+
+        <span class="nv">$markup</span> <span class="o">=</span> <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">formText</span><span class="p">(</span><span class="nv">$name</span> <span class="o">.</span> <span class="s1">&#39;[day]&#39;</span><span class="p">,</span> <span class="nv">$day</span><span class="p">,</span> <span class="nv">$params</span><span class="p">)</span>
+                <span class="o">.</span> <span class="s1">&#39; / &#39;</span> <span class="o">.</span> <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">formText</span><span class="p">(</span><span class="nv">$name</span> <span class="o">.</span> <span class="s1">&#39;[month]&#39;</span><span class="p">,</span> <span class="nv">$month</span><span class="p">,</span> <span class="nv">$params</span><span class="p">)</span>
+                <span class="o">.</span> <span class="s1">&#39; / &#39;</span> <span class="o">.</span> <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">formText</span><span class="p">(</span><span class="nv">$name</span> <span class="o">.</span> <span class="s1">&#39;[year]&#39;</span><span class="p">,</span> <span class="nv">$year</span><span class="p">,</span> <span class="nv">$yearParams</span><span class="p">);</span>
+
+        <span class="k">switch</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getPlacement</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">PREPEND</span><span class="o">:</span>
+                <span class="k">return</span> <span class="nv">$markup</span> <span class="o">.</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getSeparator</span><span class="p">()</span> <span class="o">.</span> <span class="nv">$content</span><span class="p">;</span>
+            <span class="k">case</span> <span class="nx">self</span><span class="o">::</span><span class="na">APPEND</span><span class="o">:</span>
+            <span class="k">default</span><span class="o">:</span>
+                <span class="k">return</span> <span class="nv">$content</span> <span class="o">.</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getSeparator</span><span class="p">()</span> <span class="o">.</span> <span class="nv">$markup</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>We now have to do a minor tweak to our form element, and tell it that we want to use the above decorator as a
+default. That takes two steps. First, we need to inform the element of the decorator path. We can do that in the
+constructor:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">My_Form_Element_Date</span> <span class="k">extends</span> <span class="nx">Zend\Form_Element\Xhtml</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$spec</span><span class="p">,</span> <span class="nv">$options</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">addPrefixPath</span><span class="p">(</span>
+            <span class="s1">&#39;My_Form_Decorator&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;My/Form/Decorator&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;decorator&#39;</span>
+        <span class="p">);</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="nv">$spec</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Note that this is being done in the constructor and not in <tt class="docutils literal"><span class="pre">init()</span></tt>. This is for two reasons. First, it allows
+extending the element later to add logic in <tt class="docutils literal"><span class="pre">init</span></tt> without needing to worry about calling <tt class="docutils literal"><span class="pre">parent::init()</span></tt>.
+Second, it allows passing additional plugin paths via configuration or within an <tt class="docutils literal"><span class="pre">init</span></tt> method that will then
+allow overriding the default <tt class="docutils literal"><span class="pre">Date</span></tt> decorator with my own replacement.</p>
+<p>Next, we need to override the <tt class="docutils literal"><span class="pre">loadDefaultDecorators()</span></tt> method to use our new <tt class="docutils literal"><span class="pre">Date</span></tt> decorator:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">My_Form_Element_Date</span> <span class="k">extends</span> <span class="nx">Zend\Form_Element\Xhtml</span>
+<span class="p">{</span>
+    <span class="c1">// ...</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">loadDefaultDecorators</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">loadDefaultDecoratorsIsDisabled</span><span class="p">())</span> <span class="p">{</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nv">$decorators</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getDecorators</span><span class="p">();</span>
+        <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$decorators</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">addDecorator</span><span class="p">(</span><span class="s1">&#39;Date&#39;</span><span class="p">)</span>
+                 <span class="o">-&gt;</span><span class="na">addDecorator</span><span class="p">(</span><span class="s1">&#39;Errors&#39;</span><span class="p">)</span>
+                 <span class="o">-&gt;</span><span class="na">addDecorator</span><span class="p">(</span><span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+                     <span class="s1">&#39;tag&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;class&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;description&#39;</span>
+                 <span class="p">))</span>
+                 <span class="o">-&gt;</span><span class="na">addDecorator</span><span class="p">(</span><span class="s1">&#39;HtmlTag&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+                     <span class="s1">&#39;tag&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;dd&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;id&#39;</span>  <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getName</span><span class="p">()</span> <span class="o">.</span> <span class="s1">&#39;-element&#39;</span>
+                 <span class="p">))</span>
+                 <span class="o">-&gt;</span><span class="na">addDecorator</span><span class="p">(</span><span class="s1">&#39;Label&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;tag&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;dt&#39;</span><span class="p">));</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="c1">// ...</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>What does the final output look like? Let&#8217;s consider the following element:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$d</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">My_Form_Element_Date</span><span class="p">(</span><span class="s1">&#39;dateOfBirth&#39;</span><span class="p">);</span>
+<span class="nv">$d</span><span class="o">-&gt;</span><span class="na">setLabel</span><span class="p">(</span><span class="s1">&#39;Date of Birth: &#39;</span><span class="p">)</span>
+  <span class="o">-&gt;</span><span class="na">setView</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\View\View</span><span class="p">());</span>
+
+<span class="c1">// These are equivalent:</span>
+<span class="nv">$d</span><span class="o">-&gt;</span><span class="na">setValue</span><span class="p">(</span><span class="s1">&#39;20 April 2009&#39;</span><span class="p">);</span>
+<span class="nv">$d</span><span class="o">-&gt;</span><span class="na">setValue</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;year&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;2009&#39;</span><span class="p">,</span> <span class="s1">&#39;month&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;04&#39;</span><span class="p">,</span> <span class="s1">&#39;day&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;20&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you then echo this element, you get the following markup (with some slight whitespace modifications for
+readability):</p>
+<div class="highlight-html"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nt">&lt;dt</span> <span class="na">id=</span><span class="s">&quot;dateOfBirth-label&quot;</span><span class="nt">&gt;&lt;label</span> <span class="na">for=</span><span class="s">&quot;dateOfBirth&quot;</span> <span class="na">class=</span><span class="s">&quot;optional&quot;</span><span class="nt">&gt;</span>
+    Date of Birth:
+<span class="nt">&lt;/label&gt;&lt;/dt&gt;</span>
+<span class="nt">&lt;dd</span> <span class="na">id=</span><span class="s">&quot;dateOfBirth-element&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth[day]&quot;</span> <span class="na">id=</span><span class="s">&quot;dateOfBirth-day&quot;</span>
+        <span class="na">value=</span><span class="s">&quot;20&quot;</span> <span class="na">size=</span><span class="s">&quot;2&quot;</span> <span class="na">maxlength=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;</span> /
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth[month]&quot;</span> <span class="na">id=</span><span class="s">&quot;dateOfBirth-month&quot;</span>
+        <span class="na">value=</span><span class="s">&quot;4&quot;</span> <span class="na">size=</span><span class="s">&quot;2&quot;</span> <span class="na">maxlength=</span><span class="s">&quot;2&quot;</span><span class="nt">&gt;</span> /
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth[year]&quot;</span> <span class="na">id=</span><span class="s">&quot;dateOfBirth-year&quot;</span>
+        <span class="na">value=</span><span class="s">&quot;2009&quot;</span> <span class="na">size=</span><span class="s">&quot;4&quot;</span> <span class="na">maxlength=</span><span class="s">&quot;4&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;/dd&gt;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="conclusion">
+<span id="learning-form-decorators-composite-conclusion"></span><h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<p>We now have an element that can render multiple related form input fields, and then handle the aggregated fields as
+a single entity &#8211; the <tt class="docutils literal"><span class="pre">dateOfBirth</span></tt> element will be passed as an array to the element, and the element will
+then, as we noted earlier, create the appropriate date segments and return a value we can use for most backends.</p>
+<p>In the end, you get a uniform element <em>API</em> you can use to describe an element representing a composite value.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Creating and Rendering Composite Elements</a><ul>
+<li><a class="reference internal" href="#the-element">The Element</a></li>
+<li><a class="reference internal" href="#the-decorator">The Decorator</a></li>
+<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/form.decorators.composite.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/form.decorators.composite.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/form.decorators.composite.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/form.decorators.composite.rst">
+                Creating and Rendering Composite Elements
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

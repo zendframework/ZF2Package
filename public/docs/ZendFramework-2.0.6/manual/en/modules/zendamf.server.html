@@ -1,0 +1,844 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ZendAmfServer &mdash; Zend Framework 2 2.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.6 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zendamfserver">
+<span id="zendamf-server"></span><h1>ZendAmfServer<a class="headerlink" href="#zendamfserver" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">ZendAmf\Server</span></tt> provides an <em>RPC</em>-style server for handling requests made from the Adobe Flash Player using the
+<em>AMF</em> protocol. Like all Zend Framework server classes, it follows the SoapServer <em>API</em>, providing an easy to
+remember interface for creating servers.</p>
+<p class="rubric" id="zendamf-server-basic">Basic AMF Server</p>
+<p>Let&#8217;s assume that you have created a class <tt class="docutils literal"><span class="pre">Foo</span></tt> with a variety of public methods. You may create an <em>AMF</em> server
+using the following code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendAmf\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">);</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+<span class="k">echo</span> <span class="nv">$response</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Alternately, you may choose to attach a simple function as a callback instead:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendAmf\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">addFunction</span><span class="p">(</span><span class="s1">&#39;myUberCoolFunction&#39;</span><span class="p">);</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+<span class="k">echo</span> <span class="nv">$response</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>You could also mix and match multiple classes and functions. When doing so, we suggest namespacing each to ensure
+that no method name collisions occur; this can be done by simply passing a second string argument to either
+<tt class="docutils literal"><span class="pre">addFunction()</span></tt> or <tt class="docutils literal"><span class="pre">setClass()</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendAmf\Server</span><span class="p">();</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">addFunction</span><span class="p">(</span><span class="s1">&#39;myUberCoolFunction&#39;</span><span class="p">,</span> <span class="s1">&#39;my&#39;</span><span class="p">)</span>
+       <span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">)</span>
+       <span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;Bar&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">);</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+<span class="k">echo</span> <span class="nv">$response</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">ZendAmf\Server</span></tt> also allows services to be dynamically loaded based on a supplied directory path. You may
+add as many directories as you wish to the server. The order that you add the directories to the server will be the
+order that the <em>LIFO</em> search will be performed on the directories to match the class. Adding directories is
+completed with the <tt class="docutils literal"><span class="pre">addDirectory()</span></tt> method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span><span class="o">-&gt;</span><span class="na">addDirectory</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)</span> <span class="o">.</span><span class="s1">&#39;/../services/&#39;</span><span class="p">);</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">addDirectory</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="k">__FILE__</span><span class="p">)</span> <span class="o">.</span><span class="s1">&#39;/../package/&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>When calling remote services your source name can have underscore (&#8220;_&#8221;) and dot (&#8221;.&#8221;) directory delimiters. When
+an underscore is used <em>PEAR</em> and Zend Framework class naming conventions will be respected. This means that if you
+call the service com_Foo_Bar the server will look for the file <tt class="docutils literal"><span class="pre">Bar.php</span></tt> in the each of the included paths at
+<tt class="docutils literal"><span class="pre">com/Foo/Bar.php</span></tt>. If the dot notation is used for your remote service such as <tt class="docutils literal"><span class="pre">com.Foo.Bar</span></tt> each included path
+will have <tt class="docutils literal"><span class="pre">com/Foo/Bar.php</span></tt> append to the end to autoload <tt class="docutils literal"><span class="pre">Bar.php</span></tt></p>
+<p>All <em>AMF</em> requests sent to the script will then be handled by the server, and an <em>AMF</em> response will be returned.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>All Attached Methods and Functions Need Docblocks</strong></p>
+<p>Like all other server components in Zend Framework, you must document your class methods using <em>PHP</em> docblocks.
+At the minimum, you need to provide annotations for each required argument as well as the return value. As
+examples:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Function to attach:</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * @param  string $name</span>
+<span class="sd"> * @param  string $greeting</span>
+<span class="sd"> * @return string</span>
+<span class="sd"> */</span>
+<span class="k">function</span> <span class="nf">helloWorld</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$greeting</span> <span class="o">=</span> <span class="s1">&#39;Hello&#39;</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="nv">$greeting</span> <span class="o">.</span> <span class="s1">&#39;, &#39;</span> <span class="o">.</span> <span class="nv">$name</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Attached class</span>
+
+<span class="k">class</span> <span class="nc">World</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @param  string $name</span>
+<span class="sd">     * @param  string $greeting</span>
+<span class="sd">     * @return string</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">hello</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$greeting</span> <span class="o">=</span> <span class="s1">&#39;Hello&#39;</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$greeting</span> <span class="o">.</span> <span class="s1">&#39;, &#39;</span> <span class="o">.</span> <span class="nv">$name</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p class="last">Other annotations may be used, but will be ignored.</p>
+</div>
+<div class="section" id="connecting-to-the-server-from-flex">
+<span id="zendamf-server-flex"></span><h2>Connecting to the Server from Flex<a class="headerlink" href="#connecting-to-the-server-from-flex" title="Permalink to this headline">¶</a></h2>
+<p>Connecting to your <tt class="docutils literal"><span class="pre">ZendAmf\Server</span></tt> from your Flex project is quite simple; you simply need to point your
+endpoint <em>URI</em> to your <tt class="docutils literal"><span class="pre">ZendAmf\Server</span></tt> script.</p>
+<p>Say, for instance, you have created your server and placed it in the <tt class="docutils literal"><span class="pre">server.php</span></tt> file in your application root,
+and thus the <em>URI</em> is <tt class="docutils literal"><span class="pre">http://example.com/server.php</span></tt>. In this case, you would modify your
+<tt class="docutils literal"><span class="pre">services-config.xml</span></tt> file to set the channel endpoint uri attribute to this value.</p>
+<p>If you have never created a <tt class="docutils literal"><span class="pre">service-config.xml</span></tt> file you can do so by opening your project in your Navigator
+window. Right click on the project name and select &#8216;properties&#8217;. In the Project properties dialog go into &#8216;Flex
+Build Path&#8217; menu, &#8216;Library path&#8217; tab and be sure the &#8216;<tt class="docutils literal"><span class="pre">rpc.swc</span></tt>&#8216; file is added to your projects path and Press Ok
+to close the window.</p>
+<p>You will also need to tell the compiler to use the <tt class="docutils literal"><span class="pre">service-config.xml</span></tt> to find the RemoteObject endpoint. To do
+this open your project properties panel again by right clicking on the project folder from your Navigator and
+selecting properties. From the properties popup select &#8216;Flex Compiler&#8217; and add the string: <tt class="docutils literal"><span class="pre">-services</span>
+<span class="pre">&quot;services-config.xml&quot;</span></tt>. Press Apply then OK to return to update the option. What you have just done is told the
+Flex compiler to look to the <tt class="docutils literal"><span class="pre">services-config.xml</span></tt> file for runtime variables that will be used by the
+RemotingObject class.</p>
+<p>We now need to tell Flex which services configuration file to use for connecting to our remote methods. For this
+reason create a new &#8216;<tt class="docutils literal"><span class="pre">services-config.xml</span></tt>&#8216; file into your Flex project src folder. To do this right click on the
+project folder and select &#8216;new&#8217; &#8216;File&#8217; which will popup a new window. Select the project folder and then name the
+file &#8216;<tt class="docutils literal"><span class="pre">services-config.xml</span></tt>&#8216; and press finish.</p>
+<p>Flex has created the new <tt class="docutils literal"><span class="pre">services-config.xml</span></tt> and has it open. Use the following example text for your
+<tt class="docutils literal"><span class="pre">services-config.xml</span></tt> file. Make sure that you update your endpoint to match that of your testing server. Make
+sure you save the file.</p>
+<div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;services-config&gt;</span>
+    <span class="nt">&lt;services&gt;</span>
+        <span class="nt">&lt;service</span> <span class="na">id=</span><span class="s">&quot;zend-service&quot;</span>
+            <span class="na">class=</span><span class="s">&quot;flex.messaging.services.RemotingService&quot;</span>
+            <span class="na">messageTypes=</span><span class="s">&quot;flex.messaging.messages.RemotingMessage&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;destination</span> <span class="na">id=</span><span class="s">&quot;zend&quot;</span><span class="nt">&gt;</span>
+                <span class="nt">&lt;channels&gt;</span>
+                    <span class="nt">&lt;channel</span> <span class="na">ref=</span><span class="s">&quot;zend-endpoint&quot;</span><span class="nt">/&gt;</span>
+                <span class="nt">&lt;/channels&gt;</span>
+                <span class="nt">&lt;properties&gt;</span>
+                    <span class="nt">&lt;source&gt;</span>*<span class="nt">&lt;/source&gt;</span>
+                <span class="nt">&lt;/properties&gt;</span>
+            <span class="nt">&lt;/destination&gt;</span>
+        <span class="nt">&lt;/service&gt;</span>
+    <span class="nt">&lt;/services&gt;</span>
+    <span class="nt">&lt;channels&gt;</span>
+        <span class="nt">&lt;channel-definition</span> <span class="na">id=</span><span class="s">&quot;zend-endpoint&quot;</span>
+            <span class="na">class=</span><span class="s">&quot;mx.messaging.channels.AMFChannel&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;endpoint</span> <span class="na">uri=</span><span class="s">&quot;http://example.com/server.php&quot;</span>
+                <span class="na">class=</span><span class="s">&quot;flex.messaging.endpoints.AMFEndpoint&quot;</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/channel-definition&gt;</span>
+    <span class="nt">&lt;/channels&gt;</span>
+<span class="nt">&lt;/services-config&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>There are two key points in the example. First, but last in the listing, we create an <em>AMF</em> channel, and specify
+the endpoint as the <em>URL</em> to our <tt class="docutils literal"><span class="pre">ZendAmf\Server</span></tt>:</p>
+<div class="highlight-xml"><pre>&lt;channel-definition id="zend-endpoint"
+    &lt;endpoint uri="http://example.com/server.php"
+        class="flex.messaging.endpoints.AMFEndpoint"/&gt;
+&lt;/channel-definition&gt;</pre>
+</div>
+<p>Notice that we&#8217;ve given this channel an identifier, &#8220;zend-endpoint&#8221;. The example create a service destination that
+refers to this channel, assigning it an ID as well &#8211; in this case &#8220;zend&#8221;.</p>
+<p>Within our Flex <em>MXML</em> files, we need to bind a RemoteObject to the service. In <em>MXML</em>, this might be done as
+follows:</p>
+<div class="highlight-xml"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nt">&lt;mx:RemoteObject</span> <span class="na">id=</span><span class="s">&quot;myservice&quot;</span>
+    <span class="na">fault=</span><span class="s">&quot;faultHandler(event)&quot;</span>
+    <span class="na">showBusyCursor=</span><span class="s">&quot;true&quot;</span>
+    <span class="na">destination=</span><span class="s">&quot;zend&quot;</span><span class="nt">&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Here, we&#8217;ve defined a new remote object identified by &#8220;myservice&#8221; bound to the service destination &#8220;zend&#8221; we
+defined in the <tt class="docutils literal"><span class="pre">services-config.xml</span></tt> file. We then call methods on it in our ActionScript by simply calling
+&#8220;myservice.&lt;method&gt;&#8221;. As an example:</p>
+<div class="highlight-actionscript"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">myservice</span><span class="p">.</span><span class="nx">hello</span><span class="p">(</span><span class="s2">&quot;Wade&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>When namespacing, you would use &#8220;myservice.&lt;namespace&gt;.&lt;method&gt;&#8221;:</p>
+<div class="highlight-actionscript"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">myservice</span><span class="p">.</span><span class="nx">world</span><span class="p">.</span><span class="nx">hello</span><span class="p">(</span><span class="s2">&quot;Wade&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>For more information on Flex RemoteObject invocation, <a class="reference external" href="http://livedocs.adobe.com/flex/3/html/help.html?content=data_access_4.html">visit the Adobe Flex 3 Help site</a>.</p>
+</div>
+<div class="section" id="error-handling">
+<span id="zendamf-server-errors"></span><h2>Error Handling<a class="headerlink" href="#error-handling" title="Permalink to this headline">¶</a></h2>
+<p>By default, all exceptions thrown in your attached classes or functions will be caught and returned as <em>AMF</em>
+ErrorMessages. However, the content of these ErrorMessage objects will vary based on whether or not the server is
+in &#8220;production&#8221; mode (the default state).</p>
+<p>When in production mode, only the exception code will be returned. If you disable production mode &#8211; something that
+should be done for testing only &#8211; most exception details will be returned: the exception message, line, and
+backtrace will all be attached.</p>
+<p>To disable production mode, do the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setProduction</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>To re-enable it, pass a <tt class="docutils literal"><span class="pre">TRUE</span></tt> boolean value instead:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setProduction</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Disable production mode sparingly!</strong></p>
+<p class="last">We recommend disabling production mode only when in development. Exception messages and backtraces can contain
+sensitive system information that you may not wish for outside parties to access. Even though <em>AMF</em> is a binary
+format, the specification is now open, meaning anybody can potentially deserialize the payload.</p>
+</div>
+<p>One area to be especially careful with is <em>PHP</em> errors themselves. When the <tt class="docutils literal"><span class="pre">display_errors</span></tt> <em>INI</em> directive is
+enabled, any <em>PHP</em> errors for the current error reporting level are rendered directly in the output &#8211; potentially
+disrupting the <em>AMF</em> response payload. We suggest turning off the <tt class="docutils literal"><span class="pre">display_errors</span></tt> directive in production to
+prevent such problems</p>
+</div>
+<div class="section" id="amf-responses">
+<span id="zendamf-server-response"></span><h2>AMF Responses<a class="headerlink" href="#amf-responses" title="Permalink to this headline">¶</a></h2>
+<p>Occasionally you may desire to manipulate the response object slightly, typically to return extra message headers.
+The <tt class="docutils literal"><span class="pre">handle()</span></tt> method of the server returns the response object, allowing you to do so.</p>
+<p class="rubric" id="zendamf-server-response-messageheaderexample">Adding Message Headers to the AMF Response</p>
+<p>In this example, we add a &#8216;foo&#8217; MessageHeader with the value &#8216;bar&#8217; to the response prior to returning it.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$response</span> <span class="o">=</span> <span class="nv">$server</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+<span class="nv">$response</span><span class="o">-&gt;</span><span class="na">addAmfHeader</span><span class="p">(</span><span class="k">new</span> <span class="nx">ZendAmf\Value\MessageHeader</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">))</span>
+<span class="k">echo</span> <span class="nv">$response</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="typed-objects">
+<span id="zendamf-server-typedobjects"></span><h2>Typed Objects<a class="headerlink" href="#typed-objects" title="Permalink to this headline">¶</a></h2>
+<p>Similar to <em>SOAP</em>, <em>AMF</em> allows passing objects between the client and server. This allows a great amount of
+flexibility and coherence between the two environments.</p>
+<p><tt class="docutils literal"><span class="pre">ZendAmf</span></tt> provides three methods for mapping ActionScript and <em>PHP</em> objects.</p>
+<ul>
+<li><p class="first">First, you may create explicit bindings at the server level, using the <tt class="docutils literal"><span class="pre">setClassMap()</span></tt> method. The first
+argument is the ActionScript class name, the second the <em>PHP</em> class name it maps to:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Map the ActionScript class &#39;ContactVO&#39; to the PHP class &#39;Contact&#39;:</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setClassMap</span><span class="p">(</span><span class="s1">&#39;ContactVO&#39;</span><span class="p">,</span> <span class="s1">&#39;Contact&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first">Second, you can set the public property <tt class="docutils literal"><span class="pre">$_explicitType</span></tt> in your <em>PHP</em> class, with the value representing the
+ActionScript class to map to:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Contact</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$_explicitType</span> <span class="o">=</span> <span class="s1">&#39;ContactVO&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first">Third, in a similar vein, you may define the public method <tt class="docutils literal"><span class="pre">getASClassName()</span></tt> in your <em>PHP</em> class; this method
+should return the appropriate ActionScript class:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Contact</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getASClassName</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="s1">&#39;ContactVO&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+<p>Although we have created the ContactVO on the server we now need to make its corresponding class in <em>AS3</em> for the
+server object to be mapped to.</p>
+<p>Right click on the src folder of the Flex project and select New -&gt; ActionScript File. Name the file ContactVO and
+press finish to see the new file. Copy the following code into the file to finish creating the class.</p>
+<div class="highlight-as"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">package</span>
+<span class="p">{</span>
+    <span class="p">[</span><span class="nx">Bindable</span><span class="p">]</span>
+    <span class="p">[</span><span class="nx">RemoteClass</span><span class="p">(</span><span class="nx">alias</span><span class="o">=</span><span class="s2">&quot;ContactVO&quot;</span><span class="p">)]</span>
+    <span class="kd">public</span> <span class="kd">class</span> <span class="nx">ContactVO</span>
+    <span class="p">{</span>
+        <span class="kd">public</span> <span class="k">var</span> <span class="nx">id</span><span class="o">:</span><span class="nb">int</span><span class="o">;</span>
+        <span class="kd">public</span> <span class="k">var</span> <span class="nx">firstname</span><span class="o">:</span><span class="nb">String</span><span class="o">;</span>
+        <span class="kd">public</span> <span class="k">var</span> <span class="nx">lastname</span><span class="o">:</span><span class="nb">String</span><span class="o">;</span>
+        <span class="kd">public</span> <span class="k">var</span> <span class="nx">email</span><span class="o">:</span><span class="nb">String</span><span class="o">;</span>
+        <span class="kd">public</span> <span class="k">var</span> <span class="nx">mobile</span><span class="o">:</span><span class="nb">String</span><span class="o">;</span>
+        <span class="kd">public</span> <span class="kd">function</span> <span class="nx">ProductVO</span><span class="p">()</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The class is syntactically equivalent to the <em>PHP</em> of the same name. The variable names are exactly the same and
+need to be in the same case to work properly. There are two unique <em>AS3</em> meta tags in this class. The first is
+bindable which makes fire a change event when it is updated. The second tag is the RemoteClass tag which defines
+that this class can have a remote object mapped with the alias name in this case <strong>ContactVO</strong>. It is mandatory
+that this tag the value that was set is the <em>PHP</em> class are strictly equivalent.</p>
+<div class="highlight-as"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="p">[</span><span class="nx">Bindable</span><span class="p">]</span>
+<span class="kd">private</span> <span class="k">var</span> <span class="nx">myContact</span><span class="o">:</span><span class="nx">ContactVO</span><span class="o">;</span>
+
+<span class="kd">private</span> <span class="kd">function</span> <span class="nx">getContactHandler</span><span class="p">(</span><span class="nx">event</span><span class="o">:</span><span class="nx">ResultEvent</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+    <span class="nx">myContact</span> <span class="o">=</span> <span class="nx">ContactVO</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">result</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The following result event from the service call is cast instantly onto the Flex ContactVO. Anything that is bound
+to myContact will be updated with the returned ContactVO data.</p>
+</div>
+<div class="section" id="resources">
+<span id="zendamf-server-resources"></span><h2>Resources<a class="headerlink" href="#resources" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">ZendAmf</span></tt> provides tools for mapping resource types returned by service classes into data consumable by
+ActionScript.</p>
+<p>In order to handle specific resource type, the user needs to create a plugin class named after the resource name,
+with words capitalized and spaces removed (so, resource type &#8220;mysql result&#8221; becomes MysqlResult), with some prefix,
+e.g. <tt class="docutils literal"><span class="pre">My_MysqlResult</span></tt>. This class should implement one method, <tt class="docutils literal"><span class="pre">parse()</span></tt>, receiving one argument - the resource
+- and returning the value that should be sent to ActionScript. The class should be located in the file named after
+the last component of the name, e.g. <tt class="docutils literal"><span class="pre">MysqlResult.php</span></tt>.</p>
+<p>The directory containing the resource handling plugins should be registered with <tt class="docutils literal"><span class="pre">ZendAmf</span></tt> type loader:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">ZendAmf\Parse\TypeLoader</span><span class="o">::</span><span class="na">addResourceDirectory</span><span class="p">(</span>
+    <span class="s2">&quot;My&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;application/library/resources/My&quot;</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>For detailed discussion of loading plugins, please see the <em class="xref std std-ref">plugin loader</em> section.</p>
+<p>Default directory for <tt class="docutils literal"><span class="pre">ZendAmf</span></tt> resources is registered automatically and currently contains handlers for &#8220;mysql
+result&#8221; and &#8220;stream&#8221; resources.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Example class implementing handling resources of type mysql result</span>
+<span class="k">class</span> <span class="nc">ZendAmf\Parse\Resource\MysqlResult</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * Parse resource into array</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param resource $resource</span>
+<span class="sd">     * @return array</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">parse</span><span class="p">(</span><span class="nv">$resource</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$result</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+        <span class="k">while</span> <span class="p">(</span><span class="nv">$row</span> <span class="o">=</span> <span class="nb">mysql_fetch_assoc</span><span class="p">(</span><span class="nv">$resource</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$result</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$row</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$result</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Trying to return unknown resource type (i.e., one for which no handler plugin exists) will result in an exception.</p>
+</div>
+<div class="section" id="connecting-to-the-server-from-flash">
+<span id="zendamf-server-flash"></span><h2>Connecting to the Server from Flash<a class="headerlink" href="#connecting-to-the-server-from-flash" title="Permalink to this headline">¶</a></h2>
+<p>Connecting to your <tt class="docutils literal"><span class="pre">ZendAmf\Server</span></tt> from your Flash project is slightly different than from Flex. However once
+the connection Flash functions with <tt class="docutils literal"><span class="pre">ZendAmf\Server</span></tt> the same way is flex. The following example can also be
+used from a Flex <em>AS3</em> file. We will reuse the same <tt class="docutils literal"><span class="pre">ZendAmf\Server</span></tt> configuration along with the World class
+for our connection.</p>
+<p>Open Flash CS and create and new Flash File (ActionScript 3). Name the document <tt class="docutils literal"><span class="pre">ZendExample.fla</span></tt> and save the
+document into a folder that you will use for this example. Create a new <em>AS3</em> file in the same directory and call
+the file <tt class="docutils literal"><span class="pre">Main.as</span></tt>. Have both files open in your editor. We are now going to connect the two files via the
+document class. Select ZendExample and click on the stage. From the stage properties panel change the Document
+class to Main. This links the <tt class="docutils literal"><span class="pre">Main.as</span></tt> ActionScript file with the user interface in <tt class="docutils literal"><span class="pre">ZendExample.fla</span></tt>. When
+you run the Flash file ZendExample the <tt class="docutils literal"><span class="pre">Main.as</span></tt> class will now be run. Next we will add ActionScript to make the
+<em>AMF</em> call.</p>
+<p>We now are going to make a Main class so that we can send the data to the server and display the result. Copy the
+following code into your <tt class="docutils literal"><span class="pre">Main.as</span></tt> file and then we will walk through the code to describe what each element&#8217;s
+role is.</p>
+<div class="highlight-as"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">package</span> <span class="p">{</span>
+  <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">display</span><span class="p">.</span><span class="nb">MovieClip</span><span class="o">;</span>
+  <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">events</span><span class="p">.</span><span class="o">*;</span>
+  <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">net</span><span class="p">.</span><span class="nb">NetConnection</span><span class="o">;</span>
+  <span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">net</span><span class="p">.</span><span class="nb">Responder</span><span class="o">;</span>
+
+  <span class="kd">public</span> <span class="kd">class</span> <span class="nx">Main</span> <span class="kd">extends</span> <span class="nb">MovieClip</span> <span class="p">{</span>
+    <span class="kd">private</span> <span class="k">var</span> <span class="nx">gateway</span><span class="o">:</span><span class="nb">String</span> <span class="o">=</span> <span class="s2">&quot;http://example.com/server.php&quot;</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="k">var</span> <span class="nx">connection</span><span class="o">:</span><span class="nb">NetConnection</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="k">var</span> <span class="nx">responder</span><span class="o">:</span><span class="nb">Responder</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="kd">function</span> <span class="nx">Main</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">responder</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Responder</span><span class="p">(</span><span class="nx">onResult</span><span class="o">,</span> <span class="nx">onFault</span><span class="p">);</span>
+      <span class="nx">connection</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">NetConnection</span><span class="o">;</span>
+      <span class="nx">connection</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">gateway</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">public</span> <span class="kd">function</span> <span class="nx">onComplete</span><span class="p">(</span> <span class="nx">e</span><span class="o">:</span><span class="nb">Event</span> <span class="p">)</span><span class="o">:</span><span class="nx">void</span><span class="p">{</span>
+      <span class="k">var</span> <span class="nx">params</span> <span class="o">=</span> <span class="s2">&quot;Sent to Server&quot;</span><span class="o">;</span>
+      <span class="nx">connection</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="s2">&quot;World.hello&quot;</span><span class="o">,</span> <span class="nx">responder</span><span class="o">,</span> <span class="nx">params</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kd">private</span> <span class="kd">function</span> <span class="nx">onResult</span><span class="p">(</span><span class="nx">result</span><span class="o">:</span><span class="nb">Object</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+      <span class="c1">// Display the returned data</span>
+      <span class="nf">trace</span><span class="p">(</span><span class="nb">String</span><span class="p">(</span><span class="nx">result</span><span class="p">));</span>
+    <span class="p">}</span>
+    <span class="kd">private</span> <span class="kd">function</span> <span class="nx">onFault</span><span class="p">(</span><span class="nx">fault</span><span class="o">:</span><span class="nb">Object</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+      <span class="nf">trace</span><span class="p">(</span><span class="nb">String</span><span class="p">(</span><span class="nx">fault</span><span class="p">.</span><span class="nx">description</span><span class="p">));</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>We first need to import two ActionScript libraries that perform the bulk of the work. The first is NetConnection
+which acts like a by directional pipe between the client and the server. The second is a Responder object which
+handles the return values from the server related to the success or failure of the call.</p>
+<div class="highlight-as"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">net</span><span class="p">.</span><span class="nb">NetConnection</span><span class="o">;</span>
+<span class="kd">import</span> <span class="nx">flash</span><span class="p">.</span><span class="nx">net</span><span class="p">.</span><span class="nb">Responder</span><span class="o">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>In the class we need three variables to represent the NetConnection, Responder, and the gateway <em>URL</em> to our
+<tt class="docutils literal"><span class="pre">ZendAmf\Server</span></tt> installation.</p>
+<div class="highlight-as"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">private</span> <span class="k">var</span> <span class="nx">gateway</span><span class="o">:</span><span class="nb">String</span> <span class="o">=</span> <span class="s2">&quot;http://example.com/server.php&quot;</span><span class="o">;</span>
+<span class="kd">private</span> <span class="k">var</span> <span class="nx">connection</span><span class="o">:</span><span class="nb">NetConnection</span><span class="o">;</span>
+<span class="kd">private</span> <span class="k">var</span> <span class="nx">responder</span><span class="o">:</span><span class="nb">Responder</span><span class="o">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>In the Main constructor we create a responder and a new connection to the <tt class="docutils literal"><span class="pre">ZendAmf\Server</span></tt> endpoint. The
+responder defines two different methods for handling the response from the server. For simplicity I have called
+these onResult and onFault.</p>
+<div class="highlight-as"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">responder</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Responder</span><span class="p">(</span><span class="nx">onResult</span><span class="o">,</span> <span class="nx">onFault</span><span class="p">);</span>
+<span class="nx">connection</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">NetConnection</span><span class="o">;</span>
+<span class="nx">connection</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="nx">gateway</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>In the onComplete function which is run as soon as the construct has completed we send the data to the server. We
+need to add one more line that makes a call to the <tt class="docutils literal"><span class="pre">ZendAmf\Server</span></tt> World-&gt;hello function.</p>
+<div class="highlight-as"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">connection</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="s2">&quot;World.hello&quot;</span><span class="o">,</span> <span class="nx">responder</span><span class="o">,</span> <span class="nx">params</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>When we created the responder variable we defined an onResult and onFault function to handle the response from the
+server. We added this function for the successful result from the server. A successful event handler is run every
+time the connection is handled properly to the server.</p>
+<div class="highlight-as"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">private</span> <span class="kd">function</span> <span class="nx">onResult</span><span class="p">(</span><span class="nx">result</span><span class="o">:</span><span class="nb">Object</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+    <span class="c1">// Display the returned data</span>
+    <span class="nf">trace</span><span class="p">(</span><span class="nb">String</span><span class="p">(</span><span class="nx">result</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The onFault function, is called if there was an invalid response from the server. This happens when there is an
+error on the server, the <em>URL</em> to the server is invalid, the remote service or method does not exist, and any other
+connection related issues.</p>
+<div class="highlight-as"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="kd">private</span> <span class="kd">function</span> <span class="nx">onFault</span><span class="p">(</span><span class="nx">fault</span><span class="o">:</span><span class="nb">Object</span><span class="p">)</span><span class="o">:</span><span class="nx">void</span> <span class="p">{</span>
+    <span class="nf">trace</span><span class="p">(</span><span class="nb">String</span><span class="p">(</span><span class="nx">fault</span><span class="p">.</span><span class="nx">description</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Adding in the ActionScript to make the remoting connection is now complete. Running the ZendExample file now makes
+a connection to <tt class="docutils literal"><span class="pre">ZendAmf</span></tt>. In review you have added the required variables to open a connection to the remote
+server, defined what methods should be used when your application receives a response from the server, and finally
+displayed the returned data to output via <tt class="docutils literal"><span class="pre">trace()</span></tt>.</p>
+</div>
+<div class="section" id="authentication">
+<span id="zendamf-server-auth"></span><h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">ZendAmf\Server</span></tt> allows you to specify authentication and authorization hooks to control access to the services.
+It is using the infrastructure provided by <a class="reference internal" href="../index.html#zend-authentication"><em>ZendAuthentication</em></a> and <a class="reference internal" href="../index.html#zend-permissions-acl"><em>ZendPermissionsAcl</em></a> components.</p>
+<p>In order to define authentication, the user provides authentication adapter extending <tt class="docutils literal"><span class="pre">ZendAmf\Auth\Abstract</span></tt>
+abstract class. The adapter should implement the <tt class="docutils literal"><span class="pre">authenticate()</span></tt> method just like regular <a class="reference internal" href="zend.authentication.intro.html#zend-authentication-introduction-adapters"><em>authentication
+adapter</em></a>.</p>
+<p>The adapter should use properties <strong>_username</strong> and <strong>_password</strong> from the parent <tt class="docutils literal"><span class="pre">ZendAmf\Auth\Abstract</span></tt> class
+in order to authenticate. These values are set by the server using <tt class="docutils literal"><span class="pre">setCredentials()</span></tt> method before call to
+<tt class="docutils literal"><span class="pre">authenticate()</span></tt> if the credentials are received in the <em>AMF</em> request headers.</p>
+<p>The identity returned by the adapter should be an object containing property <tt class="docutils literal"><span class="pre">role</span></tt> for the <em>ACL</em> access control
+to work.</p>
+<p>If the authentication result is not successful, the request is not proceseed further and failure message is
+returned with the reasons for failure taken from the result.</p>
+<p>The adapter is connected to the server using <tt class="docutils literal"><span class="pre">setAuth()</span></tt> method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setAuth</span><span class="p">(</span><span class="k">new</span> <span class="nx">My_Amf_Auth</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>Access control is performed by using <tt class="docutils literal"><span class="pre">Zend\Permissions\Acl</span></tt> object set by <tt class="docutils literal"><span class="pre">setAcl()</span></tt> method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$acl</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Permissions\Acl\Acl</span><span class="p">();</span>
+<span class="nx">createPermissions</span><span class="p">(</span><span class="nv">$acl</span><span class="p">);</span> <span class="c1">// create permission structure</span>
+<span class="nv">$server</span><span class="o">-&gt;</span><span class="na">setAcl</span><span class="p">(</span><span class="nv">$acl</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If the <em>ACL</em> object is set, and the class being called defines <tt class="docutils literal"><span class="pre">initAcl()</span></tt> method, this method will be called
+with the <em>ACL</em> object as an argument. The class then can create additional <em>ACL</em> rules and return <tt class="docutils literal"><span class="pre">TRUE</span></tt>, or
+return <tt class="docutils literal"><span class="pre">FALSE</span></tt> if no access control is required for this class.</p>
+<p>After <em>ACL</em> have been set up, the server will check if access is allowed with role set by the authentication,
+resource being the class name (or <tt class="docutils literal"><span class="pre">NULL</span></tt> for function calls) and privilege being the function name. If no
+authentication was provided, then if the <strong>anonymous</strong> role was defined, it will be used, otherwise the access will
+be denied.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_acl</span><span class="o">-&gt;</span><span class="na">isAllowed</span><span class="p">(</span><span class="nv">$role</span><span class="p">,</span> <span class="nv">$class</span><span class="p">,</span> <span class="nv">$function</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">require_once</span> <span class="s1">&#39;Zend/Amf/Server/Exception.php&#39;</span><span class="p">;</span>
+    <span class="k">throw</span> <span class="k">new</span> <span class="nx">ZendAmf\Server\Exception</span><span class="p">(</span><span class="s2">&quot;Access not allowed&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ZendAmfServer</a><ul>
+<li><a class="reference internal" href="#connecting-to-the-server-from-flex">Connecting to the Server from Flex</a></li>
+<li><a class="reference internal" href="#error-handling">Error Handling</a></li>
+<li><a class="reference internal" href="#amf-responses">AMF Responses</a></li>
+<li><a class="reference internal" href="#typed-objects">Typed Objects</a></li>
+<li><a class="reference internal" href="#resources">Resources</a></li>
+<li><a class="reference internal" href="#connecting-to-the-server-from-flash">Connecting to the Server from Flash</a></li>
+<li><a class="reference internal" href="#authentication">Authentication</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendamf.server.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendamf.server.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendamf.server.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendamf.server.rst">
+                ZendAmfServer
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

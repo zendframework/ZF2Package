@@ -1,0 +1,634 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Filter\Inflector &mdash; Zend Framework 2 2.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.6 documentation" href="../index.html" />
+    <link rel="next" title="Writing Filters" href="zend.filter.writing-filters.html" />
+    <link rel="prev" title="Filter Chains" href="zend.filter.filter-chains.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.filter.writing-filters.html" title="Writing Filters"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.filter.filter-chains.html" title="Filter Chains"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-filter-inflector">
+<span id="id1"></span><h1>Zend\Filter\Inflector<a class="headerlink" href="#zend-filter-inflector" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Filter\Inflector</span></tt> is a general purpose tool for rules-based inflection of strings to a given target.</p>
+<p>As an example, you may find you need to transform MixedCase or camelCasedWords into a path; for readability, OS
+policies, or other reasons, you also need to lower case this, and you want to separate the words using a dash
+(&#8216;-&#8216;). An inflector can do this for you.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Filter\Inflector</span></tt> implements <tt class="docutils literal"><span class="pre">Zend\Filter\FilterInterface</span></tt>; you perform inflection by calling <tt class="docutils literal"><span class="pre">filter()</span></tt> on
+the object instance.</p>
+<p class="rubric" id="zend-filter-inflector-camel-case-example">Transforming MixedCase and camelCaseText to another format</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$inflector</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Filter\Inflector</span><span class="p">(</span><span class="s1">&#39;pages/:page.:suffix&#39;</span><span class="p">);</span>
+<span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">setRules</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;:page&#39;</span>  <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;Word\CamelCaseToDash&#39;</span><span class="p">,</span> <span class="s1">&#39;StringToLower&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;suffix&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;html&#39;</span>
+<span class="p">));</span>
+
+<span class="nv">$string</span>   <span class="o">=</span> <span class="s1">&#39;camelCasedWords&#39;</span><span class="p">;</span>
+<span class="nv">$filtered</span> <span class="o">=</span> <span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;page&#39;</span> <span class="o">=&gt;</span> <span class="nv">$string</span><span class="p">));</span>
+<span class="c1">// pages/camel-cased-words.html</span>
+
+<span class="nv">$string</span>   <span class="o">=</span> <span class="s1">&#39;this_is_not_camel_cased&#39;</span><span class="p">;</span>
+<span class="nv">$filtered</span> <span class="o">=</span> <span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;page&#39;</span> <span class="o">=&gt;</span> <span class="nv">$string</span><span class="p">));</span>
+<span class="c1">// pages/this_is_not_camel_cased.html</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="operation">
+<span id="zend-filter-inflector-operation"></span><h2>Operation<a class="headerlink" href="#operation" title="Permalink to this headline">¶</a></h2>
+<p>An inflector requires a <strong>target</strong> and one or more <strong>rules</strong>. A target is basically a string that defines
+placeholders for variables you wish to substitute. These are specified by prefixing with a &#8216;:&#8217;: <strong>:script</strong>.</p>
+<p>When calling <tt class="docutils literal"><span class="pre">filter()</span></tt>, you then pass in an array of key and value pairs corresponding to the variables in the
+target.</p>
+<p>Each variable in the target can have zero or more rules associated with them. Rules may be either <strong>static</strong> or
+refer to a <tt class="docutils literal"><span class="pre">Zend\Filter</span></tt> class. Static rules will replace with the text provided. Otherwise, a class matching the
+rule provided will be used to inflect the text. Classes are typically specified using a short name indicating the
+filter name stripped of any common prefix.</p>
+<p>As an example, you can use any <tt class="docutils literal"><span class="pre">Zend\Filter</span></tt> concrete implementations; however, instead of referring to them as
+&#8216;<tt class="docutils literal"><span class="pre">Zend\Filter\Alpha</span></tt>&#8216; or &#8216;<tt class="docutils literal"><span class="pre">Zend\Filter\StringToLower</span></tt>&#8216;, you&#8217;d specify only &#8216;<tt class="docutils literal"><span class="pre">Alpha</span></tt>&#8216; or &#8216;<tt class="docutils literal"><span class="pre">StringToLower</span></tt>&#8216;.</p>
+</div>
+<div class="section" id="using-custom-filters">
+<span id="zend-filter-inflector-custom-filters"></span><h2>Using Custom Filters<a class="headerlink" href="#using-custom-filters" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Filter\Inflector</span></tt> uses <tt class="docutils literal"><span class="pre">Zend\Filter\FilterPluginManager</span></tt> to manage loading filters to use with inflection.
+By default, filters registered with <tt class="docutils literal"><span class="pre">Zend\Filter\FilterPluginManager</span></tt> are available. To access filters with that
+prefix but which occur deeper in the hierarchy, such as the various <tt class="docutils literal"><span class="pre">Word</span></tt> filters, simply strip off the
+<tt class="docutils literal"><span class="pre">Zend\Filter</span></tt> prefix:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// use Zend\Filter\Word\CamelCaseToDash as a rule</span>
+<span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">addRules</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;script&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Word\CamelCaseToDash&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>To use custom filters, you have two choices: reference them by fully qualified class name (e.g.,
+<tt class="docutils literal"><span class="pre">My\Custom\Filter\Mungify</span></tt>), or manipulate the composed <tt class="docutils literal"><span class="pre">FilterPluginManager</span></tt> instance.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$filters</span> <span class="o">=</span> <span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">getPluginManager</span><span class="p">();</span>
+<span class="nv">$filters</span><span class="o">-&gt;</span><span class="na">addInvokableClass</span><span class="p">(</span><span class="s1">&#39;mungify&#39;</span><span class="p">,</span> <span class="s1">&#39;My\Custom\Filter\Mungify&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="setting-the-inflector-target">
+<span id="zend-filter-inflector-targets"></span><h2>Setting the Inflector Target<a class="headerlink" href="#setting-the-inflector-target" title="Permalink to this headline">¶</a></h2>
+<p>The inflector target is a string with some placeholders for variables. Placeholders take the form of an identifier,
+a colon (&#8216;:&#8217;) by default, followed by a variable name: &#8216;:script&#8217;, &#8216;:path&#8217;, etc. The <tt class="docutils literal"><span class="pre">filter()</span></tt> method looks for
+the identifier followed by the variable name being replaced.</p>
+<p>You can change the identifier using the <tt class="docutils literal"><span class="pre">setTargetReplacementIdentifier()</span></tt> method, or passing it as the third
+argument to the constructor:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Via constructor:</span>
+<span class="nv">$inflector</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Filter\Inflector</span><span class="p">(</span><span class="s1">&#39;#foo/#bar.#sfx&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="s1">&#39;#&#39;</span><span class="p">);</span>
+
+<span class="c1">// Via accessor:</span>
+<span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">setTargetReplacementIdentifier</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Typically, you will set the target via the constructor. However, you may want to re-set the target later (for
+instance, to modify the default inflector in core components, such as the <tt class="docutils literal"><span class="pre">ViewRenderer</span></tt> or <tt class="docutils literal"><span class="pre">Zend\Layout</span></tt>).
+<tt class="docutils literal"><span class="pre">setTarget()</span></tt> can be used for this purpose:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$inflector</span> <span class="o">=</span> <span class="nv">$layout</span><span class="o">-&gt;</span><span class="na">getInflector</span><span class="p">();</span>
+<span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">setTarget</span><span class="p">(</span><span class="s1">&#39;layouts/:script.phtml&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Additionally, you may wish to have a class member for your class that you can use to keep the inflector target
+updated &#8211; without needing to directly update the target each time (thus saving on method calls).
+<tt class="docutils literal"><span class="pre">setTargetReference()</span></tt> allows you to do this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Foo</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @var string Inflector target</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$_target</span> <span class="o">=</span> <span class="s1">&#39;foo/:bar/:baz.:suffix&#39;</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Constructor</span>
+<span class="sd">     * @return void</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_inflector</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Filter\Inflector</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_inflector</span><span class="o">-&gt;</span><span class="na">setTargetReference</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_target</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Set target; updates target in inflector</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param  string $target</span>
+<span class="sd">     * @return Foo</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTarget</span><span class="p">(</span><span class="nv">$target</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_target</span> <span class="o">=</span> <span class="nv">$target</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="inflection-rules">
+<span id="zend-filter-inflector-rules"></span><h2>Inflection Rules<a class="headerlink" href="#inflection-rules" title="Permalink to this headline">¶</a></h2>
+<p>As mentioned in the introduction, there are two types of rules: static and filter-based.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is important to note that regardless of the method in which you add rules to the inflector, either
+one-by-one, or all-at-once; the order is very important. More specific names, or names that might contain other
+rule names, must be added before least specific names. For example, assuming the two rule names &#8216;moduleDir&#8217; and
+&#8216;module&#8217;, the &#8216;moduleDir&#8217; rule should appear before module since &#8216;module&#8217; is contained within &#8216;moduleDir&#8217;. If
+&#8216;module&#8217; were added before &#8216;moduleDir&#8217;, &#8216;module&#8217; will match part of &#8216;moduleDir&#8217; and process it leaving &#8216;Dir&#8217;
+inside of the target uninflected.</p>
+</div>
+<div class="section" id="static-rules">
+<span id="zend-filter-inflector-rules-static"></span><h3>Static Rules<a class="headerlink" href="#static-rules" title="Permalink to this headline">¶</a></h3>
+<p>Static rules do simple string substitution; use them when you have a segment in the target that will typically be
+static, but which you want to allow the developer to modify. Use the <tt class="docutils literal"><span class="pre">setStaticRule()</span></tt> method to set or modify
+the rule:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$inflector</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Filter\Inflector</span><span class="p">(</span><span class="s1">&#39;:script.:suffix&#39;</span><span class="p">);</span>
+<span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">setStaticRule</span><span class="p">(</span><span class="s1">&#39;suffix&#39;</span><span class="p">,</span> <span class="s1">&#39;phtml&#39;</span><span class="p">);</span>
+
+<span class="c1">// change it later:</span>
+<span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">setStaticRule</span><span class="p">(</span><span class="s1">&#39;suffix&#39;</span><span class="p">,</span> <span class="s1">&#39;php&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Much like the target itself, you can also bind a static rule to a reference, allowing you to update a single
+variable instead of require a method call; this is often useful when your class uses an inflector internally, and
+you don&#8217;t want your users to need to fetch the inflector in order to update it. The <tt class="docutils literal"><span class="pre">setStaticRuleReference()</span></tt>
+method is used to accomplish this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Foo</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @var string Suffix</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$_suffix</span> <span class="o">=</span> <span class="s1">&#39;phtml&#39;</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Constructor</span>
+<span class="sd">     * @return void</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_inflector</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Filter\Inflector</span><span class="p">(</span><span class="s1">&#39;:script.:suffix&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_inflector</span><span class="o">-&gt;</span><span class="na">setStaticRuleReference</span><span class="p">(</span><span class="s1">&#39;suffix&#39;</span><span class="p">,</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_suffix</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Set suffix; updates suffix static rule in inflector</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param  string $suffix</span>
+<span class="sd">     * @return Foo</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setSuffix</span><span class="p">(</span><span class="nv">$suffix</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_suffix</span> <span class="o">=</span> <span class="nv">$suffix</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="filter-inflector-rules">
+<span id="zend-filter-inflector-rules-filters"></span><h3>Filter Inflector Rules<a class="headerlink" href="#filter-inflector-rules" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">Zend\Filter</span></tt> filters may be used as inflector rules as well. Just like static rules, these are bound to a target
+variable; unlike static rules, you may define multiple filters to use when inflecting. These filters are processed
+in order, so be careful to register them in an order that makes sense for the data you receive.</p>
+<p>Rules may be added using <tt class="docutils literal"><span class="pre">setFilterRule()</span></tt> (which overwrites any previous rules for that variable) or
+<tt class="docutils literal"><span class="pre">addFilterRule()</span></tt> (which appends the new rule to any existing rule for that variable). Filters are specified in
+one of the following ways:</p>
+<ul class="simple">
+<li><strong>String</strong>. The string may be a filter class name, or a class name segment minus any prefix set in the
+inflector&#8217;s plugin loader (by default, minus the &#8216;<tt class="docutils literal"><span class="pre">Zend\Filter</span></tt>&#8216; prefix).</li>
+<li><strong>Filter object</strong>. Any object instance implementing <tt class="docutils literal"><span class="pre">Zend\Filter\FilterInterface</span></tt> may be passed as a filter.</li>
+<li><strong>Array</strong>. An array of one or more strings or filter objects as defined above.</li>
+</ul>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$inflector</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Filter\Inflector</span><span class="p">(</span><span class="s1">&#39;:script.:suffix&#39;</span><span class="p">);</span>
+
+<span class="c1">// Set rule to use Zend\Filter\Word\CamelCaseToDash filter</span>
+<span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">setFilterRule</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">,</span> <span class="s1">&#39;Word\CamelCaseToDash&#39;</span><span class="p">);</span>
+
+<span class="c1">// Add rule to lowercase string</span>
+<span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">addFilterRule</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">Zend\Filter\StringToLower</span><span class="p">());</span>
+
+<span class="c1">// Set rules en-masse</span>
+<span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">setFilterRule</span><span class="p">(</span><span class="s1">&#39;script&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;Word\CamelCaseToDash&#39;</span><span class="p">,</span>
+    <span class="k">new</span> <span class="nx">Zend\Filter\StringToLower</span><span class="p">()</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="setting-many-rules-at-once">
+<span id="zend-filter-inflector-rules-multiple"></span><h3>Setting Many Rules At Once<a class="headerlink" href="#setting-many-rules-at-once" title="Permalink to this headline">¶</a></h3>
+<p>Typically, it&#8217;s easier to set many rules at once than to configure a single variable and its inflection rules at a
+time. <tt class="docutils literal"><span class="pre">Zend\Filter\Inflector</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">addRules()</span></tt> and <tt class="docutils literal"><span class="pre">setRules()</span></tt> method allow this.</p>
+<p>Each method takes an array of variable and rule pairs, where the rule may be whatever the type of rule accepts
+(string, filter object, or array). Variable names accept a special notation to allow setting static rules and
+filter rules, according to the following notation:</p>
+<ul class="simple">
+<li><strong>&#8216;:&#8217; prefix</strong>: filter rules.</li>
+<li><strong>No prefix</strong>: static rule.</li>
+</ul>
+<p class="rubric" id="zend-filter-inflector-rules-multiple-example">Setting Multiple Rules at Once</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Could also use setRules() with this notation:</span>
+<span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">addRules</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="c1">// filter rules:</span>
+    <span class="s1">&#39;:controller&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;CamelCaseToUnderscore&#39;</span><span class="p">,</span><span class="s1">&#39;StringToLower&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;:action&#39;</span>     <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;CamelCaseToUnderscore&#39;</span><span class="p">,</span><span class="s1">&#39;StringToLower&#39;</span><span class="p">),</span>
+
+    <span class="c1">// Static rule:</span>
+    <span class="s1">&#39;suffix&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;phtml&#39;</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="utility-methods">
+<span id="zend-filter-inflector-utility"></span><h2>Utility Methods<a class="headerlink" href="#utility-methods" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Filter\Inflector</span></tt> has a number of utility methods for retrieving and setting the plugin loader,
+manipulating and retrieving rules, and controlling if and when exceptions are thrown.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">setPluginManager()</span></tt> can be used when you have configured your own
+<tt class="docutils literal"><span class="pre">Zend\Filter\FilterPluginManager</span></tt> instance  and wish to use it with <tt class="docutils literal"><span class="pre">Zend\Filter\Inflector</span></tt>;
+<tt class="docutils literal"><span class="pre">getPluginManager()</span></tt> retrieves the currently set one.</li>
+<li><tt class="docutils literal"><span class="pre">setThrowTargetExceptionsOn()</span></tt> can be used to control whether or not <tt class="docutils literal"><span class="pre">filter()</span></tt> throws an exception when a
+given replacement identifier passed to it is not found in the target. By default, no exceptions are thrown.
+<tt class="docutils literal"><span class="pre">isThrowTargetExceptionsOn()</span></tt> will tell you what the current value is.</li>
+<li><tt class="docutils literal"><span class="pre">getRules($spec</span> <span class="pre">=</span> <span class="pre">null)</span></tt> can be used to retrieve all registered rules for all variables, or just the rules for
+a single variable.</li>
+<li><tt class="docutils literal"><span class="pre">getRule($spec,</span> <span class="pre">$index)</span></tt> fetches a single rule for a given variable; this can be useful for fetching a specific
+filter rule for a variable that has a filter chain. <tt class="docutils literal"><span class="pre">$index</span></tt> must be passed.</li>
+<li><tt class="docutils literal"><span class="pre">clearRules()</span></tt> will clear all currently registered rules.</li>
+</ul>
+</div>
+<div class="section" id="using-a-traversable-or-an-array-with-zend-filter-inflector">
+<span id="zend-filter-inflector-config"></span><h2>Using a Traversable or an array with Zend\Filter\Inflector<a class="headerlink" href="#using-a-traversable-or-an-array-with-zend-filter-inflector" title="Permalink to this headline">¶</a></h2>
+<p>You can use a <tt class="docutils literal"><span class="pre">Traversable</span></tt> or an array to set rules and other object state in your inflectors,
+either by passing a <tt class="docutils literal"><span class="pre">Traversable</span></tt> object or an array to the constructor or <tt class="docutils literal"><span class="pre">setOptions()</span></tt>. The
+following settings may be specified:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">target</span></tt> specifies the inflection target.</li>
+<li><tt class="docutils literal"><span class="pre">pluginManager</span></tt> specifies the <tt class="docutils literal"><span class="pre">Zend\Filter\FilterPluginManager</span></tt> instance or extension to use
+for obtaining plugins; alternately, you may specify a class name of a class that extends the
+<tt class="docutils literal"><span class="pre">FilterPluginManager</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">throwTargetExceptionsOn</span></tt> should be a boolean indicating whether or not to throw exceptions when a replacement
+identifier is still present after inflection.</li>
+<li><tt class="docutils literal"><span class="pre">targetReplacementIdentifier</span></tt> specifies the character to use when identifying replacement variables in the
+target string.</li>
+<li><tt class="docutils literal"><span class="pre">rules</span></tt> specifies an array of inflection rules; it should consist of keys that specify either values or arrays
+of values, consistent with <tt class="docutils literal"><span class="pre">addRules()</span></tt>.</li>
+</ul>
+<p class="rubric" id="zend-filter-inflector-config-example">Using a Traversable or an array with <tt class="docutils literal"><span class="pre">Zend\Filter\Inflector</span></tt></p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// With the constructor:</span>
+<span class="nv">$options</span><span class="p">;</span> <span class="c1">// implements Traversable</span>
+<span class="nv">$inflector</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Filter\Inflector</span><span class="p">(</span><span class="nv">$options</span><span class="p">);</span>
+
+<span class="c1">// Or with setOptions():</span>
+<span class="nv">$inflector</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Filter\Inflector</span><span class="p">();</span>
+<span class="nv">$inflector</span><span class="o">-&gt;</span><span class="na">setOptions</span><span class="p">(</span><span class="nv">$options</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Filter\Inflector</a><ul>
+<li><a class="reference internal" href="#operation">Operation</a></li>
+<li><a class="reference internal" href="#using-custom-filters">Using Custom Filters</a></li>
+<li><a class="reference internal" href="#setting-the-inflector-target">Setting the Inflector Target</a></li>
+<li><a class="reference internal" href="#inflection-rules">Inflection Rules</a><ul>
+<li><a class="reference internal" href="#static-rules">Static Rules</a></li>
+<li><a class="reference internal" href="#filter-inflector-rules">Filter Inflector Rules</a></li>
+<li><a class="reference internal" href="#setting-many-rules-at-once">Setting Many Rules At Once</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#utility-methods">Utility Methods</a></li>
+<li><a class="reference internal" href="#using-a-traversable-or-an-array-with-zend-filter-inflector">Using a Traversable or an array with Zend\Filter\Inflector</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.filter.filter-chains.html"
+                        title="previous chapter">Filter Chains</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.filter.writing-filters.html"
+                        title="next chapter">Writing Filters</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.filter.inflector.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.filter.inflector.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.filter.inflector.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.filter.writing-filters.html" title="Writing Filters"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.filter.filter-chains.html" title="Filter Chains"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.filter.inflector.rst">
+                Zend\Filter\Inflector
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

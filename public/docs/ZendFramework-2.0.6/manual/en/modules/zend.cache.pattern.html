@@ -1,0 +1,325 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Cache\Pattern &mdash; Zend Framework 2 2.0.6 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.6',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.6 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Cache\Pattern\CallbackCache" href="zend.cache.pattern.callback-cache.html" />
+    <link rel="prev" title="Zend\Cache\Storage\Plugin" href="zend.cache.storage.plugin.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.cache.pattern.callback-cache.html" title="Zend\Cache\Pattern\CallbackCache"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.cache.storage.plugin.html" title="Zend\Cache\Storage\Plugin"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-cache-pattern">
+<span id="id1"></span><h1>Zend\Cache\Pattern<a class="headerlink" href="#zend-cache-pattern" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-cache-pattern-overview"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>Cache patterns are configurable objects to solve known performance bottlenecks. Each should be used only in the
+specific situations they are designed to address. For example you can use one of the <tt class="docutils literal"><span class="pre">CallbackCache</span></tt>,
+<tt class="docutils literal"><span class="pre">ObjectCache</span></tt> or <tt class="docutils literal"><span class="pre">ClassCache</span></tt> patterns to cache method and function calls; to cache output generation, the
+<tt class="docutils literal"><span class="pre">OutputCache</span></tt> pattern could assist.</p>
+<p>All cache patterns implement the same interface, <tt class="docutils literal"><span class="pre">Zend\Cache\Pattern\PatternInterface</span></tt>, and most extend the abstract
+class <tt class="docutils literal"><span class="pre">Zend\Cache\Pattern\AbstractPattern</span></tt> to implement basic logic.</p>
+<p>Configuration is provided via the <tt class="docutils literal"><span class="pre">Zend\Cache\Pattern\PatternOptions</span></tt> class, which can simply be instantiated
+with an associative array of options passed to the constructor. To configure a pattern object, you can set an
+instance of <tt class="docutils literal"><span class="pre">Zend\Cache\Pattern\PatternOptions</span></tt> with <tt class="docutils literal"><span class="pre">setOptions</span></tt>, or provide your options (either as an
+associative array or <tt class="docutils literal"><span class="pre">PatternOptions</span></tt> instance) as the second argument to the factory.</p>
+<p>It&#8217;s also possible to use a single instance of <tt class="docutils literal"><span class="pre">Zend\Cache\Pattern\PatternOptions</span></tt> and pass it to multiple
+pattern objects.</p>
+</div>
+<div class="section" id="quick-start">
+<span id="zend-cache-pattern-quick-start"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>Pattern objects can either be created from the provided <tt class="docutils literal"><span class="pre">Zend\Cache\PatternFactory</span></tt> factory, or, by simply
+instantiating one of the <tt class="docutils literal"><span class="pre">Zend\Cache\Pattern\*Cache</span></tt> classes.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Via the factory:</span>
+<span class="nv">$callbackCache</span> <span class="o">=</span> <span class="nx">Zend\Cache\PatternFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;callback&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;storage&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;apc&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// OR, the equivalent manual instantiation:</span>
+<span class="nv">$callbackCache</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Cache\Pattern\CallbackCache</span><span class="p">();</span>
+<span class="nv">$callbackCache</span><span class="o">-&gt;</span><span class="na">setOptions</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Cache\Pattern\PatternOptions</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;storage&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;apc&#39;</span><span class="p">,</span>
+<span class="p">)));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="available-methods">
+<h2>Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<p>The following methods are implemented by <tt class="docutils literal"><span class="pre">Zend\Cache\Pattern\AbstractPattern</span></tt>.
+Please read documentation of specific patterns to get more information.</p>
+<span class="target" id="zend-cache-pattern-methods-set-options"></span><dl class="function">
+<dt>
+<tt class="descname">setOptions</tt><big>(</big><em>Zend\Cache\Pattern\PatternOptions $options</em><big>)</big></dt>
+<dd><p>Set pattern options.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Zend\Cache\Pattern\PatternInterface</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">getOptions</tt><big>(</big><big>)</big></dt>
+<dd><p>Get all pattern options.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Zend\Cache\Pattern\PatternOptions</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Cache\Pattern</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#available-methods">Available Methods</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.cache.storage.plugin.html"
+                        title="previous chapter">Zend\Cache\Storage\Plugin</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.cache.pattern.callback-cache.html"
+                        title="next chapter">Zend\Cache\Pattern\CallbackCache</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.cache.pattern.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.cache.pattern.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.cache.pattern.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.cache.pattern.callback-cache.html" title="Zend\Cache\Pattern\CallbackCache"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.cache.storage.plugin.html" title="Zend\Cache\Storage\Plugin"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.6 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.cache.pattern.rst">
+                Zend\Cache\Pattern
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
