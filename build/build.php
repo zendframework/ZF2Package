@@ -12,8 +12,8 @@ $php = $_SERVER["_"];
 // download sources
 echo 'Finding Sources ...' . PHP_EOL;
 foreach ($components as $component_info) {
-    $name = $component_info[2];
-    $url = 'https://github.com/zendframework/' . $component_info[1] . '/tarball/release-' . $component_info[2];
+    $name = preg_match('/^\d+\.\d+\.\d+/', $component_info[2]) ? 'release-' . $component_info[2] : $component_info[2];
+    $url  = 'https://github.com/zendframework/' . $component_info[1] . '/tarball/' . $name;
     if (!file_exists(ROOT . '/packages/working/' . $component_info[1])) {
         script_run_command('mkdir ' . $component_info[1]);
         chdir(__DIR__ . '/../packages/working/' . $component_info[1]);
@@ -112,4 +112,21 @@ foreach ($components as $component_info) {
 
     // reset path
     chdir(ROOT . '/packages/working/');
+}
+
+// build zftool.phar
+foreach ($components as $component_info) {
+
+    if (!in_array('ZFTOOL', $component_info[3])) {
+        continue;
+    }
+    echo 'Building zftool.phar for ' . $component_info[0] . ' ... ' . PHP_EOL;
+    $command = 
+        $php . ' -dphar.readonly=0 '
+            . __DIR__ . '/scripts/zftool-phar-build.php';
+    script_run_command($command);
+
+    // reset path
+    chdir(ROOT . '/packages/working/');
+
 }
