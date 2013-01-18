@@ -12,4 +12,5 @@ script_run_command('rm -Rf ' . ROOT . '/packages/component-composer/Z*');
 script_run_command('rm -Rf ' . ROOT . '/packages/component-pyrus/Z*');
 script_run_command('rm -Rf ' . ROOT . '/packages/manual/Z*');
 script_run_command('rm -Rf ' . ROOT . '/packages/plain/Z*');
+script_run_command('rm -Rf ' . ROOT . '/packages/zftool-phar/ZFTool');
 script_run_command('rm -Rf ' . ROOT . '/packages/working/Z* ' . ROOT . '/packages/working/z*');
