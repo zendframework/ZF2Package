@@ -1,0 +1,276 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Best Practices when Creating Modules &mdash; Zend Framework 2 2.0.7 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.7 documentation" href="../index.html" />
+    <link rel="next" title="Introduction to the MVC Layer" href="zend.mvc.intro.html" />
+    <link rel="prev" title="The Module Autoloader" href="zend.module-manager.module-autoloader.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.mvc.intro.html" title="Introduction to the MVC Layer"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.module-manager.module-autoloader.html" title="The Module Autoloader"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="best-practices-when-creating-modules">
+<span id="zend-module-manager-best-practices"></span><h1>Best Practices when Creating Modules<a class="headerlink" href="#best-practices-when-creating-modules" title="Permalink to this headline">¶</a></h1>
+<p>When creating a ZF2 module, there are some best practices you should keep in mind.</p>
+<ul>
+<li><p class="first"><strong>Keep the ``init()`` and ``onBootstrap()`` methods lightweight.</strong> Be conservative with the actions you perform in the <tt class="docutils literal"><span class="pre">init()</span></tt> and
+<tt class="docutils literal"><span class="pre">onBootstrap()</span></tt> methods of your <tt class="docutils literal"><span class="pre">Module</span></tt> class. These methods are run for <strong>every</strong> page request, and should
+not perform anything heavy. As a rule of thumb, registering event listeners is an appropriate task to perform in
+these methods. Such lightweight tasks will generally not have a measurable impact on the performance of your
+application, even with many modules enabled. It is considered bad practice to utilize these methods for setting
+up or configuring instances of application resources such as a database connection, application logger, or
+mailer. Tasks such as these are better served through the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> capabilities of Zend Framework 2.</p>
+</li>
+<li><p class="first"><strong>Do not perform writes within a module.</strong> You should <strong>never</strong> code your module to perform or expect any writes
+within the module&#8217;s directory. Once installed, the files within a module&#8217;s directory should always match the
+distribution verbatim. Any user-provided configuration should be performed via overrides in the Application
+module or via application-level configuration files. Any other required filesystem writes should be performed in
+some writeable path that is outside of the module&#8217;s directory.</p>
+<p>There are two primary advantages to following this rule. First, any modules which attempt to write within
+themselves will not be compatible with phar packaging. Second, by keeping the module in sync with the upstream
+distribution, updates via mechanisms such as Git will be simple and trouble-free. Of course, the Application
+module is a special exception to this rule, as there is typically no upstream distribution for this module, and
+it&#8217;s unlikely you would want to run this package from within a phar archive.</p>
+</li>
+<li><p class="first"><strong>Utilize a vendor prefix for module names.</strong> To avoid module naming conflicts, you are encouraged to prefix your
+module namespace with a vendor prefix. As an example, the (incomplete) developer tools module distributed by Zend
+is named &#8220;ZendDeveloperTools&#8221; instead of simply &#8220;DeveloperTools&#8221;.</p>
+</li>
+<li><p class="first"><strong>Utilize a module prefix for service names.</strong> If you define services in the top-level Service Manager, you are
+encouraged to prefix these services with the name of your module to avoid conflicts with other modules&#8217; services.
+For example, the database adapter used by MyModule should be called &#8220;MyModuleDbAdapter&#8221; rather than simply
+&#8220;DbAdapter.&#8221;  If you need to share a service with other modules, remember that the Service Manager &#8220;alias&#8221;
+feature can be used in a merged configuration to override factories defined by individual modules.  Ideally,
+modules should define their own service dependencies, but aliases can be configured at the application level to
+ensure that common services in individual modules all refer to the same instance.</p>
+</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.module-manager.module-autoloader.html"
+                        title="previous chapter">The Module Autoloader</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.mvc.intro.html"
+                        title="next chapter">Introduction to the MVC Layer</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.module-manager.best-practices.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.module-manager.best-practices.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.module-manager.best-practices.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.mvc.intro.html" title="Introduction to the MVC Layer"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.module-manager.module-autoloader.html" title="The Module Autoloader"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.module-manager.best-practices.rst">
+                Best Practices when Creating Modules
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

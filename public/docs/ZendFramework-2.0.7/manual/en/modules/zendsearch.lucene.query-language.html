@@ -1,0 +1,515 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Query Language &mdash; Zend Framework 2 2.0.7 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.7 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="query-language">
+<span id="zendsearch-lucene-query-language"></span><h1>Query Language<a class="headerlink" href="#query-language" title="Permalink to this headline">¶</a></h1>
+<p>Java Lucene and <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> provide quite powerful query languages.</p>
+<p>These languages are mostly the same with some minor differences, which are mentioned below.</p>
+<p>Full Java Lucene query language syntax documentation can be found <a class="reference external" href="http://lucene.apache.org/java/2_3_0/queryparsersyntax.html">here</a>.</p>
+<div class="section" id="terms">
+<span id="zendsearch-lucene-query-language-terms"></span><h2>Terms<a class="headerlink" href="#terms" title="Permalink to this headline">¶</a></h2>
+<p>A query is broken up into terms and operators. There are three types of terms: Single Terms, Phrases, and
+Subqueries.</p>
+<p>A Single Term is a single word such as &#8220;test&#8221; or &#8220;hello&#8221;.</p>
+<p>A Phrase is a group of words surrounded by double quotes such as &#8220;hello dolly&#8221;.</p>
+<p>A Subquery is a query surrounded by parentheses such as &#8220;(hello dolly)&#8221;.</p>
+<p>Multiple terms can be combined together with boolean operators to form complex queries (see below).</p>
+</div>
+<div class="section" id="fields">
+<span id="zendsearch-lucene-query-language-fields"></span><h2>Fields<a class="headerlink" href="#fields" title="Permalink to this headline">¶</a></h2>
+<p>Lucene supports fields of data. When performing a search you can either specify a field, or use the default field.
+The field names depend on indexed data and default field is defined by current settings.</p>
+<p>The first and most significant difference from Java Lucene is that terms are searched through <strong>all fields</strong> by
+default.</p>
+<p>There are two static methods in the <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> class which allow the developer to configure these
+settings:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$defaultSearchField</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene</span><span class="o">::</span><span class="na">getDefaultSearchField</span><span class="p">();</span>
+<span class="o">...</span>
+<span class="nx">Zend\Search\Lucene</span><span class="o">::</span><span class="na">setDefaultSearchField</span><span class="p">(</span><span class="s1">&#39;contents&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">NULL</span></tt> value indicated that the search is performed across all fields. It&#8217;s the default setting.</p>
+<p>You can search specific fields by typing the field name followed by a colon &#8221;:&#8221; followed by the term you are
+looking for.</p>
+<p>As an example, let&#8217;s assume a Lucene index contains two fields- title and text- with text as the default field. If
+you want to find the document entitled &#8220;The Right Way&#8221; which contains the text &#8220;don&#8217;t go this way&#8221;, you can enter:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>title:&quot;The Right Way&quot; AND text:go
+</pre></div>
+</td></tr></table></div>
+<p>or</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>title:&quot;Do it right&quot; AND go
+</pre></div>
+</td></tr></table></div>
+<p>Because &#8220;text&#8221; is the default field, the field indicator is not required.</p>
+<p>Note: The field is only valid for the term, phrase or subquery that it directly precedes, so the query</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>title:Do it right
+</pre></div>
+</td></tr></table></div>
+<p>Will only find &#8220;Do&#8221; in the title field. It will find &#8220;it&#8221; and &#8220;right&#8221; in the default field (if the default field is
+set) or in all indexed fields (if the default field is set to <tt class="docutils literal"><span class="pre">NULL</span></tt>).</p>
+</div>
+<div class="section" id="wildcards">
+<span id="zendsearch-lucene-query-language-wildcard"></span><h2>Wildcards<a class="headerlink" href="#wildcards" title="Permalink to this headline">¶</a></h2>
+<p>Lucene supports single and multiple character wildcard searches within single terms (but not within phrase
+queries).</p>
+<p>To perform a single character wildcard search use the &#8221;?&#8221; symbol.</p>
+<p>To perform a multiple character wildcard search use the &#8220;*&#8221; symbol.</p>
+<p>The single character wildcard search looks for string that match the term with the &#8221;?&#8221; replaced by any single
+character. For example, to search for &#8220;text&#8221; or &#8220;test&#8221; you can use the search:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>te?t
+</pre></div>
+</td></tr></table></div>
+<p>Multiple character wildcard searches look for 0 or more characters when matching strings against terms. For
+example, to search for test, tests or tester, you can use the search:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>test*
+</pre></div>
+</td></tr></table></div>
+<p>You can use &#8221;?&#8221;, &#8220;*&#8221; or both at any place of the term:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>*wr?t*
+</pre></div>
+</td></tr></table></div>
+<p>It searches for &#8220;write&#8221;, &#8220;wrote&#8221;, &#8220;written&#8221;, &#8220;rewrite&#8221;, &#8220;rewrote&#8221; and so on.</p>
+<p>Starting from ZF 1.7.7 wildcard patterns need some non-wildcard prefix. Default prefix length is 3 (like in Java
+Lucene). So &#8220;*&#8221;, &#8220;te?t&#8221;, &#8220;*wr?t*&#8221; terms will cause an exception <a class="footnote-reference" href="#id4" id="id1">[1]</a>.</p>
+<p>It can be altered using <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\Query\Wildcard::getMinPrefixLength()</span></tt> and
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\Query\Wildcard::setMinPrefixLength()</span></tt> methods.</p>
+</div>
+<div class="section" id="term-modifiers">
+<span id="zendsearch-lucene-query-language-modifiers"></span><h2>Term Modifiers<a class="headerlink" href="#term-modifiers" title="Permalink to this headline">¶</a></h2>
+<p>Lucene supports modifying query terms to provide a wide range of searching options.</p>
+<p>&#8220;~&#8221; modifier can be used to specify proximity search for phrases or fuzzy search for individual terms.</p>
+</div>
+<div class="section" id="range-searches">
+<span id="zendsearch-lucene-query-language-range"></span><h2>Range Searches<a class="headerlink" href="#range-searches" title="Permalink to this headline">¶</a></h2>
+<p>Range queries allow the developer or user to match documents whose field(s) values are between the lower and upper
+bound specified by the range query. Range Queries can be inclusive or exclusive of the upper and lower bounds.
+Sorting is performed lexicographically.</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>mod_date:[20020101 TO 20030101]
+</pre></div>
+</td></tr></table></div>
+<p>This will find documents whose mod_date fields have values between 20020101 and 20030101, inclusive. Note that
+Range Queries are not reserved for date fields. You could also use range queries with non-date fields:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>title:{Aida TO Carmen}
+</pre></div>
+</td></tr></table></div>
+<p>This will find all documents whose titles would be sorted between Aida and Carmen, but not including Aida and
+Carmen.</p>
+<p>Inclusive range queries are denoted by square brackets. Exclusive range queries are denoted by curly brackets.</p>
+<p>If field is not specified then <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> searches for specified interval through all fields by
+default.</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>{Aida TO Carmen}
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="fuzzy-searches">
+<span id="zendsearch-lucene-query-language-fuzzy"></span><h2>Fuzzy Searches<a class="headerlink" href="#fuzzy-searches" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> as well as Java Lucene supports fuzzy searches based on the Levenshtein Distance, or Edit
+Distance algorithm. To do a fuzzy search use the tilde, &#8220;~&#8221;, symbol at the end of a Single word Term. For example
+to search for a term similar in spelling to &#8220;roam&#8221; use the fuzzy search:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>roam~
+</pre></div>
+</td></tr></table></div>
+<p>This search will find terms like foam and roams. Additional (optional) parameter can specify the required
+similarity. The value is between 0 and 1, with a value closer to 1 only terms with a higher similarity will be
+matched. For example:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>roam~0.8
+</pre></div>
+</td></tr></table></div>
+<p>The default that is used if the parameter is not given is 0.5.</p>
+</div>
+<div class="section" id="matched-terms-limitation">
+<span id="zendsearch-lucene-query-language-matched-terms-limitations"></span><h2>Matched terms limitation<a class="headerlink" href="#matched-terms-limitation" title="Permalink to this headline">¶</a></h2>
+<p>Wildcard, range and fuzzy search queries may match too many terms. It may cause incredible search performance
+downgrade.</p>
+<p>So <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> sets a limit of matching terms per query (subquery). This limit can be retrieved and set
+using <tt class="docutils literal"><span class="pre">Zend\Search\Lucene::getTermsPerQueryLimit()</span></tt> and <tt class="docutils literal"><span class="pre">Zend\Search\Lucene::setTermsPerQueryLimit($limit)</span></tt>
+methods.</p>
+<p>Default matched terms per query limit is 1024.</p>
+</div>
+<div class="section" id="proximity-searches">
+<span id="zendsearch-lucene-query-language-proximity-search"></span><h2>Proximity Searches<a class="headerlink" href="#proximity-searches" title="Permalink to this headline">¶</a></h2>
+<p>Lucene supports finding words from a phrase that are within a specified word distance in a string. To do a
+proximity search use the tilde, &#8220;~&#8221;, symbol at the end of the phrase. For example to search for a &#8220;Zend&#8221; and
+&#8220;Framework&#8221; within 10 words of each other in a document use the search:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>&quot;Zend Framework&quot;~10
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="boosting-a-term">
+<span id="zendsearch-lucene-query-language-boosting"></span><h2>Boosting a Term<a class="headerlink" href="#boosting-a-term" title="Permalink to this headline">¶</a></h2>
+<p>Java Lucene and <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> provide the relevance level of matching documents based on the terms found.
+To boost the relevance of a term use the caret, &#8220;^&#8221;, symbol with a boost factor (a number) at the end of the term
+you are searching. The higher the boost factor, the more relevant the term will be.</p>
+<p>Boosting allows you to control the relevance of a document by boosting individual terms. For example, if you are
+searching for</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>PHP framework
+</pre></div>
+</td></tr></table></div>
+<p>and you want the term &#8220;PHP&#8221; to be more relevant boost it using the ^ symbol along with the boost factor next to the
+term. You would type:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>PHP^4 framework
+</pre></div>
+</td></tr></table></div>
+<p>This will make documents with the term <em>PHP</em> appear more relevant. You can also boost phrase terms and subqueries
+as in the example:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>&quot;PHP framework&quot;^4 &quot;Zend Framework&quot;
+</pre></div>
+</td></tr></table></div>
+<p>By default, the boost factor is 1. Although the boost factor must be positive, it may be less than 1 (e.g. 0.2).</p>
+</div>
+<div class="section" id="boolean-operators">
+<span id="zendsearch-lucene-query-language-boolean"></span><h2>Boolean Operators<a class="headerlink" href="#boolean-operators" title="Permalink to this headline">¶</a></h2>
+<p>Boolean operators allow terms to be combined through logic operators. Lucene supports AND, &#8220;+&#8221;, OR, NOT and &#8220;-&#8221; as
+Boolean operators. Java Lucene requires boolean operators to be ALL CAPS. <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> does not.</p>
+<p>AND, OR, and NOT operators and &#8220;+&#8221;, &#8220;-&#8221; defines two different styles to construct boolean queries. Unlike Java
+Lucene, <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> doesn&#8217;t allow these two styles to be mixed.</p>
+<p>If the AND/OR/NOT style is used, then an AND or OR operator must be present between all query terms. Each term may
+also be preceded by NOT operator. The AND operator has higher precedence than the OR operator. This differs from
+Java Lucene behavior.</p>
+<div class="section" id="and">
+<span id="zendsearch-lucene-query-language-boolean-and"></span><h3>AND<a class="headerlink" href="#and" title="Permalink to this headline">¶</a></h3>
+<p>The AND operator means that all terms in the &#8220;AND group&#8221; must match some part of the searched field(s).</p>
+<p>To search for documents that contain &#8220;PHP framework&#8221; and &#8220;Zend Framework&#8221; use the query:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>&quot;PHP framework&quot; AND &quot;Zend Framework&quot;
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="or">
+<span id="zendsearch-lucene-query-language-boolean-or"></span><h3>OR<a class="headerlink" href="#or" title="Permalink to this headline">¶</a></h3>
+<p>The OR operator divides the query into several optional terms.</p>
+<p>To search for documents that contain &#8220;PHP framework&#8221; or &#8220;Zend Framework&#8221; use the query:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>&quot;PHP framework&quot; OR &quot;Zend Framework&quot;
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="not">
+<span id="zendsearch-lucene-query-language-boolean-not"></span><h3>NOT<a class="headerlink" href="#not" title="Permalink to this headline">¶</a></h3>
+<p>The NOT operator excludes documents that contain the term after NOT. But an &#8220;AND group&#8221; which contains only terms
+with the NOT operator gives an empty result set instead of a full set of indexed documents.</p>
+<p>To search for documents that contain &#8220;PHP framework&#8221; but not &#8220;Zend Framework&#8221; use the query:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>&quot;PHP framework&quot; AND NOT &quot;Zend Framework&quot;
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="and-operators">
+<span id="zendsearch-lucene-query-language-boolean-other-form"></span><h3>&amp;&amp;, ||, and ! operators<a class="headerlink" href="#and-operators" title="Permalink to this headline">¶</a></h3>
+<p>&amp;&amp;, ||, and ! may be used instead of AND, OR, and NOT notation.</p>
+</div>
+<div class="section" id="zendsearch-lucene-query-language-boolean-plus">
+<span id="id2"></span><h3>+<a class="headerlink" href="#zendsearch-lucene-query-language-boolean-plus" title="Permalink to this headline">¶</a></h3>
+<p>The &#8220;+&#8221; or required operator stipulates that the term after the &#8220;+&#8221; symbol must match the document.</p>
+<p>To search for documents that must contain &#8220;Zend&#8221; and may contain &#8220;Framework&#8221; use the query:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>+Zend Framework
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="zendsearch-lucene-query-language-boolean-minus">
+<span id="id3"></span><h3>-<a class="headerlink" href="#zendsearch-lucene-query-language-boolean-minus" title="Permalink to this headline">¶</a></h3>
+<p>The &#8220;-&#8221; or prohibit operator excludes documents that match the term after the &#8220;-&#8221; symbol.</p>
+<p>To search for documents that contain &#8220;PHP framework&#8221; but not &#8220;Zend Framework&#8221; use the query:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>&quot;PHP framework&quot; -&quot;Zend Framework&quot;
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="no-operator">
+<span id="zendsearch-lucene-query-language-boolean-no-operator"></span><h3>No Operator<a class="headerlink" href="#no-operator" title="Permalink to this headline">¶</a></h3>
+<p>If no operator is used, then the search behavior is defined by the &#8220;default boolean operator&#8221;.</p>
+<p>This is set to &#8216;OR&#8217; by default.</p>
+<p>That implies each term is optional by default. It may or may not be present within document, but documents with
+this term will receive a higher score.</p>
+<p>To search for documents that requires &#8220;PHP framework&#8221; and may contain &#8220;Zend Framework&#8221; use the query:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>+&quot;PHP framework&quot; &quot;Zend Framework&quot;
+</pre></div>
+</td></tr></table></div>
+<p>The default boolean operator may be set or retrieved with the
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\QueryParser::setDefaultOperator($operator)</span></tt> and
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\QueryParser::getDefaultOperator()</span></tt> methods, respectively.</p>
+<p>These methods operate with the <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\QueryParser::B_AND</span></tt> and
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\QueryParser::B_OR</span></tt> constants.</p>
+</div>
+</div>
+<div class="section" id="grouping">
+<span id="zendsearch-lucene-query-language-grouping"></span><h2>Grouping<a class="headerlink" href="#grouping" title="Permalink to this headline">¶</a></h2>
+<p>Java Lucene and <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> support using parentheses to group clauses to form sub queries. This can be
+useful if you want to control the precedence of boolean logic operators for a query or mix different boolean query
+styles:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>+(framework OR library) +php
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> supports subqueries nested to any level.</p>
+</div>
+<div class="section" id="field-grouping">
+<span id="zendsearch-lucene-query-language-field-grouping"></span><h2>Field Grouping<a class="headerlink" href="#field-grouping" title="Permalink to this headline">¶</a></h2>
+<p>Lucene also supports using parentheses to group multiple clauses to a single field.</p>
+<p>To search for a title that contains both the word &#8220;return&#8221; and the phrase &#8220;pink panther&#8221; use the query:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>title:(+return +&quot;pink panther&quot;)
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="escaping-special-characters">
+<span id="zendsearch-lucene-query-language-escaping"></span><h2>Escaping Special Characters<a class="headerlink" href="#escaping-special-characters" title="Permalink to this headline">¶</a></h2>
+<p>Lucene supports escaping special characters that are used in query syntax. The current list of special characters
+is:</p>
+<p>+ - &amp;&amp; || ! ( ) { } [ ] ^ &#8221; ~ * ? : \</p>
+<p>+ and - inside single terms are automatically treated as common characters.</p>
+<p>For other instances of these characters use the \ before each special character you&#8217;d like to escape. For example
+to search for (1+1):2 use the query:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>\(1\+1\)\:2
+</pre></div>
+</td></tr></table></div>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Please note, that it&#8217;s not a <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\QueryParserException</span></tt>, but a
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Exception</span></tt>. It&#8217;s thrown during query rewrite (execution) operation.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Query Language</a><ul>
+<li><a class="reference internal" href="#terms">Terms</a></li>
+<li><a class="reference internal" href="#fields">Fields</a></li>
+<li><a class="reference internal" href="#wildcards">Wildcards</a></li>
+<li><a class="reference internal" href="#term-modifiers">Term Modifiers</a></li>
+<li><a class="reference internal" href="#range-searches">Range Searches</a></li>
+<li><a class="reference internal" href="#fuzzy-searches">Fuzzy Searches</a></li>
+<li><a class="reference internal" href="#matched-terms-limitation">Matched terms limitation</a></li>
+<li><a class="reference internal" href="#proximity-searches">Proximity Searches</a></li>
+<li><a class="reference internal" href="#boosting-a-term">Boosting a Term</a></li>
+<li><a class="reference internal" href="#boolean-operators">Boolean Operators</a><ul>
+<li><a class="reference internal" href="#and">AND</a></li>
+<li><a class="reference internal" href="#or">OR</a></li>
+<li><a class="reference internal" href="#not">NOT</a></li>
+<li><a class="reference internal" href="#and-operators">&amp;&amp;, ||, and ! operators</a></li>
+<li><a class="reference internal" href="#zendsearch-lucene-query-language-boolean-plus">+</a></li>
+<li><a class="reference internal" href="#zendsearch-lucene-query-language-boolean-minus">-</a></li>
+<li><a class="reference internal" href="#no-operator">No Operator</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#grouping">Grouping</a></li>
+<li><a class="reference internal" href="#field-grouping">Field Grouping</a></li>
+<li><a class="reference internal" href="#escaping-special-characters">Escaping Special Characters</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendsearch.lucene.query-language.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendsearch.lucene.query-language.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendsearch.lucene.query-language.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendsearch.lucene.query-language.rst">
+                Query Language
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,636 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Global Session Management &mdash; Zend Framework 2 2.0.7 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.7 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="global-session-management">
+<span id="zend-session-global-session-management"></span><h1>Global Session Management<a class="headerlink" href="#global-session-management" title="Permalink to this headline">¶</a></h1>
+<p>The default behavior of sessions can be modified using the static methods of <tt class="docutils literal"><span class="pre">Zend\Session</span></tt>. All management and
+manipulation of global session management occurs using <tt class="docutils literal"><span class="pre">Zend\Session</span></tt>, including configuration of the <a class="reference external" href="http://www.php.net/session#session.configuration">usual
+options provided by ext/session</a>, using <tt class="docutils literal"><span class="pre">Zend\Session\Session::setOptions()</span></tt>. For example, failure to insure the use of
+a safe <em>save_path</em> or a unique cookie name by ext/session using <tt class="docutils literal"><span class="pre">Zend\Session\Session::setOptions()</span></tt> may result in
+security issues.</p>
+<div class="section" id="configuration-options">
+<span id="zend-session-global-session-management-configuration-options"></span><h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>When the first session namespace is requested, <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> will automatically start the <em>PHP</em> session, unless
+already started with <a class="reference internal" href="zend.session.advanced-usage.html#zend-session-advanced-usage-starting-a-session"><em>ZendSessionSession::start()</em></a>. The underlying
+<em>PHP</em> session will use defaults from <tt class="docutils literal"><span class="pre">Zend\Session</span></tt>, unless modified first by <tt class="docutils literal"><span class="pre">Zend\Session\Session::setOptions()</span></tt>.</p>
+<p>To set a session configuration option, include the basename (the part of the name after &#8220;<em>session.</em>&#8221;) as a key of
+an array passed to <tt class="docutils literal"><span class="pre">Zend\Session\Session::setOptions()</span></tt>. The corresponding value in the array is used to set the session
+option value. If no options are set by the developer, <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> will utilize recommended default options
+first, then the default php.ini settings. Community feedback about best practices for these options should be sent
+to <a class="reference external" href="mailto:fw-auth&#37;&#52;&#48;lists&#46;zend&#46;com">fw-auth<span>&#64;</span>lists<span>&#46;</span>zend<span>&#46;</span>com</a>.</p>
+<p class="rubric" id="zend-session-global-session-management-setoptions-example">Using ZendConfig to Configure ZendSession</p>
+<p>To configure this component using <em class="xref std std-ref">ZendConfigIni</em>, first add the configuration
+options to the <em>INI</em> file:</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">; Accept defaults for production</span>
+<span class="k">[production]</span>
+<span class="c">; bug_compat_42</span>
+<span class="c">; bug_compat_warn</span>
+<span class="c">; cache_expire</span>
+<span class="c">; cache_limiter</span>
+<span class="c">; cookie_domain</span>
+<span class="c">; cookie_lifetime</span>
+<span class="c">; cookie_path</span>
+<span class="c">; cookie_secure</span>
+<span class="c">; entropy_file</span>
+<span class="c">; entropy_length</span>
+<span class="c">; gc_divisor</span>
+<span class="c">; gc_maxlifetime</span>
+<span class="c">; gc_probability</span>
+<span class="c">; hash_bits_per_character</span>
+<span class="c">; hash_function</span>
+<span class="c">; name should be unique for each PHP application sharing the same</span>
+<span class="c">; domain name</span>
+<span class="na">name</span> <span class="o">=</span> <span class="s">UNIQUE_NAME</span>
+<span class="c">; referer_check</span>
+<span class="c">; save_handler</span>
+<span class="c">; save_path</span>
+<span class="c">; serialize_handler</span>
+<span class="c">; use_cookies</span>
+<span class="c">; use_only_cookies</span>
+<span class="c">; use_trans_sid</span>
+
+<span class="c">; remember_me_seconds = &lt;integer seconds&gt;</span>
+<span class="c">; strict = on|off</span>
+
+<span class="c">; Development inherits configuration from production, but overrides</span>
+<span class="c">; several values</span>
+<span class="k">[development : production]</span>
+<span class="c">; Don&#39;t forget to create this directory and make it rwx (readable and</span>
+<span class="c">; modifiable) by PHP.</span>
+<span class="na">save_path</span> <span class="o">=</span> <span class="s">/home/myaccount/zend_sessions/myapp</span>
+<span class="na">use_only_cookies</span> <span class="o">=</span> <span class="s">on</span>
+<span class="c">; When persisting session id cookies, request a TTL of 10 days</span>
+<span class="na">remember_me_seconds</span> <span class="o">=</span> <span class="s">864000</span>
+</pre></div>
+</td></tr></table></div>
+<p>Next, load the configuration file and pass its array representation to <tt class="docutils literal"><span class="pre">Zend\Session\Session::setOptions()</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$config</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Config\Ini</span><span class="p">(</span><span class="s1">&#39;myapp.ini&#39;</span><span class="p">,</span> <span class="s1">&#39;development&#39;</span><span class="p">);</span>
+
+<span class="nx">Zend\Session\Session</span><span class="o">::</span><span class="na">setOptions</span><span class="p">(</span><span class="nv">$config</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>Most options shown above need no explanation beyond that found in the standard <em>PHP</em> documentation, but those of
+particular interest are noted below.</p>
+<blockquote>
+<div><ul>
+<li><p class="first">boolean <em>strict</em>- disables automatic starting of <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> when using <em>new ZendSessionNamespace()</em>.</p>
+</li>
+<li><p class="first">integer <em>remember_me_seconds</em>- how long should session id cookie persist, after user agent has ended (e.g.,
+browser application terminated).</p>
+</li>
+<li><p class="first">string <em>save_path</em>- The correct value is system dependent, and should be provided by the developer using an
+<strong>absolute path</strong> to a directory readable and writable by the <em>PHP</em> process. If a writable path is not
+supplied, then <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> will throw an exception when started (i.e., when <tt class="docutils literal"><span class="pre">start()</span></tt> is called).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Security Risk</strong></p>
+<p>If the path is readable by other applications, then session hijacking might be possible. if the path is
+writable by other applications, then <a class="reference external" href="http://en.wikipedia.org/wiki/Session_poisoning">session poisoning</a> might be possible. If this path is shared with
+other users or other <em>PHP</em> applications, various security issues might occur, including theft of session
+content, hijacking of sessions, and collision of garbage collection (e.g., another user&#8217;s application might
+cause <em>PHP</em> to delete your application&#8217;s session files).</p>
+<p class="last">For example, an attacker can visit the victim&#8217;s website to obtain a session cookie. Then, he edits the
+cookie path to his own domain on the same server, before visiting his own website to execute
+<tt class="docutils literal"><span class="pre">var_dump($_SESSION)</span></tt>. Armed with detailed knowledge of the victim&#8217;s use of data in their sessions, the
+attacker can then modify the session state (poisoning the session), alter the cookie path back to the
+victim&#8217;s website, and then make requests from the victim&#8217;s website using the poisoned session. Even if two
+applications on the same server do not have read/write access to the other application&#8217;s <em>save_path</em>, if
+the <em>save_path</em> is guessable, and the attacker has control over one of these two websites, the attacker
+could alter their website&#8217;s <em>save_path</em> to use the other&#8217;s save_path, and thus accomplish session
+poisoning, under some common configurations of <em>PHP</em>. Thus, the value for <em>save_path</em> should not be made
+public knowledge and should be altered to a secure location unique to each application.</p>
+</div>
+</li>
+<li><p class="first">string <em>name</em>- The correct value is system dependent and should be provided by the developer using a value
+<strong>unique</strong> to the application.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Security Risk</strong></p>
+<p class="last">If the <em>php.ini</em> setting for <em>session.name</em> is the same (e.g., the default &#8220;PHPSESSID&#8221;), and there are two
+or more <em>PHP</em> applications accessible through the same domain name then they will share the same session
+data for visitors to both websites. Additionally, possible corruption of session data may result.</p>
+</div>
+</li>
+<li><p class="first">boolean <em>use_only_cookies</em>- In order to avoid introducing additional security risks, do not alter the default
+value of this option.</p>
+<blockquote>
+<div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Security Risk</strong></p>
+<p class="last">If this setting is not enabled, an attacker can easily fix victim&#8217;s session ids, using links on the
+attacker&#8217;s website, such as <em>http://www.example.com/index.php?PHPSESSID=fixed_session_id</em>. The fixation
+works, if the victim does not already have a session id cookie for example.com. Once a victim is using a
+known session id, the attacker can then attempt to hijack the session by pretending to be the victim,
+and emulating the victim&#8217;s user agent.</p>
+</div>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="error-headers-already-sent">
+<span id="zend-session-global-session-management-headers-sent"></span><h2>Error: Headers Already Sent<a class="headerlink" href="#error-headers-already-sent" title="Permalink to this headline">¶</a></h2>
+<p>If you see the error message, &#8220;Cannot modify header information - headers already sent&#8221;, or, &#8220;You must call ...
+before any output has been sent to the browser; output started in ...&#8221;, then carefully examine the immediate cause
+(function or method) associated with the message. Any actions that require sending <em>HTTP</em> headers, such as sending
+a cookie, must be done before sending normal output (unbuffered output), except when using <em>PHP</em>&#8216;s output
+buffering.</p>
+<ul class="simple">
+<li>Using <a class="reference external" href="http://php.net/outcontrol">output buffering</a> often is sufficient to prevent this issue, and may help improve performance. For
+example, in <em>php.ini</em>, &#8220;<em>output_buffering = 65535</em>&#8221; enables output buffering with a 64K buffer. Even though
+output buffering might be a good tactic on production servers to increase performance, relying only on buffering
+to resolve the &#8220;headers already sent&#8221; problem is not sufficient. The application must not exceed the buffer size,
+or the problem will occur whenever the output sent (prior to the <em>HTTP</em> headers) exceeds the buffer size.</li>
+<li>If a <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> method is involved in causing the error message, examine the method carefully, and make
+sure its use really is needed in the application. For example, the default usage of <tt class="docutils literal"><span class="pre">destroy()</span></tt> also sends an
+<em>HTTP</em> header to expire the client-side session cookie. If this is not needed, then use <tt class="docutils literal"><span class="pre">destroy(false)</span></tt>, since
+the instructions to set cookies are sent with <em>HTTP</em> headers.</li>
+<li>Alternatively, try rearranging the application logic so that all actions manipulating headers are performed prior
+to sending any output whatsoever.</li>
+<li>Remove any closing &#8220;<em>?&gt;</em>&#8221; tags, if they occur at the end of a <em>PHP</em> source file. They are not needed, and
+newlines and other nearly invisible whitespace following the closing tag can trigger output to the client.</li>
+</ul>
+</div>
+<div class="section" id="session-identifiers">
+<span id="zend-session-global-session-management-session-identifiers"></span><h2>Session Identifiers<a class="headerlink" href="#session-identifiers" title="Permalink to this headline">¶</a></h2>
+<p>Introduction: Best practice in relation to using sessions with Zend Framework calls for using a browser cookie
+(i.e. a normal cookie stored in your web browser), instead of embedding a unique session identifier in <em>URL</em>s as
+a means to track individual users. By default this component uses only cookies to maintain session identifiers. The
+cookie&#8217;s value is the unique identifier of your browser&#8217;s session. <em>PHP</em>&#8216;s ext/session uses this identifier to
+maintain a unique one-to-one relationship between website visitors, and persistent session data storage unique to
+each visitor. <tt class="docutils literal"><span class="pre">Zend\Session</span></tt>* wraps this storage mechanism (<tt class="docutils literal"><span class="pre">$_SESSION</span></tt>) with an object-oriented interface.
+Unfortunately, if an attacker gains access to the value of the cookie (the session id), an attacker might be able
+to hijack a visitor&#8217;s session. This problem is not unique to <em>PHP</em>, or Zend Framework. The <tt class="docutils literal"><span class="pre">regenerateId()</span></tt>
+method allows an application to change the session id (stored in the visitor&#8217;s cookie) to a new, random,
+unpredictable value. Note: Although not the same, to make this section easier to read, we use the terms &#8220;user
+agent&#8221; and &#8220;web browser&#8221; interchangeably.</p>
+<p>Why?: If an attacker obtains a valid session identifier, an attacker might be able to impersonate a valid user (the
+victim), and then obtain access to confidential information or otherwise manipulate the victim&#8217;s data managed by
+your application. Changing session ids helps protect against session hijacking. If the session id is changed, and
+an attacker does not know the new value, the attacker can not use the new session id in their attempts to hijack
+the visitor&#8217;s session. Even if an attacker gains access to an old session id, <tt class="docutils literal"><span class="pre">regenerateId()</span></tt> also moves the
+session data from the old session id &#8220;handle&#8221; to the new one, so no data remains accessible via the old session id.</p>
+<p>When to use regenerateId(): Adding <tt class="docutils literal"><span class="pre">Zend\Session\Session::regenerateId()</span></tt> to your Zend Framework bootstrap yields one of
+the safest and most secure ways to regenerate session id&#8217;s in user agent cookies. If there is no conditional logic
+to determine when to regenerate the session id, then there are no flaws in that logic. Although regenerating on
+every request prevents several possible avenues of attack, not everyone wants the associated small performance and
+bandwidth cost. Thus, applications commonly try to dynamically determine situations of greater risk, and only
+regenerate the session ids in those situations. Whenever a website visitor&#8217;s session&#8217;s privileges are &#8220;escalated&#8221;
+(e.g. a visitor re-authenticates their identity before editing their personal &#8220;profile&#8221;), or whenever a security
+&#8220;sensitive&#8221; session parameter change occurs, consider using <tt class="docutils literal"><span class="pre">regenerateId()</span></tt> to create a new session id. If you
+call the <tt class="docutils literal"><span class="pre">rememberMe()</span></tt> function, then don&#8217;t use <tt class="docutils literal"><span class="pre">regenerateId()</span></tt>, since the former calls the latter. If a user
+has successfully logged into your website, use <tt class="docutils literal"><span class="pre">rememberMe()</span></tt> instead of <tt class="docutils literal"><span class="pre">regenerateId()</span></tt>.</p>
+<div class="section" id="session-hijacking-and-fixation">
+<span id="zend-session-global-session-management-session-identifiers-hijacking-and-fixation"></span><h3>Session Hijacking and Fixation<a class="headerlink" href="#session-hijacking-and-fixation" title="Permalink to this headline">¶</a></h3>
+<p>Avoiding <a class="reference external" href="http://en.wikipedia.org/wiki/Cross_site_scripting">cross-site script (XSS) vulnerabilities</a> helps preventing session hijacking. According to <a class="reference external" href="http://secunia.com/">Secunia&#8217;s</a>
+statistics XSS problems occur frequently, regardless of the languages used to create web applications. Rather than
+expecting to never have a XSS problem with an application, plan for it by following best practices to help minimize
+damage, if it occurs. With XSS, an attacker does not need direct access to a victim&#8217;s network traffic. If the
+victim already has a session cookie, Javascript XSS might allow an attacker to read the cookie and steal the
+session. for victims with no session cookies, using XSS to inject Javascript, an attacker could create a session id
+cookie on the victim&#8217;s browser with a known value, then set an identical cookie on the attacker&#8217;s system, in order
+to hijack the victim&#8217;s session. If the victim visited an attacker&#8217;s website, then the attacker can also emulate
+most other identifiable characteristics of the victim&#8217;s user agent. If your website has an XSS vulnerability, the
+attacker might be able to insert an <em>AJAX</em> Javascript that secretly &#8220;visits&#8221; the attacker&#8217;s website, so that the
+attacker knows the victim&#8217;s browser characteristics and becomes aware of a compromised session at the victim
+website. However, the attacker can not arbitrarily alter the server-side state of <em>PHP</em> sessions, provided the
+developer has correctly set the value for the <em>save_path</em> option.</p>
+<p>By itself, calling <tt class="docutils literal"><span class="pre">Zend\Session\Session::regenerateId()</span></tt> when the user&#8217;s session is first used, does not prevent session
+fixation attacks, unless you can distinguish between a session originated by an attacker emulating the victim. At
+first, this might sound contradictory to the previous statement above, until we consider an attacker who first
+initiates a real session on your website. The session is &#8220;first used&#8221; by the attacker, who then knows the result of
+the initialization (<tt class="docutils literal"><span class="pre">regenerateId()</span></tt>). The attacker then uses the new session id in combination with an XSS
+vulnerability, or injects the session id via a link on the attacker&#8217;s website (works if <em>use_only_cookies = off</em>).</p>
+<p>If you can distinguish between an attacker and victim using the same session id, then session hijacking can be
+dealt with directly. However, such distinctions usually involve some form of usability tradeoffs, because the
+methods of distinction are often imprecise. For example, if a request is received from an IP in a different country
+than the IP of the request when the session was created, then the new request probably belongs to an attacker.
+Under the following conditions, there might not be any way for a website application to distinguish between a
+victim and an attacker:</p>
+<blockquote>
+<div><ul class="simple">
+<li>attacker first initiates a session on your website to obtain a valid session id</li>
+<li>attacker uses XSS vulnerability on your website to create a cookie on the victim&#8217;s browser with the same,
+valid session id (i.e. session fixation)</li>
+<li>both the victim and attacker originate from the same proxy farm (e.g. both are behind the same firewall at a
+large company, like AOL)</li>
+</ul>
+</div></blockquote>
+<p>The sample code below makes it much harder for an attacker to know the current victim&#8217;s session id, unless the
+attacker has already performed the first two steps above.</p>
+<p class="rubric" id="zend-session-global-session-management-session-identifiers-hijacking-and-fixation-example">Session Fixation</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$defaultNamespace</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$defaultNamespace</span><span class="o">-&gt;</span><span class="na">initialized</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nx">Zend\Session\Session</span><span class="o">::</span><span class="na">regenerateId</span><span class="p">();</span>
+    <span class="nv">$defaultNamespace</span><span class="o">-&gt;</span><span class="na">initialized</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="rememberme-integer-seconds">
+<span id="zend-session-global-session-management-rememberme"></span><h2>rememberMe(integer $seconds)<a class="headerlink" href="#rememberme-integer-seconds" title="Permalink to this headline">¶</a></h2>
+<p>Ordinarily, sessions end when the user agent terminates, such as when an end user exits a web browser program.
+However, your application may provide the ability to extend user sessions beyond the lifetime of the client program
+through the use of persistent cookies. Use <tt class="docutils literal"><span class="pre">Zend\Session\Session::rememberMe()</span></tt> before a session is started to control
+the length of time before a persisted session cookie expires. If you do not specify a number of seconds, then the
+session cookie lifetime defaults to <em>remember_me_seconds</em>, which may be set using <tt class="docutils literal"><span class="pre">Zend\Session\Session::setOptions()</span></tt>.
+To help thwart session fixation/hijacking, use this function when a user successfully authenticates with your
+application (e.g., from a &#8220;login&#8221; form).</p>
+</div>
+<div class="section" id="forgetme">
+<span id="zend-session-global-session-management-forgetme"></span><h2>forgetMe()<a class="headerlink" href="#forgetme" title="Permalink to this headline">¶</a></h2>
+<p>This function complements <tt class="docutils literal"><span class="pre">rememberMe()</span></tt> by writing a session cookie that has a lifetime ending when the user
+agent terminates.</p>
+</div>
+<div class="section" id="sessionexists">
+<span id="zend-session-global-session-management-sessionexists"></span><h2>sessionExists()<a class="headerlink" href="#sessionexists" title="Permalink to this headline">¶</a></h2>
+<p>Use this method to determine if a session already exists for the current user agent/request. It may be used before
+starting a session, and independently of all other <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> and <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt> methods.</p>
+</div>
+<div class="section" id="destroy-bool-remove-cookie-true-bool-readonly-true">
+<span id="zend-session-global-session-management-destroy"></span><h2>destroy(bool $remove_cookie = true, bool $readonly = true)<a class="headerlink" href="#destroy-bool-remove-cookie-true-bool-readonly-true" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Session\Session::destroy()</span></tt> destroys all of the persistent data associated with the current session. However, no
+variables in <em>PHP</em> are affected, so your namespaced sessions (instances of <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt>) remain
+readable. To complete a &#8220;logout&#8221;, set the optional parameter to <tt class="docutils literal"><span class="pre">TRUE</span></tt> (the default) to also delete the user
+agent&#8217;s session id cookie. The optional <tt class="docutils literal"><span class="pre">$readonly</span></tt> parameter removes the ability to create new
+<tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt> instances and for <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> methods to write to the session data store.</p>
+<p>If you see the error message, &#8220;Cannot modify header information - headers already sent&#8221;, then either avoid using
+<tt class="docutils literal"><span class="pre">TRUE</span></tt> as the value for the first argument (requesting removal of the session cookie), or see <a class="reference internal" href="#zend-session-global-session-management-headers-sent"><em>this section</em></a>. Thus, <tt class="docutils literal"><span class="pre">Zend\Session\Session::destroy(true)</span></tt> must either be called
+before <em>PHP</em> has sent <em>HTTP</em> headers, or output buffering must be enabled. Also, the total output sent must not
+exceed the set buffer size, in order to prevent triggering sending the output before the call to <tt class="docutils literal"><span class="pre">destroy()</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Throws</strong></p>
+<p class="last">By default, <tt class="docutils literal"><span class="pre">$readonly</span></tt> is enabled and further actions involving writing to the session data store will throw
+an exception.</p>
+</div>
+</div>
+<div class="section" id="stop">
+<span id="zend-session-global-session-management-stop"></span><h2>stop()<a class="headerlink" href="#stop" title="Permalink to this headline">¶</a></h2>
+<p>This method does absolutely nothing more than toggle a flag in <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> to prevent further writing to the
+session data store. We are specifically requesting feedback on this feature. Potential uses/abuses might include
+temporarily disabling the use of <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt> instances or <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> methods to write to the
+session data store, while execution is transferred to view- related code. Attempts to perform actions involving
+writes via these instances or methods will throw an exception.</p>
+</div>
+<div class="section" id="writeclose-readonly-true">
+<span id="zend-session-global-session-management-writeclose"></span><h2>writeClose($readonly = true)<a class="headerlink" href="#writeclose-readonly-true" title="Permalink to this headline">¶</a></h2>
+<p>Shutdown the session, close writing and detach <tt class="docutils literal"><span class="pre">$_SESSION</span></tt> from the back-end storage mechanism. This will
+complete the internal data transformation on this request. The optional <tt class="docutils literal"><span class="pre">$readonly</span></tt> boolean parameter can remove
+write access by throwing an exception upon any attempt to write to the session via <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> or
+<tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Throws</strong></p>
+<p class="last">By default, <tt class="docutils literal"><span class="pre">$readonly</span></tt> is enabled and further actions involving writing to the session data store will throw
+an exception. However, some legacy application might expect <tt class="docutils literal"><span class="pre">$_SESSION</span></tt> to remain writable after ending the
+session via <tt class="docutils literal"><span class="pre">session_write_close()</span></tt>. Although not considered &#8220;best practice&#8221;, the <tt class="docutils literal"><span class="pre">$readonly</span></tt> option is
+available for those who need it.</p>
+</div>
+</div>
+<div class="section" id="expiresessioncookie">
+<span id="zend-session-global-session-management-expiresessioncookie"></span><h2>expireSessionCookie()<a class="headerlink" href="#expiresessioncookie" title="Permalink to this headline">¶</a></h2>
+<p>This method sends an expired session id cookie, causing the client to delete the session cookie. Sometimes this
+technique is used to perform a client-side logout.</p>
+</div>
+<div class="section" id="setsavehandler-zendsessionsavehandlerinterface-interface">
+<span id="zend-session-global-session-management-savehandler"></span><h2>setSaveHandler(ZendSessionSaveHandlerInterface $interface)<a class="headerlink" href="#setsavehandler-zendsessionsavehandlerinterface-interface" title="Permalink to this headline">¶</a></h2>
+<p>Most developers will find the default save handler sufficient. This method provides an object-oriented wrapper for
+<a class="reference external" href="http://php.net/session_set_save_handler">session_set_save_handler()</a>.</p>
+</div>
+<div class="section" id="namespaceisset-namespace">
+<span id="zend-session-global-session-management-namespaceisset"></span><h2>namespaceIsset($namespace)<a class="headerlink" href="#namespaceisset-namespace" title="Permalink to this headline">¶</a></h2>
+<p>Use this method to determine if a session namespace exists, or if a particular index exists in a particular
+namespace.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Throws</strong></p>
+<p class="last">An exception will be thrown if <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> is not marked as readable (e.g., before <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> has
+been started).</p>
+</div>
+</div>
+<div class="section" id="namespaceunset-namespace">
+<span id="zend-session-global-session-management-namespaceunset"></span><h2>namespaceUnset($namespace)<a class="headerlink" href="#namespaceunset-namespace" title="Permalink to this headline">¶</a></h2>
+<p>Use <tt class="docutils literal"><span class="pre">Zend\Session\Session::namespaceUnset($namespace)</span></tt> to efficiently remove an entire namespace and its contents. As
+with all arrays in <em>PHP</em>, if a variable containing an array is unset, and the array contains other objects, those
+objects will remain available, if they were also stored by reference in other array/objects that remain accessible
+via other variables. So <tt class="docutils literal"><span class="pre">namespaceUnset()</span></tt> does not perform a &#8220;deep&#8221; unsetting/deleting of the contents of the
+entries in the namespace. For a more detailed explanation, please see <a class="reference external" href="http://php.net/references">References Explained</a> in the <em>PHP</em> manual.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Throws</strong></p>
+<p class="last">An exception will be thrown if the namespace is not writable (e.g., after <tt class="docutils literal"><span class="pre">destroy()</span></tt>).</p>
+</div>
+</div>
+<div class="section" id="namespaceget-namespace">
+<span id="zend-session-global-session-management-namespaceget"></span><h2>namespaceGet($namespace)<a class="headerlink" href="#namespaceget-namespace" title="Permalink to this headline">¶</a></h2>
+<p>DEPRECATED: Use <tt class="docutils literal"><span class="pre">getIterator()</span></tt> in <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt>. This method returns an array of the contents of
+<tt class="docutils literal"><span class="pre">$namespace</span></tt>. If you have logical reasons to keep this method publicly accessible, please provide feedback to the
+<a class="reference external" href="mailto:fw-auth&#37;&#52;&#48;lists&#46;zend&#46;com">fw-auth<span>&#64;</span>lists<span>&#46;</span>zend<span>&#46;</span>com</a> mail list. Actually, all participation on any relevant topic is welcome :)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Throws</strong></p>
+<p class="last">An exception will be thrown if <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> is not marked as readable (e.g., before <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> has
+been started).</p>
+</div>
+</div>
+<div class="section" id="getiterator">
+<span id="zend-session-global-session-management-getiterator"></span><h2>getIterator()<a class="headerlink" href="#getiterator" title="Permalink to this headline">¶</a></h2>
+<p>Use <tt class="docutils literal"><span class="pre">getIterator()</span></tt> to obtain an array containing the names of all namespaces.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Throws</strong></p>
+<p class="last">An exception will be thrown if <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> is not marked as readable (e.g., before <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> has
+been started).</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Global Session Management</a><ul>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#error-headers-already-sent">Error: Headers Already Sent</a></li>
+<li><a class="reference internal" href="#session-identifiers">Session Identifiers</a><ul>
+<li><a class="reference internal" href="#session-hijacking-and-fixation">Session Hijacking and Fixation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#rememberme-integer-seconds">rememberMe(integer $seconds)</a></li>
+<li><a class="reference internal" href="#forgetme">forgetMe()</a></li>
+<li><a class="reference internal" href="#sessionexists">sessionExists()</a></li>
+<li><a class="reference internal" href="#destroy-bool-remove-cookie-true-bool-readonly-true">destroy(bool $remove_cookie = true, bool $readonly = true)</a></li>
+<li><a class="reference internal" href="#stop">stop()</a></li>
+<li><a class="reference internal" href="#writeclose-readonly-true">writeClose($readonly = true)</a></li>
+<li><a class="reference internal" href="#expiresessioncookie">expireSessionCookie()</a></li>
+<li><a class="reference internal" href="#setsavehandler-zendsessionsavehandlerinterface-interface">setSaveHandler(ZendSessionSaveHandlerInterface $interface)</a></li>
+<li><a class="reference internal" href="#namespaceisset-namespace">namespaceIsset($namespace)</a></li>
+<li><a class="reference internal" href="#namespaceunset-namespace">namespaceUnset($namespace)</a></li>
+<li><a class="reference internal" href="#namespaceget-namespace">namespaceGet($namespace)</a></li>
+<li><a class="reference internal" href="#getiterator">getIterator()</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.session.global-session-management.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.session.global-session-management.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.session.global-session-management.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.0.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.session.global-session-management.rst">
+                Global Session Management
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

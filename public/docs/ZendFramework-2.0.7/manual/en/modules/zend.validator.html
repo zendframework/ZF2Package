@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Zend Framework 2 2.0.7 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.7 documentation" href="../index.html" />
+    <link rel="next" title="Standard Validation Classes" href="zend.validator.set.html" />
+    <link rel="prev" title="Zend\Uri" href="zend.uri.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.validator.set.html" title="Standard Validation Classes"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.uri.html" title="Zend\Uri"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<span id="zend-validator-introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Validator</span></tt> component provides a set of commonly needed validators. It also provides a simple validator
+chaining mechanism by which multiple validators may be applied to a single datum in a user-defined order.</p>
+<div class="section" id="what-is-a-validator">
+<span id="zend-validator-introduction-definition"></span><h2>What is a validator?<a class="headerlink" href="#what-is-a-validator" title="Permalink to this headline">¶</a></h2>
+<p>A validator examines its input with respect to some requirements and produces a boolean result - whether the input
+successfully validates against the requirements. If the input does not meet the requirements, a validator may
+additionally provide information about which requirement(s) the input does not meet.</p>
+<p>For example, a web application might require that a username be between six and twelve characters in length and may
+only contain alphanumeric characters. A validator can be used for ensuring that a username meets these requirements.
+If a chosen username does not meet one or both of the requirements, it would be useful to know which of the
+requirements the username fails to meet.</p>
+</div>
+<div class="section" id="basic-usage-of-validators">
+<span id="zend-validator-introduction-using"></span><h2>Basic usage of validators<a class="headerlink" href="#basic-usage-of-validators" title="Permalink to this headline">¶</a></h2>
+<p>Having defined validation in this way provides the foundation for <tt class="docutils literal"><span class="pre">Zend\Validator\ValidatorInterface</span></tt>, which
+defines two methods, <tt class="docutils literal"><span class="pre">isValid()</span></tt> and <tt class="docutils literal"><span class="pre">getMessages()</span></tt>. The <tt class="docutils literal"><span class="pre">isValid()</span></tt> method performs validation upon the
+provided value, returning <tt class="docutils literal"><span class="pre">TRUE</span></tt> if and only if the value passes against the validation criteria.</p>
+<p>If <tt class="docutils literal"><span class="pre">isValid()</span></tt> returns <tt class="docutils literal"><span class="pre">FALSE</span></tt>, the <tt class="docutils literal"><span class="pre">getMessages()</span></tt> returns an array of messages explaining the reason(s) for
+validation failure. The array keys are short strings that identify the reasons for validation failure, and the
+array values are the corresponding human-readable string messages. The keys and values are class-dependent; each
+validation class defines its own set of validation failure messages and the unique keys that identify them. Each
+class also has a const definition that matches each identifier for a validation failure cause.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">getMessages()</span></tt> methods return validation failure information only for the most recent <tt class="docutils literal"><span class="pre">isValid()</span></tt> call.
+Each call to <tt class="docutils literal"><span class="pre">isValid()</span></tt> clears any messages and errors caused by a previous <tt class="docutils literal"><span class="pre">isValid()</span></tt> call, because it&#8217;s
+likely that each call to <tt class="docutils literal"><span class="pre">isValid()</span></tt> is made for a different input value.</p>
+</div>
+<p>The following example illustrates validation of an e-mail address:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\EmailAddress</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="nv">$email</span><span class="p">))</span> <span class="p">{</span>
+    <span class="c1">// email appears to be valid</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// email is invalid; print the reasons</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$messageId</span> <span class="o">=&gt;</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;Validation failure &#39;</span><span class="si">$messageId</span><span class="s2">&#39;: </span><span class="si">$message</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="customizing-messages">
+<span id="zend-validator-introduction-messages"></span><h2>Customizing messages<a class="headerlink" href="#customizing-messages" title="Permalink to this headline">¶</a></h2>
+<p>Validator classes provide a <tt class="docutils literal"><span class="pre">setMessage()</span></tt> method with which you can specify the format of a message returned by
+<tt class="docutils literal"><span class="pre">getMessages()</span></tt> in case of validation failure. The first argument of this method is a string containing the error
+message. You can include tokens in this string which will be substituted with data relevant to the validator. The
+token <strong>%value%</strong> is supported by all validators; this is substituted with the value you passed to <tt class="docutils literal"><span class="pre">isValid()</span></tt>.
+Other tokens may be supported on a case-by-case basis in each validation class. For example, <strong>%max%</strong> is a token
+supported by <tt class="docutils literal"><span class="pre">Zend\Validator\LessThan</span></tt>. The <tt class="docutils literal"><span class="pre">getMessageVariables()</span></tt> method returns an array of variable tokens
+supported by the validator.</p>
+<p>The second optional argument is a string that identifies the validation failure message template to be set, which
+is useful when a validation class defines more than one cause for failure. If you omit the second argument,
+<tt class="docutils literal"><span class="pre">setMessage()</span></tt> assumes the message you specify should be used for the first message template declared in the
+validation class. Many validation classes only have one error message template defined, so there is no need to
+specify which message template you are changing.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\StringLength</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+
+<span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">setMessage</span><span class="p">(</span>
+    <span class="s1">&#39;The string \&#39;%value%\&#39; is too short; it must be at least %min% &#39;</span> <span class="o">.</span>
+    <span class="s1">&#39;characters&#39;</span><span class="p">,</span>
+    <span class="nx">Zend\Validator\StringLength</span><span class="o">::</span><span class="na">TOO_SHORT</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="s1">&#39;word&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$messages</span> <span class="o">=</span> <span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">();</span>
+    <span class="k">echo</span> <span class="nb">current</span><span class="p">(</span><span class="nv">$messages</span><span class="p">);</span>
+
+    <span class="c1">// &quot;The string &#39;word&#39; is too short; it must be at least 8 characters&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can set multiple messages using the <tt class="docutils literal"><span class="pre">setMessages()</span></tt> method. Its argument is an array containing key/message
+pairs.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\StringLength</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;min&#39;</span> <span class="o">=&gt;</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span> <span class="o">=&gt;</span> <span class="mi">12</span><span class="p">));</span>
+
+<span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">setMessages</span><span class="p">(</span> <span class="k">array</span><span class="p">(</span>
+    <span class="nx">Zend\Validator\StringLength</span><span class="o">::</span><span class="na">TOO_SHORT</span> <span class="o">=&gt;</span>
+        <span class="s1">&#39;The string \&#39;%value%\&#39; is too short&#39;</span><span class="p">,</span>
+    <span class="nx">Zend\Validator\StringLength</span><span class="o">::</span><span class="na">TOO_LONG</span>  <span class="o">=&gt;</span>
+        <span class="s1">&#39;The string \&#39;%value%\&#39; is too long&#39;</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>If your application requires even greater flexibility with which it reports validation failures, you can access
+properties by the same name as the message tokens supported by a given validation class. The <tt class="docutils literal"><span class="pre">value</span></tt> property is
+always available in a validator; it is the value you specified as the argument of <tt class="docutils literal"><span class="pre">isValid()</span></tt>. Other properties
+may be supported on a case-by-case basis in each validation class.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\StringLength</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;min&#39;</span> <span class="o">=&gt;</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span> <span class="o">=&gt;</span> <span class="mi">12</span><span class="p">));</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">(</span><span class="s1">&#39;word&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;Word failed: &#39;</span>
+        <span class="o">.</span> <span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">value</span>
+        <span class="o">.</span> <span class="s1">&#39;; its length is not between &#39;</span>
+        <span class="o">.</span> <span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">min</span>
+        <span class="o">.</span> <span class="s1">&#39; and &#39;</span>
+        <span class="o">.</span> <span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">max</span>
+        <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="translating-messages">
+<span id="zend-validator-introduction-translation"></span><h2>Translating messages<a class="headerlink" href="#translating-messages" title="Permalink to this headline">¶</a></h2>
+<p>Validator classes provide a <tt class="docutils literal"><span class="pre">setTranslator()</span></tt> method with which you can specify an instance of
+<tt class="docutils literal"><span class="pre">Zend\I18n\Translator\Translator</span></tt> which will translate the messages in case of a validation failure. The
+<tt class="docutils literal"><span class="pre">getTranslator()</span></tt> method returns the set translator instance.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\StringLength</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;min&#39;</span> <span class="o">=&gt;</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span> <span class="o">=&gt;</span> <span class="mi">12</span><span class="p">));</span>
+<span class="nv">$translate</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\I18n\Translator\Translator</span><span class="p">();</span>
+<span class="c1">// configure the translator...</span>
+
+<span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">setTranslator</span><span class="p">(</span><span class="nv">$translate</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>With the static <tt class="docutils literal"><span class="pre">setDefaultTranslator()</span></tt> method you can set a instance of <tt class="docutils literal"><span class="pre">Zend\I18n\Translator\Translator</span></tt>
+which will be used for all validation classes, and can be retrieved with <tt class="docutils literal"><span class="pre">getDefaultTranslator()</span></tt>. This prevents
+you from setting a translator manually for all validator classes, and simplifies your code.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$translate</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\I18n\Translator\Translator</span><span class="p">();</span>
+<span class="c1">// configure the translator...</span>
+
+<span class="nx">Zend\Validator\AbstractValidator</span><span class="o">::</span><span class="na">setDefaultTranslator</span><span class="p">(</span><span class="nv">$translate</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Sometimes it is necessary to disable the translator within a validator. To archive this you can use the
+<tt class="docutils literal"><span class="pre">setDisableTranslator()</span></tt> method, which accepts a boolean parameter, and <tt class="docutils literal"><span class="pre">isTranslatorDisabled()</span></tt> to get the set
+value.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Validator\StringLength</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;min&#39;</span> <span class="o">=&gt;</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span> <span class="o">=&gt;</span> <span class="mi">12</span><span class="p">));</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">isTranslatorDisabled</span><span class="p">())</span> <span class="p">{</span>
+    <span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">setDisableTranslator</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>It is also possible to use a translator instead of setting own messages with <tt class="docutils literal"><span class="pre">setMessage()</span></tt>. But doing so, you
+should keep in mind, that the translator works also on messages you set your own.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#what-is-a-validator">What is a validator?</a></li>
+<li><a class="reference internal" href="#basic-usage-of-validators">Basic usage of validators</a></li>
+<li><a class="reference internal" href="#customizing-messages">Customizing messages</a></li>
+<li><a class="reference internal" href="#translating-messages">Translating messages</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.uri.html"
+                        title="previous chapter">Zend\Uri</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.validator.set.html"
+                        title="next chapter">Standard Validation Classes</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.validator.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.validator.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.validator.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.validator.set.html" title="Standard Validation Classes"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.uri.html" title="Zend\Uri"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.validator.rst">
+                Introduction
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

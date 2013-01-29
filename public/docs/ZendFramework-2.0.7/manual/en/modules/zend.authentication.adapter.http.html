@@ -1,0 +1,453 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>HTTP Authentication Adapter &mdash; Zend Framework 2 2.0.7 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0.7',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.0.7 documentation" href="../index.html" />
+    <link rel="next" title="LDAP Authentication" href="zend.authentication.adapter.ldap.html" />
+    <link rel="prev" title="Digest Authentication" href="zend.authentication.adapter.digest.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.authentication.adapter.ldap.html" title="LDAP Authentication"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.authentication.adapter.digest.html" title="Digest Authentication"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="http-authentication-adapter">
+<span id="zend-authentication-adapter-http"></span><h1>HTTP Authentication Adapter<a class="headerlink" href="#http-authentication-adapter" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-authentication-adapter-http-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Authentication\Adapter\Http</span></tt> provides a mostly-compliant implementation of <a class="reference external" href="http://tools.ietf.org/html/rfc2617">RFC-2617</a>, <a class="reference external" href="http://en.wikipedia.org/wiki/Basic_authentication_scheme">Basic</a> and
+<a class="reference external" href="http://en.wikipedia.org/wiki/Digest_access_authentication">Digest</a> <em>HTTP</em> Authentication. Digest authentication is a method of <em>HTTP</em> authentication that improves upon
+Basic authentication by providing a way to authenticate without having to transmit the password in clear text
+across the network.</p>
+<p><strong>Major Features:</strong></p>
+<ul class="simple">
+<li>Supports both Basic and Digest authentication.</li>
+<li>Issues challenges in all supported schemes, so client can respond with any scheme it supports.</li>
+<li>Supports proxy authentication.</li>
+<li>Includes support for authenticating against text files and provides an interface for authenticating against other
+sources, such as databases.</li>
+</ul>
+<p>There are a few notable features of <em>RFC-2617</em> that are not implemented yet:</p>
+<ul class="simple">
+<li>Nonce tracking, which would allow for &#8220;stale&#8221; support, and increased replay attack protection.</li>
+<li>Authentication with integrity checking, or &#8220;auth-int&#8221;.</li>
+<li>Authentication-Info <em>HTTP</em> header.</li>
+</ul>
+</div>
+<div class="section" id="design-overview">
+<span id="zend-authentication-adapter-design-overview"></span><h2>Design Overview<a class="headerlink" href="#design-overview" title="Permalink to this headline">¶</a></h2>
+<p>This adapter consists of two sub-components, the <em>HTTP</em> authentication class itself, and the so-called &#8220;Resolvers.&#8221;
+The <em>HTTP</em> authentication class encapsulates the logic for carrying out both Basic and Digest authentication. It
+uses a Resolver to look up a client&#8217;s identity in some data store (text file by default), and retrieve the
+credentials from the data store. The &#8220;resolved&#8221; credentials are then compared to the values submitted by the client
+to determine whether authentication is successful.</p>
+</div>
+<div class="section" id="configuration-options">
+<span id="zend-authentication-adapter-configuration-options"></span><h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Authentication\Adapter\Http</span></tt> class requires a configuration array passed to its constructor. There are
+several configuration options available, and some are required:</p>
+<table border="1" class="docutils" id="zend-authentication-adapter-configuration-options-table">
+<caption>Configuration Options</caption>
+<colgroup>
+<col width="7%" />
+<col width="20%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Option Name</th>
+<th class="head">Required</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>accept_schemes</td>
+<td>Yes</td>
+<td>Determines which authentication schemes the adapter will accept from the client. Must be a space=separated list containing &#8216;basic&#8217; and/or &#8216;digest&#8217;.</td>
+</tr>
+<tr class="row-odd"><td>realm</td>
+<td>Yes</td>
+<td>Sets the authentication realm; usernames should be unique within a given realm.</td>
+</tr>
+<tr class="row-even"><td>digest_domains</td>
+<td>Yes, when accept_schemes contains digest</td>
+<td>Space-separated list of URIs for which the same authentication information is valid. The URIs need not all point to the same server.</td>
+</tr>
+<tr class="row-odd"><td>nonce_timeout</td>
+<td>Yes, when accept_schemes contains digest</td>
+<td>Sets the number of seconds for which the nonce is valid. See notes below.</td>
+</tr>
+<tr class="row-even"><td>use_opaque</td>
+<td>No</td>
+<td>Specifies whether to send the opaque value in the header. True by default.</td>
+</tr>
+<tr class="row-odd"><td>algorithm</td>
+<td>No</td>
+<td>Specified the algorithm. Defaults to MD5, the only supported option (for now).</td>
+</tr>
+<tr class="row-even"><td>proxy_auth</td>
+<td>No</td>
+<td>Disabled by default. Enable to perform Proxy authentication, instead of normal origin server authentication.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The current implementation of the <tt class="docutils literal"><span class="pre">nonce_timeout</span></tt> has some interesting side effects. This setting is supposed
+to determine the valid lifetime of a given nonce, or effectively how long a client&#8217;s authentication information
+is accepted. Currently, if it&#8217;s set to 3600 (for example), it will cause the adapter to prompt the client for
+new credentials every hour, on the hour. This will be resolved in a future release, once nonce tracking and
+stale support are implemented.</p>
+</div>
+</div>
+<div class="section" id="resolvers">
+<span id="zend-authentication-adapter-http-resolvers"></span><h2>Resolvers<a class="headerlink" href="#resolvers" title="Permalink to this headline">¶</a></h2>
+<p>The resolver&#8217;s job is to take a username and realm, and return some kind of credential value. Basic authentication
+expects to receive the Base64 encoded version of the user&#8217;s password. Digest authentication expects to receive a
+hash of the user&#8217;s username, the realm, and their password (each separated by colons). Currently, the only
+supported hash algorithm is <em>MD5</em>.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Authentication\Adapter\Http</span></tt> relies on objects implementing
+<tt class="docutils literal"><span class="pre">Zend\Authentication\Adapter\Http\ResolverInterface</span></tt>. A text file resolver class is included with this adapter,
+but any other kind of resolver can be created simply by implementing the resolver interface.</p>
+<div class="section" id="file-resolver">
+<span id="zend-authentication-adapter-http-resolvers-file"></span><h3>File Resolver<a class="headerlink" href="#file-resolver" title="Permalink to this headline">¶</a></h3>
+<p>The file resolver is a very simple class. It has a single property specifying a filename, which can also be passed
+to the constructor. Its <tt class="docutils literal"><span class="pre">resolve()</span></tt> method walks through the text file, searching for a line with a matching
+username and realm. The text file format similar to Apache htpasswd files:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>&lt;username&gt;:&lt;realm&gt;:&lt;credentials&gt;\n
+</pre></div>
+</td></tr></table></div>
+<p>Each line consists of three fields - username, realm, and credentials - each separated by a colon. The credentials
+field is opaque to the file resolver; it simply returns that value as-is to the caller. Therefore, this same file
+format serves both Basic and Digest authentication. In Basic authentication, the credentials field should be
+written in clear text. In Digest authentication, it should be the <em>MD5</em> hash described above.</p>
+<p>There are two equally easy ways to create a File resolver:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Authentication\Adapter\Http\FileResolver</span><span class="p">;</span>
+<span class="nv">$path</span>     <span class="o">=</span> <span class="s1">&#39;files/passwd.txt&#39;</span><span class="p">;</span>
+<span class="nv">$resolver</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileResolver</span><span class="p">(</span><span class="nv">$path</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>or</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$path</span>     <span class="o">=</span> <span class="s1">&#39;files/passwd.txt&#39;</span><span class="p">;</span>
+<span class="nv">$resolver</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileResolver</span><span class="p">();</span>
+<span class="nv">$resolver</span><span class="o">-&gt;</span><span class="na">setFile</span><span class="p">(</span><span class="nv">$path</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If the given path is empty or not readable, an exception is thrown.</p>
+</div>
+</div>
+<div class="section" id="basic-usage">
+<span id="zend-authentication-adapter-http-basic-usage"></span><h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>First, set up an array with the required configuration values:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$config</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;accept_schemes&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;basic digest&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;realm&#39;</span>          <span class="o">=&gt;</span> <span class="s1">&#39;My Web Site&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;digest_domains&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/members_only /my_account&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;nonce_timeout&#39;</span>  <span class="o">=&gt;</span> <span class="mi">3600</span><span class="p">,</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>This array will cause the adapter to accept either Basic or Digest authentication, and will require authenticated
+access to all the areas of the site under <tt class="docutils literal"><span class="pre">/members_only</span></tt> and <tt class="docutils literal"><span class="pre">/my_account</span></tt>. The realm value is usually
+displayed by the browser in the password dialog box. The <tt class="docutils literal"><span class="pre">nonce_timeout</span></tt>, of course, behaves as described above.</p>
+<p>Next, create the <tt class="docutils literal"><span class="pre">Zend\Authentication\Adapter\Http</span></tt> object:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Authentication\Adapter\Http</span><span class="p">(</span><span class="nv">$config</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Since we&#8217;re supporting both Basic and Digest authentication, we need two different resolver objects. Note that this
+could just as easily be two different classes:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Authentication\Adapter\Http\FileResolver</span><span class="p">;</span>
+
+<span class="nv">$basicResolver</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileResolver</span><span class="p">();</span>
+<span class="nv">$basicResolver</span><span class="o">-&gt;</span><span class="na">setFile</span><span class="p">(</span><span class="s1">&#39;files/basicPasswd.txt&#39;</span><span class="p">);</span>
+
+<span class="nv">$digestResolver</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FileResolver</span><span class="p">();</span>
+<span class="nv">$digestResolver</span><span class="o">-&gt;</span><span class="na">setFile</span><span class="p">(</span><span class="s1">&#39;files/digestPasswd.txt&#39;</span><span class="p">);</span>
+
+<span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">setBasicResolver</span><span class="p">(</span><span class="nv">$basicResolver</span><span class="p">);</span>
+<span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">setDigestResolver</span><span class="p">(</span><span class="nv">$digestResolver</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Finally, we perform the authentication. The adapter needs a reference to both the Request and Response objects in
+order to do its job:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nb">assert</span><span class="p">(</span><span class="nv">$request</span> <span class="nx">instanceof</span> <span class="nx">Zend\Http\Request</span><span class="p">);</span>
+<span class="nb">assert</span><span class="p">(</span><span class="nv">$response</span> <span class="nx">instanceof</span> <span class="nx">Zend\Http\Response</span><span class="p">);</span>
+
+<span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">setRequest</span><span class="p">(</span><span class="nv">$request</span><span class="p">);</span>
+<span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">setResponse</span><span class="p">(</span><span class="nv">$response</span><span class="p">);</span>
+
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">authenticate</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$result</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+    <span class="c1">// Bad userame/password, or canceled password prompt</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">HTTP Authentication Adapter</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#design-overview">Design Overview</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#resolvers">Resolvers</a><ul>
+<li><a class="reference internal" href="#file-resolver">File Resolver</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.authentication.adapter.digest.html"
+                        title="previous chapter">Digest Authentication</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.authentication.adapter.ldap.html"
+                        title="next chapter">LDAP Authentication</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.authentication.adapter.http.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.authentication.adapter.http.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.authentication.adapter.http.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.authentication.adapter.ldap.html" title="LDAP Authentication"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.authentication.adapter.digest.html" title="Digest Authentication"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.0.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.authentication.adapter.http.rst">
+                HTTP Authentication Adapter
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
