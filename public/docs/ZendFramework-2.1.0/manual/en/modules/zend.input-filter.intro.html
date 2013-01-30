@@ -1,0 +1,493 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Zend Framework 2 2.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.0 documentation" href="../index.html" />
+    <link rel="next" title="File Upload Input" href="zend.input-filter.file-input.html" />
+    <link rel="prev" title="I18n Validators" href="zend.i18n.validators.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.input-filter.file-input.html" title="File Upload Input"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.i18n.validators.html" title="I18n Validators"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<span id="zend-input-filter-intro"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">Zend\InputFilter</span></tt> component can be used to filter and validate generic sets of input data. For instance, you
+could use it to filter <tt class="docutils literal"><span class="pre">$_GET</span></tt> or <tt class="docutils literal"><span class="pre">$_POST</span></tt> values, CLI arguments, etc.</p>
+<p>To pass input data to the <tt class="docutils literal"><span class="pre">InputFilter</span></tt>, you can use the <tt class="docutils literal"><span class="pre">setData()</span></tt> method. The data must be specified using
+an associative array. Below is an example on how to validate the data coming from a form using the <em>POST</em> method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilter</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\Input</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Validator</span><span class="p">;</span>
+
+<span class="nv">$email</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Input</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">);</span>
+<span class="nv">$email</span><span class="o">-&gt;</span><span class="na">getValidatorChain</span><span class="p">()</span>
+      <span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="k">new</span> <span class="nx">Validator\EmailAddress</span><span class="p">());</span>
+
+<span class="nv">$password</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Input</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">);</span>
+<span class="nv">$password</span><span class="o">-&gt;</span><span class="na">getValidatorChain</span><span class="p">()</span>
+         <span class="o">-&gt;</span><span class="na">addValidator</span><span class="p">(</span><span class="k">new</span> <span class="nx">Validator\StringLength</span><span class="p">(</span><span class="mi">8</span><span class="p">));</span>
+
+<span class="nv">$inputFilter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InputFilter</span><span class="p">();</span>
+<span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$email</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$password</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;The form is valid</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;The form is not valid</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">getInvalidInput</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$error</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">print_r</span> <span class="p">(</span><span class="nv">$error</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>In this example we validated the email and password values. The email must be a valid address and the password must
+be composed with at least 8 characters. If the input data are not valid, we report the list of invalid input using
+the <tt class="docutils literal"><span class="pre">getInvalidInput()</span></tt> method.</p>
+<p>You can add one or more validators to each input using the <tt class="docutils literal"><span class="pre">addValidator()</span></tt> method for each validator. It is also
+possible to specify a &#8220;validation group&#8221;, a subset of the data to be validated; this may be done using the
+<tt class="docutils literal"><span class="pre">setValidationGroup()</span></tt> method. You can specify the list of the input names as an array or as individual
+parameters.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// As individual parameters</span>
+<span class="nv">$filterInput</span><span class="o">-&gt;</span><span class="na">setValidationGroup</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">);</span>
+
+<span class="c1">// or as an array of names</span>
+<span class="nv">$filterInput</span><span class="o">-&gt;</span><span class="na">setValidationGroup</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;email&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>You can validate and/or filter the data using the <tt class="docutils literal"><span class="pre">InputFilter</span></tt>. To filter data, use the <tt class="docutils literal"><span class="pre">getFilterChain()</span></tt>
+method of individual <tt class="docutils literal"><span class="pre">Input</span></tt> instances, and attach filters to the returned filter chain. Below is an example that
+uses filtering without validation.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\InputFilter\Input</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilter</span><span class="p">;</span>
+
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Input</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$input</span><span class="o">-&gt;</span><span class="na">getFilterChain</span><span class="p">()</span>
+      <span class="o">-&gt;</span><span class="na">attachByName</span><span class="p">(</span><span class="s1">&#39;stringtrim&#39;</span><span class="p">)</span>
+      <span class="o">-&gt;</span><span class="na">attachByName</span><span class="p">(</span><span class="s1">&#39;alpha&#39;</span><span class="p">);</span>
+
+<span class="nv">$inputFilter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InputFilter</span><span class="p">();</span>
+<span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$input</span><span class="p">)</span>
+            <span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;foo&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39; Bar3 &#39;</span><span class="p">,</span>
+            <span class="p">));</span>
+
+<span class="k">echo</span> <span class="s2">&quot;Before:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">getRawValue</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span> <span class="c1">// the output is &#39; Bar3 &#39;</span>
+<span class="k">echo</span> <span class="s2">&quot;After:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span> <span class="c1">// the output is &#39;Bar&#39;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getValue()</span></tt> method returns the filtered value of the &#8216;foo&#8217; input, while <tt class="docutils literal"><span class="pre">getRawValue()</span></tt> returns the
+original value of the input.</p>
+<p>We provide also <tt class="docutils literal"><span class="pre">Zend\InputFilter\Factory</span></tt>, to allow initialization of the <tt class="docutils literal"><span class="pre">InputFilter</span></tt> based on a
+configuration array (or <tt class="docutils literal"><span class="pre">Traversable</span></tt> object). Below is an example where we create a password input value with
+the same constraints proposed before (a string with at least 8 characters):</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\InputFilter\Factory</span><span class="p">;</span>
+
+<span class="nv">$factory</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Factory</span><span class="p">();</span>
+<span class="nv">$inputFilter</span> <span class="o">=</span> <span class="nv">$factory</span><span class="o">-&gt;</span><span class="na">createInputFilter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span>       <span class="o">=&gt;</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;required&#39;</span>   <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+        <span class="s1">&#39;validators&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;not_empty&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;string_length&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;min&#39;</span> <span class="o">=&gt;</span> <span class="mi">8</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+
+<span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$_POST</span><span class="p">);</span>
+<span class="k">echo</span> <span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">()</span> <span class="o">?</span> <span class="s2">&quot;Valid form&quot;</span> <span class="o">:</span> <span class="s2">&quot;Invalid form&quot;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The factory may be used to create not only <tt class="docutils literal"><span class="pre">Input</span></tt> instances, but also nested <tt class="docutils literal"><span class="pre">InputFilter</span></tt>s, allowing you to
+create validation and filtering rules for hierarchical data sets.</p>
+<p>Finally, the default <tt class="docutils literal"><span class="pre">InputFilter</span></tt> implementation is backed by a <tt class="docutils literal"><span class="pre">Factory</span></tt>. This means that when calling
+<tt class="docutils literal"><span class="pre">add()</span></tt>, you can provide a specification that the <tt class="docutils literal"><span class="pre">Factory</span></tt> would understand, and it will create the
+appropriate object. You may create either <tt class="docutils literal"><span class="pre">Input</span></tt> or <tt class="docutils literal"><span class="pre">InputFilter</span></tt> objects in this fashion.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilter</span><span class="p">;</span>
+
+<span class="nv">$filter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InputFilter</span><span class="p">();</span>
+
+<span class="c1">// Adding a single input</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+    <span class="s1">&#39;validators&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;not_empty&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;string_length&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;min&#39;</span> <span class="o">=&gt;</span> <span class="mi">5</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+
+<span class="c1">// Adding another input filter what also contains a single input. Merging both.</span>
+<span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Zend\InputFilter\InputFilter&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;required&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+        <span class="s1">&#39;validators&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;not_empty&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;string_length&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;min&#39;</span> <span class="o">=&gt;</span> <span class="mi">8</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.i18n.validators.html"
+                        title="previous chapter">I18n Validators</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.input-filter.file-input.html"
+                        title="next chapter">File Upload Input</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.input-filter.intro.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.input-filter.intro.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.input-filter.intro.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.input-filter.file-input.html" title="File Upload Input"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.i18n.validators.html" title="I18n Validators"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.input-filter.intro.rst">
+                Introduction
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

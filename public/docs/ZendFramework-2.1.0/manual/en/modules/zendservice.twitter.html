@@ -1,0 +1,938 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ZendServiceTwitter &mdash; Zend Framework 2 2.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.0 documentation" href="../index.html" />
+    <link rel="next" title="ZendServiceWindowsAzure" href="zendservice.windows-azure.html" />
+    <link rel="prev" title="ZendServiceTechnorati" href="zendservice.technorati.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zendservice.windows-azure.html" title="ZendServiceWindowsAzure"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zendservice.technorati.html" title="ZendServiceTechnorati"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zendservicetwitter">
+<span id="zendservice-twitter"></span><h1>ZendServiceTwitter<a class="headerlink" href="#zendservicetwitter" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zendservice-twitter-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt> provides a client for the <a class="reference external" href="http://apiwiki.twitter.com/Twitter-API-Documentation">Twitter RESTAPI</a>. <tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt> allows you to query
+the public timeline. If you provide a username and OAuth details for Twitter, it will allow you to get and update
+your status, reply to friends, direct message friends, mark tweets as favorite, and much more.</p>
+<p><tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt> implements a <em>REST</em> service, and all methods return an instance of
+<tt class="docutils literal"><span class="pre">Zend\Rest\Client\Result</span></tt>.</p>
+<p><tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt> is broken up into subsections so you can easily identify which type of call is being
+requested.</p>
+<ul class="simple">
+<li><em>account</em> makes sure that your account credentials are valid, checks your <em>API</em> rate limit, and ends the current
+session for the authenticated user.</li>
+<li><em>status</em> retrieves the public and user timelines and shows, updates, destroys, and retrieves replies for the
+authenticated user.</li>
+<li><em>user</em> retrieves friends and followers for the authenticated user and returns extended information about a passed
+user.</li>
+<li><em>directMessage</em> retrieves the authenticated user&#8217;s received direct messages, deletes direct messages, and sends
+new direct messages.</li>
+<li><em>friendship</em> creates and removes friendships for the authenticated user.</li>
+<li><em>favorite</em> lists, creates, and removes favorite tweets.</li>
+<li><em>block</em> blocks and unblocks users from following you.</li>
+</ul>
+</div>
+<div class="section" id="authentication">
+<span id="zendservice-twitter-authentication"></span><h2>Authentication<a class="headerlink" href="#authentication" title="Permalink to this headline">¶</a></h2>
+<p>With the exception of fetching the public timeline, <tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt> requires authentication as a valid
+user. This is achieved using the OAuth authentication protocol. OAuth is the only supported authentication mode for
+Twitter as of August 2010. The OAuth implementation used by <tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt> is <tt class="docutils literal"><span class="pre">ZendOAuth</span></tt>.</p>
+<p class="rubric" id="zendservice-twitter-authentication-example">Creating the Twitter Class</p>
+<p><tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt> must authorize itself, on behalf of a user, before use with the Twitter API (except for
+public timeline). This must be accomplished using OAuth since Twitter has disabled it&#8217;s basic HTTP authentication
+as of August 2010.</p>
+<p>There are two options to establishing authorization. The first is to implement the workflow of <tt class="docutils literal"><span class="pre">ZendOAuth</span></tt> via
+<tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt> which proxies to an internal <tt class="docutils literal"><span class="pre">ZendOAuth\Consumer</span></tt> object. Please refer to the
+<tt class="docutils literal"><span class="pre">ZendOAuth</span></tt> documentation for a full example of this workflow - you can call all documented
+<tt class="docutils literal"><span class="pre">ZendOAuth\Consumer</span></tt> methods on <tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt> including constructor options. You may also use
+<tt class="docutils literal"><span class="pre">ZendOAuth</span></tt> directly and only pass the resulting access token into <tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt>. This is the normal
+workflow once you have established a reusable access token for a particular Twitter user. The resulting OAuth
+access token should be stored to a database for future use (otherwise you will need to authorize for every new
+instance of <tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt>). Bear in mind that authorization via OAuth results in your user being
+redirected to Twitter to give their consent to the requested authorization (this is not repeated for stored access
+tokens). This will require additional work (i.e. redirecting users and hosting a callback URL) over the previous
+HTTP authentication mechanism where a user just needed to allow applications to store their username and password.</p>
+<p>The following example demonstrates setting up <tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt> which is given an already established OAuth
+access token. Please refer to the <tt class="docutils literal"><span class="pre">ZendOAuth</span></tt> documentation to understand the workflow involved. The access
+token is a serializable object, so you may store the serialized object to a database, and unserialize it at
+retrieval time before passing the objects into <tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt>. The <tt class="docutils literal"><span class="pre">ZendOAuth</span></tt> documentation
+demonstrates the workflow and objects involved.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">/**</span>
+<span class="sd"> * We assume $serializedToken is the serialized token retrieved from a database</span>
+<span class="sd"> * or even $_SESSION (if following the simple ZendOAuth documented example)</span>
+<span class="sd"> */</span>
+<span class="nv">$token</span> <span class="o">=</span> <span class="nb">unserialize</span><span class="p">(</span><span class="nv">$serializedToken</span><span class="p">);</span>
+
+<span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+
+<span class="c1">// verify user&#39;s credentials with Twitter</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">account</span><span class="o">-&gt;</span><span class="na">verifyCredentials</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>In order to authenticate with Twitter, ALL applications MUST be registered with Twitter in order to receive a
+Consumer Key and Consumer Secret to be used when authenticating with OAuth. This can not be reused across
+multiple applications - you must register each new application separately. Twitter access tokens have no expiry
+date, so storing them to a database is advised (they can, of course, be refreshed simply be repeating the OAuth
+authorization process). This can only be done while interacting with the user associated with that access token.</p>
+<p class="last">The previous pre-OAuth version of <tt class="docutils literal"><span class="pre">ZendService\Twitter</span></tt> allowed passing in a username as the first parameter
+rather than within an array. This is no longer supported.</p>
+</div>
+</div>
+<div class="section" id="account-methods">
+<span id="zendservice-twitter-account"></span><h2>Account Methods<a class="headerlink" href="#account-methods" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">verifyCredentials()</span></tt> tests if supplied user credentials are valid with minimal overhead.</p>
+<p class="rubric" id="zendservice-twitter-account-verifycredentails">Verifying credentials</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">account</span><span class="o">-&gt;</span><span class="na">verifyCredentials</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">endSession()</span></tt> signs users out of client-facing applications.</p>
+<p class="rubric" id="zendservice-twitter-account-endsession">Sessions ending</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">account</span><span class="o">-&gt;</span><span class="na">endSession</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">rateLimitStatus()</span></tt> returns the remaining number of <em>API</em> requests available to the authenticating user before
+the <em>API</em> limit is reached for the current hour.</p>
+<p class="rubric" id="zendservice-twitter-account-ratelimitstatus">Rating limit status</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">account</span><span class="o">-&gt;</span><span class="na">rateLimitStatus</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+</div>
+<div class="section" id="status-methods">
+<span id="zendservice-twitter-status"></span><h2>Status Methods<a class="headerlink" href="#status-methods" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">publicTimeline()</span></tt> returns the 20 most recent statuses from non-protected users with a custom user icon. The
+public timeline is cached by Twitter for 60 seconds.</p>
+<p class="rubric" id="zendservice-twitter-status-publictimeline">Retrieving public timeline</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">status</span><span class="o">-&gt;</span><span class="na">publicTimeline</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">friendsTimeline()</span></tt> returns the 20 most recent statuses posted by the authenticating user and that user&#8217;s
+friends.</p>
+<p class="rubric" id="zendservice-twitter-status-friendstimeline">Retrieving friends timeline</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">status</span><span class="o">-&gt;</span><span class="na">friendsTimeline</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">friendsTimeline()</span></tt> method accepts an array of optional parameters to modify the query.</p>
+<ul class="simple">
+<li><em>since</em> narrows the returned results to just those statuses created after the specified date/time (up to 24
+hours old).</li>
+<li><em>page</em> specifies which page you want to return.</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">userTimeline()</span></tt> returns the 20 most recent statuses posted from the authenticating user.</p>
+<p class="rubric" id="zendservice-twitter-status-usertimeline">Retrieving user timeline</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">status</span><span class="o">-&gt;</span><span class="na">userTimeline</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">userTimeline()</span></tt> method accepts an array of optional parameters to modify the query.</p>
+<ul class="simple">
+<li><em>id</em> specifies the ID or screen name of the user for whom to return the friends_timeline.</li>
+<li><em>since</em> narrows the returned results to just those statuses created after the specified date/time (up to 24
+hours old).</li>
+<li><em>page</em> specifies which page you want to return.</li>
+<li><em>count</em> specifies the number of statuses to retrieve. May not be greater than 200.</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">show()</span></tt> returns a single status, specified by the <em>id</em> parameter below. The status&#8217; author will be returned
+inline.</p>
+<p class="rubric" id="zendservice-twitter-status-show">Showing user status</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">status</span><span class="o">-&gt;</span><span class="na">show</span><span class="p">(</span><span class="mi">1234</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">update()</span></tt> updates the authenticating user&#8217;s status. This method requires that you pass in the status update
+that you want to post to Twitter.</p>
+<p class="rubric" id="zendservice-twitter-status-update">Updating user status</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">status</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">(</span><span class="s1">&#39;My Great Tweet&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">update()</span></tt> method accepts a second additional parameter.</p>
+<ul class="simple">
+<li><em>in_reply_to_status_id</em> specifies the ID of an existing status that the status to be posted is in reply to.</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">replies()</span></tt> returns the 20 most recent &#64;replies (status updates prefixed with &#64;username) for the authenticating
+user.</p>
+<p class="rubric" id="zendservice-twitter-status-replies">Showing user replies</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">status</span><span class="o">-&gt;</span><span class="na">replies</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">replies()</span></tt> method accepts an array of optional parameters to modify the query.</p>
+<ul class="simple">
+<li><em>since</em> narrows the returned results to just those statuses created after the specified date/time (up to 24
+hours old).</li>
+<li><em>page</em> specifies which page you want to return.</li>
+<li><em>since_id</em> returns only statuses with an ID greater than (that is, more recent than) the specified ID.</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">destroy()</span></tt> destroys the status specified by the required <em>id</em> parameter.</p>
+<p class="rubric" id="zendservice-twitter-status-destroy">Deleting user status</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">status</span><span class="o">-&gt;</span><span class="na">destroy</span><span class="p">(</span><span class="mi">12345</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+</div>
+<div class="section" id="user-methods">
+<span id="zendservice-twitter-user"></span><h2>User Methods<a class="headerlink" href="#user-methods" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">friends()</span></tt>r eturns up to 100 of the authenticating user&#8217;s friends who have most recently updated, each with
+current status inline.</p>
+<p class="rubric" id="zendservice-twitter-user-friends">Retrieving user friends</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">user</span><span class="o">-&gt;</span><span class="na">friends</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">friends()</span></tt> method accepts an array of optional parameters to modify the query.</p>
+<ul class="simple">
+<li><em>id</em> specifies the ID or screen name of the user for whom to return a list of friends.</li>
+<li><em>since</em> narrows the returned results to just those statuses created after the specified date/time (up to 24
+hours old).</li>
+<li><em>page</em> specifies which page you want to return.</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">followers()</span></tt> returns the authenticating user&#8217;s followers, each with current status inline.</p>
+<p class="rubric" id="zendservice-twitter-user-followers">Retrieving user followers</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">user</span><span class="o">-&gt;</span><span class="na">followers</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">followers()</span></tt> method accepts an array of optional parameters to modify the query.</p>
+<ul class="simple">
+<li><em>id</em> specifies the ID or screen name of the user for whom to return a list of followers.</li>
+<li><em>page</em> specifies which page you want to return.</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">show()</span></tt> returns extended information of a given user, specified by ID or screen name as per the required <em>id</em>
+parameter below.</p>
+<p class="rubric" id="zendservice-twitter-user-show">Showing user informations</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">user</span><span class="o">-&gt;</span><span class="na">show</span><span class="p">(</span><span class="s1">&#39;myfriend&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+</div>
+<div class="section" id="direct-message-methods">
+<span id="zendservice-twitter-directmessage"></span><h2>Direct Message Methods<a class="headerlink" href="#direct-message-methods" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">messages()</span></tt> returns a list of the 20 most recent direct messages sent to the authenticating user.</p>
+<p class="rubric" id="zendservice-twitter-directmessage-messages">Retrieving recent direct messages received</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">directMessage</span><span class="o">-&gt;</span><span class="na">messages</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">message()</span></tt> method accepts an array of optional parameters to modify the query.</p>
+<ul class="simple">
+<li><em>since_id</em> returns only direct messages with an ID greater than (that is, more recent than) the specified ID.</li>
+<li><em>since</em> narrows the returned results to just those statuses created after the specified date/time (up to 24
+hours old).</li>
+<li><em>page</em> specifies which page you want to return.</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">sent()</span></tt> returns a list of the 20 most recent direct messages sent by the authenticating user.</p>
+<p class="rubric" id="zendservice-twitter-directmessage-sent">Retrieving recent direct messages sent</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">directMessage</span><span class="o">-&gt;</span><span class="na">sent</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">sent()</span></tt> method accepts an array of optional parameters to modify the query.</p>
+<ul class="simple">
+<li><em>since_id</em> returns only direct messages with an ID greater than (that is, more recent than) the specified ID.</li>
+<li><em>since</em> narrows the returned results to just those statuses created after the specified date/time (up to 24
+hours old).</li>
+<li><em>page</em> specifies which page you want to return.</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">new()</span></tt> sends a new direct message to the specified user from the authenticating user. Requires both the user
+and text parameters below.</p>
+<p class="rubric" id="zendservice-twitter-directmessage-new">Sending direct message</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">directMessage</span><span class="o">-&gt;</span><span class="na">new</span><span class="p">(</span><span class="s1">&#39;myfriend&#39;</span><span class="p">,</span> <span class="s1">&#39;mymessage&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">destroy()</span></tt> destroys the direct message specified in the required <em>id</em> parameter. The authenticating user must
+be the recipient of the specified direct message.</p>
+<p class="rubric" id="zendservice-twitter-directmessage-destroy">Deleting direct message</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">directMessage</span><span class="o">-&gt;</span><span class="na">destroy</span><span class="p">(</span><span class="mi">123548</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+</div>
+<div class="section" id="friendship-methods">
+<span id="zendservice-twitter-friendship"></span><h2>Friendship Methods<a class="headerlink" href="#friendship-methods" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">create()</span></tt> befriends the user specified in the <em>id</em> parameter with the authenticating user.</p>
+<p class="rubric" id="zendservice-twitter-friendship-create">Creating friend</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">friendship</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="s1">&#39;mynewfriend&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">destroy()</span></tt> discontinues friendship with the user specified in the <em>id</em> parameter and the authenticating user.</p>
+<p class="rubric" id="zendservice-twitter-friendship-destroy">Deleting friend</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">friendship</span><span class="o">-&gt;</span><span class="na">destroy</span><span class="p">(</span><span class="s1">&#39;myoldfriend&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">exists()</span></tt> tests if a friendship exists between the user specified in the <em>id</em> parameter and the authenticating
+user.</p>
+<p class="rubric" id="zendservice-twitter-friendship-exists">Checking friend existence</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">friendship</span><span class="o">-&gt;</span><span class="na">exists</span><span class="p">(</span><span class="s1">&#39;myfriend&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+</div>
+<div class="section" id="favorite-methods">
+<span id="zendservice-twitter-favorite"></span><h2>Favorite Methods<a class="headerlink" href="#favorite-methods" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">favorites()</span></tt> returns the 20 most recent favorite statuses for the authenticating user or user specified by the
+<em>id</em> parameter.</p>
+<p class="rubric" id="zendservice-twitter-favorite-favorites">Retrieving favorites</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">favorite</span><span class="o">-&gt;</span><span class="na">favorites</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">favorites()</span></tt> method accepts an array of optional parameters to modify the query.</p>
+<ul class="simple">
+<li><em>id</em> specifies the ID or screen name of the user for whom to request a list of favorite statuses.</li>
+<li><em>page</em> specifies which page you want to return.</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">create()</span></tt> favorites the status specified in the <em>id</em> parameter as the authenticating user.</p>
+<p class="rubric" id="zendservice-twitter-favorite-create">Creating favorites</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">favorite</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="mi">12351</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">destroy()</span></tt> un-favorites the status specified in the <em>id</em> parameter as the authenticating user.</p>
+<p class="rubric" id="zendservice-twitter-favorite-destroy">Deleting favorites</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">favorite</span><span class="o">-&gt;</span><span class="na">destroy</span><span class="p">(</span><span class="mi">12351</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ul>
+</div>
+<div class="section" id="block-methods">
+<span id="zendservice-twitter-block"></span><h2>Block Methods<a class="headerlink" href="#block-methods" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">exists()</span></tt> checks if the authenticating user is blocking a target user and can optionally return the blocked
+user&#8217;s object if a block does exists.</p>
+<p class="rubric" id="zendservice-twitter-block-exists">Checking if block exists</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+
+<span class="c1">// returns true or false</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">block</span><span class="o">-&gt;</span><span class="na">exists</span><span class="p">(</span><span class="s1">&#39;blockeduser&#39;</span><span class="p">);</span>
+
+<span class="c1">// returns the blocked user&#39;s info if the user is blocked</span>
+<span class="nv">$response2</span> <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">block</span><span class="o">-&gt;</span><span class="na">exists</span><span class="p">(</span><span class="s1">&#39;blockeduser&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">favorites()</span></tt> method accepts a second optional parameter.</p>
+<ul class="simple">
+<li><em>returnResult</em> specifies whether or not return the user object instead of just <tt class="docutils literal"><span class="pre">TRUE</span></tt> or <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</li>
+</ul>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">create()</span></tt> blocks the user specified in the <em>id</em> parameter as the authenticating user and destroys a friendship
+to the blocked user if one exists. Returns the blocked user in the requested format when successful.</p>
+<p class="rubric" id="zendservice-twitter-block-create">Blocking a user</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">block</span><span class="o">-&gt;</span><span class="na">create</span><span class="p">(</span><span class="err">&#39;</span><span class="nx">usertoblock</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">destroy()</span></tt> un-blocks the user specified in the <em>id</em> parameter for the authenticating user. Returns the
+un-blocked user in the requested format when successful.</p>
+<p class="rubric" id="zendservice-twitter-block-destroy">Removing a block</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+<span class="nv">$response</span>   <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">block</span><span class="o">-&gt;</span><span class="na">destroy</span><span class="p">(</span><span class="s1">&#39;blockeduser&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">blocking()</span></tt> returns an array of user objects that the authenticating user is blocking.</p>
+<p class="rubric" id="zendservice-twitter-block-blocking">Who are you blocking</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Twitter</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;johndoe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;accessToken&#39;</span> <span class="o">=&gt;</span> <span class="nv">$token</span>
+<span class="p">));</span>
+
+<span class="c1">// return the full user list from the first page</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">block</span><span class="o">-&gt;</span><span class="na">blocking</span><span class="p">();</span>
+
+<span class="c1">// return an array of numeric user IDs from the second page</span>
+<span class="nv">$response2</span> <span class="o">=</span> <span class="nv">$twitter</span><span class="o">-&gt;</span><span class="na">block</span><span class="o">-&gt;</span><span class="na">blocking</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">favorites()</span></tt> method accepts two optional parameters.</p>
+<ul class="simple">
+<li><em>page</em> specifies which page ou want to return. A single page contains 20 IDs.</li>
+<li><em>returnUserIds</em> specifies whether to return an array of numeric user IDs the authenticating user is blocking
+instead of an array of user objects.</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="zendservicetwittersearch">
+<span id="zendservice-twitter-search"></span><h1>ZendServiceTwitterSearch<a class="headerlink" href="#zendservicetwittersearch" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="zendservice-twitter-search-introduction">
+<span id="id1"></span><h2>Introduction<a class="headerlink" href="#zendservice-twitter-search-introduction" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">ZendService\Twitter\Search</span></tt> provides a client for the <a class="reference external" href="http://apiwiki.twitter.com/Search+API+Documentation">Twitter Search API</a>. The Twitter Search service is use
+to search Twitter. Currently, it only returns data in Atom or <em>JSON</em> format, but a full <em>REST</em> service is in the
+future, which will support <em>XML</em> responses.</p>
+</div>
+<div class="section" id="twitter-trends">
+<span id="zendservice-twitter-search-trends"></span><h2>Twitter Trends<a class="headerlink" href="#twitter-trends" title="Permalink to this headline">¶</a></h2>
+<p>Returns the top ten queries that are currently trending on Twitter. The response includes the time of the request,
+the name of each trending topic, and the url to the Twitter Search results page for that topic. Currently the
+search <em>API</em> for trends only supports a <em>JSON</em> return so the function returns an array.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitterSearch</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Search</span><span class="p">();</span>
+<span class="nv">$twitterTrends</span>  <span class="o">=</span> <span class="nv">$twitterSearch</span><span class="o">-&gt;</span><span class="na">trends</span><span class="p">();</span>
+
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$twitterTrends</span> <span class="k">as</span> <span class="nv">$trend</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">print</span> <span class="nv">$trend</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="s1">&#39; - &#39;</span> <span class="o">.</span> <span class="nv">$trend</span><span class="p">[</span><span class="s1">&#39;url&#39;</span><span class="p">]</span> <span class="o">.</span> <span class="nx">PHP_EOL</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The return array has two values in it:</p>
+<ul class="simple">
+<li><em>name</em> is the name of trend.</li>
+<li><em>url</em> is the <em>URL</em> to see the tweets for that trend.</li>
+</ul>
+</div>
+<div class="section" id="searching-twitter">
+<span id="zendservice-twitter-search-search"></span><h2>Searching Twitter<a class="headerlink" href="#searching-twitter" title="Permalink to this headline">¶</a></h2>
+<p>Using the search method returns tweets that match a specific query. There are a number of <a class="reference external" href="http://search.twitter.com/operators">Search Operators</a> that
+you can use to query with.</p>
+<p>The search method can accept six different optional <em>URL</em> parameters passed in as an array:</p>
+<ul class="simple">
+<li><em>lang</em> restricts the tweets to a given language. <em>lang</em> must be given by an <a class="reference external" href="http://en.wikipedia.org/wiki/ISO_639-1">ISO 639-1 code</a>.</li>
+<li><em>rpp</em> is the number of tweets to return per page, up to a maximum of 100.</li>
+<li><em>page</em> specifies the page number to return, up to a maximum of roughly 1500 results (based on rpp * page).</li>
+<li><em>since_id</em> returns tweets with status IDs greater than the given ID.</li>
+<li><em>show_user</em> specifies whether to add &#8220;&gt;user&lt;:&#8221; to the beginning of the tweet. This is useful for readers that do
+not display Atom&#8217;s author field. The default is &#8220;<tt class="docutils literal"><span class="pre">FALSE</span></tt>&#8221;.</li>
+<li><em>geocode</em> returns tweets by users located within a given radius of the given latitude/longitude, where the user&#8217;s
+location is taken from their Twitter profile. The parameter value is specified by &#8220;latitude,longitude,radius&#8221;,
+where radius units must be specified as either &#8220;mi&#8221; (miles) or &#8220;km&#8221; (kilometers).</li>
+</ul>
+<p class="rubric" id="zendservice-twitter-search-search-json">JSON Search Example</p>
+<p>The following code sample will return an array with the search results.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitterSearch</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Search</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">);</span>
+<span class="nv">$searchResults</span>  <span class="o">=</span> <span class="nv">$twitterSearch</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">(</span><span class="s1">&#39;zend&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;lang&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;en&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zendservice-twitter-search-search-atom">ATOM Search Example</p>
+<p>The following code sample will return a <tt class="docutils literal"><span class="pre">Zend\Feed\Atom</span></tt> object.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$twitterSearch</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Twitter\Search</span><span class="p">(</span><span class="s1">&#39;atom&#39;</span><span class="p">);</span>
+<span class="nv">$searchResults</span>  <span class="o">=</span> <span class="nv">$twitterSearch</span><span class="o">-&gt;</span><span class="na">search</span><span class="p">(</span><span class="s1">&#39;zend&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;lang&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;en&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="zend-specific-accessor-methods">
+<span id="zendservice-twitter-search-accessors"></span><h2>Zend-specific Accessor Methods<a class="headerlink" href="#zend-specific-accessor-methods" title="Permalink to this headline">¶</a></h2>
+<p>While the Twitter Search <em>API</em> only specifies two methods, <tt class="docutils literal"><span class="pre">ZendService\Twitter\Search</span></tt> has additional methods
+that may be used for retrieving and modifying internal properties.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">getResponseType()</span></tt> and <tt class="docutils literal"><span class="pre">setResponseType()</span></tt> allow you to retrieve and modify the response type of the search
+between <em>JSON</em> and Atom.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ZendServiceTwitter</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#authentication">Authentication</a></li>
+<li><a class="reference internal" href="#account-methods">Account Methods</a></li>
+<li><a class="reference internal" href="#status-methods">Status Methods</a></li>
+<li><a class="reference internal" href="#user-methods">User Methods</a></li>
+<li><a class="reference internal" href="#direct-message-methods">Direct Message Methods</a></li>
+<li><a class="reference internal" href="#friendship-methods">Friendship Methods</a></li>
+<li><a class="reference internal" href="#favorite-methods">Favorite Methods</a></li>
+<li><a class="reference internal" href="#block-methods">Block Methods</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zendservicetwittersearch">ZendServiceTwitterSearch</a><ul>
+<li><a class="reference internal" href="#zendservice-twitter-search-introduction">Introduction</a></li>
+<li><a class="reference internal" href="#twitter-trends">Twitter Trends</a></li>
+<li><a class="reference internal" href="#searching-twitter">Searching Twitter</a></li>
+<li><a class="reference internal" href="#zend-specific-accessor-methods">Zend-specific Accessor Methods</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zendservice.technorati.html"
+                        title="previous chapter">ZendServiceTechnorati</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zendservice.windows-azure.html"
+                        title="next chapter">ZendServiceWindowsAzure</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendservice.twitter.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendservice.twitter.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendservice.twitter.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zendservice.windows-azure.html" title="ZendServiceWindowsAzure"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zendservice.technorati.html" title="ZendServiceTechnorati"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendservice.twitter.rst">
+                ZendServiceTwitter
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

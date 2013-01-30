@@ -1,0 +1,657 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Advanced Usage &mdash; Zend Framework 2 2.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.0 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="advanced-usage">
+<span id="zend-session-advanced-usage"></span><h1>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Permalink to this headline">¶</a></h1>
+<p>While the basic usage examples are a perfectly acceptable way to utilize Zend Framework sessions, there are some
+best practices to consider. This section discusses the finer details of session handling and illustrates more
+advanced usage of the <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> component.</p>
+<div class="section" id="starting-a-session">
+<span id="zend-session-advanced-usage-starting-a-session"></span><h2>Starting a Session<a class="headerlink" href="#starting-a-session" title="Permalink to this headline">¶</a></h2>
+<p>If you want all requests to have a session facilitated by <tt class="docutils literal"><span class="pre">Zend\Session</span></tt>, then start the session in the bootstrap
+file:</p>
+<p class="rubric" id="zend-session-advanced-usage-starting-a-session-example">Starting the Global Session</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Zend\Session\Session</span><span class="o">::</span><span class="na">start</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>By starting the session in the bootstrap file, you avoid the possibility that your session might be started after
+headers have been sent to the browser, which results in an exception, and possibly a broken page for website
+viewers. Various advanced features require <tt class="docutils literal"><span class="pre">Zend\Session\Session::start()</span></tt> first. (More on advanced features later.)</p>
+<p>There are four ways to start a session, when using <tt class="docutils literal"><span class="pre">Zend\Session</span></tt>. Two are wrong.</p>
+<dl class="docutils">
+<dt>. Wrong: Do not enable <em>PHP</em>&#8216;s <a class="reference external" href="http://www.php.net/manual/en/ref.session.php#ini.session.auto-start">session.auto_start setting</a>. If you do not have the ability to disable this</dt>
+<dd><p class="first">setting in php.ini, you are using mod_php (or equivalent), and the setting is already enabled in <em>php.ini</em>, then
+add the following to your <em>.htaccess</em> file (usually in your <em>HTML</em> document root directory):</p>
+<div class="last highlight-apache"><pre>php_value session.auto_start 0</pre>
+</div>
+</dd>
+<dt>. Wrong: Do not use <em>PHP</em>&#8216;s <a class="reference external" href="http://www.php.net/session_start">session_start()</a> function directly. If you use <tt class="docutils literal"><span class="pre">session_start()</span></tt> directly, and then</dt>
+<dd>start using <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt>, an exception will be thrown by <tt class="docutils literal"><span class="pre">Zend\Session\Session::start()</span></tt> (&#8220;session has
+already been started&#8221;). If you call <tt class="docutils literal"><span class="pre">session_start()</span></tt> after using <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt> or calling
+<tt class="docutils literal"><span class="pre">Zend\Session\Session::start()</span></tt>, an error of level <tt class="docutils literal"><span class="pre">E_NOTICE</span></tt> will be generated, and the call will be ignored.</dd>
+<dt>. Correct: Use <tt class="docutils literal"><span class="pre">Zend\Session\Session::start()</span></tt>. If you want all requests to have and use sessions, then place this</dt>
+<dd><p class="first">function call early and unconditionally in your bootstrap code. Sessions have some overhead. If some requests
+need sessions, but other requests will not need to use sessions, then:</p>
+<ul class="simple">
+<li>Unconditionally set the <em>strict</em> option to <tt class="docutils literal"><span class="pre">TRUE</span></tt> using <tt class="docutils literal"><span class="pre">Zend\Session\Session::setOptions()</span></tt> in your bootstrap.</li>
+<li>Call <tt class="docutils literal"><span class="pre">Zend\Session\Session::start()</span></tt> only for requests that need to use sessions and before any
+<tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt> objects are instantiated.</li>
+<li>Use &#8220;<em>new ZendSessionNamespace()</em>&#8221; normally, where needed, but make sure <tt class="docutils literal"><span class="pre">Zend\Session\Session::start()</span></tt> has been
+called previously.</li>
+</ul>
+<p class="last">The <em>strict</em> option prevents <em>new ZendSessionNamespace()</em> from automatically starting the session using
+<tt class="docutils literal"><span class="pre">Zend\Session\Session::start()</span></tt>. Thus, this option helps application developers enforce a design decision to avoid
+using sessions for certain requests, since it causes an exception to be thrown when <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt> is
+instantiated before <tt class="docutils literal"><span class="pre">Zend\Session\Session::start()</span></tt> is called. Developers should carefully consider the impact of using
+<tt class="docutils literal"><span class="pre">Zend\Session\Session::setOptions()</span></tt>, since these options have global effect, owing to their correspondence to the
+underlying options for ext/session.</p>
+</dd>
+<dt>. Correct: Just instantiate <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt> whenever needed, and the underlying <em>PHP</em> session will be</dt>
+<dd>automatically started. This offers extremely simple usage that works well in most situations. However, you then
+become responsible for ensuring that the first <em>new ZendSessionNamespace()</em> happens <strong>before</strong> any output
+(e.g., <a class="reference external" href="http://www.php.net/headers_sent">HTTP headers</a>) has been sent by <em>PHP</em> to the client, if you are using the default, cookie-based sessions
+(strongly recommended). See <a class="reference internal" href="zend.session.global-session-management.html#zend-session-global-session-management-headers-sent"><em>this section</em></a> for more
+information.</dd>
+</dl>
+</div>
+<div class="section" id="locking-session-namespaces">
+<span id="zend-session-advanced-usage-locking"></span><h2>Locking Session Namespaces<a class="headerlink" href="#locking-session-namespaces" title="Permalink to this headline">¶</a></h2>
+<p>Session namespaces can be locked, to prevent further alterations to the data in that namespace. Use <tt class="docutils literal"><span class="pre">lock()</span></tt> to
+make a specific namespace read-only, <tt class="docutils literal"><span class="pre">unLock()</span></tt> to make a read-only namespace read-write, and <tt class="docutils literal"><span class="pre">isLocked()</span></tt> to
+test if a namespace has been previously locked. Locks are transient and do not persist from one request to the
+next. Locking the namespace has no effect on setter methods of objects stored in the namespace, but does prevent
+the use of the namespace&#8217;s setter method to remove or replace objects stored directly in the namespace. Similarly,
+locking <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt> instances does not prevent the use of symbol table aliases to the same data (see
+<a class="reference external" href="http://www.php.net/references">PHP references</a>).</p>
+<p class="rubric" id="zend-session-advanced-usage-locking-example-basic">Locking Session Namespaces</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$userProfileNamespace</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">(</span><span class="s1">&#39;userProfileNamespace&#39;</span><span class="p">);</span>
+
+<span class="c1">// marking session as read only locked</span>
+<span class="nv">$userProfileNamespace</span><span class="o">-&gt;</span><span class="na">lock</span><span class="p">();</span>
+
+<span class="c1">// unlocking read-only lock</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$userProfileNamespace</span><span class="o">-&gt;</span><span class="na">isLocked</span><span class="p">())</span> <span class="p">{</span>
+    <span class="nv">$userProfileNamespace</span><span class="o">-&gt;</span><span class="na">unLock</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="namespace-expiration">
+<span id="zend-session-advanced-usage-expiration"></span><h2>Namespace Expiration<a class="headerlink" href="#namespace-expiration" title="Permalink to this headline">¶</a></h2>
+<p>Limits can be placed on the longevity of both namespaces and individual keys in namespaces. Common use cases
+include passing temporary information between requests, and reducing exposure to certain security risks by removing
+access to potentially sensitive information some time after authentication occurred. Expiration can be based on
+either elapsed seconds or the number of &#8220;hops&#8221;, where a hop occurs for each successive request.</p>
+<p class="rubric" id="zend-session-advanced-usage-expiration-example">Expiration Examples</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">(</span><span class="s1">&#39;expireAll&#39;</span><span class="p">);</span>
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">a</span> <span class="o">=</span> <span class="s1">&#39;apple&#39;</span><span class="p">;</span>
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">p</span> <span class="o">=</span> <span class="s1">&#39;pear&#39;</span><span class="p">;</span>
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">o</span> <span class="o">=</span> <span class="s1">&#39;orange&#39;</span><span class="p">;</span>
+
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">setExpirationSeconds</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">);</span> <span class="c1">// expire only the key &quot;a&quot; in 5 seconds</span>
+
+<span class="c1">// expire entire namespace in 5 &quot;hops&quot;</span>
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">setExpirationHops</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">setExpirationSeconds</span><span class="p">(</span><span class="mi">60</span><span class="p">);</span>
+<span class="c1">// The &quot;expireAll&quot; namespace will be marked &quot;expired&quot; on</span>
+<span class="c1">// the first request received after 60 seconds have elapsed,</span>
+<span class="c1">// or in 5 hops, whichever happens first.</span>
+</pre></div>
+</td></tr></table></div>
+<p>When working with data expiring from the session in the current request, care should be used when retrieving them.
+Although the data are returned by reference, modifying the data will not make expiring data persist past the
+current request. In order to &#8220;reset&#8221; the expiration time, fetch the data into temporary variables, use the
+namespace to unset them, and then set the appropriate keys again.</p>
+</div>
+<div class="section" id="session-encapsulation-and-controllers">
+<span id="zend-session-advanced-usage-controllers"></span><h2>Session Encapsulation and Controllers<a class="headerlink" href="#session-encapsulation-and-controllers" title="Permalink to this headline">¶</a></h2>
+<p>Namespaces can also be used to separate session access by controllers to protect variables from contamination. For
+example, an authentication controller might keep its session state data separate from all other controllers for
+meeting security requirements.</p>
+<p class="rubric" id="zend-session-advanced-usage-controllers-example">Namespaced Sessions for Controllers with Automatic Expiration</p>
+<p>The following code, as part of a controller that displays a test question, initiates a boolean variable to
+represent whether or not a submitted answer to the test question should be accepted. In this case, the application
+user is given 300 seconds to answer the displayed question.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// ...</span>
+<span class="c1">// in the question view controller</span>
+<span class="nv">$testSpace</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">(</span><span class="s1">&#39;testSpace&#39;</span><span class="p">);</span>
+<span class="c1">// expire only this variable</span>
+<span class="nv">$testSpace</span><span class="o">-&gt;</span><span class="na">setExpirationSeconds</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="s1">&#39;accept_answer&#39;</span><span class="p">);</span>
+<span class="nv">$testSpace</span><span class="o">-&gt;</span><span class="na">accept_answer</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="c1">//...</span>
+</pre></div>
+</td></tr></table></div>
+<p>Below, the controller that processes the answers to test questions determines whether or not to accept an answer
+based on whether the user submitted the answer within the allotted time:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// ...</span>
+<span class="c1">// in the answer processing controller</span>
+<span class="nv">$testSpace</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">(</span><span class="s1">&#39;testSpace&#39;</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$testSpace</span><span class="o">-&gt;</span><span class="na">accept_answer</span> <span class="o">===</span> <span class="k">true</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// within time</span>
+<span class="p">}</span>
+<span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// not within time</span>
+<span class="p">}</span>
+<span class="c1">// ...</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="preventing-multiple-instances-per-namespace">
+<span id="zend-session-advanced-usage-single-instance"></span><h2>Preventing Multiple Instances per Namespace<a class="headerlink" href="#preventing-multiple-instances-per-namespace" title="Permalink to this headline">¶</a></h2>
+<p>Although <a class="reference internal" href="#zend-session-advanced-usage-locking"><em>session locking</em></a> provides a good degree of protection against
+unintended use of namespaced session data, <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt> also features the ability to prevent the
+creation of multiple instances corresponding to a single namespace.</p>
+<p>To enable this behavior, pass <tt class="docutils literal"><span class="pre">TRUE</span></tt> to the second constructor argument when creating the last allowed instance
+of <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt>. Any subsequent attempt to instantiate the same namespace would result in a thrown
+exception.</p>
+<p class="rubric" id="zend-session-advanced-usage-single-instance-example">Limiting Session Namespace Access to a Single Instance</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// create an instance of a namespace</span>
+<span class="nv">$authSpaceAccessor1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">(</span><span class="s1">&#39;Zend_Auth&#39;</span><span class="p">);</span>
+
+<span class="c1">// create another instance of the same namespace, but disallow any</span>
+<span class="c1">// new instances</span>
+<span class="nv">$authSpaceAccessor2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">(</span><span class="s1">&#39;Zend_Auth&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>
+
+<span class="c1">// making a reference is still possible</span>
+<span class="nv">$authSpaceAccessor3</span> <span class="o">=</span> <span class="nv">$authSpaceAccessor2</span><span class="p">;</span>
+
+<span class="nv">$authSpaceAccessor1</span><span class="o">-&gt;</span><span class="na">foo</span> <span class="o">=</span> <span class="s1">&#39;bar&#39;</span><span class="p">;</span>
+
+<span class="nb">assert</span><span class="p">(</span><span class="nv">$authSpaceAccessor2</span><span class="o">-&gt;</span><span class="na">foo</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">);</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$aNamespaceObject</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">(</span><span class="s1">&#39;Zend_Auth&#39;</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend\Session\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;Cannot instantiate this namespace since &#39;</span> <span class="o">.</span>
+         <span class="s1">&#39;$authSpaceAccessor2 was created\n&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The second parameter in the constructor above tells <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt> that any future instances with the
+&#8220;<tt class="docutils literal"><span class="pre">Zend_Auth</span></tt>&#8221; namespace are not allowed. Attempting to create such an instance causes an exception to be thrown
+by the constructor. The developer therefore becomes responsible for storing a reference to an instance object
+(<tt class="docutils literal"><span class="pre">$authSpaceAccessor1</span></tt>, <tt class="docutils literal"><span class="pre">$authSpaceAccessor2</span></tt>, or <tt class="docutils literal"><span class="pre">$authSpaceAccessor3</span></tt> in the example above) somewhere, if
+access to the session namespace is needed at a later time during the same request. For example, a developer may
+store the reference in a static variable, add the reference to a <a class="reference external" href="http://www.martinfowler.com/eaaCatalog/registry.html">registry</a> (see <em class="xref std std-ref">Zend_Registry</em>), or otherwise make it available to other methods that may need access to the session namespace.</p>
+</div>
+<div class="section" id="working-with-arrays">
+<span id="zend-session-advanced-usage-arrays"></span><h2>Working with Arrays<a class="headerlink" href="#working-with-arrays" title="Permalink to this headline">¶</a></h2>
+<p>Due to the implementation history of <em>PHP</em> magic methods, modifying an array inside a namespace may not work under
+<em>PHP</em> versions before 5.2.1. If you will only be working with <em>PHP</em> 5.2.1 or later, then you may <a class="reference internal" href="#zend-session-advanced-usage-objects"><em>skip to the
+next section</em></a>.</p>
+<p class="rubric" id="zend-session-advanced-usage-arrays-example-modifying">Modifying Array Data with a Session Namespace</p>
+<p>The following illustrates how the problem may be reproduced:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$sessionNamespace</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">();</span>
+<span class="nv">$sessionNamespace</span><span class="o">-&gt;</span><span class="na">array</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+<span class="c1">// may not work as expected before PHP 5.2.1</span>
+<span class="nv">$sessionNamespace</span><span class="o">-&gt;</span><span class="na">array</span><span class="p">[</span><span class="s1">&#39;testKey&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">echo</span> <span class="nv">$sessionNamespace</span><span class="o">-&gt;</span><span class="na">array</span><span class="p">[</span><span class="s1">&#39;testKey&#39;</span><span class="p">];</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-session-advanced-usage-arrays-example-building-prior">Building Arrays Prior to Session Storage</p>
+<p>If possible, avoid the problem altogether by storing arrays into a session namespace only after all desired array
+values have been set.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$sessionNamespace</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">(</span><span class="s1">&#39;Foo&#39;</span><span class="p">);</span>
+<span class="nv">$sessionNamespace</span><span class="o">-&gt;</span><span class="na">array</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you are using an affected version of <em>PHP</em> and need to modify the array after assigning it to a session
+namespace key, you may use either or both of the following workarounds.</p>
+<p class="rubric" id="zend-session-advanced-usage-arrays-example-workaround-reassign">Workaround: Reassign a Modified Array</p>
+<p>In the code that follows, a copy of the stored array is created, modified, and reassigned to the location from
+which the copy was created, overwriting the original array.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$sessionNamespace</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">();</span>
+
+<span class="c1">// assign the initial array</span>
+<span class="nv">$sessionNamespace</span><span class="o">-&gt;</span><span class="na">array</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;tree&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;apple&#39;</span><span class="p">);</span>
+
+<span class="c1">// make a copy of the array</span>
+<span class="nv">$tmp</span> <span class="o">=</span> <span class="nv">$sessionNamespace</span><span class="o">-&gt;</span><span class="na">array</span><span class="p">;</span>
+
+<span class="c1">// modfiy the array copy</span>
+<span class="nv">$tmp</span><span class="p">[</span><span class="s1">&#39;fruit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;peach&#39;</span><span class="p">;</span>
+
+<span class="c1">// assign a copy of the array back to the session namespace</span>
+<span class="nv">$sessionNamespace</span><span class="o">-&gt;</span><span class="na">array</span> <span class="o">=</span> <span class="nv">$tmp</span><span class="p">;</span>
+
+<span class="k">echo</span> <span class="nv">$sessionNamespace</span><span class="o">-&gt;</span><span class="na">array</span><span class="p">[</span><span class="s1">&#39;fruit&#39;</span><span class="p">];</span> <span class="c1">// prints &quot;peach&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-session-advanced-usage-arrays-example-workaround-reference">Workaround: store array containing reference</p>
+<p>Alternatively, store an array containing a reference to the desired array, and then access it indirectly.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$myNamespace</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">(</span><span class="s1">&#39;myNamespace&#39;</span><span class="p">);</span>
+<span class="nv">$a</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+<span class="nv">$myNamespace</span><span class="o">-&gt;</span><span class="na">someArray</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span> <span class="o">&amp;</span><span class="nv">$a</span> <span class="p">);</span>
+<span class="nv">$a</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;bar&#39;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="nv">$myNamespace</span><span class="o">-&gt;</span><span class="na">someArray</span><span class="p">[</span><span class="s1">&#39;foo&#39;</span><span class="p">];</span> <span class="c1">// prints &quot;bar&quot;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="using-sessions-with-objects">
+<span id="zend-session-advanced-usage-objects"></span><h2>Using Sessions with Objects<a class="headerlink" href="#using-sessions-with-objects" title="Permalink to this headline">¶</a></h2>
+<p>If you plan to persist objects in the <em>PHP</em> session, know that they will be <a class="reference external" href="http://www.php.net/manual/en/language.oop5.serialization.php">serialized</a> for storage. Thus, any
+object persisted with the <em>PHP</em> session must be unserialized upon retrieval from storage. The implication is that
+the developer must ensure that the classes for the persisted objects must have been defined before the object is
+unserialized from session storage. If an unserialized object&#8217;s class is not defined, then it becomes an instance of
+<em>stdClass</em>.</p>
+</div>
+<div class="section" id="using-sessions-with-unit-tests">
+<span id="zend-session-advanced-usage-testing"></span><h2>Using Sessions with Unit Tests<a class="headerlink" href="#using-sessions-with-unit-tests" title="Permalink to this headline">¶</a></h2>
+<p>Zend Framework relies on PHPUnit to facilitate testing of itself. Many developers extend the existing suite of unit
+tests to cover the code in their applications. The exception &#8220;<strong>ZendSession is currently marked as read-only</strong>&#8221; is
+thrown while performing unit tests, if any write-related methods are used after ending the session. However, unit
+tests using <tt class="docutils literal"><span class="pre">Zend\Session</span></tt> require extra attention, because closing (<tt class="docutils literal"><span class="pre">Zend\Session\Session::writeClose()</span></tt>), or
+destroying a session (<tt class="docutils literal"><span class="pre">Zend\Session\Session::destroy()</span></tt>) prevents any further setting or unsetting of keys in any
+instance of <tt class="docutils literal"><span class="pre">Zend\Session\Namespace</span></tt>. This behavior is a direct result of the underlying ext/session mechanism
+and <em>PHP</em>&#8216;s <tt class="docutils literal"><span class="pre">session_destroy()</span></tt> and <tt class="docutils literal"><span class="pre">session_write_close()</span></tt>, which have no &#8220;undo&#8221; mechanism to facilitate
+setup/teardown with unit tests.</p>
+<p>To work around this, see the unit test <tt class="docutils literal"><span class="pre">testSetExpirationSeconds()</span></tt> in <em>SessionTest.php</em> and
+<em>SessionTestHelper.php</em>, both located in <em>tests/Zend/Session</em>, which make use of <em>PHP</em>&#8216;s <tt class="docutils literal"><span class="pre">exec()</span></tt> to launch a
+separate process. The new process more accurately simulates a second, successive request from a browser. The
+separate process begins with a &#8220;clean&#8221; session, just like any <em>PHP</em> script execution for a web request. Also, any
+changes to <tt class="docutils literal"><span class="pre">$_SESSION</span></tt> made in the calling process become available to the child process, provided the parent
+closed the session before using <tt class="docutils literal"><span class="pre">exec()</span></tt>.</p>
+<p class="rubric" id="zend-session-advanced-usage-testing-example">PHPUnit Testing Code Dependent on ZendSession</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// testing setExpirationSeconds()</span>
+<span class="nv">$script</span> <span class="o">=</span> <span class="s1">&#39;SessionTestHelper.php&#39;</span><span class="p">;</span>
+<span class="nv">$s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">(</span><span class="s1">&#39;space&#39;</span><span class="p">);</span>
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">a</span> <span class="o">=</span> <span class="s1">&#39;apple&#39;</span><span class="p">;</span>
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">o</span> <span class="o">=</span> <span class="s1">&#39;orange&#39;</span><span class="p">;</span>
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">setExpirationSeconds</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+
+<span class="nx">Zend\Session\Session</span><span class="o">::</span><span class="na">regenerateId</span><span class="p">();</span>
+<span class="nv">$id</span> <span class="o">=</span> <span class="nx">Zend\Session\Session</span><span class="o">::</span><span class="na">getId</span><span class="p">();</span>
+<span class="nb">session_write_close</span><span class="p">();</span> <span class="c1">// release session so process below can use it</span>
+<span class="nb">sleep</span><span class="p">(</span><span class="mi">4</span><span class="p">);</span> <span class="c1">// not long enough for things to expire</span>
+<span class="nb">exec</span><span class="p">(</span><span class="nv">$script</span> <span class="o">.</span> <span class="s2">&quot;expireAll </span><span class="si">$id</span><span class="s2"> expireAll&quot;</span><span class="p">,</span> <span class="nv">$result</span><span class="p">);</span>
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">sortResult</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
+<span class="nv">$expect</span> <span class="o">=</span> <span class="s1">&#39;;a === apple;o === orange;p === pear&#39;</span><span class="p">;</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertTrue</span><span class="p">(</span><span class="nv">$result</span> <span class="o">===</span> <span class="nv">$expect</span><span class="p">,</span>
+    <span class="s2">&quot;iteration over default Zend\Session namespace failed; &quot;</span> <span class="o">.</span>
+    <span class="s2">&quot;expecting result === &#39;</span><span class="si">$expect</span><span class="s2">&#39;, but got &#39;</span><span class="si">$result</span><span class="s2">&#39;&quot;</span><span class="p">);</span>
+
+<span class="nb">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span> <span class="c1">// long enough for things to expire (total of 6 seconds</span>
+          <span class="c1">// waiting, but expires in 5)</span>
+<span class="nb">exec</span><span class="p">(</span><span class="nv">$script</span> <span class="o">.</span> <span class="s2">&quot;expireAll </span><span class="si">$id</span><span class="s2"> expireAll&quot;</span><span class="p">,</span> <span class="nv">$result</span><span class="p">);</span>
+<span class="nv">$result</span> <span class="o">=</span> <span class="nb">array_pop</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertTrue</span><span class="p">(</span><span class="nv">$result</span> <span class="o">===</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;iteration over default Zend\Session namespace failed; &quot;</span> <span class="o">.</span>
+    <span class="s2">&quot;expecting result === &#39;&#39;, but got &#39;</span><span class="si">$result</span><span class="s2">&#39;)&quot;</span><span class="p">);</span>
+<span class="nb">session_start</span><span class="p">();</span> <span class="c1">// resume artificially suspended session</span>
+
+<span class="c1">// We could split this into a separate test, but actually, if anything</span>
+<span class="c1">// leftover from above contaminates the tests below, that is also a</span>
+<span class="c1">// bug that we want to know about.</span>
+<span class="nv">$s</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Session\Namespace</span><span class="p">(</span><span class="s1">&#39;expireGuava&#39;</span><span class="p">);</span>
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">setExpirationSeconds</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;g&#39;</span><span class="p">);</span> <span class="c1">// now try to expire only 1 of the</span>
+                                  <span class="c1">// keys in the namespace</span>
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">g</span> <span class="o">=</span> <span class="s1">&#39;guava&#39;</span><span class="p">;</span>
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">p</span> <span class="o">=</span> <span class="s1">&#39;peach&#39;</span><span class="p">;</span>
+<span class="nv">$s</span><span class="o">-&gt;</span><span class="na">p</span> <span class="o">=</span> <span class="s1">&#39;plum&#39;</span><span class="p">;</span>
+
+<span class="nb">session_write_close</span><span class="p">();</span> <span class="c1">// release session so process below can use it</span>
+<span class="nb">sleep</span><span class="p">(</span><span class="mi">6</span><span class="p">);</span> <span class="c1">// not long enough for things to expire</span>
+<span class="nb">exec</span><span class="p">(</span><span class="nv">$script</span> <span class="o">.</span> <span class="s2">&quot;expireAll </span><span class="si">$id</span><span class="s2"> expireGuava&quot;</span><span class="p">,</span> <span class="nv">$result</span><span class="p">);</span>
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">sortResult</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
+<span class="nb">session_start</span><span class="p">();</span> <span class="c1">// resume artificially suspended session</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertTrue</span><span class="p">(</span><span class="nv">$result</span> <span class="o">===</span> <span class="s1">&#39;;p === plum&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;iteration over named Zend\Session namespace failed (result=</span><span class="si">$result</span><span class="s2">)&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Advanced Usage</a><ul>
+<li><a class="reference internal" href="#starting-a-session">Starting a Session</a></li>
+<li><a class="reference internal" href="#locking-session-namespaces">Locking Session Namespaces</a></li>
+<li><a class="reference internal" href="#namespace-expiration">Namespace Expiration</a></li>
+<li><a class="reference internal" href="#session-encapsulation-and-controllers">Session Encapsulation and Controllers</a></li>
+<li><a class="reference internal" href="#preventing-multiple-instances-per-namespace">Preventing Multiple Instances per Namespace</a></li>
+<li><a class="reference internal" href="#working-with-arrays">Working with Arrays</a></li>
+<li><a class="reference internal" href="#using-sessions-with-objects">Using Sessions with Objects</a></li>
+<li><a class="reference internal" href="#using-sessions-with-unit-tests">Using Sessions with Unit Tests</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.session.advanced-usage.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.session.advanced-usage.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.session.advanced-usage.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.session.advanced-usage.rst">
+                Advanced Usage
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -167,7 +167,7 @@ $dev_master_package['dist'] = array(
 );
 $dev_master_package['extra'] = array(
     'branch_alias' => array(
-        'dev-master' => '2.0.x-dev',
+        'dev-master' => '2.1.x-dev',
     ),
 );
 $dev_master_commit_ref = getLastCommitByBranch('master');
@@ -190,7 +190,7 @@ $dev_develop_package['dist'] = array(
 );
 $dev_develop_package['extra'] = array(
     'branch_alias' => array(
-        'dev-develop' => '2.1.x-dev',
+        'dev-develop' => '2.2.x-dev',
     ),
 );
 $dev_develop_commit_ref = getLastCommitByBranch('develop');

@@ -1,0 +1,451 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>FormElementErrors &mdash; Zend Framework 2 2.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.0 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="formelementerrors">
+<span id="zend-form-view-helper-form-element-errors"></span><h1>FormElementErrors<a class="headerlink" href="#formelementerrors" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">FormElementErrors</span></tt> view helper is used to render the validation
+error messages of an element.</p>
+<p>Basic usage:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Form\Form</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Element</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\InputFilter</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\InputFilter\Input</span><span class="p">;</span>
+
+<span class="c1">// Create a form</span>
+<span class="nv">$form</span>    <span class="o">=</span> <span class="k">new</span> <span class="nx">Form</span><span class="p">();</span>
+<span class="nv">$element</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Element\Text</span><span class="p">(</span><span class="s1">&#39;my-text&#39;</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$element</span><span class="p">);</span>
+
+<span class="c1">// Create a input</span>
+<span class="nv">$input</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Input</span><span class="p">(</span><span class="s1">&#39;my-text&#39;</span><span class="p">);</span>
+<span class="nv">$input</span><span class="o">-&gt;</span><span class="na">setRequired</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+
+<span class="nv">$inputFilter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InputFilter</span><span class="p">();</span>
+<span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$input</span><span class="p">);</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setInputFilter</span><span class="p">(</span><span class="nv">$inputFilter</span><span class="p">);</span>
+
+<span class="c1">// Force a failure</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="k">array</span><span class="p">());</span> <span class="c1">// Empty data</span>
+<span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">();</span>        <span class="c1">// Not valid</span>
+
+<span class="c1">// Within your view...</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Example #1: Default options</span>
+<span class="sd"> */</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElementErrors</span><span class="p">(</span><span class="nv">$element</span><span class="p">);</span>
+<span class="c1">// &lt;ul&gt;&lt;li&gt;Value is required and can&amp;#039;t be empty&lt;/li&gt;&lt;/ul&gt;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Example #2: Add attributes to open format</span>
+<span class="sd"> */</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElementErrors</span><span class="p">(</span><span class="nv">$element</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;class&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;help-inline&#39;</span><span class="p">));</span>
+<span class="c1">// &lt;ul class=&quot;help-inline&quot;&gt;&lt;li&gt;Value is required and can&amp;#039;t be empty&lt;/li&gt;&lt;/ul&gt;</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Example #3: Custom format</span>
+<span class="sd"> */</span>
+<span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElementErrors</span><span class="p">()</span>
+                <span class="o">-&gt;</span><span class="na">setMessageOpenFormat</span><span class="p">(</span><span class="s1">&#39;&lt;div class=&quot;help-inline&quot;&gt;&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">setMessageSeparatorString</span><span class="p">(</span><span class="s1">&#39;&lt;/div&gt;&lt;div class=&quot;help-inline&quot;&gt;&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">setMessageCloseString</span><span class="p">(</span><span class="s1">&#39;&lt;/div&gt;&#39;</span><span class="p">)</span>
+                <span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="nv">$element</span><span class="p">);</span>
+<span class="c1">// &lt;div class=&quot;help-inline&quot;&gt;Value is required and can&amp;#039;t be empty&lt;/div&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p id="zend-form-view-helper-form-element-errors-methods">The following public methods are in addition to those inherited from
+<a class="reference internal" href="zend.form.view.helpers.html#zend-form-view-helper-abstract-helper-methods"><em>Zend\Form\View\Helper\AbstractHelper</em></a>.</p>
+<dl class="function">
+<dt>
+<tt class="descname">setMessageOpenFormat</tt><big>(</big><em>string $messageOpenFormat</em><big>)</big></dt>
+<dd><p>Set the formatted string used to open message representation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>$messageOpenFormat</strong> &#8211; The formatted string to use to open the messages. Uses <tt class="docutils literal"><span class="pre">'&lt;ul%s&gt;&lt;li&gt;'</span></tt> by default. Attributes are inserted here.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">getMessageOpenFormat</tt><big>(</big><big>)</big></dt>
+<dd><p>Returns the formatted string used to open message representation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">setMessageSeparatorString</tt><big>(</big><em>string $messageSeparatorString</em><big>)</big></dt>
+<dd><p>Sets the string used to separate messages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>$messageSeparatorString</strong> &#8211; The string to use to separate the messages. Uses <tt class="docutils literal"><span class="pre">'&lt;/li&gt;&lt;li&gt;'</span></tt> by default.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">getMessageSeparatorString</tt><big>(</big><big>)</big></dt>
+<dd><p>Returns the string used to separate messages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">setMessageCloseString</tt><big>(</big><em>string $messageCloseString</em><big>)</big></dt>
+<dd><p>Sets the string used to close message representation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>$messageCloseString</strong> &#8211; The string to use to close the messages. Uses <tt class="docutils literal"><span class="pre">'&lt;/li&gt;&lt;/ul&gt;'</span></tt> by default.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">getMessageCloseString</tt><big>(</big><big>)</big></dt>
+<dd><p>Returns the string used to close message representation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">setAttributes</tt><big>(</big><em>array $attributes</em><big>)</big></dt>
+<dd><p>Set the attributes that will go on the message open format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>$attributes</strong> &#8211; Key value pairs of attributes.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">getAttributes</tt><big>(</big><big>)</big></dt>
+<dd><p>Returns the attributes that will go on the message open format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">render</tt><big>(</big><em>ElementInterface $element</em><span class="optional">[</span>, <em>array $attributes = array()</em><span class="optional">]</span><big>)</big></dt>
+<dd><p>Renders validation errors for the provided <tt class="docutils literal"><span class="pre">$element</span></tt>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>$element</strong> &#8211; The element.</li>
+<li><strong>$attributes</strong> &#8211; Additional attributes that will go on the message open format. These are merged with those set via <tt class="docutils literal"><span class="pre">setAttributes()</span></tt>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">string</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.form.view.helper.form-element-errors.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.form.view.helper.form-element-errors.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.form.view.helper.form-element-errors.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.form.view.helper.form-element-errors.rst">
+                FormElementErrors
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

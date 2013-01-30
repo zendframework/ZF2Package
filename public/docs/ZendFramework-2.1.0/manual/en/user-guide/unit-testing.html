@@ -1,0 +1,509 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Unit Testing &mdash; Zend Framework 2 2.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.0 documentation" href="../index.html" />
+    <link rel="next" title="Modules" href="modules.html" />
+    <link rel="prev" title="Getting started: A skeleton application" href="skeleton-application.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modules.html" title="Modules"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="skeleton-application.html" title="Getting started: A skeleton application"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="unit-testing">
+<span id="user-guide-unit-testing-rst"></span><h1>Unit Testing<a class="headerlink" href="#unit-testing" title="Permalink to this headline">¶</a></h1>
+<p>A solid unit test suite is essential for ongoing development in large
+projects, especially those with many people involved. Going back and
+manually testing every individual component of an application after
+every change is impractical. Your unit tests will help alleviate that
+by automatically testing your application&#8217;s components and alerting
+you when something is not working the same way it was when you wrote
+your tests.</p>
+<p>The Zend Framework 2 API uses <a class="reference external" href="http://phpunit.de/">PHPUnit</a>, and so
+does this tutorial application. A detailed explanation of unit testing
+is beyond the scope of this tutorial, so we will only provide sample
+tests for the components in the pages that follow. This tutorial assumes
+that you already have PHPUnit installed.</p>
+<div class="section" id="setting-up-the-tests-directory">
+<h2>Setting up the tests directory<a class="headerlink" href="#setting-up-the-tests-directory" title="Permalink to this headline">¶</a></h2>
+<p>Start by creating a directory called <tt class="docutils literal"><span class="pre">test</span></tt> in <tt class="docutils literal"><span class="pre">zf2-tutorial\module\Application</span></tt> with
+the following subdirectories:</p>
+<div class="highlight-text"><div class="highlight"><pre>zf2-tutorial/
+    /module
+        /Application
+            /test
+                /ApplicationTest
+                    /Controller
+</pre></div>
+</div>
+<p>The structure of the <tt class="docutils literal"><span class="pre">test</span></tt> directory matches exactly with that of the
+module&#8217;s source files, and it will allow you to keep your tests
+well-organized and easy to find.</p>
+</div>
+<div class="section" id="bootstrapping-your-tests">
+<h2>Bootstrapping your tests<a class="headerlink" href="#bootstrapping-your-tests" title="Permalink to this headline">¶</a></h2>
+<p>Next, create a file called <tt class="docutils literal"><span class="pre">phpunit.xml.dist</span></tt> under <tt class="docutils literal"><span class="pre">zf2-tutorial/module/Application/test</span></tt>:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+
+<span class="nt">&lt;phpunit</span> <span class="na">bootstrap=</span><span class="s">&quot;Bootstrap.php&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;testsuites&gt;</span>
+        <span class="nt">&lt;testsuite</span> <span class="na">name=</span><span class="s">&quot;zf2tutorial&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;directory&gt;</span>./ApplicationTest<span class="nt">&lt;/directory&gt;</span>
+        <span class="nt">&lt;/testsuite&gt;</span>
+    <span class="nt">&lt;/testsuites&gt;</span>
+<span class="nt">&lt;/phpunit&gt;</span>
+</pre></div>
+</div>
+<p>A file called <tt class="docutils literal"><span class="pre">Bootstrap.php</span></tt>, also under <tt class="docutils literal"><span class="pre">zf-tutorial/module/Application/test</span></tt>:
+This is a Bootstrap written by Evan Coury which can just be dropped in, only the namespace needs changing.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">namespace</span> <span class="nx">ApplicationTest</span><span class="p">;</span><span class="c1">//Change this namespace for your test</span>
+
+<span class="k">use</span> <span class="nx">Zend\Loader\AutoloaderFactory</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Mvc\Service\ServiceManagerConfig</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\ServiceManager\ServiceManager</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Stdlib\ArrayUtils</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">RuntimeException</span><span class="p">;</span>
+
+<span class="nb">error_reporting</span><span class="p">(</span><span class="k">E_ALL</span> <span class="o">|</span> <span class="nx">E_STRICT</span><span class="p">);</span>
+<span class="nb">chdir</span><span class="p">(</span><span class="nx">__DIR__</span><span class="p">);</span>
+
+<span class="k">class</span> <span class="nc">Bootstrap</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="k">static</span> <span class="nv">$serviceManager</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="k">static</span> <span class="nv">$config</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="k">static</span> <span class="nv">$bootstrap</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">init</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// Load the user-defined test configuration file, if it exists; otherwise, load</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">is_readable</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/TestConfig.php&#39;</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$testConfig</span> <span class="o">=</span> <span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/TestConfig.php&#39;</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nv">$testConfig</span> <span class="o">=</span> <span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/TestConfig.php.dist&#39;</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="nv">$zf2ModulePaths</span> <span class="o">=</span> <span class="k">array</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$testConfig</span><span class="p">[</span><span class="s1">&#39;module_listener_options&#39;</span><span class="p">][</span><span class="s1">&#39;module_paths&#39;</span><span class="p">]))</span> <span class="p">{</span>
+            <span class="nv">$modulePaths</span> <span class="o">=</span> <span class="nv">$testConfig</span><span class="p">[</span><span class="s1">&#39;module_listener_options&#39;</span><span class="p">][</span><span class="s1">&#39;module_paths&#39;</span><span class="p">];</span>
+            <span class="k">foreach</span> <span class="p">(</span><span class="nv">$modulePaths</span> <span class="k">as</span> <span class="nv">$modulePath</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">((</span><span class="nv">$path</span> <span class="o">=</span> <span class="k">static</span><span class="o">::</span><span class="na">findParentPath</span><span class="p">(</span><span class="nv">$modulePath</span><span class="p">))</span> <span class="p">)</span> <span class="p">{</span>
+                    <span class="nv">$zf2ModulePaths</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$path</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="nv">$zf2ModulePaths</span>  <span class="o">=</span> <span class="nb">implode</span><span class="p">(</span><span class="nx">PATH_SEPARATOR</span><span class="p">,</span> <span class="nv">$zf2ModulePaths</span><span class="p">)</span> <span class="o">.</span> <span class="nx">PATH_SEPARATOR</span><span class="p">;</span>
+        <span class="nv">$zf2ModulePaths</span> <span class="o">.=</span> <span class="nb">getenv</span><span class="p">(</span><span class="s1">&#39;ZF2_MODULES_TEST_PATHS&#39;</span><span class="p">)</span> <span class="o">?:</span> <span class="p">(</span><span class="nb">defined</span><span class="p">(</span><span class="s1">&#39;ZF2_MODULES_TEST_PATHS&#39;</span><span class="p">)</span> <span class="o">?</span> <span class="nx">ZF2_MODULES_TEST_PATHS</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">);</span>
+
+        <span class="k">static</span><span class="o">::</span><span class="na">initAutoloader</span><span class="p">();</span>
+
+        <span class="c1">// use ModuleManager to load this module and it&#39;s dependencies</span>
+        <span class="nv">$baseConfig</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;module_listener_options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;module_paths&#39;</span> <span class="o">=&gt;</span> <span class="nb">explode</span><span class="p">(</span><span class="nx">PATH_SEPARATOR</span><span class="p">,</span> <span class="nv">$zf2ModulePaths</span><span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">);</span>
+
+        <span class="nv">$config</span> <span class="o">=</span> <span class="nx">ArrayUtils</span><span class="o">::</span><span class="na">merge</span><span class="p">(</span><span class="nv">$baseConfig</span><span class="p">,</span> <span class="nv">$testConfig</span><span class="p">);</span>
+
+        <span class="nv">$serviceManager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ServiceManager</span><span class="p">(</span><span class="k">new</span> <span class="nx">ServiceManagerConfig</span><span class="p">());</span>
+        <span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">setService</span><span class="p">(</span><span class="s1">&#39;ApplicationConfig&#39;</span><span class="p">,</span> <span class="nv">$config</span><span class="p">);</span>
+        <span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;ModuleManager&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">loadModules</span><span class="p">();</span>
+
+        <span class="k">static</span><span class="o">::</span><span class="nv">$serviceManager</span> <span class="o">=</span> <span class="nv">$serviceManager</span><span class="p">;</span>
+        <span class="k">static</span><span class="o">::</span><span class="nv">$config</span> <span class="o">=</span> <span class="nv">$config</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">getServiceManager</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">static</span><span class="o">::</span><span class="nv">$serviceManager</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">getConfig</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">static</span><span class="o">::</span><span class="nv">$config</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">initAutoloader</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$vendorPath</span> <span class="o">=</span> <span class="k">static</span><span class="o">::</span><span class="na">findParentPath</span><span class="p">(</span><span class="s1">&#39;vendor&#39;</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nb">is_readable</span><span class="p">(</span><span class="nv">$vendorPath</span> <span class="o">.</span> <span class="s1">&#39;/autoload.php&#39;</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$loader</span> <span class="o">=</span> <span class="k">include</span> <span class="nv">$vendorPath</span> <span class="o">.</span> <span class="s1">&#39;/autoload.php&#39;</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nv">$zf2Path</span> <span class="o">=</span> <span class="nb">getenv</span><span class="p">(</span><span class="s1">&#39;ZF2_PATH&#39;</span><span class="p">)</span> <span class="o">?:</span> <span class="p">(</span><span class="nb">defined</span><span class="p">(</span><span class="s1">&#39;ZF2_PATH&#39;</span><span class="p">)</span> <span class="o">?</span> <span class="nx">ZF2_PATH</span> <span class="o">:</span> <span class="p">(</span><span class="nb">is_dir</span><span class="p">(</span><span class="nv">$vendorPath</span> <span class="o">.</span> <span class="s1">&#39;/ZF2/library&#39;</span><span class="p">)</span> <span class="o">?</span> <span class="nv">$vendorPath</span> <span class="o">.</span> <span class="s1">&#39;/ZF2/library&#39;</span> <span class="o">:</span> <span class="k">false</span><span class="p">));</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$zf2Path</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">&#39;Unable to load ZF2. Run `php composer.phar install` or define a ZF2_PATH environment variable.&#39;</span><span class="p">);</span>
+            <span class="p">}</span>
+
+            <span class="k">include</span> <span class="nv">$zf2Path</span> <span class="o">.</span> <span class="s1">&#39;/Zend/Loader/AutoloaderFactory.php&#39;</span><span class="p">;</span>
+
+        <span class="p">}</span>
+
+        <span class="nx">AutoloaderFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;Zend\Loader\StandardAutoloader&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;autoregister_zf&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                <span class="s1">&#39;namespaces&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="nx">__NAMESPACE__</span> <span class="o">=&gt;</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/&#39;</span> <span class="o">.</span> <span class="nx">__NAMESPACE__</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">findParentPath</span><span class="p">(</span><span class="nv">$path</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$dir</span> <span class="o">=</span> <span class="nx">__DIR__</span><span class="p">;</span>
+        <span class="nv">$previousDir</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="nb">is_dir</span><span class="p">(</span><span class="nv">$dir</span> <span class="o">.</span> <span class="s1">&#39;/&#39;</span> <span class="o">.</span> <span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$dir</span> <span class="o">=</span> <span class="nb">dirname</span><span class="p">(</span><span class="nv">$dir</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$previousDir</span> <span class="o">===</span> <span class="nv">$dir</span><span class="p">)</span> <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+            <span class="nv">$previousDir</span> <span class="o">=</span> <span class="nv">$dir</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$dir</span> <span class="o">.</span> <span class="s1">&#39;/&#39;</span> <span class="o">.</span> <span class="nv">$path</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">Bootstrap</span><span class="o">::</span><span class="na">init</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>And a file called TestConfig.php.dist</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;modules&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;Application&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;module_listener_options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;config_glob_paths&#39;</span>    <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;../../../config/autoload/{,*.}{global,local}.php&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="s1">&#39;module_paths&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;module&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;vendor&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>This is basically the same as config/application.config.php but we define only the modules which are required for this test</p>
+</div>
+<div class="section" id="your-first-controller-test">
+<h2>Your first Controller test<a class="headerlink" href="#your-first-controller-test" title="Permalink to this headline">¶</a></h2>
+<p>Next, create <tt class="docutils literal"><span class="pre">IndexControllerTest.php</span></tt> under
+<tt class="docutils literal"><span class="pre">zf-tutorial/module/Application/test/ApplicationTest/Controller</span></tt> with
+the following contents:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+
+<span class="k">namespace</span> <span class="nx">ApplicationTest\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">ApplicationTest\Bootstrap</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Mvc\Router\Http\TreeRouteStack</span> <span class="k">as</span> <span class="nx">HttpRouter</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Application\Controller\IndexController</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Http\Request</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Http\Response</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Mvc\MvcEvent</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Mvc\Router\RouteMatch</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">PHPUnit_Framework_TestCase</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">IndexControllerTest</span> <span class="k">extends</span> <span class="nx">\PHPUnit_Framework_TestCase</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$controller</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$request</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$response</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$routeMatch</span><span class="p">;</span>
+    <span class="k">protected</span> <span class="nv">$event</span><span class="p">;</span>
+
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">setUp</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$serviceManager</span> <span class="o">=</span> <span class="nx">Bootstrap</span><span class="o">::</span><span class="na">getServiceManager</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">IndexController</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span>    <span class="o">=</span> <span class="k">new</span> <span class="nx">Request</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RouteMatch</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;controller&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;index&#39;</span><span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">event</span>      <span class="o">=</span> <span class="k">new</span> <span class="nx">MvcEvent</span><span class="p">();</span>
+        <span class="nv">$config</span> <span class="o">=</span> <span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;Config&#39;</span><span class="p">);</span>
+        <span class="nv">$routerConfig</span> <span class="o">=</span> <span class="nb">isset</span><span class="p">(</span><span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;router&#39;</span><span class="p">])</span> <span class="o">?</span> <span class="nv">$config</span><span class="p">[</span><span class="s1">&#39;router&#39;</span><span class="p">]</span> <span class="o">:</span> <span class="k">array</span><span class="p">();</span>
+        <span class="nv">$router</span> <span class="o">=</span> <span class="nx">HttpRouter</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="nv">$routerConfig</span><span class="p">);</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">event</span><span class="o">-&gt;</span><span class="na">setRouter</span><span class="p">(</span><span class="nv">$router</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">event</span><span class="o">-&gt;</span><span class="na">setRouteMatch</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">setEvent</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">event</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">setServiceLocator</span><span class="p">(</span><span class="nv">$serviceManager</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Here, we expand a bit on the setup in Tom Oram&#8217;s
+<a class="reference external" href="http://devblog.x2k.co.uk/unit-testing-a-zend-framework-2-controller/">Unit Testing a ZF 2 Controller</a>
+blog entry by initializing our application in the <tt class="docutils literal"><span class="pre">setUp()</span></tt> method and
+setting the <tt class="docutils literal"><span class="pre">EventManager</span></tt> and <tt class="docutils literal"><span class="pre">ServiceLocator</span></tt> directly on the controller.
+This isn&#8217;t important right now, but we&#8217;ll need it later on when writing more
+advanced tests.</p>
+<p>Now, add the following function to the <tt class="docutils literal"><span class="pre">IndexControllerTest</span></tt> class:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">testIndexActionCanBeAccessed</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">routeMatch</span><span class="o">-&gt;</span><span class="na">setParam</span><span class="p">(</span><span class="s1">&#39;action&#39;</span><span class="p">,</span> <span class="s1">&#39;index&#39;</span><span class="p">);</span>
+
+    <span class="nv">$result</span>   <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">request</span><span class="p">);</span>
+    <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">controller</span><span class="o">-&gt;</span><span class="na">getResponse</span><span class="p">();</span>
+
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertEquals</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="nv">$response</span><span class="o">-&gt;</span><span class="na">getStatusCode</span><span class="p">());</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The test is verifying that the homepage responds with HTTP status code 200.</p>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>Finally, <tt class="docutils literal"><span class="pre">cd</span></tt> to <tt class="docutils literal"><span class="pre">zf-tutorial/module/Application/test/</span></tt> and run <tt class="docutils literal"><span class="pre">phpunit</span></tt>. If you see something like
+this, then your application is ready for more tests!</p>
+<div class="highlight-text"><div class="highlight"><pre>PHPUnit 3.5.15 by Sebastian Bergmann.
+
+.
+
+Time: 0 seconds, Memory: 5.75Mb
+
+OK (1 test, 2 assertions)
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Unit Testing</a><ul>
+<li><a class="reference internal" href="#setting-up-the-tests-directory">Setting up the tests directory</a></li>
+<li><a class="reference internal" href="#bootstrapping-your-tests">Bootstrapping your tests</a></li>
+<li><a class="reference internal" href="#your-first-controller-test">Your first Controller test</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="skeleton-application.html"
+                        title="previous chapter">Getting started: A skeleton application</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="modules.html"
+                        title="next chapter">Modules</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/user-guide/unit-testing.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/user-guide/unit-testing.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/user-guide/unit-testing.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modules.html" title="Modules"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="skeleton-application.html" title="Getting started: A skeleton application"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/user-guide/unit-testing.rst">
+                Unit Testing
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

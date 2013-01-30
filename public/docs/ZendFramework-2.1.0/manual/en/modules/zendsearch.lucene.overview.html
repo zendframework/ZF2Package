@@ -1,0 +1,670 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Overview &mdash; Zend Framework 2 2.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.0 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="overview">
+<span id="zendsearch-lucene-overview"></span><h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zendsearch-lucene-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> is a general purpose text search engine written entirely in <em>PHP</em> 5. Since it stores its
+index on the filesystem and does not require a database server, it can add search capabilities to almost any
+<em>PHP</em>-driven website. <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> supports the following features:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Ranked searching - best results returned first</li>
+<li>Many powerful query types: phrase queries, boolean queries, wildcard queries, proximity queries, range queries
+and many others.</li>
+<li>Search by specific field (e.g., title, author, contents)</li>
+</ul>
+</div></blockquote>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> was derived from the Apache Lucene project. The currently (starting from ZF 1.6) supported
+Lucene index format versions are 1.4 - 2.3. For more information on Lucene, visit
+<a class="reference external" href="http://lucene.apache.org/java/docs/">http://lucene.apache.org/java/docs/</a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Previous <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> implementations support the Lucene 1.4 (1.9) - 2.1 index formats.</p>
+<p class="last">Starting from Zend Framework 1.5 any index created using pre-2.1 index format is automatically upgraded to
+Lucene 2.1 format after the <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> update and will not be compatible with <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt>
+implementations included into Zend Framework 1.0.x.</p>
+</div>
+</div>
+<div class="section" id="document-and-field-objects">
+<span id="zendsearch-lucene-index-creation-documents-and-fields"></span><h2>Document and Field Objects<a class="headerlink" href="#document-and-field-objects" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> operates with documents as atomic objects for indexing. A document is divided into named
+fields, and fields have content that can be searched.</p>
+<p>A document is represented by the <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document</span></tt> class, and this objects of this class contain
+instances of <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Field</span></tt> that represent the fields on the document.</p>
+<p>It is important to note that any information can be added to the index. Application-specific information or
+metadata can be stored in the document fields, and later retrieved with the document during search.</p>
+<p>It is the responsibility of your application to control the indexer. This means that data can be indexed from any
+source that is accessible by your application. For example, this could be the filesystem, a database, an <em>HTML</em>
+form, etc.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Field</span></tt> class provides several static methods to create fields with different characteristics:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Document</span><span class="p">();</span>
+
+<span class="c1">// Field is not tokenized, but is indexed and stored within the index.</span>
+<span class="c1">// Stored fields can be retrived from the index.</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">Keyword</span><span class="p">(</span><span class="s1">&#39;doctype&#39;</span><span class="p">,</span>
+                                                 <span class="s1">&#39;autogenerated&#39;</span><span class="p">));</span>
+
+<span class="c1">// Field is not tokenized nor indexed, but is stored in the index.</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">UnIndexed</span><span class="p">(</span><span class="s1">&#39;created&#39;</span><span class="p">,</span>
+                                                   <span class="nb">time</span><span class="p">()));</span>
+
+<span class="c1">// Binary String valued Field that is not tokenized nor indexed,</span>
+<span class="c1">// but is stored in the index.</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">Binary</span><span class="p">(</span><span class="s1">&#39;icon&#39;</span><span class="p">,</span>
+                                                <span class="nv">$iconData</span><span class="p">));</span>
+
+<span class="c1">// Field is tokenized and indexed, and is stored in the index.</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">Text</span><span class="p">(</span><span class="s1">&#39;annotation&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;Document annotation text&#39;</span><span class="p">));</span>
+
+<span class="c1">// Field is tokenized and indexed, but is not stored in the index.</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">UnStored</span><span class="p">(</span><span class="s1">&#39;contents&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;My document content&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>Each of these methods (excluding the <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Field::Binary()</span></tt> method) has an optional <tt class="docutils literal"><span class="pre">$encoding</span></tt>
+parameter for specifying input data encoding.</p>
+<p>Encoding may differ for different documents as well as for different fields within one document:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Document</span><span class="p">();</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">Text</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span>
+                                              <span class="nv">$title</span><span class="p">,</span>
+                                              <span class="s1">&#39;iso-8859-1&#39;</span><span class="p">));</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">UnStored</span><span class="p">(</span><span class="s1">&#39;contents&#39;</span><span class="p">,</span>
+                                                  <span class="nv">$contents</span><span class="p">,</span>
+                                                  <span class="s1">&#39;utf-8&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>If encoding parameter is omitted, then the current locale is used at processing time. For example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nb">setlocale</span><span class="p">(</span><span class="nx">LC_ALL</span><span class="p">,</span> <span class="s1">&#39;de_DE.iso-8859-1&#39;</span><span class="p">);</span>
+<span class="o">...</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">UnStored</span><span class="p">(</span><span class="s1">&#39;contents&#39;</span><span class="p">,</span> <span class="nv">$contents</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>Fields are always stored and returned from the index in UTF-8 encoding. Any required conversion to UTF-8 happens
+automatically.</p>
+<p>Text analyzers (<a class="reference internal" href="zendsearch.lucene.extending.html#zendsearch-lucene-extending-analysis"><em>see below</em></a>) may also convert text to some other
+encodings. Actually, the default analyzer converts text to &#8216;ASCII//TRANSLIT&#8217; encoding. Be careful, however; this
+translation may depend on current locale.</p>
+<p>Fields&#8217; names are defined at your discretion in the <tt class="docutils literal"><span class="pre">addField()</span></tt> method.</p>
+<p>Java Lucene uses the &#8216;contents&#8217; field as a default field to search. <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> searches through all
+fields by default, but the behavior is configurable. See the <a class="reference internal" href="zendsearch.lucene.query-language.html#zendsearch-lucene-query-language-fields"><em>&#8220;Default search field&#8221;</em></a> chapter for details.</p>
+</div>
+<div class="section" id="understanding-field-types">
+<span id="zendsearch-lucene-index-creation-understanding-field-types"></span><h2>Understanding Field Types<a class="headerlink" href="#understanding-field-types" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><em>Keyword</em> fields are stored and indexed, meaning that they can be searched as well as displayed in search
+results. They are not split up into separate words by tokenization. Enumerated database fields usually translate
+well to Keyword fields in <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt>.</p>
+</li>
+<li><p class="first"><em>UnIndexed</em> fields are not searchable, but they are returned with search hits. Database timestamps, primary keys,
+file system paths, and other external identifiers are good candidates for UnIndexed fields.</p>
+</li>
+<li><p class="first"><em>Binary</em> fields are not tokenized or indexed, but are stored for retrieval with search hits. They can be used to
+store any data encoded as a binary string, such as an image icon.</p>
+</li>
+<li><p class="first"><em>Text</em> fields are stored, indexed, and tokenized. Text fields are appropriate for storing information like
+subjects and titles that need to be searchable as well as returned with search results.</p>
+</li>
+<li><p class="first"><em>UnStored</em> fields are tokenized and indexed, but not stored in the index. Large amounts of text are best indexed
+using this type of field. Storing data creates a larger index on disk, so if you need to search but not redisplay
+the data, use an UnStored field. UnStored fields are practical when using a <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> index in
+combination with a relational database. You can index large data fields with UnStored fields for searching, and
+retrieve them from your relational database by using a separate field as an identifier.</p>
+<table border="1" class="docutils" id="zendsearch-lucene-index-creation-understanding-field-types-table">
+<caption>ZendSearchLuceneField Types</caption>
+<colgroup>
+<col width="26%" />
+<col width="16%" />
+<col width="18%" />
+<col width="24%" />
+<col width="16%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head"><p class="first last">Field Type</p>
+</th>
+<th class="head"><p class="first last">Stored</p>
+</th>
+<th class="head"><p class="first last">Indexed</p>
+</th>
+<th class="head"><p class="first last">Tokenized</p>
+</th>
+<th class="head"><p class="first last">Binary</p>
+</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><p class="first last">Keyword</p>
+</td>
+<td><p class="first last">Yes</p>
+</td>
+<td><p class="first last">Yes</p>
+</td>
+<td><p class="first last">No</p>
+</td>
+<td><p class="first last">No</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p class="first last">UnIndexed</p>
+</td>
+<td><p class="first last">Yes</p>
+</td>
+<td><p class="first last">No</p>
+</td>
+<td><p class="first last">No</p>
+</td>
+<td><p class="first last">No</p>
+</td>
+</tr>
+<tr class="row-even"><td><p class="first last">Binary</p>
+</td>
+<td><p class="first last">Yes</p>
+</td>
+<td><p class="first last">No</p>
+</td>
+<td><p class="first last">No</p>
+</td>
+<td><p class="first last">Yes</p>
+</td>
+</tr>
+<tr class="row-odd"><td><p class="first last">Text</p>
+</td>
+<td><p class="first last">Yes</p>
+</td>
+<td><p class="first last">Yes</p>
+</td>
+<td><p class="first last">Yes</p>
+</td>
+<td><p class="first last">No</p>
+</td>
+</tr>
+<tr class="row-even"><td><p class="first last">UnStored</p>
+</td>
+<td><p class="first last">No</p>
+</td>
+<td><p class="first last">Yes</p>
+</td>
+<td><p class="first last">Yes</p>
+</td>
+<td><p class="first last">No</p>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</div>
+<div class="section" id="html-documents">
+<span id="zendsearch-lucene-index-creation-html-documents"></span><h2>HTML documents<a class="headerlink" href="#html-documents" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> offers a <em>HTML</em> parsing feature. Documents can be created directly from a <em>HTML</em> file or
+string:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Html</span><span class="o">::</span><span class="na">loadHTMLFile</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+<span class="nv">$index</span><span class="o">-&gt;</span><span class="na">addDocument</span><span class="p">(</span><span class="nv">$doc</span><span class="p">);</span>
+<span class="o">...</span>
+<span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Html</span><span class="o">::</span><span class="na">loadHTML</span><span class="p">(</span><span class="nv">$htmlString</span><span class="p">);</span>
+<span class="nv">$index</span><span class="o">-&gt;</span><span class="na">addDocument</span><span class="p">(</span><span class="nv">$doc</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Html</span></tt> class uses the <tt class="docutils literal"><span class="pre">DOMDocument::loadHTML()</span></tt> and <tt class="docutils literal"><span class="pre">DOMDocument::loadHTMLFile()</span></tt>
+methods to parse the source <em>HTML</em>, so it doesn&#8217;t need <em>HTML</em> to be well formed or to be <em>XHTML</em>. On the other
+hand, it&#8217;s sensitive to the encoding specified by the &#8220;meta http-equiv&#8221; header tag.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Html</span></tt> class recognizes document title, body and document header meta tags.</p>
+<p>The &#8216;title&#8217; field is actually the /html/head/title value. It&#8217;s stored within the index, tokenized and available for
+search.</p>
+<p>The &#8216;body&#8217; field is the actual body content of the <em>HTML</em> file or string. It doesn&#8217;t include scripts, comments or
+attributes.</p>
+<p>The <tt class="docutils literal"><span class="pre">loadHTML()</span></tt> and <tt class="docutils literal"><span class="pre">loadHTMLFile()</span></tt> methods of <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Html</span></tt> class also have second
+optional argument. If it&#8217;s set to <tt class="docutils literal"><span class="pre">TRUE</span></tt>, then body content is also stored within index and can be retrieved from
+the index. By default, the body is tokenized and indexed, but not stored.</p>
+<p>The third parameter of <tt class="docutils literal"><span class="pre">loadHTML()</span></tt> and <tt class="docutils literal"><span class="pre">loadHTMLFile()</span></tt> methods optionally specifies source <em>HTML</em> document
+encoding. It&#8217;s used if encoding is not specified using Content-type HTTP-EQUIV meta tag.</p>
+<p>Other document header meta tags produce additional document fields. The field &#8216;name&#8217; is taken from &#8216;name&#8217;
+attribute, and the &#8216;content&#8217; attribute populates the field &#8216;value&#8217;. Both are tokenized, indexed and stored, so
+documents may be searched by their meta tags (for example, by keywords).</p>
+<p>Parsed documents may be augmented by the programmer with any other field:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Html</span><span class="o">::</span><span class="na">loadHTML</span><span class="p">(</span><span class="nv">$htmlString</span><span class="p">);</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">UnIndexed</span><span class="p">(</span><span class="s1">&#39;created&#39;</span><span class="p">,</span>
+                                                   <span class="nb">time</span><span class="p">()));</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">UnIndexed</span><span class="p">(</span><span class="s1">&#39;updated&#39;</span><span class="p">,</span>
+                                                   <span class="nb">time</span><span class="p">()));</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">Text</span><span class="p">(</span><span class="s1">&#39;annotation&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;Document annotation text&#39;</span><span class="p">));</span>
+<span class="nv">$index</span><span class="o">-&gt;</span><span class="na">addDocument</span><span class="p">(</span><span class="nv">$doc</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Document links are not included in the generated document, but may be retrieved with the
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Html::getLinks()</span></tt> and <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Html::getHeaderLinks()</span></tt>
+methods:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Html</span><span class="o">::</span><span class="na">loadHTML</span><span class="p">(</span><span class="nv">$htmlString</span><span class="p">);</span>
+<span class="nv">$linksArray</span> <span class="o">=</span> <span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">getLinks</span><span class="p">();</span>
+<span class="nv">$headerLinksArray</span> <span class="o">=</span> <span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">getHeaderLinks</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>Starting from Zend Framework 1.6 it&#8217;s also possible to exclude links with <em>rel</em> attribute set to <em>&#8216;nofollow&#8217;</em>. Use
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Html::setExcludeNoFollowLinks($true)</span></tt> to turn on this option.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Html::getExcludeNoFollowLinks()</span></tt> method returns current state of &#8220;Exclude nofollow
+links&#8221; flag.</p>
+</div>
+<div class="section" id="word-2007-documents">
+<span id="zendsearch-lucene-index-creation-docx-documents"></span><h2>Word 2007 documents<a class="headerlink" href="#word-2007-documents" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> offers a Word 2007 parsing feature. Documents can be created directly from a Word 2007 file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Docx</span><span class="o">::</span><span class="na">loadDocxFile</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+<span class="nv">$index</span><span class="o">-&gt;</span><span class="na">addDocument</span><span class="p">(</span><span class="nv">$doc</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Docx</span></tt> class uses the <em>ZipArchive</em> class and <em>simplexml</em> methods to parse the source
+document. If the <em>ZipArchive</em> class (from module php_zip) is not available, the
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Docx</span></tt> will also not be available for use with Zend Framework.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Docx</span></tt> class recognizes document meta data and document text. Meta data consists,
+depending on document contents, of filename, title, subject, creator, keywords, description, lastModifiedBy,
+revision, modified, created.</p>
+<p>The &#8216;filename&#8217; field is the actual Word 2007 file name.</p>
+<p>The &#8216;title&#8217; field is the actual document title.</p>
+<p>The &#8216;subject&#8217; field is the actual document subject.</p>
+<p>The &#8216;creator&#8217; field is the actual document creator.</p>
+<p>The &#8216;keywords&#8217; field contains the actual document keywords.</p>
+<p>The &#8216;description&#8217; field is the actual document description.</p>
+<p>The &#8216;lastModifiedBy&#8217; field is the username who has last modified the actual document.</p>
+<p>The &#8216;revision&#8217; field is the actual document revision number.</p>
+<p>The &#8216;modified&#8217; field is the actual document last modified date / time.</p>
+<p>The &#8216;created&#8217; field is the actual document creation date / time.</p>
+<p>The &#8216;body&#8217; field is the actual body content of the Word 2007 document. It only includes normal text, comments and
+revisions are not included.</p>
+<p>The <tt class="docutils literal"><span class="pre">loadDocxFile()</span></tt> methods of <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Docx</span></tt> class also have second optional argument. If
+it&#8217;s set to <tt class="docutils literal"><span class="pre">TRUE</span></tt>, then body content is also stored within index and can be retrieved from the index. By
+default, the body is tokenized and indexed, but not stored.</p>
+<p>Parsed documents may be augmented by the programmer with any other field:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Docx</span><span class="o">::</span><span class="na">loadDocxFile</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">UnIndexed</span><span class="p">(</span>
+    <span class="s1">&#39;indexTime&#39;</span><span class="p">,</span>
+    <span class="nb">time</span><span class="p">())</span>
+<span class="p">);</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">Text</span><span class="p">(</span>
+    <span class="s1">&#39;annotation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Document annotation text&#39;</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="nv">$index</span><span class="o">-&gt;</span><span class="na">addDocument</span><span class="p">(</span><span class="nv">$doc</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="powerpoint-2007-documents">
+<span id="zendsearch-lucene-index-creation-pptx-documents"></span><h2>Powerpoint 2007 documents<a class="headerlink" href="#powerpoint-2007-documents" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> offers a Powerpoint 2007 parsing feature. Documents can be created directly from a
+Powerpoint 2007 file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Pptx</span><span class="o">::</span><span class="na">loadPptxFile</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+<span class="nv">$index</span><span class="o">-&gt;</span><span class="na">addDocument</span><span class="p">(</span><span class="nv">$doc</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Pptx</span></tt> class uses the <em>ZipArchive</em> class and <em>simplexml</em> methods to parse the source
+document. If the <em>ZipArchive</em> class (from module php_zip) is not available, the
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Pptx</span></tt> will also not be available for use with Zend Framework.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Pptx</span></tt> class recognizes document meta data and document text. Meta data consists,
+depending on document contents, of filename, title, subject, creator, keywords, description, lastModifiedBy,
+revision, modified, created.</p>
+<p>The &#8216;filename&#8217; field is the actual Powerpoint 2007 file name.</p>
+<p>The &#8216;title&#8217; field is the actual document title.</p>
+<p>The &#8216;subject&#8217; field is the actual document subject.</p>
+<p>The &#8216;creator&#8217; field is the actual document creator.</p>
+<p>The &#8216;keywords&#8217; field contains the actual document keywords.</p>
+<p>The &#8216;description&#8217; field is the actual document description.</p>
+<p>The &#8216;lastModifiedBy&#8217; field is the username who has last modified the actual document.</p>
+<p>The &#8216;revision&#8217; field is the actual document revision number.</p>
+<p>The &#8216;modified&#8217; field is the actual document last modified date / time.</p>
+<p>The &#8216;created&#8217; field is the actual document creation date / time.</p>
+<p>The &#8216;body&#8217; field is the actual content of all slides and slide notes in the Powerpoint 2007 document.</p>
+<p>The <tt class="docutils literal"><span class="pre">loadPptxFile()</span></tt> methods of <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Pptx</span></tt> class also have second optional argument. If
+it&#8217;s set to <tt class="docutils literal"><span class="pre">TRUE</span></tt>, then body content is also stored within index and can be retrieved from the index. By
+default, the body is tokenized and indexed, but not stored.</p>
+<p>Parsed documents may be augmented by the programmer with any other field:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Pptx</span><span class="o">::</span><span class="na">loadPptxFile</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">UnIndexed</span><span class="p">(</span>
+    <span class="s1">&#39;indexTime&#39;</span><span class="p">,</span>
+    <span class="nb">time</span><span class="p">()));</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">Text</span><span class="p">(</span>
+    <span class="s1">&#39;annotation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Document annotation text&#39;</span><span class="p">));</span>
+<span class="nv">$index</span><span class="o">-&gt;</span><span class="na">addDocument</span><span class="p">(</span><span class="nv">$doc</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="excel-2007-documents">
+<span id="zendsearch-lucene-index-creation-xlsx-documents"></span><h2>Excel 2007 documents<a class="headerlink" href="#excel-2007-documents" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> offers a Excel 2007 parsing feature. Documents can be created directly from a Excel 2007
+file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Xlsx</span><span class="o">::</span><span class="na">loadXlsxFile</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+<span class="nv">$index</span><span class="o">-&gt;</span><span class="na">addDocument</span><span class="p">(</span><span class="nv">$doc</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Xlsx</span></tt> class uses the <em>ZipArchive</em> class and <em>simplexml</em> methods to parse the source
+document. If the <em>ZipArchive</em> class (from module php_zip) is not available, the
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Xlsx</span></tt> will also not be available for use with Zend Framework.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Xlsx</span></tt> class recognizes document meta data and document text. Meta data consists,
+depending on document contents, of filename, title, subject, creator, keywords, description, lastModifiedBy,
+revision, modified, created.</p>
+<p>The &#8216;filename&#8217; field is the actual Excel 2007 file name.</p>
+<p>The &#8216;title&#8217; field is the actual document title.</p>
+<p>The &#8216;subject&#8217; field is the actual document subject.</p>
+<p>The &#8216;creator&#8217; field is the actual document creator.</p>
+<p>The &#8216;keywords&#8217; field contains the actual document keywords.</p>
+<p>The &#8216;description&#8217; field is the actual document description.</p>
+<p>The &#8216;lastModifiedBy&#8217; field is the username who has last modified the actual document.</p>
+<p>The &#8216;revision&#8217; field is the actual document revision number.</p>
+<p>The &#8216;modified&#8217; field is the actual document last modified date / time.</p>
+<p>The &#8216;created&#8217; field is the actual document creation date / time.</p>
+<p>The &#8216;body&#8217; field is the actual content of all cells in all worksheets of the Excel 2007 document.</p>
+<p>The <tt class="docutils literal"><span class="pre">loadXlsxFile()</span></tt> methods of <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Document\Xlsx</span></tt> class also have second optional argument. If
+it&#8217;s set to <tt class="docutils literal"><span class="pre">TRUE</span></tt>, then body content is also stored within index and can be retrieved from the index. By
+default, the body is tokenized and indexed, but not stored.</p>
+<p>Parsed documents may be augmented by the programmer with any other field:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Xlsx</span><span class="o">::</span><span class="na">loadXlsxFile</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">UnIndexed</span><span class="p">(</span>
+    <span class="s1">&#39;indexTime&#39;</span><span class="p">,</span>
+    <span class="nb">time</span><span class="p">()));</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search\Lucene\Field</span><span class="o">::</span><span class="na">Text</span><span class="p">(</span>
+    <span class="s1">&#39;annotation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Document annotation text&#39;</span><span class="p">));</span>
+<span class="nv">$index</span><span class="o">-&gt;</span><span class="na">addDocument</span><span class="p">(</span><span class="nv">$doc</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overview</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#document-and-field-objects">Document and Field Objects</a></li>
+<li><a class="reference internal" href="#understanding-field-types">Understanding Field Types</a></li>
+<li><a class="reference internal" href="#html-documents">HTML documents</a></li>
+<li><a class="reference internal" href="#word-2007-documents">Word 2007 documents</a></li>
+<li><a class="reference internal" href="#powerpoint-2007-documents">Powerpoint 2007 documents</a></li>
+<li><a class="reference internal" href="#excel-2007-documents">Excel 2007 documents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendsearch.lucene.overview.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendsearch.lucene.overview.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendsearch.lucene.overview.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendsearch.lucene.overview.rst">
+                Overview
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

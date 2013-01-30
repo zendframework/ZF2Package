@@ -1,0 +1,803 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Extensibility &mdash; Zend Framework 2 2.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.0 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="extensibility">
+<span id="zendsearch-lucene-extending"></span><h1>Extensibility<a class="headerlink" href="#extensibility" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="text-analysis">
+<span id="zendsearch-lucene-extending-analysis"></span><h2>Text Analysis<a class="headerlink" href="#text-analysis" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\Analyzer</span></tt> class is used by the indexer to tokenize document text fields.</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\Analyzer::getDefault()</span></tt> and <em>ZendSearchLuceneAnalysisAnalyzer::setDefault()</em>
+methods are used to get and set the default analyzer.</p>
+<p>You can assign your own text analyzer or choose it from the set of predefined analyzers:
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\Analyzer\Common\Text</span></tt> and
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\Analyzer\Common\Text\CaseInsensitive</span></tt> (default). Both of them interpret tokens as
+sequences of letters. <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\Analyzer\Common\Text\CaseInsensitive</span></tt> converts all tokens to
+lower case.</p>
+<p>To switch between analyzers:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Zend\Search\Lucene\Analysis\Analyzer</span><span class="o">::</span><span class="na">setDefault</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Analysis\Analyzer\Common\Text</span><span class="p">());</span>
+<span class="o">...</span>
+<span class="nv">$index</span><span class="o">-&gt;</span><span class="na">addDocument</span><span class="p">(</span><span class="nv">$doc</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\Analyzer\Common</span></tt> class is designed to be an ancestor of all user defined
+analyzers. User should only define the <tt class="docutils literal"><span class="pre">reset()</span></tt> and <tt class="docutils literal"><span class="pre">nextToken()</span></tt> methods, which takes its string from the
+$_input member and returns tokens one by one (a <tt class="docutils literal"><span class="pre">NULL</span></tt> value indicates the end of the stream).</p>
+<p>The <tt class="docutils literal"><span class="pre">nextToken()</span></tt> method should call the <tt class="docutils literal"><span class="pre">normalize()</span></tt> method on each token. This will allow you to use token
+filters with your analyzer.</p>
+<p>Here is an example of a custom analyzer, which accepts words with digits as terms:</p>
+<blockquote>
+<div><p class="rubric" id="zendsearch-lucene-extending-analysis-example-1">Custom text Analyzer</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">/**</span>
+<span class="sd"> * Here is a custom text analyser, which treats words with digits as</span>
+<span class="sd"> * one term</span>
+<span class="sd"> */</span>
+
+<span class="k">class</span> <span class="nc">My_Analyzer</span> <span class="k">extends</span> <span class="nx">Zend\Search\Lucene\Analysis\Analyzer\Common</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$_position</span><span class="p">;</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Reset token stream</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">reset</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_position</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Tokenization stream API</span>
+<span class="sd">     * Get next token</span>
+<span class="sd">     * Returns null at the end of stream</span>
+<span class="sd">     *</span>
+<span class="sd">     * @return Zend\Search\Lucene\Analysis\Token|null</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">nextToken</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_input</span> <span class="o">===</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">while</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_position</span> <span class="o">&lt;</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_input</span><span class="p">))</span> <span class="p">{</span>
+            <span class="c1">// skip white space</span>
+            <span class="k">while</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_position</span> <span class="o">&lt;</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_input</span><span class="p">)</span> <span class="o">&amp;&amp;</span>
+                   <span class="o">!</span><span class="nb">ctype_alnum</span><span class="p">(</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_input</span><span class="p">[</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_position</span><span class="p">]</span> <span class="p">))</span> <span class="p">{</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_position</span><span class="o">++</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="nv">$termStartPosition</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_position</span><span class="p">;</span>
+
+            <span class="c1">// read token</span>
+            <span class="k">while</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_position</span> <span class="o">&lt;</span> <span class="nb">strlen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_input</span><span class="p">)</span> <span class="o">&amp;&amp;</span>
+                   <span class="nb">ctype_alnum</span><span class="p">(</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_input</span><span class="p">[</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_position</span><span class="p">]</span> <span class="p">))</span> <span class="p">{</span>
+                <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_position</span><span class="o">++</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="c1">// Empty token, end of stream.</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_position</span> <span class="o">==</span> <span class="nv">$termStartPosition</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="nv">$token</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Analysis\Token</span><span class="p">(</span>
+                                      <span class="nx">substr</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_input</span><span class="p">,</span>
+                                             <span class="nv">$termStartPosition</span><span class="p">,</span>
+                                             <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_position</span> <span class="o">-</span>
+                                             <span class="nv">$termStartPosition</span><span class="p">),</span>
+                                      <span class="nv">$termStartPosition</span><span class="p">,</span>
+                                      <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">_position</span><span class="p">);</span>
+            <span class="nv">$token</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">normalize</span><span class="p">(</span><span class="nv">$token</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$token</span> <span class="o">!==</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="nv">$token</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="c1">// Continue if token is skipped</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">Zend\Search\Lucene\Analysis\Analyzer</span><span class="o">::</span><span class="na">setDefault</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">My_Analyzer</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+</div></blockquote>
+</div>
+<div class="section" id="tokens-filtering">
+<span id="zendsearch-lucene-extending-filters"></span><h2>Tokens Filtering<a class="headerlink" href="#tokens-filtering" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\Analyzer\Common</span></tt> analyzer also offers a token filtering mechanism.</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\TokenFilter</span></tt> class provides an abstract interface for such filters. Your own
+filters should extend this class either directly or indirectly.</p>
+<p>Any custom filter must implement the <tt class="docutils literal"><span class="pre">normalize()</span></tt> method which may transform input token or signal that the
+current token should be skipped.</p>
+<p>There are three filters already defined in the analysis subpackage:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\TokenFilter\LowerCase</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\TokenFilter\ShortWords</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\TokenFilter\StopWords</span></tt></li>
+</ul>
+</div></blockquote>
+<p>The <em>LowerCase</em> filter is already used for <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\Analyzer\Common\Text\CaseInsensitive</span></tt>
+analyzer by default.</p>
+<p>The <em>ShortWords</em> and <em>StopWords</em> filters may be used with pre-defined or custom analyzers like this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$stopWords</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;an&#39;</span><span class="p">,</span> <span class="s1">&#39;at&#39;</span><span class="p">,</span> <span class="s1">&#39;the&#39;</span><span class="p">,</span> <span class="s1">&#39;and&#39;</span><span class="p">,</span> <span class="s1">&#39;or&#39;</span><span class="p">,</span> <span class="s1">&#39;is&#39;</span><span class="p">,</span> <span class="s1">&#39;am&#39;</span><span class="p">);</span>
+<span class="nv">$stopWordsFilter</span> <span class="o">=</span>
+    <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Analysis\TokenFilter\StopWords</span><span class="p">(</span><span class="nv">$stopWords</span><span class="p">);</span>
+
+<span class="nv">$analyzer</span> <span class="o">=</span>
+    <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Analysis\Analyzer\Common\TextNum\CaseInsensitive</span><span class="p">();</span>
+<span class="nv">$analyzer</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="nv">$stopWordsFilter</span><span class="p">);</span>
+
+<span class="nx">Zend\Search\Lucene\Analysis\Analyzer</span><span class="o">::</span><span class="na">setDefault</span><span class="p">(</span><span class="nv">$analyzer</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$shortWordsFilter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Analysis\TokenFilter\ShortWords</span><span class="p">();</span>
+
+<span class="nv">$analyzer</span> <span class="o">=</span>
+    <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Analysis\Analyzer\Common\TextNum\CaseInsensitive</span><span class="p">();</span>
+<span class="nv">$analyzer</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="nv">$shortWordsFilter</span><span class="p">);</span>
+
+<span class="nx">Zend\Search\Lucene\Analysis\Analyzer</span><span class="o">::</span><span class="na">setDefault</span><span class="p">(</span><span class="nv">$analyzer</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\TokenFilter\StopWords</span></tt> constructor takes an array of stop-words as an input. But
+stop-words may be also loaded from a file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$stopWordsFilter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Analysis\TokenFilter\StopWords</span><span class="p">();</span>
+<span class="nv">$stopWordsFilter</span><span class="o">-&gt;</span><span class="na">loadFromFile</span><span class="p">(</span><span class="nv">$my_stopwords_file</span><span class="p">);</span>
+
+<span class="nv">$analyzer</span> <span class="o">=</span>
+   <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Analysis\Analyzer\Common\TextNum\CaseInsensitive</span><span class="p">();</span>
+<span class="nv">$analyzer</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="nv">$stopWordsFilter</span><span class="p">);</span>
+
+<span class="nx">Zend\Search\Lucene\Analysis\Analyzer</span><span class="o">::</span><span class="na">setDefault</span><span class="p">(</span><span class="nv">$analyzer</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>This file should be a common text file with one word in each line. The &#8216;#&#8217; character marks a line as a comment.</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Analysis\TokenFilter\ShortWords</span></tt> constructor has one optional argument. This is the word
+length limit, set by default to 2.</p>
+</div>
+<div class="section" id="scoring-algorithms">
+<span id="zendsearch-lucene-extending-scoring"></span><h2>Scoring Algorithms<a class="headerlink" href="#scoring-algorithms" title="Permalink to this headline">¶</a></h2>
+<p>The score of a document <tt class="docutils literal"><span class="pre">d</span></tt> for a query <tt class="docutils literal"><span class="pre">q</span></tt> is defined as follows:</p>
+<p><em>score(q,d) = sum( tf(t in d) * idf(t) * getBoost(t.field in d) * lengthNorm(t.field in d) ) * coord(q,d) *
+queryNorm(q)</em></p>
+<p>tf(t in d) -<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\Similarity::tf($freq)</span></tt>- a score factor based on the frequency of a term or
+phrase in a document.</p>
+<p>idf(t) -<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\Similarity::idf($input,</span> <span class="pre">$reader)</span></tt>- a score factor for a simple term with the
+specified index.</p>
+<p>getBoost(t.field in d) - the boost factor for the term field.</p>
+<p>lengthNorm($term) - the normalization value for a field given the total number of terms contained in a field. This
+value is stored within the index. These values, together with field boosts, are stored in an index and multiplied
+into scores for hits on each field by the search code.</p>
+<p>Matches in longer fields are less precise, so implementations of this method usually return smaller values when
+numTokens is large, and larger values when numTokens is small.</p>
+<p>coord(q,d) -<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\Similarity::coord($overlap,</span> <span class="pre">$maxOverlap)</span></tt>- a score factor based on the
+fraction of all query terms that a document contains.</p>
+<p>The presence of a large portion of the query terms indicates a better match with the query, so implementations of
+this method usually return larger values when the ratio between these parameters is large and smaller values when
+the ratio between them is small.</p>
+<p>queryNorm(q) - the normalization value for a query given the sum of the squared weights of each of the query terms.
+This value is then multiplied into the weight of each query term.</p>
+<p>This does not affect ranking, but rather just attempts to make scores from different queries comparable.</p>
+<p>The scoring algorithm can be customized by defining your own Similarity class. To do this extend the
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\Similarity</span></tt> class as defined below, then use the
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\Similarity::setDefault($similarity);</span></tt> method to set it as default.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MySimilarity</span> <span class="k">extends</span> <span class="nx">Zend\Search\Lucene\Search\Similarity</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">lengthNorm</span><span class="p">(</span><span class="nv">$fieldName</span><span class="p">,</span> <span class="nv">$numTerms</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="mf">1.0</span><span class="o">/</span><span class="nx">sqrt</span><span class="p">(</span><span class="nv">$numTerms</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">queryNorm</span><span class="p">(</span><span class="nv">$sumOfSquaredWeights</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="mf">1.0</span><span class="o">/</span><span class="nx">sqrt</span><span class="p">(</span><span class="nv">$sumOfSquaredWeights</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">tf</span><span class="p">(</span><span class="nv">$freq</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">sqrt</span><span class="p">(</span><span class="nv">$freq</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * It&#39;s not used now. Computes the amount of a sloppy phrase match,</span>
+<span class="sd">     * based on an edit distance.</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">sloppyFreq</span><span class="p">(</span><span class="nv">$distance</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="mf">1.0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">idfFreq</span><span class="p">(</span><span class="nv">$docFreq</span><span class="p">,</span> <span class="nv">$numDocs</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nx">log</span><span class="p">(</span><span class="nv">$numDocs</span><span class="o">/</span><span class="p">(</span><span class="nx">float</span><span class="p">)(</span><span class="nv">$docFreq</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">coord</span><span class="p">(</span><span class="nv">$overlap</span><span class="p">,</span> <span class="nv">$maxOverlap</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$overlap</span><span class="o">/</span><span class="p">(</span><span class="nx">float</span><span class="p">)</span><span class="nv">$maxOverlap</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$mySimilarity</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MySimilarity</span><span class="p">();</span>
+<span class="nx">Zend\Search\Lucene\Search\Similarity</span><span class="o">::</span><span class="na">setDefault</span><span class="p">(</span><span class="nv">$mySimilarity</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="storage-containers">
+<span id="zendsearch-lucene-extending-storage"></span><h2>Storage Containers<a class="headerlink" href="#storage-containers" title="Permalink to this headline">¶</a></h2>
+<p>The abstract class <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Storage\Directory</span></tt> defines directory functionality.</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> constructor uses either a string or a <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Storage\Directory</span></tt> object as
+an input.</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Storage\Directory\Filesystem</span></tt> class implements directory functionality for a file system.</p>
+<p>If a string is used as an input for the <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> constructor, then the index reader
+(<tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> object) treats it as a file system path and instantiates the
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Storage\Directory\Filesystem</span></tt> class.</p>
+<p>You can define your own directory implementation by extending the <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Storage\Directory</span></tt> class.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Storage\Directory</span></tt> methods:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">abstract</span> <span class="k">class</span> <span class="nc">Zend\Search\Lucene\Storage\Directory</span> <span class="p">{</span>
+<span class="sd">/**</span>
+<span class="sd"> * Closes the store.</span>
+<span class="sd"> *</span>
+<span class="sd"> * @return void</span>
+<span class="sd"> */</span>
+<span class="k">abstract</span> <span class="k">function</span> <span class="nf">close</span><span class="p">();</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Creates a new, empty file in the directory with the given $filename.</span>
+<span class="sd"> *</span>
+<span class="sd"> * @param string $name</span>
+<span class="sd"> * @return void</span>
+<span class="sd"> */</span>
+<span class="k">abstract</span> <span class="k">function</span> <span class="nf">createFile</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Removes an existing $filename in the directory.</span>
+<span class="sd"> *</span>
+<span class="sd"> * @param string $filename</span>
+<span class="sd"> * @return void</span>
+<span class="sd"> */</span>
+<span class="k">abstract</span> <span class="k">function</span> <span class="nf">deleteFile</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Returns true if a file with the given $filename exists.</span>
+<span class="sd"> *</span>
+<span class="sd"> * @param string $filename</span>
+<span class="sd"> * @return boolean</span>
+<span class="sd"> */</span>
+<span class="k">abstract</span> <span class="k">function</span> <span class="nf">fileExists</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Returns the length of a $filename in the directory.</span>
+<span class="sd"> *</span>
+<span class="sd"> * @param string $filename</span>
+<span class="sd"> * @return integer</span>
+<span class="sd"> */</span>
+<span class="k">abstract</span> <span class="k">function</span> <span class="nf">fileLength</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Returns the UNIX timestamp $filename was last modified.</span>
+<span class="sd"> *</span>
+<span class="sd"> * @param string $filename</span>
+<span class="sd"> * @return integer</span>
+<span class="sd"> */</span>
+<span class="k">abstract</span> <span class="k">function</span> <span class="nf">fileModified</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Renames an existing file in the directory.</span>
+<span class="sd"> *</span>
+<span class="sd"> * @param string $from</span>
+<span class="sd"> * @param string $to</span>
+<span class="sd"> * @return void</span>
+<span class="sd"> */</span>
+<span class="k">abstract</span> <span class="k">function</span> <span class="nf">renameFile</span><span class="p">(</span><span class="nv">$from</span><span class="p">,</span> <span class="nv">$to</span><span class="p">);</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Sets the modified time of $filename to now.</span>
+<span class="sd"> *</span>
+<span class="sd"> * @param string $filename</span>
+<span class="sd"> * @return void</span>
+<span class="sd"> */</span>
+<span class="k">abstract</span> <span class="k">function</span> <span class="nf">touchFile</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Returns a Zend\Search\Lucene\Storage\File object for a given</span>
+<span class="sd"> * $filename in the directory.</span>
+<span class="sd"> *</span>
+<span class="sd"> * @param string $filename</span>
+<span class="sd"> * @return Zend\Search\Lucene\Storage\File</span>
+<span class="sd"> */</span>
+<span class="k">abstract</span> <span class="k">function</span> <span class="nf">getFileObject</span><span class="p">(</span><span class="nv">$filename</span><span class="p">);</span>
+
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getFileObject($filename)</span></tt> method of a <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Storage\Directory</span></tt> instance returns a
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Storage\File</span></tt> object.</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Storage\File</span></tt> abstract class implements file abstraction and index file reading
+primitives.</p>
+<p>You must also extend <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Storage\File</span></tt> for your directory implementation.</p>
+<p>Only two methods of <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Storage\File</span></tt> must be overridden in your implementation:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MyFile</span> <span class="k">extends</span> <span class="nx">Zend\Search\Lucene\Storage\File</span> <span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * Sets the file position indicator and advances the file pointer.</span>
+<span class="sd">     * The new position, measured in bytes from the beginning of the file,</span>
+<span class="sd">     * is obtained by adding offset to the position specified by whence,</span>
+<span class="sd">     * whose values are defined as follows:</span>
+<span class="sd">     * SEEK_SET - Set position equal to offset bytes.</span>
+<span class="sd">     * SEEK_CUR - Set position to current location plus offset.</span>
+<span class="sd">     * SEEK_END - Set position to end-of-file plus offset. (To move to</span>
+<span class="sd">     * a position before the end-of-file, you need to pass a negative value</span>
+<span class="sd">     * in offset.)</span>
+<span class="sd">     * Upon success, returns 0; otherwise, returns -1</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param integer $offset</span>
+<span class="sd">     * @param integer $whence</span>
+<span class="sd">     * @return integer</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">seek</span><span class="p">(</span><span class="nv">$offset</span><span class="p">,</span> <span class="nv">$whence</span><span class="o">=</span><span class="nx">SEEK_SET</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Read a $length bytes from the file and advance the file pointer.</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param integer $length</span>
+<span class="sd">     * @return string</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">_fread</span><span class="p">(</span><span class="nv">$length</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Extensibility</a><ul>
+<li><a class="reference internal" href="#text-analysis">Text Analysis</a></li>
+<li><a class="reference internal" href="#tokens-filtering">Tokens Filtering</a></li>
+<li><a class="reference internal" href="#scoring-algorithms">Scoring Algorithms</a></li>
+<li><a class="reference internal" href="#storage-containers">Storage Containers</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendsearch.lucene.extending.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendsearch.lucene.extending.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendsearch.lucene.extending.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendsearch.lucene.extending.rst">
+                Extensibility
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
