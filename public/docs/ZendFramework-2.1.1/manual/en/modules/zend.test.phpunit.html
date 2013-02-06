@@ -1,0 +1,447 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Unit testing with PHPUnit &mdash; Zend Framework 2 2.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.1 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Text\Figlet" href="zend.text.figlet.html" />
+    <link rel="prev" title="Introduction" href="zend.test.introduction.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.text.figlet.html" title="Zend\Text\Figlet"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.test.introduction.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="unit-testing-with-phpunit">
+<span id="zend-test-phpunit"></span><h1>Unit testing with PHPUnit<a class="headerlink" href="#unit-testing-with-phpunit" title="Permalink to this headline">¶</a></h1>
+<p>ZendTestPHPUnit provides a TestCase for MVC applications that contains assertions for testing against a variety of
+responsibilities. Probably the easiest way to understand what it can do is to see an example.</p>
+<p>The following is a simple test case for a IndexController to verify things like HTTP code, controller and action name :</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+
+<span class="k">namespace</span> <span class="nx">ApplicationTest\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">IndexControllerTest</span> <span class="k">extends</span> <span class="nx">AbstractHttpControllerTestCase</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setUp</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setApplicationConfig</span><span class="p">(</span>
+            <span class="k">include</span> <span class="s1">&#39;/path/to/application/config/test/application.config.php&#39;</span>
+        <span class="p">);</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">setUp</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testIndexActionCanBeAccessed</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertResponseStatusCode</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertModule</span><span class="p">(</span><span class="s1">&#39;application&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertControllerName</span><span class="p">(</span><span class="s1">&#39;application_index&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertControllerClass</span><span class="p">(</span><span class="s1">&#39;IndexController&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertMatchedRouteName</span><span class="p">(</span><span class="s1">&#39;home&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The setup of the test case can to define the application config. You can use several config
+to test modules dependencies or your current application config.</p>
+</div>
+<div class="section" id="setup-your-testcase">
+<span id="zend-test-setup"></span><h1>Setup your TestCase<a class="headerlink" href="#setup-your-testcase" title="Permalink to this headline">¶</a></h1>
+<p>As noted in the previous example, all MVC test cases should extend AbstractHttpControllerTestCase.
+This class in turn extends PHPUnit_Framework_TestCase, and gives you all the structure and assertions
+you&#8217;d expect from PHPUnit &#8211; as well as some scaffolding and assertions specific to Zend Framework&#8217;s MVC implementation.</p>
+<p>In order to test your MVC application, you will need to setup the application config. Use simply the the <tt class="docutils literal"><span class="pre">setApplicationConfig</span></tt> method :</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">setUp</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setApplicationConfig</span><span class="p">(</span>
+        <span class="k">include</span> <span class="s1">&#39;/path/to/application/config/test/application.config.php&#39;</span>
+    <span class="p">);</span>
+    <span class="k">parent</span><span class="o">::</span><span class="na">setUp</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Once the application is set up, you can write your tests. To help debug tests, you can activate the flag <tt class="docutils literal"><span class="pre">traceError</span></tt> to
+throw MVC exception during the tests writing :</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+
+<span class="k">namespace</span> <span class="nx">ApplicationTest\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">IndexControllerTest</span> <span class="k">extends</span> <span class="nx">AbstractHttpControllerTestCase</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="nv">$traceError</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing-your-controllers-and-mvc-applications">
+<span id="zend-test-testing"></span><h1>Testing your Controllers and MVC Applications<a class="headerlink" href="#testing-your-controllers-and-mvc-applications" title="Permalink to this headline">¶</a></h1>
+<p>Once you have your application config in place, you can begin testing. Testing is basically as you would expect in an PHPUnit test
+suite, with a few minor differences.</p>
+<p>First, you will need to dispatch a URL to test, using the <tt class="docutils literal"><span class="pre">dispatch</span></tt> method of the TestCase:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">testIndexAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There will be times, however, that you need to provide extra information &#8211; GET and POST variables, COOKIE information, etc.
+You can populate the request with that information:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">testIndexAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">()</span>
+        <span class="o">-&gt;</span><span class="na">setMethod</span><span class="p">(</span><span class="s1">&#39;POST&#39;</span><span class="p">)</span>
+        <span class="o">-&gt;</span><span class="na">setPost</span><span class="p">(</span><span class="k">new</span> <span class="nx">Parameters</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;argument&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;value&#39;</span><span class="p">)));</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can populate GET or POST variables directly with the <tt class="docutils literal"><span class="pre">dispatch</span></tt> method :</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">testIndexAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;argument&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;value&#39;</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>You can use directly yours query args in the url :</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">testIndexAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">&#39;/tests?foo=bar&amp;baz=foo&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now that the request is made, it&#8217;s time to start making assertions against it.</p>
+</div>
+<div class="section" id="assertions">
+<h1>Assertions<a class="headerlink" href="#assertions" title="Permalink to this headline">¶</a></h1>
+<p>Assertions are at the heart of Unit Testing; you use them to verify that the results are what you expect.
+To this end, ZendTestPHPUnitAbstractControllerTestCase provides a number of assertions to make testing your
+MVC apps and controllers simpler.</p>
+</div>
+<div class="section" id="request-assertions">
+<h1>Request Assertions<a class="headerlink" href="#request-assertions" title="Permalink to this headline">¶</a></h1>
+<p>It&#8217;s often useful to assert against the last run action, controller, and module; additionally, you may want
+to assert against the route that was matched. The following assertions can help you in this regard:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">assertModulesLoaded(array</span> <span class="pre">$modules)</span></tt>: Assert that the given modules was loaded by the application.</li>
+<li><tt class="docutils literal"><span class="pre">assertModuleName($module)</span></tt>: Assert that the given module was used in the last dispatched action.</li>
+<li><tt class="docutils literal"><span class="pre">assertControllerName($controller)</span></tt>: Assert that the given controller identifier was selected in the last dispatched action.</li>
+<li><tt class="docutils literal"><span class="pre">assertControllerClass($controller)</span></tt>: Assert that the given controller class was selected in the last dispatched action.</li>
+<li><tt class="docutils literal"><span class="pre">assertActionName($action)</span></tt>: Assert that the given action was last dispatched.</li>
+<li><tt class="docutils literal"><span class="pre">assertMatchedRouteName($route)</span></tt>: Assert that the given named route was matched by the router.</li>
+</ul>
+<p>Each also has a &#8216;Not&#8217; variant for negative assertions.</p>
+</div>
+<div class="section" id="css-selector-assertions">
+<h1>CSS Selector Assertions<a class="headerlink" href="#css-selector-assertions" title="Permalink to this headline">¶</a></h1>
+<p>CSS selectors are an easy way to verify that certain artifacts are present in the response content.
+They also make it trivial to ensure that items necessary for Javascript UIs and/or AJAX integration will be present; most
+JS toolkits provide some mechanism for pulling DOM elements based on CSS selectors, so the syntax would be the same.</p>
+<p>This functionality is provided via ZendDomQuery, and integrated into a set of &#8216;Query&#8217; assertions. Each of these
+assertions takes as their first argument a CSS selector, with optionally additional arguments and/or an error message,
+based on the assertion type. You can find the rules for writing the CSS selectors in the Zend_Dom_Query theory of operation chapter.
+Query assertions include:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">assertQuery($path)</span></tt>: assert that one or more DOM elements matching the given CSS selector are present.</li>
+<li><tt class="docutils literal"><span class="pre">assertQueryContentContains($path,</span> <span class="pre">$match)</span></tt>: assert that one or more DOM elements matching the given CSS selector are present,</li>
+</ul>
+<p>and that at least one contains the content provided in $match.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">assertQueryContentRegex($path,</span> <span class="pre">$pattern)</span></tt>: assert that one or more DOM elements matching the given CSS selector are present,</li>
+</ul>
+<p>and that at least one matches the regular expression provided in $pattern. If a $message is present, it will be prepended to any
+failed assertion message.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">assertQueryCount($path,</span> <span class="pre">$count)</span></tt>: assert that there are exactly $count DOM elements matching the given CSS selector present.</li>
+<li><tt class="docutils literal"><span class="pre">assertQueryCountMin($path,</span> <span class="pre">$count)</span></tt>: assert that there are at least $count DOM elements matching the given CSS selector present.</li>
+<li><tt class="docutils literal"><span class="pre">assertQueryCountMax($path,</span> <span class="pre">$count)</span></tt>: assert that there are no more than $count DOM elements matching the given CSS selector present.</li>
+</ul>
+<p>Additionally, each of the above has a &#8216;Not&#8217; variant that provides a negative assertion: assertNotQuery(), assertNotQueryContentContains(),
+assertNotQueryContentRegex(), and assertNotQueryCount(). (Note that the min and max counts do not have these variants, for what should
+be obvious reasons.)</p>
+</div>
+<div class="section" id="xpath-assertions">
+<h1>XPath Assertions<a class="headerlink" href="#xpath-assertions" title="Permalink to this headline">¶</a></h1>
+<p>Some developers are more familiar with XPath than with CSS selectors, and thus XPath variants of all the Query assertions are also provided.
+These are:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">assertXpath($path)</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">assertNotXpathQuery($path)</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">assertXpathQueryCount($path,</span> <span class="pre">$count)</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">assertNotXpathQueryCount($path,</span> <span class="pre">$count)</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">assertXpathQueryCountMin($path,</span> <span class="pre">$count)</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">assertXpathQueryCountMax($path,</span> <span class="pre">$count)</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">assertXpathQueryContentContains($path,</span> <span class="pre">$match)</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">assertNotXpathQueryContentContains($path,</span> <span class="pre">$match)</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">assertXpathQueryContentRegex($path,</span> <span class="pre">$pattern)</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">assertNotXpathQueryContentRegex($path,</span> <span class="pre">$pattern)</span></tt></li>
+</ul>
+</div>
+<div class="section" id="redirect-assertions">
+<h1>Redirect Assertions<a class="headerlink" href="#redirect-assertions" title="Permalink to this headline">¶</a></h1>
+<p>Often an action will redirect. Instead of following the redirect, Zend_Test_PHPUnit_ControllerTestCase allows you to test for redirects
+with a handful of assertions.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">assertRedirect()</span></tt>: assert simply that a redirect has occurred.</li>
+<li><tt class="docutils literal"><span class="pre">assertRedirectTo($url)</span></tt>: assert that a redirect has occurred, and that the value of the Location header is the $url provided.</li>
+<li><tt class="docutils literal"><span class="pre">assertRedirectRegex($pattern)</span></tt>: assert that a redirect has occurred, and that the value of the Location header matches the regular</li>
+</ul>
+<p>expression provided by $pattern.</p>
+<p>Each also has a &#8216;Not&#8217; variant for negative assertions.</p>
+</div>
+<div class="section" id="response-header-assertions">
+<h1>Response Header Assertions<a class="headerlink" href="#response-header-assertions" title="Permalink to this headline">¶</a></h1>
+<p>In addition to checking for redirect headers, you will often need to check for specific HTTP response codes and headers &#8211; for instance,
+to determine whether an action results in a 404 or 500 response, or to ensure that JSON responses contain the appropriate Content-Type header.
+The following assertions are available.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">assertResponseCode($code)</span></tt>: assert that the response resulted in the given HTTP response code.</li>
+<li><tt class="docutils literal"><span class="pre">assertResponseHeader($header)</span></tt>: assert that the response contains the given header.</li>
+<li><tt class="docutils literal"><span class="pre">assertResponseHeaderContains($header,</span> <span class="pre">$match)</span></tt>: assert that the response contains the given header and that its content contains the given string.</li>
+<li><tt class="docutils literal"><span class="pre">assertResponseHeaderRegex($header,</span> <span class="pre">$pattern)</span></tt>: assert that the response contains the given header and that its content matches the given regex.</li>
+</ul>
+<p>Additionally, each of the above assertions have a &#8216;Not&#8217; variant for negative assertions.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Unit testing with PHPUnit</a></li>
+<li><a class="reference internal" href="#setup-your-testcase">Setup your TestCase</a></li>
+<li><a class="reference internal" href="#testing-your-controllers-and-mvc-applications">Testing your Controllers and MVC Applications</a></li>
+<li><a class="reference internal" href="#assertions">Assertions</a></li>
+<li><a class="reference internal" href="#request-assertions">Request Assertions</a></li>
+<li><a class="reference internal" href="#css-selector-assertions">CSS Selector Assertions</a></li>
+<li><a class="reference internal" href="#xpath-assertions">XPath Assertions</a></li>
+<li><a class="reference internal" href="#redirect-assertions">Redirect Assertions</a></li>
+<li><a class="reference internal" href="#response-header-assertions">Response Header Assertions</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.test.introduction.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.text.figlet.html"
+                        title="next chapter">Zend\Text\Figlet</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.test.phpunit.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.test.phpunit.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.test.phpunit.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.text.figlet.html" title="Zend\Text\Figlet"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.test.introduction.html" title="Introduction"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.test.phpunit.rst">
+                Unit testing with PHPUnit
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

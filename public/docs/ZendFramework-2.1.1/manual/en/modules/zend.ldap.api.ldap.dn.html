@@ -1,0 +1,326 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Ldap\Dn &mdash; Zend Framework 2 2.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.1 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-ldap-dn">
+<span id="zend-ldap-api-reference-zend-ldap-dn"></span><h1>Zend\Ldap\Dn<a class="headerlink" href="#zend-ldap-dn" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Ldap\Dn</span></tt> provides an object-oriented interface to manipulating <em>LDAP</em> distinguished names (DN). The
+parameter <tt class="docutils literal"><span class="pre">$caseFold</span></tt> that is used in several methods determines the way DN attributes are handled regarding
+their case. Allowed values for this parameter are:</p>
+<dl class="docutils">
+<dt><strong>ZendLdapDn::ATTR_CASEFOLD_NONE</strong></dt>
+<dd>No case-folding will be done.</dd>
+<dt><strong>ZendLdapDn::ATTR_CASEFOLD_UPPER</strong></dt>
+<dd>All attributes will be converted to upper-case.</dd>
+<dt><strong>ZendLdapDn::ATTR_CASEFOLD_LOWER</strong></dt>
+<dd>All attributes will be converted to lower-case.</dd>
+</dl>
+<p>The default case-folding is <tt class="docutils literal"><span class="pre">Zend\Ldap\Dn::ATTR_CASEFOLD_NONE</span></tt> and can be set with
+<tt class="docutils literal"><span class="pre">Zend\Ldap\Dn::setDefaultCaseFold()</span></tt>. Each instance of <tt class="docutils literal"><span class="pre">Zend\Ldap\Dn</span></tt> can have its own case-folding-setting. If
+the <tt class="docutils literal"><span class="pre">$caseFold</span></tt> parameter is omitted in method-calls it defaults to the instance&#8217;s case-folding setting.</p>
+<p>The class implements <em>ArrayAccess</em> to allow indexer-access to the different parts of the DN. The
+<em>ArrayAccess</em>-methods proxy to <tt class="docutils literal"><span class="pre">Zend\Ldap\Dn::get($offset,</span> <span class="pre">1,</span> <span class="pre">null)</span></tt> for <em>offsetGet(integer $offset)</em>, to
+<tt class="docutils literal"><span class="pre">Zend\Ldap\Dn::set($offset,</span> <span class="pre">$value)</span></tt> for <tt class="docutils literal"><span class="pre">offsetSet()</span></tt> and to <tt class="docutils literal"><span class="pre">Zend\Ldap\Dn::remove($offset,</span> <span class="pre">1)</span></tt> for
+<tt class="docutils literal"><span class="pre">offsetUnset()</span></tt>. <tt class="docutils literal"><span class="pre">offsetExists()</span></tt> simply checks if the index is within the bounds.</p>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-dn-table">
+<caption>Zend\Ldap\Dn API</caption>
+<colgroup>
+<col width="18%" />
+<col width="82%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Zend\Ldap\Dn factory(string|array $dn, string|null $caseFold)</td>
+<td>Creates a Zend\Ldap\Dn instance from an array or a string. The array must conform to the array structure detailed under Zend\Ldap\Dn::implodeDn().</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Dn fromString(string $dn, string|null $caseFold)</td>
+<td>Creates a Zend\Ldap\Dn instance from a string.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Dn fromArray(array $dn, string|null $caseFold)</td>
+<td>Creates a Zend\Ldap\Dn instance from an array. The array must conform to the array structure detailed under Zend\Ldap\Dn::implodeDn().</td>
+</tr>
+<tr class="row-odd"><td>array getRdn(string|null $caseFold)</td>
+<td>Gets the RDN of the current DN. The return value is an array with the RDN attribute names its keys and the RDN attribute values.</td>
+</tr>
+<tr class="row-even"><td>string getRdnString(string|null $caseFold)</td>
+<td>Gets the RDN of the current DN. The return value is a string.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Dn getParentDn(integer $levelUp)</td>
+<td>Gets the DN of the current DN&#8217;s ancestor $levelUp levels up the tree. $levelUp defaults to 1.</td>
+</tr>
+<tr class="row-even"><td>array get(integer $index, integer $length, string|null $caseFold)</td>
+<td>Returns a slice of the current DN determined by $index and $length. $index starts with 0 on the DN part from the left.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Dn set(integer $index, array $value)</td>
+<td>Replaces a DN part in the current DN. This operation manipulates the current instance.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Dn remove(integer $index, integer $length)</td>
+<td>Removes a DN part from the current DN. This operation manipulates the current instance. $length defaults to 1</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Dn append(array $value)</td>
+<td>Appends a DN part to the current DN. This operation manipulates the current instance.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Dn prepend(array $value)</td>
+<td>Prepends a DN part to the current DN. This operation manipulates the current instance.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Dn insert(integer $index, array $value)</td>
+<td>Inserts a DN part after the index $index to the current DN. This operation manipulates the current instance.</td>
+</tr>
+<tr class="row-even"><td>void setCaseFold(string|null $caseFold)</td>
+<td>Sets the case-folding option to the current DN instance. If $caseFold is NULL the default case-folding setting (Zend\Ldap\Dn::ATTR_CASEFOLD_NONE by default or set via Zend\Ldap\Dn::setDefaultCaseFold() will be set for the current instance.</td>
+</tr>
+<tr class="row-odd"><td>string toString(string|null $caseFold)</td>
+<td>Returns DN as a string.</td>
+</tr>
+<tr class="row-even"><td>array toArray(string|null $caseFold)</td>
+<td>Returns DN as an array.</td>
+</tr>
+<tr class="row-odd"><td>string __toString()</td>
+<td>Returns DN as a string - proxies to Zend\Ldap\Dn::toString(null).</td>
+</tr>
+<tr class="row-even"><td>void setDefaultCaseFold(string $caseFold)</td>
+<td>Sets the default case-folding option used by all instances on creation by default. Already existing instances are not affected by this setting.</td>
+</tr>
+<tr class="row-odd"><td>array escapeValue(string|array $values)</td>
+<td>Escapes a DN value according to RFC 2253.</td>
+</tr>
+<tr class="row-even"><td>array unescapeValue(string|array $values)</td>
+<td>Undoes the conversion done by Zend\Ldap\Dn::escapeValue().</td>
+</tr>
+<tr class="row-odd"><td>array explodeDn(string $dn, array &amp;$keys, array &amp;$vals, string|null $caseFold)</td>
+<td>Explodes the DN $dn into an array containing all parts of the given DN. $keys optionally receive DN keys (e.g. CN, OU, DC, ...). $vals optionally receive DN values. The resulting array will be of type array( array(&#8220;cn&#8221; =&gt; &#8220;name1&#8221;, &#8220;uid&#8221; =&gt; &#8220;user&#8221;), array(&#8220;cn&#8221; =&gt; &#8220;name2&#8221;), array(&#8220;dc&#8221; =&gt; &#8220;example&#8221;), array(&#8220;dc&#8221; =&gt; &#8220;org&#8221;) ) for a DN of cn=name1+uid=user,cn=name2,dc=example,dc=org.</td>
+</tr>
+<tr class="row-even"><td>boolean checkDn(string $dn, array &amp;$keys, array &amp;$vals, string|null $caseFold)</td>
+<td>Checks if a given DN $dn is malformed. If $keys or $keys and $vals are given, these arrays will be filled with the appropriate DN keys and values.</td>
+</tr>
+<tr class="row-odd"><td>string implodeRdn(array $part, string|null $caseFold)</td>
+<td>Returns a DN part in the form $attribute=$value</td>
+</tr>
+<tr class="row-even"><td>string implodeDn(array $dnArray, string|null $caseFold, string $separator)</td>
+<td>Implodes an array in the form delivered by Zend\Ldap\Dn::explodeDn() to a DN string. $separator defaults to &#8216;,&#8217; but some LDAP servers also understand &#8216;;&#8217;. $dnArray must of type array( array(&#8220;cn&#8221; =&gt; &#8220;name1&#8221;, &#8220;uid&#8221; =&gt; &#8220;user&#8221;), array(&#8220;cn&#8221; =&gt; &#8220;name2&#8221;), array(&#8220;dc&#8221; =&gt; &#8220;example&#8221;), array(&#8220;dc&#8221; =&gt; &#8220;org&#8221;) )</td>
+</tr>
+<tr class="row-odd"><td>boolean isChildOf(string|Zend\Ldap\Dn $childDn, string|Zend\Ldap\Dn $parentDn)</td>
+<td>Checks if given $childDn is beneath $parentDn subtree.</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.ldap.api.ldap.dn.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.ldap.api.ldap.dn.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.ldap.api.ldap.dn.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.ldap.api.ldap.dn.rst">
+                Zend\Ldap\Dn
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,550 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Uri &mdash; Zend Framework 2 2.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.1 documentation" href="../index.html" />
+    <link rel="next" title="Introduction" href="zend.validator.html" />
+    <link rel="prev" title="Zend\Text\Table" href="zend.text.table.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.validator.html" title="Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.text.table.html" title="Zend\Text\Table"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-uri">
+<span id="zend-uri-chapter"></span><h1>Zend\Uri<a class="headerlink" href="#zend-uri" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-uri-overview"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Uri</span></tt> is a component that aids in manipulating and validating
+<a class="reference external" href="http://www.w3.org/Addressing/">Uniform Resource Identifiers</a> (URIs) <a class="footnote-reference" href="#id4" id="id1">[1]</a>. <tt class="docutils literal"><span class="pre">Zend\Uri</span></tt> exists primarily to service
+other components, such as <tt class="docutils literal"><span class="pre">Zend\Http\</span></tt>, but is also useful as a standalone
+utility.</p>
+<p><em>URI</em>s always begin with a scheme, followed by a colon. The construction of
+the many different schemes varies significantly. The <tt class="docutils literal"><span class="pre">Zend\Uri</span></tt> component
+provides the <tt class="docutils literal"><span class="pre">Zend\Uri\UriFactory</span></tt> that returns a class implementing the
+<tt class="docutils literal"><span class="pre">Zend\Uri\UriInterface</span></tt> which specializes in the scheme if such a class is
+registered with the Factory.</p>
+</div>
+<div class="section" id="creating-a-new-uri">
+<span id="zend-uri-creation"></span><h2>Creating a New URI<a class="headerlink" href="#creating-a-new-uri" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Uri\UriFactory</span></tt> will build a new <em>URI</em> from scratch if only a scheme is
+passed to <tt class="docutils literal"><span class="pre">Zend\Uri\UriFactory::factory()</span></tt>.</p>
+<p class="rubric" id="zend-uri-creation-example-1">Creating a New URI with ZendUriUriFactory::factory()</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// To create a new URI from scratch, pass only the scheme</span>
+<span class="c1">// followed by a colon.</span>
+<span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http:&#39;</span><span class="p">);</span>
+
+<span class="c1">// $uri instanceof Zend\Uri\UriInterface</span>
+</pre></div>
+</td></tr></table></div>
+<p>To create a new <em>URI</em> from scratch, pass only the scheme followed by a colon to
+<tt class="docutils literal"><span class="pre">Zend\Uri\UriFactory::factory()</span></tt> <a class="footnote-reference" href="#id5" id="id2">[2]</a>. If an unsupported scheme is passed and
+no scheme-specific class is specified, a
+<tt class="docutils literal"><span class="pre">Zend\Uri\Exception\InvalidArgumentException</span></tt> will be thrown.</p>
+<p>If the scheme or <em>URI</em> passed is supported, <tt class="docutils literal"><span class="pre">Zend\Uri\UriFactory::factory()</span></tt>
+will return a class implementing <tt class="docutils literal"><span class="pre">Zend\Uri\UriInterface</span></tt> that specializes
+in the scheme to be created.</p>
+<div class="section" id="creating-a-new-custom-class-uri">
+<h3>Creating a New Custom-Class URI<a class="headerlink" href="#creating-a-new-custom-class-uri" title="Permalink to this headline">¶</a></h3>
+<p>You can specify a custom class to be used when using the <tt class="docutils literal"><span class="pre">Zend\Uri\UriFactory</span></tt>
+by registering your class with the Factory using
+<tt class="docutils literal"><span class="pre">\Zend\Uri\UriFactory::registerScheme()</span></tt> which takes the scheme as first
+parameter. This enables you to create your own <em>URI</em>-class and instantiate new
+URI objects based on your own custom classes.</p>
+<p>The 2nd parameter passed to <tt class="docutils literal"><span class="pre">Zend\Uri\UriFactory::registerScheme()</span></tt> must be a
+string with the name of a class implementing <tt class="docutils literal"><span class="pre">Zend\Uri\UriInterface</span></tt>. The
+class must either be alredy loaded, or be loadable by the autoloader.</p>
+<p class="rubric" id="zend-uri-creation-custom-example-1">Creating a URI using a custom class</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Create a new &#39;ftp&#39; URI based on a custom class</span>
+<span class="k">use</span> <span class="nx">Zend\Uri\UriFactory</span>
+
+<span class="nx">UriFactory</span><span class="o">::</span><span class="na">registerScheme</span><span class="p">(</span><span class="s1">&#39;ftp&#39;</span><span class="p">,</span> <span class="s1">&#39;MyNamespace\MyClass&#39;</span><span class="p">);</span>
+
+<span class="nv">$ftpUri</span> <span class="o">=</span> <span class="nx">UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span>
+    <span class="s1">&#39;ftp://user@ftp.example.com/path/file&#39;</span>
+<span class="p">);</span>
+
+<span class="c1">// $ftpUri is an instance of MyLibrary\MyClass, which implements</span>
+<span class="c1">// Zend\Uri\UriInterface</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="manipulating-an-existing-uri">
+<span id="zend-uri-manipulation"></span><h2>Manipulating an Existing URI<a class="headerlink" href="#manipulating-an-existing-uri" title="Permalink to this headline">¶</a></h2>
+<p>To manipulate an existing <em>URI</em>, pass the entire <em>URI</em> as string to
+<tt class="docutils literal"><span class="pre">Zend\Uri\UriFactory::factory()</span></tt>.</p>
+<p class="rubric" id="zend-uri-manipulation-example-1">Manipulating an Existing URI with Zend\Uri\UriFactory::factory()</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// To manipulate an existing URI, pass it in.</span>
+<span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://www.zend.com&#39;</span><span class="p">);</span>
+
+<span class="c1">// $uri instanceof Zend\Uri\UriInterface</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <em>URI</em> will be parsed and validated. If it is found to be invalid, a
+<tt class="docutils literal"><span class="pre">Zend\Uri\Exception\InvalidArgumentException</span></tt> will be thrown immediately.
+Otherwise, <tt class="docutils literal"><span class="pre">Zend\Uri\UriFactory::factory()</span></tt> will return a class implementing
+<tt class="docutils literal"><span class="pre">Zend\Uri\UriInterface</span></tt> that specializes in the scheme to be manipulated.</p>
+</div>
+<div class="section" id="common-instance-methods">
+<span id="zend-uri-instance-methods"></span><h2>Common Instance Methods<a class="headerlink" href="#common-instance-methods" title="Permalink to this headline">¶</a></h2>
+<p>The <cite>ZendUriUriInterface`</cite> defines several instance methods that are useful
+for working with any kind of <em>URI</em>.</p>
+<div class="section" id="getting-the-scheme-of-the-uri">
+<span id="zend-uri-instance-methods-getscheme"></span><h3>Getting the Scheme of the URI<a class="headerlink" href="#getting-the-scheme-of-the-uri" title="Permalink to this headline">¶</a></h3>
+<p>The scheme of the <em>URI</em> is the part of the <em>URI</em> that precedes the colon. For
+example, the scheme of <tt class="docutils literal"><span class="pre">http://johndoe&#64;example.com/my/path?query#token</span></tt> is &#8216;http&#8217;.</p>
+<p class="rubric" id="zend-uri-instance-methods-getscheme-example-1">Getting the Scheme from a Zend\Uri\UriInterface Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;mailto:john.doe@example.com&#39;</span><span class="p">);</span>
+
+<span class="nv">$scheme</span> <span class="o">=</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getScheme</span><span class="p">();</span>  <span class="c1">// &quot;mailto&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getScheme()</span></tt> instance method returns only the scheme part of the <em>URI</em>
+object.</p>
+</div>
+<div class="section" id="getting-the-userinfo-of-the-uri">
+<span id="zend-uri-instance-methods-getuserinfo"></span><span id="zend-uri-instance-methods-geturi"></span><h3>Getting the Userinfo of the URI<a class="headerlink" href="#getting-the-userinfo-of-the-uri" title="Permalink to this headline">¶</a></h3>
+<p>The userinfo of the <em>URI</em> is the optional part of the <em>URI</em> that follows the
+colon and comes before the host-part. For example, the userinfo of
+<tt class="docutils literal"><span class="pre">http://johndoe&#64;example.com/my/path?query#token</span></tt> is &#8216;johndoe&#8217;.</p>
+<p class="rubric" id="zend-uri-instance-methods-getuserinfo-example-1">Getting the Username from a Zend\Uri\UriInterface Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;mailto:john.doe@example.com&#39;</span><span class="p">);</span>
+
+<span class="nv">$scheme</span> <span class="o">=</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getUserinfo</span><span class="p">();</span>  <span class="c1">// &quot;john.doe&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getUserinfo()</span></tt>  method returns only the userinfo part of the <em>URI</em>
+object.</p>
+</div>
+<div class="section" id="getting-the-host-of-the-uri">
+<span id="zend-uri-instance-methods-gethost"></span><h3>Getting the host of the URI<a class="headerlink" href="#getting-the-host-of-the-uri" title="Permalink to this headline">¶</a></h3>
+<p>The host of the <em>URI</em> is the optional part of the <em>URI</em> that follows the
+user-part and comes before the path-part. For example, the host of
+<tt class="docutils literal"><span class="pre">http://johndoe&#64;example.com/my/path?query#token</span></tt> is &#8216;example.com&#8217;.</p>
+<p class="rubric" id="zend-uri-instance-methods-gethost-example-1">Getting the host from a Zend\Uri\UriInterface Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;mailto:john.doe@example.com&#39;</span><span class="p">);</span>
+
+<span class="nv">$scheme</span> <span class="o">=</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getHost</span><span class="p">();</span>  <span class="c1">// &quot;example.com&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getHost()</span></tt>  method returns only the host part of the <em>URI</em>
+object.</p>
+</div>
+<div class="section" id="getting-the-port-of-the-uri">
+<span id="zend-uri-instance-methods-getport"></span><h3>Getting the port of the URI<a class="headerlink" href="#getting-the-port-of-the-uri" title="Permalink to this headline">¶</a></h3>
+<p>The port of the <em>URI</em> is the optional part of the <em>URI</em> that follows the
+host-part and comes before the path-part. For example, the host of
+<tt class="docutils literal"><span class="pre">http://johndoe&#64;example.com:80/my/path?query#token</span></tt> is &#8216;80&#8217;. The URI-class
+can define default-ports that can be returned when no port is given in the
+<tt class="docutils literal"><span class="pre">URI</span></tt>.</p>
+<p class="rubric" id="zend-uri-instance-methods-getport-example-1">Getting the port from a Zend\Uri\UriInterface Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://example.com:8080&#39;</span><span class="p">);</span>
+
+<span class="nv">$scheme</span> <span class="o">=</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getPort</span><span class="p">();</span>  <span class="c1">// &quot;8080&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p class="rubric" id="zend-uri-instance-methods-getport-example-2">Getting a default port from a Zend\Uri\UriInterface Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://example.com&#39;</span><span class="p">);</span>
+
+<span class="nv">$scheme</span> <span class="o">=</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getPort</span><span class="p">();</span>  <span class="c1">// &quot;80&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getHost()</span></tt>  method returns only the port part of the <em>URI</em>
+object.</p>
+</div>
+<div class="section" id="getting-the-path-of-the-uri">
+<span id="zend-uri-instance-methods-getpath"></span><h3>Getting the path of the URI<a class="headerlink" href="#getting-the-path-of-the-uri" title="Permalink to this headline">¶</a></h3>
+<p>The path of the <em>URI</em> is the mandatory part of the <em>URI</em> that follows the
+port and comes before the query-part. For example, the path of
+<tt class="docutils literal"><span class="pre">http://johndoe&#64;example.com:80/my/path?query#token</span></tt> is &#8216;/my/path&#8217;.</p>
+<p class="rubric" id="zend-uri-instance-methods-getpath-example-1">Getting the path from a Zend\Uri\UriInterface Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://example.com:80/my/path?a=b&amp;c=d#token&#39;</span><span class="p">);</span>
+
+<span class="nv">$scheme</span> <span class="o">=</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getPath</span><span class="p">();</span>  <span class="c1">// &quot;/my/path&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getPath()</span></tt>  method returns only the path of the <em>URI</em> object.</p>
+</div>
+<div class="section" id="getting-the-query-part-of-the-uri">
+<span id="zend-uri-instance-methods-getquery"></span><h3>Getting the query-part of the URI<a class="headerlink" href="#getting-the-query-part-of-the-uri" title="Permalink to this headline">¶</a></h3>
+<p>The query-part of the <em>URI</em> is the optional part of the <em>URI</em> that follows the
+path and comes before the fragment. For example, the query of
+<tt class="docutils literal"><span class="pre">http://johndoe&#64;example.com:80/my/path?query#token</span></tt> is &#8216;query&#8217;.</p>
+<p class="rubric" id="zend-uri-instance-methods-getquery-example-1">Getting the query from a Zend\Uri\UriInterface Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://example.com:80/my/path?a=b&amp;c=d#token&#39;</span><span class="p">);</span>
+
+<span class="nv">$scheme</span> <span class="o">=</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getQuery</span><span class="p">();</span>  <span class="c1">// &quot;a=b&amp;c=d&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getQuery()</span></tt>  method returns only the query-part of the <em>URI</em> object.</p>
+<p class="rubric" id="zend-uri-instance-methods-getquery-example-2">Getting the query as array from a Zend\Uri\UriInterface Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://example.com:80/my/path?a=b&amp;c=d#token&#39;</span><span class="p">);</span>
+
+<span class="nv">$scheme</span> <span class="o">=</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getQueryAsArray</span><span class="p">();</span>
+<span class="c1">// array(</span>
+<span class="c1">//  &#39;a&#39; =&gt; &#39;b&#39;,</span>
+<span class="c1">//  &#39;c&#39; =&gt; &#39;d&#39;,</span>
+<span class="c1">// )</span>
+</pre></div>
+</td></tr></table></div>
+<p>The query-part often contains key=value pairs and therefore can be split into
+an associative array. This array can be retrieved using <tt class="docutils literal"><span class="pre">getQueryAsArray()</span></tt></p>
+</div>
+<div class="section" id="getting-the-fragment-part-of-the-uri">
+<span id="zend-uri-instance-methods-getfragment"></span><h3>Getting the fragment-part of the URI<a class="headerlink" href="#getting-the-fragment-part-of-the-uri" title="Permalink to this headline">¶</a></h3>
+<p>The fragment-part of the <em>URI</em> is the optional part of the <em>URI</em> that follows the
+query. For example, the fragment of
+<tt class="docutils literal"><span class="pre">http://johndoe&#64;example.com:80/my/path?query#token</span></tt> is &#8216;token&#8217;.</p>
+<p class="rubric" id="zend-uri-instance-methods-getfragment-example-1">Getting the fragment from a Zend\Uri\UriInterface Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://example.com:80/my/path?a=b&amp;c=d#token&#39;</span><span class="p">);</span>
+
+<span class="nv">$scheme</span> <span class="o">=</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">getFragment</span><span class="p">();</span>  <span class="c1">// &quot;token&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getFragment()</span></tt>  method returns only the fragment-part of the <em>URI</em> object.</p>
+</div>
+<div class="section" id="getting-the-entire-uri">
+<span id="id3"></span><h3>Getting the Entire URI<a class="headerlink" href="#getting-the-entire-uri" title="Permalink to this headline">¶</a></h3>
+<p class="rubric" id="zend-uri-instance-methods-geturi-example-1">Getting the Entire URI from a Zend\Uri\UriInterface Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://www.zend.com&#39;</span><span class="p">);</span>
+
+<span class="k">echo</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">toString</span><span class="p">();</span>  <span class="c1">// &quot;http://www.zend.com&quot;</span>
+
+<span class="c1">// Alternate method:</span>
+<span class="k">echo</span> <span class="p">(</span><span class="nx">string</span><span class="p">)</span> <span class="nv">$uri</span><span class="p">;</span>     <span class="c1">// &quot;http://www.zend.com&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">toString()</span></tt> method returns the string representation of the entire <em>URI</em>.</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Uri\UriInterface</span></tt> defines also a magic <tt class="docutils literal"><span class="pre">__toString()</span></tt> method that
+returns the string representation of the <em>URI</em> when the Object is cast to a
+string.</p>
+</div>
+<div class="section" id="validating-the-uri">
+<span id="zend-uri-instance-methods-valid"></span><h3>Validating the URI<a class="headerlink" href="#validating-the-uri" title="Permalink to this headline">¶</a></h3>
+<p>When using <tt class="docutils literal"><span class="pre">Zend\Uri\UriFactory::factory()</span></tt> the given <em>URI</em> will always be
+validated and a <tt class="docutils literal"><span class="pre">Zend\Uri\Exception\InvalidArgumentException</span></tt> will be thrown
+when the <em>URI</em> is invalid. However, after the <tt class="docutils literal"><span class="pre">Zend\Uri\UriInterface</span></tt> is
+instantiated for a new <em>URI</em> or an existing valid one, it is possible that the
+<em>URI</em> can later become invalid after it is manipulated.</p>
+<p class="rubric" id="zend-uri-instance-methods-valid-example-1">Validating a ZendUri* Object</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$uri</span> <span class="o">=</span> <span class="nx">Zend\Uri\UriFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;http://www.zend.com&#39;</span><span class="p">);</span>
+
+<span class="nv">$isValid</span> <span class="o">=</span> <span class="nv">$uri</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">();</span>  <span class="c1">// TRUE</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">isValid()</span></tt> instance method provides a means to check that the <em>URI</em>
+object is still valid.</p>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>See <a class="reference external" href="http://www.ietf.org/rfc/rfc3986.txt">http://www.ietf.org/rfc/rfc3986.txt</a> for more information on URIs</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>At the time of writing, <tt class="docutils literal"><span class="pre">Zend\Uri</span></tt> provides built-in support for
+the following schemes: <em>HTTP</em>, <em>HTTPS</em>, <em>MAILTO</em> and <em>FILE</em></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Uri</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#creating-a-new-uri">Creating a New URI</a><ul>
+<li><a class="reference internal" href="#creating-a-new-custom-class-uri">Creating a New Custom-Class URI</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#manipulating-an-existing-uri">Manipulating an Existing URI</a></li>
+<li><a class="reference internal" href="#common-instance-methods">Common Instance Methods</a><ul>
+<li><a class="reference internal" href="#getting-the-scheme-of-the-uri">Getting the Scheme of the URI</a></li>
+<li><a class="reference internal" href="#getting-the-userinfo-of-the-uri">Getting the Userinfo of the URI</a></li>
+<li><a class="reference internal" href="#getting-the-host-of-the-uri">Getting the host of the URI</a></li>
+<li><a class="reference internal" href="#getting-the-port-of-the-uri">Getting the port of the URI</a></li>
+<li><a class="reference internal" href="#getting-the-path-of-the-uri">Getting the path of the URI</a></li>
+<li><a class="reference internal" href="#getting-the-query-part-of-the-uri">Getting the query-part of the URI</a></li>
+<li><a class="reference internal" href="#getting-the-fragment-part-of-the-uri">Getting the fragment-part of the URI</a></li>
+<li><a class="reference internal" href="#getting-the-entire-uri">Getting the Entire URI</a></li>
+<li><a class="reference internal" href="#validating-the-uri">Validating the URI</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.text.table.html"
+                        title="previous chapter">Zend\Text\Table</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.validator.html"
+                        title="next chapter">Introduction</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.uri.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.uri.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.uri.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.validator.html" title="Introduction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.text.table.html" title="Zend\Text\Table"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.uri.rst">
+                Zend\Uri
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

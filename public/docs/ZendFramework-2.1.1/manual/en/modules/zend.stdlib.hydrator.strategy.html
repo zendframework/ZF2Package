@@ -1,0 +1,530 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Stdlib\Hydrator\Strategy &mdash; Zend Framework 2 2.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.1 documentation" href="../index.html" />
+    <link rel="next" title="Introduction" href="zend.tag.introduction.html" />
+    <link rel="prev" title="Zend\Stdlib\Hydrator\Filter" href="zend.stdlib.hydrator.filter.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.tag.introduction.html" title="Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.stdlib.hydrator.filter.html" title="Zend\Stdlib\Hydrator\Filter"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-stdlib-hydrator-strategy">
+<span id="id1"></span><h1>Zend\Stdlib\Hydrator\Strategy<a class="headerlink" href="#zend-stdlib-hydrator-strategy" title="Permalink to this headline">¶</a></h1>
+<p>You can add a <tt class="docutils literal"><span class="pre">Zend\Stdlib\Hydrator\Strategy\StrategyInterface</span></tt> to any of the hydrators
+(expect it extends <tt class="docutils literal"><span class="pre">Zend\Stdlib\Hydrator\AbstractHydrator</span></tt> or implements
+<tt class="docutils literal"><span class="pre">Zend\Stdlib\Hydrator\HydratorInterface</span></tt> and <tt class="docutils literal"><span class="pre">Zend\Stdlib\Hydrator\Strategy\StrategyEnabledInterface</span></tt>)
+to manipulate the way how they behave on <tt class="docutils literal"><span class="pre">extract()</span></tt> and <tt class="docutils literal"><span class="pre">hydrate()</span></tt> for specific key / value pairs.
+This is the interface that needs to be implemented:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Zend\Stdlib\Hydrator\Strategy</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="nx">StrategyInterface</span>
+<span class="p">{</span>
+     <span class="sd">/**</span>
+<span class="sd">      * Converts the given value so that it can be extracted by the hydrator.</span>
+<span class="sd">      *</span>
+<span class="sd">      * @param mixed $value The original value.</span>
+<span class="sd">      * @return mixed Returns the value that should be extracted.</span>
+<span class="sd">      */</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">extract</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+     <span class="sd">/**</span>
+<span class="sd">      * Converts the given value so that it can be hydrated by the hydrator.</span>
+<span class="sd">      *</span>
+<span class="sd">      * @param mixed $value The original value.</span>
+<span class="sd">      * @return mixed Returns the value that should be hydrated.</span>
+<span class="sd">      */</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">hydrate</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>As you can see, this interface is similar to <tt class="docutils literal"><span class="pre">Zend\Stdlib\Hydrator\HydratorInterface</span></tt>. The reason why is, that
+the strategies provide a proxy implementation for <tt class="docutils literal"><span class="pre">hydrate()</span></tt> and <tt class="docutils literal"><span class="pre">extract()</span></tt>.</p>
+<div class="section" id="adding-strategies-to-the-hydrators">
+<span id="zend-stdlib-hydrator-strategy-usage"></span><h2>Adding strategies to the hydrators<a class="headerlink" href="#adding-strategies-to-the-hydrators" title="Permalink to this headline">¶</a></h2>
+<p>To allow strategies within your hydrator, the <tt class="docutils literal"><span class="pre">Zend\Stdlib\Hydrator\Strategy\StrategyEnabledInterface</span></tt>
+provide the following methods:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Zend\Stdlib\Hydrator</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Stdlib\Hydrator\Strategy\StrategyInterface</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="nx">StrategyEnabledInterface</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * Adds the given strategy under the given name.</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param string $name The name of the strategy to register.</span>
+<span class="sd">     * @param StrategyInterface $strategy The strategy to register.</span>
+<span class="sd">     * @return HydratorInterface</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">addStrategy</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nx">StrategyInterface</span> <span class="nv">$strategy</span><span class="p">);</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Gets the strategy with the given name.</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param string $name The name of the strategy to get.</span>
+<span class="sd">     * @return StrategyInterface</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getStrategy</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Checks if the strategy with the given name exists.</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param string $name The name of the strategy to check for.</span>
+<span class="sd">     * @return bool</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">hasStrategy</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * Removes the strategy with the given name.</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param string $name The name of the strategy to remove.</span>
+<span class="sd">     * @return HydratorInterface</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">removeStrategy</span><span class="p">(</span><span class="nv">$name</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Every hydrator, that is shipped by default, provides this functionality. The <tt class="docutils literal"><span class="pre">AbstractHydrator</span></tt> has it fully functional
+implemented. If you want to use this functionality in your own hydrators, you should extend the <tt class="docutils literal"><span class="pre">AbstractHydrator</span></tt>.</p>
+</div>
+<div class="section" id="available-implementations">
+<span id="zend-stdlib-hydrator-strategy-implementations"></span><h2>Available implementations<a class="headerlink" href="#available-implementations" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><strong>Zend\Stdlib\Hydrator\Strategy\SerializableStrategy</strong></p>
+<p>This is the strategy, that provides the functionality for <tt class="docutils literal"><span class="pre">Zend\Stdlib\Hydrator\ArraySerializable</span></tt>.
+You can use it with custom implementations for <tt class="docutils literal"><span class="pre">Zend\Serializer\Adapter\AdapterInterface</span></tt> if you want to.</p>
+</li>
+<li><p class="first"><strong>Zend\Stdlib\Hydrator\Strategy\DefaultStrategy</strong></p>
+<p>This is a kind of dummy-implementation, that simply proxies everything through, without doing anything on the
+parameters.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="writing-custom-strategies">
+<span id="zend-stdlib-hydrator-strategy-custom"></span><h2>Writing custom strategies<a class="headerlink" href="#writing-custom-strategies" title="Permalink to this headline">¶</a></h2>
+<p>As usual, this is not really a very useful example, but will give you a good point about how to start with writing your own
+strategies and where to use them. This strategy simply transform the value for the defined key to rot13 on <tt class="docutils literal"><span class="pre">extract()</span></tt>
+and back on <tt class="docutils literal"><span class="pre">hydrate()</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre> <span class="k">class</span> <span class="nc">Rot13Strategy</span> <span class="k">implements</span> <span class="nx">StrategyInterface</span>
+ <span class="p">{</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">extract</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+     <span class="p">{</span>
+         <span class="k">return</span> <span class="nb">str_rot13</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+     <span class="p">}</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">hydrate</span><span class="p">(</span><span class="nv">$value</span><span class="p">)</span>
+     <span class="p">{</span>
+         <span class="k">return</span> <span class="nb">str_rot13</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+     <span class="p">}</span>
+ <span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This is the example class, we want to use for the hydrator example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre> <span class="k">class</span> <span class="nc">Foo</span>
+ <span class="p">{</span>
+     <span class="k">protected</span> <span class="nv">$foo</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+     <span class="k">protected</span> <span class="nv">$bar</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getFoo</span><span class="p">()</span>
+     <span class="p">{</span>
+         <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">foo</span><span class="p">;</span>
+     <span class="p">}</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">setFoo</span><span class="p">(</span><span class="nv">$foo</span><span class="p">)</span>
+     <span class="p">{</span>
+         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">foo</span> <span class="o">=</span> <span class="nv">$foo</span><span class="p">;</span>
+     <span class="p">}</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getBar</span><span class="p">()</span>
+     <span class="p">{</span>
+         <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">bar</span><span class="p">;</span>
+     <span class="p">}</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">setBar</span><span class="p">(</span><span class="nv">$bar</span><span class="p">)</span>
+     <span class="p">{</span>
+         <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">bar</span> <span class="o">=</span> <span class="nv">$bar</span><span class="p">;</span>
+     <span class="p">}</span>
+ <span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now, we want to add the rot13 strategy to the method <tt class="docutils literal"><span class="pre">getFoo()</span></tt> and <tt class="docutils literal"><span class="pre">setFoo($foo)</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre> <span class="nv">$foo</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Foo</span><span class="p">();</span>
+ <span class="nv">$foo</span><span class="o">-&gt;</span><span class="na">setFoo</span><span class="p">(</span><span class="s2">&quot;bar&quot;</span><span class="p">);</span>
+ <span class="nv">$foo</span><span class="o">-&gt;</span><span class="na">setBar</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">);</span>
+
+ <span class="nv">$hydrator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ClassMethods</span><span class="p">();</span>
+ <span class="nv">$hydrator</span><span class="o">-&gt;</span><span class="na">addStrategy</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">Rot13Strategy</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>When you now use the hydrator, to get an array of the object $foo, this is the array you&#8217;ll get:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre> <span class="nv">$extractedArray</span> <span class="o">=</span> <span class="nv">$hydrator</span><span class="o">-&gt;</span><span class="na">extract</span><span class="p">(</span><span class="nv">$foo</span><span class="p">);</span>
+
+ <span class="c1">// array(2) {</span>
+ <span class="c1">//     [&quot;foo&quot;]=&gt;</span>
+ <span class="c1">//     string(3) &quot;one&quot;</span>
+ <span class="c1">//     [&quot;bar&quot;]=&gt;</span>
+ <span class="c1">//     string(3) &quot;foo&quot;</span>
+ <span class="c1">// }</span>
+</pre></div>
+</td></tr></table></div>
+<p>And the the way back:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre> <span class="nv">$hydrator</span><span class="o">-&gt;</span><span class="na">hydrate</span><span class="p">(</span><span class="nv">$extractedArray</span><span class="p">,</span> <span class="nv">$foo</span><span class="p">)</span>
+
+ <span class="c1">// object(Foo)#2 (2) {</span>
+ <span class="c1">//   [&quot;foo&quot;:protected]=&gt;</span>
+ <span class="c1">//   string(3) &quot;bar&quot;</span>
+ <span class="c1">//   [&quot;bar&quot;:protected]=&gt;</span>
+ <span class="c1">//   string(3) &quot;foo&quot;</span>
+ <span class="c1">// }</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Stdlib\Hydrator\Strategy</a><ul>
+<li><a class="reference internal" href="#adding-strategies-to-the-hydrators">Adding strategies to the hydrators</a></li>
+<li><a class="reference internal" href="#available-implementations">Available implementations</a></li>
+<li><a class="reference internal" href="#writing-custom-strategies">Writing custom strategies</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.stdlib.hydrator.filter.html"
+                        title="previous chapter">Zend\Stdlib\Hydrator\Filter</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.tag.introduction.html"
+                        title="next chapter">Introduction</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.stdlib.hydrator.strategy.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.stdlib.hydrator.strategy.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.stdlib.hydrator.strategy.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.tag.introduction.html" title="Introduction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.stdlib.hydrator.filter.html" title="Zend\Stdlib\Hydrator\Filter"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.stdlib.hydrator.strategy.rst">
+                Zend\Stdlib\Hydrator\Strategy
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

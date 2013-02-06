@@ -1,0 +1,767 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Query Construction API &mdash; Zend Framework 2 2.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.1 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="query-construction-api">
+<span id="zendsearch-lucene-query-api"></span><h1>Query Construction API<a class="headerlink" href="#query-construction-api" title="Permalink to this headline">¶</a></h1>
+<p>In addition to parsing a string query automatically it&#8217;s also possible to construct them with the query <em>API</em>.</p>
+<p>User queries can be combined with queries created through the query <em>API</em>. Simply use the query parser to construct
+a query from a string:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Search\QueryParser</span><span class="o">::</span><span class="na">parse</span><span class="p">(</span><span class="nv">$queryString</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="query-parser-exceptions">
+<span id="zendsearch-lucene-queries-exceptions"></span><h2>Query Parser Exceptions<a class="headerlink" href="#query-parser-exceptions" title="Permalink to this headline">¶</a></h2>
+<p>The query parser may generate two types of exceptions:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Exception</span></tt> is thrown if something goes wrong in the query parser itself.</li>
+<li><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\QueryParserException</span></tt> is thrown when there is an error in the query syntax.</li>
+</ul>
+</div></blockquote>
+<p>It&#8217;s a good idea to catch <tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\QueryParserException</span></tt>s and handle them appropriately:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$query</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Search\QueryParser</span><span class="o">::</span><span class="na">parse</span><span class="p">(</span><span class="nv">$queryString</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend\Search\Lucene\Search\QueryParserException</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Query syntax error: &quot;</span> <span class="o">.</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The same technique should be used for the find() method of a <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> object.</p>
+<p>Starting in 1.5, query parsing exceptions are suppressed by default. If query doesn&#8217;t conform query language, then
+it&#8217;s tokenized using current default analyzer and all tokenized terms are used for searching. Use
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\QueryParser::dontSuppressQueryParsingExceptions()</span></tt> method to turn exceptions on.
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\QueryParser::suppressQueryParsingExceptions()</span></tt> and
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\QueryParser::queryParsingExceptionsSuppressed()</span></tt> methods are also intended to manage
+exceptions handling behavior.</p>
+</div>
+<div class="section" id="term-query">
+<span id="zendsearch-lucene-queries-term-query"></span><h2>Term Query<a class="headerlink" href="#term-query" title="Permalink to this headline">¶</a></h2>
+<p>Term queries can be used for searching with a single term.</p>
+<p>Query string:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>word1
+</pre></div>
+</td></tr></table></div>
+<p>or</p>
+<p>Query construction by <em>API</em>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$term</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word1&#39;</span><span class="p">,</span> <span class="s1">&#39;field1&#39;</span><span class="p">);</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Term</span><span class="p">(</span><span class="nv">$term</span><span class="p">);</span>
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The term field is optional. <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> searches through all indexed fields in each document if the
+field is not specified:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Search for &#39;word1&#39; in all indexed fields</span>
+<span class="nv">$term</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word1&#39;</span><span class="p">);</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Term</span><span class="p">(</span><span class="nv">$term</span><span class="p">);</span>
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="multi-term-query">
+<span id="zendsearch-lucene-queries-multiterm-query"></span><h2>Multi-Term Query<a class="headerlink" href="#multi-term-query" title="Permalink to this headline">¶</a></h2>
+<p>Multi-term queries can be used for searching with a set of terms.</p>
+<p>Each term in a set can be defined as <strong>required</strong>, <strong>prohibited</strong>, or <strong>neither</strong>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>required</strong> means that documents not matching this term will not match the query;</li>
+<li><strong>prohibited</strong> means that documents matching this term will not match the query;</li>
+<li><strong>neither</strong>, in which case matched documents are neither prohibited from, nor required to, match the term. A
+document must match at least 1 term, however, to match the query.</li>
+</ul>
+</div></blockquote>
+<p>If optional terms are added to a query with required terms, both queries will have the same result set but the
+optional terms may affect the score of the matched documents.</p>
+<p>Both search methods can be used for multi-term queries.</p>
+<p>Query string:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>+word1 author:word2 -word3
+</pre></div>
+</td></tr></table></div>
+<ul class="simple">
+<li>&#8216;+&#8217; is used to define a required term.</li>
+<li>&#8216;-&#8216; is used to define a prohibited term.</li>
+<li>&#8216;field:&#8217; prefix is used to indicate a document field for a search. If it&#8217;s omitted, then all fields are searched.</li>
+</ul>
+<p>or</p>
+<p>Query construction by <em>API</em>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\MultiTerm</span><span class="p">();</span>
+
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word1&#39;</span><span class="p">),</span> <span class="k">true</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word2&#39;</span><span class="p">,</span> <span class="s1">&#39;author&#39;</span><span class="p">),</span>
+                <span class="k">null</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word3&#39;</span><span class="p">),</span> <span class="k">false</span><span class="p">);</span>
+
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>It&#8217;s also possible to specify terms list within MultiTerm query constructor:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$terms</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word1&#39;</span><span class="p">),</span>
+               <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word2&#39;</span><span class="p">,</span> <span class="s1">&#39;author&#39;</span><span class="p">),</span>
+               <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word3&#39;</span><span class="p">));</span>
+<span class="nv">$signs</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="k">true</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\MultiTerm</span><span class="p">(</span><span class="nv">$terms</span><span class="p">,</span> <span class="nv">$signs</span><span class="p">);</span>
+
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">$signs</span></tt> array contains information about the term type:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">TRUE</span></tt> is used to define required term.</li>
+<li><tt class="docutils literal"><span class="pre">FALSE</span></tt> is used to define prohibited term.</li>
+<li><tt class="docutils literal"><span class="pre">NULL</span></tt> is used to define a term that is neither required nor prohibited.</li>
+</ul>
+</div></blockquote>
+</div>
+<div class="section" id="boolean-query">
+<span id="zendsearch-lucene-queries-boolean-query"></span><h2>Boolean Query<a class="headerlink" href="#boolean-query" title="Permalink to this headline">¶</a></h2>
+<p>Boolean queries allow to construct query using other queries and boolean operators.</p>
+<p>Each subquery in a set can be defined as <strong>required</strong>, <strong>prohibited</strong>, or <strong>optional</strong>.</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>required</strong> means that documents not matching this subquery will not match the query;</li>
+<li><strong>prohibited</strong> means that documents matching this subquery will not match the query;</li>
+<li><strong>optional</strong>, in which case matched documents are neither prohibited from, nor required to, match the
+subquery. A document must match at least 1 subquery, however, to match the query.</li>
+</ul>
+</div></blockquote>
+<p>If optional subqueries are added to a query with required subqueries, both queries will have the same result set
+but the optional subqueries may affect the score of the matched documents.</p>
+<p>Both search methods can be used for boolean queries.</p>
+<p>Query string:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>+(word1 word2 word3) (author:word4 author:word5) -(word6)
+</pre></div>
+</td></tr></table></div>
+<ul class="simple">
+<li>&#8216;+&#8217; is used to define a required subquery.</li>
+<li>&#8216;-&#8216; is used to define a prohibited subquery.</li>
+<li>&#8216;field:&#8217; prefix is used to indicate a document field for a search. If it&#8217;s omitted, then all fields are searched.</li>
+</ul>
+<p>or</p>
+<p>Query construction by <em>API</em>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Boolean</span><span class="p">();</span>
+
+<span class="nv">$subquery1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\MultiTerm</span><span class="p">();</span>
+<span class="nv">$subquery1</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word1&#39;</span><span class="p">));</span>
+<span class="nv">$subquery1</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word2&#39;</span><span class="p">));</span>
+<span class="nv">$subquery1</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word3&#39;</span><span class="p">));</span>
+
+<span class="nv">$subquery2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\MultiTerm</span><span class="p">();</span>
+<span class="nv">$subquery2</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word4&#39;</span><span class="p">,</span> <span class="s1">&#39;author&#39;</span><span class="p">));</span>
+<span class="nv">$subquery2</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word5&#39;</span><span class="p">,</span> <span class="s1">&#39;author&#39;</span><span class="p">));</span>
+
+<span class="nv">$term6</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word6&#39;</span><span class="p">);</span>
+<span class="nv">$subquery3</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Term</span><span class="p">(</span><span class="nv">$term6</span><span class="p">);</span>
+
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">addSubquery</span><span class="p">(</span><span class="nv">$subquery1</span><span class="p">,</span> <span class="k">true</span>  <span class="cm">/* required */</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">addSubquery</span><span class="p">(</span><span class="nv">$subquery2</span><span class="p">,</span> <span class="k">null</span>  <span class="cm">/* optional */</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">addSubquery</span><span class="p">(</span><span class="nv">$subquery3</span><span class="p">,</span> <span class="k">false</span> <span class="cm">/* prohibited */</span><span class="p">);</span>
+
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>It&#8217;s also possible to specify subqueries list within Boolean query constructor:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">...</span>
+<span class="nv">$subqueries</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="nv">$subquery1</span><span class="p">,</span> <span class="nv">$subquery2</span><span class="p">,</span> <span class="nv">$subquery3</span><span class="p">);</span>
+<span class="nv">$signs</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="k">true</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Boolean</span><span class="p">(</span><span class="nv">$subqueries</span><span class="p">,</span> <span class="nv">$signs</span><span class="p">);</span>
+
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">$signs</span></tt> array contains information about the subquery type:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">TRUE</span></tt> is used to define required subquery.</li>
+<li><tt class="docutils literal"><span class="pre">FALSE</span></tt> is used to define prohibited subquery.</li>
+<li><tt class="docutils literal"><span class="pre">NULL</span></tt> is used to define a subquery that is neither required nor prohibited.</li>
+</ul>
+</div></blockquote>
+<p>Each query which uses boolean operators can be rewritten using signs notation and constructed using <em>API</em>. For
+example:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>word1 AND (word2 AND word3 AND NOT word4) OR word5
+</pre></div>
+</td></tr></table></div>
+<p>is equivalent to</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>(+(word1) +(+word2 +word3 -word4)) (word5)
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="wildcard-query">
+<span id="zendsearch-lucene-queries-wildcard"></span><h2>Wildcard Query<a class="headerlink" href="#wildcard-query" title="Permalink to this headline">¶</a></h2>
+<p>Wildcard queries can be used to search for documents containing strings matching specified patterns.</p>
+<p>The &#8216;?&#8217; symbol is used as a single character wildcard.</p>
+<p>The &#8216;*&#8217; symbol is used as a multiple character wildcard.</p>
+<p>Query string:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>field1:test*
+</pre></div>
+</td></tr></table></div>
+<p>or</p>
+<p>Query construction by <em>API</em>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$pattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;test*&#39;</span><span class="p">,</span> <span class="s1">&#39;field1&#39;</span><span class="p">);</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Wildcard</span><span class="p">(</span><span class="nv">$pattern</span><span class="p">);</span>
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The term field is optional. <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> searches through all fields on each document if a field is not
+specified:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$pattern</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;test*&#39;</span><span class="p">);</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Wildcard</span><span class="p">(</span><span class="nv">$pattern</span><span class="p">);</span>
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="fuzzy-query">
+<span id="zendsearch-lucene-queries-fuzzy"></span><h2>Fuzzy Query<a class="headerlink" href="#fuzzy-query" title="Permalink to this headline">¶</a></h2>
+<p>Fuzzy queries can be used to search for documents containing strings matching terms similar to specified term.</p>
+<p>Query string:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>field1:test~
+</pre></div>
+</td></tr></table></div>
+<p>This query matches documents containing &#8216;test&#8217; &#8216;text&#8217; &#8216;best&#8217; words and others.</p>
+<p>or</p>
+<p>Query construction by <em>API</em>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$term</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="s1">&#39;field1&#39;</span><span class="p">);</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Fuzzy</span><span class="p">(</span><span class="nv">$term</span><span class="p">);</span>
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Optional similarity can be specified after &#8220;~&#8221; sign.</p>
+<p>Query string:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre>field1:test~0.4
+</pre></div>
+</td></tr></table></div>
+<p>or</p>
+<p>Query construction by <em>API</em>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$term</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">,</span> <span class="s1">&#39;field1&#39;</span><span class="p">);</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Fuzzy</span><span class="p">(</span><span class="nv">$term</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">);</span>
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The term field is optional. <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> searches through all fields on each document if a field is not
+specified:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$term</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;test&#39;</span><span class="p">);</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Fuzzy</span><span class="p">(</span><span class="nv">$term</span><span class="p">);</span>
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="phrase-query">
+<span id="zendsearch-lucene-queries-phrase-query"></span><h2>Phrase Query<a class="headerlink" href="#phrase-query" title="Permalink to this headline">¶</a></h2>
+<p>Phrase Queries can be used to search for a phrase within documents.</p>
+<p>Phrase Queries are very flexible and allow the user or developer to search for exact phrases as well as &#8216;sloppy&#8217;
+phrases.</p>
+<p>Phrases can also contain gaps or terms in the same places; they can be generated by the analyzer for different
+purposes. For example, a term can be duplicated to increase the term its weight, or several synonyms can be placed
+into a single position.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="p">();</span>
+
+<span class="c1">// Add &#39;word1&#39; at 0 relative position.</span>
+<span class="nv">$query1</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word1&#39;</span><span class="p">));</span>
+
+<span class="c1">// Add &#39;word2&#39; at 1 relative position.</span>
+<span class="nv">$query1</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word2&#39;</span><span class="p">));</span>
+
+<span class="c1">// Add &#39;word3&#39; at 3 relative position.</span>
+<span class="nv">$query1</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;word3&#39;</span><span class="p">),</span> <span class="mi">3</span><span class="p">);</span>
+
+<span class="o">...</span>
+
+<span class="nv">$query2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="p">(</span>
+                <span class="k">array</span><span class="p">(</span><span class="s1">&#39;word1&#39;</span><span class="p">,</span> <span class="s1">&#39;word2&#39;</span><span class="p">,</span> <span class="s1">&#39;word3&#39;</span><span class="p">),</span> <span class="k">array</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">));</span>
+
+<span class="o">...</span>
+
+<span class="c1">// Query without a gap.</span>
+<span class="nv">$query3</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="p">(</span>
+                <span class="k">array</span><span class="p">(</span><span class="s1">&#39;word1&#39;</span><span class="p">,</span> <span class="s1">&#39;word2&#39;</span><span class="p">,</span> <span class="s1">&#39;word3&#39;</span><span class="p">));</span>
+
+<span class="o">...</span>
+
+<span class="nv">$query4</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="p">(</span>
+                <span class="k">array</span><span class="p">(</span><span class="s1">&#39;word1&#39;</span><span class="p">,</span> <span class="s1">&#39;word2&#39;</span><span class="p">),</span> <span class="k">array</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;annotation&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>A phrase query can be constructed in one step with a class constructor or step by step with
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\Query\Phrase::addTerm()</span></tt> method calls.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\Query\Phrase</span></tt> class constructor takes three optional arguments:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="p">(</span>
+    <span class="p">[</span><span class="k">array</span> <span class="nv">$terms</span><span class="p">[,</span> <span class="k">array</span> <span class="nv">$offsets</span><span class="p">[,</span> <span class="nx">string</span> <span class="nv">$field</span><span class="p">]]]</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">$terms</span></tt> parameter is an array of strings that contains a set of phrase terms. If it&#8217;s omitted or equal to
+<tt class="docutils literal"><span class="pre">NULL</span></tt>, then an empty query is constructed.</p>
+<p>The <tt class="docutils literal"><span class="pre">$offsets</span></tt> parameter is an array of integers that contains offsets of terms in a phrase. If it&#8217;s omitted or
+equal to <tt class="docutils literal"><span class="pre">NULL</span></tt>, then the terms&#8217; positions are assumed to be sequential with no gaps.</p>
+<p>The <tt class="docutils literal"><span class="pre">$field</span></tt> parameter is a string that indicates the document field to search. If it&#8217;s omitted or equal to
+<tt class="docutils literal"><span class="pre">NULL</span></tt>, then the default field is searched.</p>
+<p>Thus:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span>
+    <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;zend&#39;</span><span class="p">,</span> <span class="s1">&#39;framework&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>will search for the phrase &#8216;zend framework&#8217; in all fields.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="p">(</span>
+                 <span class="k">array</span><span class="p">(</span><span class="s1">&#39;zend&#39;</span><span class="p">,</span> <span class="s1">&#39;download&#39;</span><span class="p">),</span> <span class="k">array</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+             <span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>will search for the phrase &#8216;zend ????? download&#8217; and match &#8216;zend platform download&#8217;, &#8216;zend studio download&#8217;, &#8216;zend
+core download&#8217;, &#8216;zend framework download&#8217;, and so on.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="p">(</span>
+                 <span class="k">array</span><span class="p">(</span><span class="s1">&#39;zend&#39;</span><span class="p">,</span> <span class="s1">&#39;framework&#39;</span><span class="p">),</span> <span class="k">null</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span>
+             <span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>will search for the phrase &#8216;zend framework&#8217; in the &#8216;title&#8217; field.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Search\Query\Phrase::addTerm()</span></tt> takes two arguments, a required
+<tt class="docutils literal"><span class="pre">Zend\Search\Lucene\Index\Term</span></tt> object and an optional position:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="o">::</span><span class="na">addTerm</span><span class="p">(</span>
+    <span class="nx">Zend\Search\Lucene\Index\Term</span> <span class="nv">$term</span><span class="p">[,</span> <span class="nx">integer</span> <span class="nv">$position</span><span class="p">]</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">$term</span></tt> parameter describes the next term in the phrase. It must indicate the same field as previous terms,
+or an exception will be thrown.</p>
+<p>The <tt class="docutils literal"><span class="pre">$position</span></tt> parameter indicates the term position in the phrase.</p>
+<p>Thus:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;zend&#39;</span><span class="p">));</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;framework&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>will search for the phrase &#8216;zend framework&#8217;.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;zend&#39;</span><span class="p">),</span> <span class="mi">0</span><span class="p">);</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;framework&#39;</span><span class="p">),</span> <span class="mi">2</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>will search for the phrase &#8216;zend ????? download&#8217; and match &#8216;zend platform download&#8217;, &#8216;zend studio download&#8217;, &#8216;zend
+core download&#8217;, &#8216;zend framework download&#8217;, and so on.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="p">();</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;zend&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">));</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">addTerm</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;framework&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>will search for the phrase &#8216;zend framework&#8217; in the &#8216;title&#8217; field.</p>
+<p>The slop factor sets the number of other words permitted between specified words in the query phrase. If set to
+zero, then the corresponding query is an exact phrase search. For larger values this works like the WITHIN or NEAR
+operators.</p>
+<p>The slop factor is in fact an edit distance, where the edits correspond to moving terms in the query phrase. For
+example, to switch the order of two words requires two moves (the first move places the words atop one another), so
+to permit re-orderings of phrases, the slop factor must be at least two.</p>
+<p>More exact matches are scored higher than sloppier matches; thus, search results are sorted by exactness. The slop
+is zero by default, requiring exact matches.</p>
+<p>The slop factor can be assigned after query creation:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Query without a gap.</span>
+<span class="nv">$query</span> <span class="o">=</span>
+    <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Phrase</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;word1&#39;</span><span class="p">,</span> <span class="s1">&#39;word2&#39;</span><span class="p">));</span>
+
+<span class="c1">// Search for &#39;word1 word2&#39;, &#39;word1 ... word2&#39;</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setSlop</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="nv">$hits1</span> <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+
+<span class="c1">// Search for &#39;word1 word2&#39;, &#39;word1 ... word2&#39;,</span>
+<span class="c1">// &#39;word1 ... ... word2&#39;, &#39;word2 word1&#39;</span>
+<span class="nv">$query</span><span class="o">-&gt;</span><span class="na">setSlop</span><span class="p">(</span><span class="mi">2</span><span class="p">);</span>
+<span class="nv">$hits2</span> <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="range-query">
+<span id="zendsearch-lucene-queries-range"></span><h2>Range Query<a class="headerlink" href="#range-query" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference internal" href="zendsearch.lucene.query-language.html#zendsearch-lucene-query-language-range"><em>Range queries</em></a> are intended for searching terms within specified
+interval.</p>
+<p>Query string:</p>
+<div class="highlight-text"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre>mod_date:[20020101 TO 20030101]
+title:{Aida TO Carmen}
+</pre></div>
+</td></tr></table></div>
+<p>or</p>
+<p>Query construction by <em>API</em>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$from</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;20020101&#39;</span><span class="p">,</span> <span class="s1">&#39;mod_date&#39;</span><span class="p">);</span>
+<span class="nv">$to</span>   <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;20030101&#39;</span><span class="p">,</span> <span class="s1">&#39;mod_date&#39;</span><span class="p">);</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Range</span><span class="p">(</span>
+                 <span class="nv">$from</span><span class="p">,</span> <span class="nv">$to</span><span class="p">,</span> <span class="k">true</span> <span class="c1">// inclusive</span>
+             <span class="p">);</span>
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Term fields are optional. <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> searches through all fields if the field is not specified:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$from</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;Aida&#39;</span><span class="p">);</span>
+<span class="nv">$to</span>   <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;Carmen&#39;</span><span class="p">);</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Range</span><span class="p">(</span>
+                 <span class="nv">$from</span><span class="p">,</span> <span class="nv">$to</span><span class="p">,</span> <span class="k">false</span> <span class="c1">// non-inclusive</span>
+             <span class="p">);</span>
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Either (but not both) of the boundary terms may be set to <tt class="docutils literal"><span class="pre">NULL</span></tt>. <tt class="docutils literal"><span class="pre">Zend\Search\Lucene</span></tt> searches from the
+beginning or up to the end of the dictionary for the specified field(s) in this case:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// searches for [&#39;20020101&#39; TO ...]</span>
+<span class="nv">$from</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Index\Term</span><span class="p">(</span><span class="s1">&#39;20020101&#39;</span><span class="p">,</span> <span class="s1">&#39;mod_date&#39;</span><span class="p">);</span>
+<span class="nv">$query</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search\Lucene\Search\Query\Range</span><span class="p">(</span>
+                 <span class="nv">$from</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="k">true</span> <span class="c1">// inclusive</span>
+             <span class="p">);</span>
+<span class="nv">$hits</span>  <span class="o">=</span> <span class="nv">$index</span><span class="o">-&gt;</span><span class="na">find</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Query Construction API</a><ul>
+<li><a class="reference internal" href="#query-parser-exceptions">Query Parser Exceptions</a></li>
+<li><a class="reference internal" href="#term-query">Term Query</a></li>
+<li><a class="reference internal" href="#multi-term-query">Multi-Term Query</a></li>
+<li><a class="reference internal" href="#boolean-query">Boolean Query</a></li>
+<li><a class="reference internal" href="#wildcard-query">Wildcard Query</a></li>
+<li><a class="reference internal" href="#fuzzy-query">Fuzzy Query</a></li>
+<li><a class="reference internal" href="#phrase-query">Phrase Query</a></li>
+<li><a class="reference internal" href="#range-query">Range Query</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendsearch.lucene.queries.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendsearch.lucene.queries.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendsearch.lucene.queries.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendsearch.lucene.queries.rst">
+                Query Construction API
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

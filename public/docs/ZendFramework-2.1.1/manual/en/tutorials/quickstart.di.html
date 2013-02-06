@@ -1,0 +1,973 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Learning Dependency Injection &mdash; Zend Framework 2 2.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.1 documentation" href="../index.html" />
+    <link rel="next" title="Introduction" href="../modules/zend.authentication.intro.html" />
+    <link rel="prev" title="Zend Framework Tool (ZFTool)" href="../modules/zendtool.introduction.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modules/zend.authentication.intro.html" title="Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../modules/zendtool.introduction.html" title="Zend Framework Tool (ZFTool)"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="learning-dependency-injection">
+<span id="learning-di"></span><h1>Learning Dependency Injection<a class="headerlink" href="#learning-dependency-injection" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="very-brief-introduction-to-di">
+<span id="learning-di-very-brief-introduction-to-di"></span><h2>Very brief introduction to Di.<a class="headerlink" href="#very-brief-introduction-to-di" title="Permalink to this headline">¶</a></h2>
+<p><strong>Dependency Injection</strong> is a concept that has been talked about in numerous places over the web. For the purposes
+of this quickstart, we&#8217;ll explain the act of injecting dependencies simply with this below code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">B</span><span class="p">(</span><span class="k">new</span> <span class="nx">A</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>Above, A is a dependency of B, and A was <strong>injected</strong> into B. If you are not familar with the concept of dependency
+injection, here are a couple of great reads: Matthew Weier O&#8217;Phinney&#8217;s <a class="reference external" href="http://weierophinney.net/matthew/archives/260-Dependency-Injection-An-analogy.html">Analogy</a>, Ralph Schindler&#8217;s <a class="reference external" href="http://ralphschindler.com/2011/05/18/learning-about-dependency-injection-and-php">Learning
+DI</a>, or Fabien Potencier&#8217;s <a class="reference external" href="http://fabien.potencier.org/article/11/what-is-dependency-injection">Series on DI</a>.</p>
+</div>
+<div class="section" id="very-brief-introduction-to-di-container">
+<span id="learning-di-very-brief-introduction-to-di-container"></span><h2>Very brief introduction to Di Container.<a class="headerlink" href="#very-brief-introduction-to-di-container" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">TBD</span><span class="o">.</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="simplest-usage-case-2-classes-one-consumes-the-other">
+<span id="learning-di-simplest-usage-case-2-classes-one-consumes-the-other"></span><h2>Simplest usage case (2 classes, one consumes the other)<a class="headerlink" href="#simplest-usage-case-2-classes-one-consumes-the-other" title="Permalink to this headline">¶</a></h2>
+<p>In the simplest use case, a developer might have one class (<tt class="docutils literal"><span class="pre">A</span></tt>) that is consumed by another class (<tt class="docutils literal"><span class="pre">B</span></tt>)
+through the constructor. By having the dependency injected through the constructor, this requires an object of type
+<tt class="docutils literal"><span class="pre">A</span></tt> be instantiated before an object of type <tt class="docutils literal"><span class="pre">B</span></tt> so that <tt class="docutils literal"><span class="pre">A</span></tt> can be injected into <tt class="docutils literal"><span class="pre">B</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">My</span> <span class="p">{</span>
+
+    <span class="k">class</span> <span class="nc">A</span>
+    <span class="p">{</span>
+        <span class="cm">/* Some useful functionality */</span>
+    <span class="p">}</span>
+
+    <span class="k">class</span> <span class="nc">B</span>
+    <span class="p">{</span>
+        <span class="k">protected</span> <span class="nv">$a</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+        <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">A</span> <span class="nv">$a</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">a</span> <span class="o">=</span> <span class="nv">$a</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>To create <tt class="docutils literal"><span class="pre">B</span></tt> by hand, a developer would follow this work flow, or a similar workflow to this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">B</span><span class="p">(</span><span class="k">new</span> <span class="nx">A</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>If this workflow becomes repeated throughout your application multiple times, this creates an opportunity where one
+might want to <a class="reference external" href="http://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY</a> up the code. While there are several ways to do this, using a dependency injection container is
+one of these solutions. With Zend&#8217;s dependency injection container <tt class="docutils literal"><span class="pre">Zend\Di\Di</span></tt>, the above use
+case can be taken care of with no configuration (provided all of your autoloading is already configured properly)
+with the following usage:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$di</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Di\Di</span><span class="p">;</span>
+<span class="nv">$b</span> <span class="o">=</span> <span class="nv">$di</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;My\B&#39;</span><span class="p">);</span> <span class="c1">// will produce a B object that is consuming an A object</span>
+</pre></div>
+</td></tr></table></div>
+<p>Moreover, by using the <tt class="docutils literal"><span class="pre">Di::get()</span></tt> method, you are ensuring that the same exact object is
+returned on subsequent calls. To force new objects to be created on each and every request, one would use the
+<tt class="docutils literal"><span class="pre">Di::newInstance()</span></tt> method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$b</span> <span class="o">=</span> <span class="nv">$di</span><span class="o">-&gt;</span><span class="na">newInstance</span><span class="p">(</span><span class="s1">&#39;My\B&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Let&#8217;s assume for a moment that <tt class="docutils literal"><span class="pre">A</span></tt> requires some configuration before it can be created. Our previous use case is
+expanded to this (we&#8217;ll throw a 3rd class in for good measure):</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">My</span> <span class="p">{</span>
+
+    <span class="k">class</span> <span class="nc">A</span>
+    <span class="p">{</span>
+        <span class="k">protected</span> <span class="nv">$username</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+        <span class="k">protected</span> <span class="nv">$password</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+        <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$username</span><span class="p">,</span> <span class="nv">$password</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">username</span> <span class="o">=</span> <span class="nv">$username</span><span class="p">;</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">password</span> <span class="o">=</span> <span class="nv">$password</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">class</span> <span class="nc">B</span>
+    <span class="p">{</span>
+        <span class="k">protected</span> <span class="nv">$a</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+        <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">A</span> <span class="nv">$a</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">a</span> <span class="o">=</span> <span class="nv">$a</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">class</span> <span class="nc">C</span>
+    <span class="p">{</span>
+        <span class="k">protected</span> <span class="nv">$b</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+        <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nx">B</span> <span class="nv">$b</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">b</span> <span class="o">=</span> <span class="nv">$b</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>With the above, we need to ensure that our <tt class="docutils literal"><span class="pre">Di</span></tt> is capable of seeing the <tt class="docutils literal"><span class="pre">A</span></tt> class with a few
+configuration values (which are generally scalar in nature). To do this, we need to interact with the
+<tt class="docutils literal"><span class="pre">InstanceManager</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$di</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Di\Di</span><span class="p">;</span>
+<span class="nv">$di</span><span class="o">-&gt;</span><span class="na">getInstanceManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setProperty</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;MyUsernameValue&#39;</span><span class="p">);</span>
+<span class="nv">$di</span><span class="o">-&gt;</span><span class="na">getInstanceManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setProperty</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;MyHardToGuessPassword%$#&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now that our container has values it can use when creating <tt class="docutils literal"><span class="pre">A</span></tt>, and our new goal is to have a <tt class="docutils literal"><span class="pre">C</span></tt> object that
+consumes <tt class="docutils literal"><span class="pre">B</span></tt> and in turn consumes <tt class="docutils literal"><span class="pre">A</span></tt>, the usage scenario is still the same:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$c</span> <span class="o">=</span> <span class="nv">$di</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;My\C&#39;</span><span class="p">);</span>
+<span class="c1">// or</span>
+<span class="nv">$c</span> <span class="o">=</span> <span class="nv">$di</span><span class="o">-&gt;</span><span class="na">newInstance</span><span class="p">(</span><span class="s1">&#39;My\C&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Simple enough, but what if we wanted to pass in these parameters at call time? Assuming a default
+<tt class="docutils literal"><span class="pre">Di</span></tt> object (<tt class="docutils literal"><span class="pre">$di</span> <span class="pre">=</span> <span class="pre">new</span> <span class="pre">Zend\Di\Di()</span></tt> without any configuration to the
+<tt class="docutils literal"><span class="pre">InstanceManager</span></tt>), we could do the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$parameters</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;MyUsernameValue&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;MyHardToGuessPassword%$#&#39;</span><span class="p">,</span>
+<span class="p">);</span>
+
+<span class="nv">$c</span> <span class="o">=</span> <span class="nv">$di</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;My\C&#39;</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">);</span>
+<span class="c1">// or</span>
+<span class="nv">$c</span> <span class="o">=</span> <span class="nv">$di</span><span class="o">-&gt;</span><span class="na">newInstance</span><span class="p">(</span><span class="s1">&#39;My\C&#39;</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Constructor injection is not the only supported type of injection. The other most popular method of injection is
+also supported: setter injection. Setter injection allows one to have a usage scenario that is the same as our
+previous example with the exception, for example, of our <tt class="docutils literal"><span class="pre">B</span></tt> class now looking like this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">My</span> <span class="p">{</span>
+    <span class="k">class</span> <span class="nc">B</span>
+    <span class="p">{</span>
+        <span class="k">protected</span> <span class="nv">$a</span><span class="p">;</span>
+        <span class="k">public</span> <span class="k">function</span> <span class="nf">setA</span><span class="p">(</span><span class="nx">A</span> <span class="nv">$a</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">a</span> <span class="o">=</span> <span class="nv">$a</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Since the method is prefixed with set, and is followed by a capital letter, the <tt class="docutils literal"><span class="pre">Di</span></tt> knows that
+this method is used for setter injection, and again, the use case <tt class="docutils literal"><span class="pre">$c</span> <span class="pre">=</span> <span class="pre">$di-&gt;get('C')</span></tt>, will once again know how
+to fill the dependencies when needed to create an object of type <tt class="docutils literal"><span class="pre">C</span></tt>.</p>
+<p>Other methods are being created to determine what the wirings between classes are, such as interface injection and
+annotation based injection.</p>
+</div>
+<div class="section" id="simplest-usage-case-without-type-hints">
+<span id="learning-di-simplest-usage-case-without-type-hints"></span><h2>Simplest Usage Case Without Type-hints<a class="headerlink" href="#simplest-usage-case-without-type-hints" title="Permalink to this headline">¶</a></h2>
+<p>If your code does not have type-hints or you are using 3rd party code that does not have type-hints but does
+practice dependency injection, you can still use the <tt class="docutils literal"><span class="pre">Di</span></tt>, but you might find you need to
+describe your dependencies explicitly. To do this, you will need to interact with one of the definitions that is
+capable of letting a developer describe, with objects, the map between classes. This particular definition is
+called the <tt class="docutils literal"><span class="pre">BuilderDefinition</span></tt> and can work with, or in place of, the default <tt class="docutils literal"><span class="pre">RuntimeDefinition</span></tt>.</p>
+<p>Definitions are a part of the <tt class="docutils literal"><span class="pre">Di</span></tt> that attempt to describe the relationship between classes so
+that <tt class="docutils literal"><span class="pre">Di::newInstance()</span></tt> and <tt class="docutils literal"><span class="pre">Di::get()</span></tt> can know what the dependencies are
+that need to be filled for a particular class/object. With no configuration, <tt class="docutils literal"><span class="pre">Di</span></tt> will use the
+<tt class="docutils literal"><span class="pre">RuntimeDefinition</span></tt> which uses reflection and the type-hints in your code to determine the dependency map.
+Without type-hints, it will assume that all dependencies are scalar or required configuration parameters.</p>
+<p>The <tt class="docutils literal"><span class="pre">BuilderDefinition</span></tt>, which can be used in tandem with the <tt class="docutils literal"><span class="pre">RuntimeDefinition</span></tt> (technically, it can be used
+in tandem with any definition by way of the <tt class="docutils literal"><span class="pre">AggregateDefinition</span></tt>), allows you to programmatically describe the
+mappings with objects. Let&#8217;s say for example, our above <tt class="docutils literal"><span class="pre">A/B/C</span></tt> usage scenario, were altered such that class
+<tt class="docutils literal"><span class="pre">B</span></tt> now looks like this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">My</span> <span class="p">{</span>
+    <span class="k">class</span> <span class="nc">B</span>
+    <span class="p">{</span>
+        <span class="k">protected</span> <span class="nv">$a</span><span class="p">;</span>
+        <span class="k">public</span> <span class="k">function</span> <span class="nf">setA</span><span class="p">(</span><span class="nv">$a</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">a</span> <span class="o">=</span> <span class="nv">$a</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>You&#8217;ll notice the only change is that setA now does not include any type-hinting information.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Di\Di</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Di\Definition</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Di\Definition\Builder</span><span class="p">;</span>
+
+<span class="c1">// Describe this class:</span>
+<span class="nv">$builder</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Definition\BuilderDefinition</span><span class="p">;</span>
+<span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">addClass</span><span class="p">((</span><span class="nv">$class</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Builder\PhpClass</span><span class="p">));</span>
+
+<span class="nv">$class</span><span class="o">-&gt;</span><span class="na">setName</span><span class="p">(</span><span class="s1">&#39;My\B&#39;</span><span class="p">);</span>
+<span class="nv">$class</span><span class="o">-&gt;</span><span class="na">addInjectableMethod</span><span class="p">((</span><span class="nv">$im</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Builder\InjectibleMethod</span><span class="p">));</span>
+
+<span class="nv">$im</span><span class="o">-&gt;</span><span class="na">setName</span><span class="p">(</span><span class="s1">&#39;setA&#39;</span><span class="p">);</span>
+<span class="nv">$im</span><span class="o">-&gt;</span><span class="na">addParameter</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;My\A&#39;</span><span class="p">);</span>
+
+<span class="c1">// Use both our Builder Definition as well as the default</span>
+<span class="c1">// RuntimeDefinition, builder first</span>
+<span class="nv">$aDef</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Definition\AggregateDefinition</span><span class="p">;</span>
+<span class="nv">$aDef</span><span class="o">-&gt;</span><span class="na">addDefinition</span><span class="p">(</span><span class="nv">$builder</span><span class="p">);</span>
+<span class="nv">$aDef</span><span class="o">-&gt;</span><span class="na">addDefinition</span><span class="p">(</span><span class="k">new</span> <span class="nx">Definition\RuntimeDefinition</span><span class="p">);</span>
+
+<span class="c1">// Now make sure the Di understands it</span>
+<span class="nv">$di</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Di</span><span class="p">;</span>
+<span class="nv">$di</span><span class="o">-&gt;</span><span class="na">setDefinition</span><span class="p">(</span><span class="nv">$aDef</span><span class="p">);</span>
+
+<span class="c1">// and finally, create C</span>
+<span class="nv">$parameters</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;MyUsernameValue&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;MyHardToGuessPassword%$#&#39;</span><span class="p">,</span>
+<span class="p">);</span>
+
+<span class="nv">$c</span> <span class="o">=</span> <span class="nv">$di</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;My\C&#39;</span><span class="p">,</span> <span class="nv">$parameters</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>This above usage scenario provides that whatever the code looks like, you can ensure that it works with the
+dependency injection container. In an ideal world, all of your code would have the proper type hinting and/or would
+be using a mapping strategy that reduces the amount of bootstrapping work that needs to be done in order to have a
+full definition that is capable of instantiating all of the objects you might require.</p>
+</div>
+<div class="section" id="simplest-usage-case-with-compiled-definition">
+<span id="learning-di-simplest-usage-case-with-compiled-definition"></span><h2>Simplest usage case with Compiled Definition<a class="headerlink" href="#simplest-usage-case-with-compiled-definition" title="Permalink to this headline">¶</a></h2>
+<p>Without going into the gritty details, as you might expect, PHP at its core is not DI friendly. Out-of-the-box, the
+<tt class="docutils literal"><span class="pre">Di</span></tt> uses a <tt class="docutils literal"><span class="pre">RuntimeDefinition</span></tt> which does all class map resolution via PHP&#8217;s <tt class="docutils literal"><span class="pre">Reflection</span></tt>
+extension. Couple that with the fact that PHP does not have a true application layer capable of storing objects
+in-memory between requests, and you get a recipe that is less performant than similar solutions you&#8217;ll find in Java
+and .Net (where there is an application layer with in-memory object storage.)</p>
+<p>To mitigate this shortcoming, <tt class="docutils literal"><span class="pre">Zend\Di</span></tt> has several features built in capable of pre-compiling the most expensive
+tasks that surround dependency injection. It is worth noting that the <tt class="docutils literal"><span class="pre">RuntimeDefition</span></tt>, which is used by
+default, is the <strong>only</strong> definition that does lookups on-demand. The rest of the <tt class="docutils literal"><span class="pre">Definition</span></tt> objects are capable
+of being aggregated and stored to disk in a very performant way.</p>
+<p>Ideally, 3rd party code will ship with a pre-compiled <tt class="docutils literal"><span class="pre">Definition</span></tt> that will describe the various relationships
+and parameter/property needs of each class that is to be instantiated. This <tt class="docutils literal"><span class="pre">Definition</span></tt> would have been built as
+part of some deployment or packaging task by this 3rd party. When this is not the case, you can create these
+<tt class="docutils literal"><span class="pre">Definitions</span></tt> via any of the <tt class="docutils literal"><span class="pre">Definition</span></tt> types provided with the exception of the <tt class="docutils literal"><span class="pre">RuntimeDefinition</span></tt>. Here
+is a breakdown of the job of each definition type:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">AggregateDefinition</span></tt>- Aggregates multiple definitions of various types. When looking for a class, it looks it
+up in the order the definitions were provided to this aggregate.</li>
+<li><tt class="docutils literal"><span class="pre">ArrayDefinition</span></tt>- This definition takes an array of information and exposes it via the interface provided by
+<tt class="docutils literal"><span class="pre">Zend\Di\Definition</span></tt> suitable for usage by <tt class="docutils literal"><span class="pre">Di</span></tt> or an <tt class="docutils literal"><span class="pre">AggregateDefinition</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">BuilderDefinition</span></tt>- Creates a definition based on an object graph consisting of various <tt class="docutils literal"><span class="pre">Builder\PhpClass</span></tt>
+objects and <tt class="docutils literal"><span class="pre">Builder\InectionMethod</span></tt> objects that describe the mapping needs of the target codebase and …</li>
+<li><tt class="docutils literal"><span class="pre">Compiler</span></tt>- This is not actually a definition, but produces an <tt class="docutils literal"><span class="pre">ArrayDefinition</span></tt> based off of a code scanner
+(<tt class="docutils literal"><span class="pre">Zend\Code\Scanner\DirectoryScanner</span></tt> or <tt class="docutils literal"><span class="pre">Zend\Code\Scanner\FileScanner</span></tt>).</li>
+</ul>
+<p>The following is an example of producing a definition via a <tt class="docutils literal"><span class="pre">DirectoryScanner</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$compiler</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Di\Definition\Compiler</span><span class="p">();</span>
+<span class="nv">$compiler</span><span class="o">-&gt;</span><span class="na">addCodeScannerDirectory</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">Zend\Code\Scanner\ScannerDirectory</span><span class="p">(</span><span class="s1">&#39;path/to/library/My/&#39;</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="nv">$definition</span> <span class="o">=</span> <span class="nv">$compiler</span><span class="o">-&gt;</span><span class="na">compile</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>This definition can then be directly used by the <tt class="docutils literal"><span class="pre">Di</span></tt> (assuming the above <tt class="docutils literal"><span class="pre">A,</span> <span class="pre">B,</span> <span class="pre">C</span></tt> scenario
+was actually a file per class on disk):</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$di</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Di\Di</span><span class="p">;</span>
+<span class="nv">$di</span><span class="o">-&gt;</span><span class="na">setDefinition</span><span class="p">(</span><span class="nv">$definition</span><span class="p">);</span>
+<span class="nv">$di</span><span class="o">-&gt;</span><span class="na">getInstanceManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setProperty</span><span class="p">(</span><span class="s1">&#39;My\A&#39;</span><span class="p">,</span> <span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$di</span><span class="o">-&gt;</span><span class="na">getInstanceManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">setProperty</span><span class="p">(</span><span class="s1">&#39;My\A&#39;</span><span class="p">,</span> <span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">);</span>
+<span class="nv">$c</span> <span class="o">=</span> <span class="nv">$di</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;My\C&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>One strategy for persisting these compiled definitions would be the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nb">file_exists</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/di-definition.php&#39;</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="nv">$isProduction</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$compiler</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Di\Definition\Compiler</span><span class="p">();</span>
+    <span class="nv">$compiler</span><span class="o">-&gt;</span><span class="na">addCodeScannerDirectory</span><span class="p">(</span>
+        <span class="k">new</span> <span class="nx">Zend\Code\Scanner\ScannerDirectory</span><span class="p">(</span><span class="s1">&#39;path/to/library/My/&#39;</span><span class="p">)</span>
+    <span class="p">);</span>
+    <span class="nv">$definition</span> <span class="o">=</span> <span class="nv">$compiler</span><span class="o">-&gt;</span><span class="na">compile</span><span class="p">();</span>
+    <span class="nb">file_put_contents</span><span class="p">(</span>
+        <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/di-definition.php&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;&lt;?php return &#39;</span> <span class="o">.</span> <span class="nb">var_export</span><span class="p">(</span><span class="nv">$definition</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">(),</span> <span class="k">true</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;;&#39;</span>
+    <span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nv">$definition</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Di\Definition\ArrayDefinition</span><span class="p">(</span>
+        <span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/di-definition.php&#39;</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// $definition can now be used; in a production system it will be written</span>
+<span class="c1">// to disk.</span>
+</pre></div>
+</td></tr></table></div>
+<p>Since <tt class="docutils literal"><span class="pre">Zend\Code\Scanner</span></tt> does not include files, the classes contained within are not loaded into memory.
+Instead, <tt class="docutils literal"><span class="pre">Zend\Code\Scanner</span></tt> uses tokenization to determine the structure of your files. This makes this suitable
+to use this solution during development and within the same request as any one of your application&#8217;s dispatched
+actions.</p>
+</div>
+<div class="section" id="creating-a-precompiled-definition-for-others-to-use">
+<span id="learning-di-creating-a-precompiled-definition-for-others-to-use"></span><h2>Creating a precompiled definition for others to use<a class="headerlink" href="#creating-a-precompiled-definition-for-others-to-use" title="Permalink to this headline">¶</a></h2>
+<p>If you are a 3rd party code developer, it makes sense to produce a <tt class="docutils literal"><span class="pre">Definition</span></tt> file that describes your code so
+that others can utilize this <tt class="docutils literal"><span class="pre">Definition</span></tt> without having to <tt class="docutils literal"><span class="pre">Reflect</span></tt> it via the <tt class="docutils literal"><span class="pre">RuntimeDefintion</span></tt>, or
+create it via the <tt class="docutils literal"><span class="pre">Compiler</span></tt>. To do this, use the same technique as above. Instead of writing the resulting array
+to disk, you would write the information into a definition directly, by way of <tt class="docutils literal"><span class="pre">Zend\Code\Generator</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// First, compile the information</span>
+<span class="nv">$compiler</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Di\Definition\CompilerDefinition</span><span class="p">();</span>
+<span class="nv">$compiler</span><span class="o">-&gt;</span><span class="na">addDirectoryScanner</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">Zend\Code\Scanner\DirectoryScanner</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/My/&#39;</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="nv">$compiler</span><span class="o">-&gt;</span><span class="na">compile</span><span class="p">();</span>
+<span class="nv">$definition</span> <span class="o">=</span> <span class="nv">$compiler</span><span class="o">-&gt;</span><span class="na">toArrayDefinition</span><span class="p">();</span>
+
+<span class="c1">// Now, create a Definition class for this information</span>
+<span class="nv">$codeGenerator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Code\Generator\FileGenerator</span><span class="p">();</span>
+<span class="nv">$codeGenerator</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">((</span><span class="nv">$class</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Code\Generator\ClassGenerator</span><span class="p">()));</span>
+<span class="nv">$class</span><span class="o">-&gt;</span><span class="na">setNamespaceName</span><span class="p">(</span><span class="s1">&#39;My&#39;</span><span class="p">);</span>
+<span class="nv">$class</span><span class="o">-&gt;</span><span class="na">setName</span><span class="p">(</span><span class="s1">&#39;DiDefinition&#39;</span><span class="p">);</span>
+<span class="nv">$class</span><span class="o">-&gt;</span><span class="na">setExtendedClass</span><span class="p">(</span><span class="s1">&#39;\Zend\Di\Definition\ArrayDefinition&#39;</span><span class="p">);</span>
+<span class="nv">$class</span><span class="o">-&gt;</span><span class="na">addMethod</span><span class="p">(</span>
+    <span class="s1">&#39;__construct&#39;</span><span class="p">,</span>
+    <span class="k">array</span><span class="p">(),</span>
+    <span class="nx">\Zend\Code\Generator\MethodGenerator</span><span class="o">::</span><span class="na">FLAG_PUBLIC</span><span class="p">,</span>
+    <span class="s1">&#39;parent::__construct(&#39;</span> <span class="o">.</span> <span class="nb">var_export</span><span class="p">(</span><span class="nv">$definition</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">(),</span> <span class="k">true</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;);&#39;</span>
+<span class="p">);</span>
+<span class="nb">file_put_contents</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/My/DiDefinition.php&#39;</span><span class="p">,</span> <span class="nv">$codeGenerator</span><span class="o">-&gt;</span><span class="na">generate</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="using-multiple-definitions-from-multiple-sources">
+<span id="learning-di-using-multiple-definitions-from-multiple-sources"></span><h2>Using Multiple Definitions From Multiple Sources<a class="headerlink" href="#using-multiple-definitions-from-multiple-sources" title="Permalink to this headline">¶</a></h2>
+<p>In all actuality, you will be using code from multiple places, some Zend Framework code, some other 3rd party code,
+and of course, your own code that makes up your application. Here is a method for consuming definitions from
+multiple places:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Di\Di</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Di\Definition</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Di\Definition\Builder</span><span class="p">;</span>
+
+<span class="nv">$di</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Di</span><span class="p">;</span>
+<span class="nv">$diDefAggregate</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Definition\Aggregate</span><span class="p">();</span>
+
+<span class="c1">// first add in provided Definitions, for example</span>
+<span class="nv">$diDefAggregate</span><span class="o">-&gt;</span><span class="na">addDefinition</span><span class="p">(</span><span class="k">new</span> <span class="nx">ThirdParty\Dbal\DiDefinition</span><span class="p">());</span>
+<span class="nv">$diDefAggregate</span><span class="o">-&gt;</span><span class="na">addDefinition</span><span class="p">(</span><span class="k">new</span> <span class="nx">Zend\Controller\DiDefinition</span><span class="p">());</span>
+
+<span class="c1">// for code that does not have TypeHints</span>
+<span class="nv">$builder</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Definition\BuilderDefinition</span><span class="p">();</span>
+<span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">addClass</span><span class="p">((</span><span class="nv">$class</span> <span class="o">=</span> <span class="nx">Builder\PhpClass</span><span class="p">));</span>
+<span class="nv">$class</span><span class="o">-&gt;</span><span class="na">addInjectionMethod</span><span class="p">(</span>
+    <span class="p">(</span><span class="nv">$injectMethod</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Builder\InjectionMethod</span><span class="p">())</span>
+<span class="p">);</span>
+<span class="nv">$injectMethod</span><span class="o">-&gt;</span><span class="na">setName</span><span class="p">(</span><span class="s1">&#39;injectImplementation&#39;</span><span class="p">);</span>
+<span class="nv">$injectMethod</span><span class="o">-&gt;</span><span class="na">addParameter</span><span class="p">(</span>
+<span class="s1">&#39;implementation&#39;</span><span class="p">,</span> <span class="s1">&#39;Class\For\Specific\Implementation&#39;</span>
+<span class="p">);</span>
+
+<span class="c1">// now, your application code</span>
+<span class="nv">$compiler</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Definition\Compiler</span><span class="p">()</span>
+<span class="nv">$compiler</span><span class="o">-&gt;</span><span class="na">addCodeScannerDirectory</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">Zend\Code\Scanner\DirectoryScanner</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/App/&#39;</span><span class="p">)</span>
+<span class="p">);</span>
+<span class="nv">$appDefinition</span> <span class="o">=</span> <span class="nv">$compiler</span><span class="o">-&gt;</span><span class="na">compile</span><span class="p">();</span>
+<span class="nv">$diDefAggregate</span><span class="o">-&gt;</span><span class="na">addDefinition</span><span class="p">(</span><span class="nv">$appDefinition</span><span class="p">);</span>
+
+<span class="c1">// now, pass in properties</span>
+<span class="nv">$im</span> <span class="o">=</span> <span class="nv">$di</span><span class="o">-&gt;</span><span class="na">getInstanceManager</span><span class="p">();</span>
+
+<span class="c1">// this could come from Zend\Config\Config::toArray</span>
+<span class="nv">$propertiesFromConfig</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;ThirdParty\Dbal\DbAdapter&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;someUsername&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;somePassword&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;Zend\Controller\Helper\ContentType&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;default&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;xhtml5&#39;</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+<span class="nv">$im</span><span class="o">-&gt;</span><span class="na">setProperties</span><span class="p">(</span><span class="nv">$propertiesFromConfig</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="generating-service-locators">
+<span id="learning-di-generating-service-locators"></span><h2>Generating Service Locators<a class="headerlink" href="#generating-service-locators" title="Permalink to this headline">¶</a></h2>
+<p>In production, you want things to be as fast as possible. The Dependency Injection Container, while engineered for
+speed, still must do a fair bit of work resolving parameters and dependencies at runtime. What if you could speed
+things up and remove those lookups?</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Di\ServiceLocator\Generator</span></tt> component can do just that. It takes a configured DI instance, and
+generates a service locator class for you from it. That class will manage instances for you, as well as provide
+hard-coded, lazy-loading instantiation of instances.</p>
+<p>The method <tt class="docutils literal"><span class="pre">getCodeGenerator()</span></tt> returns an instance of <tt class="docutils literal"><span class="pre">Zend\CodeGenerator\Php\PhpFile</span></tt>, from which you can
+then write a class file with the new Service Locator. Methods on the <tt class="docutils literal"><span class="pre">Generator</span></tt> class allow you to specify the
+namespace and class for the generated Service Locator.</p>
+<p>As an example, consider the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Di\ServiceLocator\Generator</span><span class="p">;</span>
+
+<span class="c1">// $di is a fully configured DI instance</span>
+<span class="nv">$generator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Generator</span><span class="p">(</span><span class="nv">$di</span><span class="p">);</span>
+
+<span class="nv">$generator</span><span class="o">-&gt;</span><span class="na">setNamespace</span><span class="p">(</span><span class="s1">&#39;Application&#39;</span><span class="p">)</span>
+          <span class="o">-&gt;</span><span class="na">setContainerClass</span><span class="p">(</span><span class="s1">&#39;Context&#39;</span><span class="p">);</span>
+<span class="nv">$file</span> <span class="o">=</span> <span class="nv">$generator</span><span class="o">-&gt;</span><span class="na">getCodeGenerator</span><span class="p">();</span>
+<span class="nv">$file</span><span class="o">-&gt;</span><span class="na">setFilename</span><span class="p">(</span><span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../Application/Context.php&#39;</span><span class="p">);</span>
+<span class="nv">$file</span><span class="o">-&gt;</span><span class="na">write</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The above code will write to <tt class="docutils literal"><span class="pre">../Application/Context.php</span></tt>, and that file will contain the class
+<tt class="docutils literal"><span class="pre">Application\Context</span></tt>. That file might look like the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+
+<span class="k">namespace</span> <span class="nx">Application</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Di\ServiceLocator</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Context</span> <span class="k">extends</span> <span class="nx">ServiceLocator</span>
+<span class="p">{</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">get</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$params</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="k">switch</span> <span class="p">(</span><span class="nv">$name</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">case</span> <span class="s1">&#39;composed&#39;</span><span class="o">:</span>
+            <span class="k">case</span> <span class="s1">&#39;My\ComposedClass&#39;</span><span class="o">:</span>
+                <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getMyComposedClass</span><span class="p">();</span>
+
+            <span class="k">case</span> <span class="s1">&#39;struct&#39;</span><span class="o">:</span>
+            <span class="k">case</span> <span class="s1">&#39;My\Struct&#39;</span><span class="o">:</span>
+                <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getMyStruct</span><span class="p">();</span>
+
+            <span class="k">default</span><span class="o">:</span>
+                <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$params</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getComposedClass</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">services</span><span class="p">[</span><span class="s1">&#39;My\ComposedClass&#39;</span><span class="p">]))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">services</span><span class="p">[</span><span class="s1">&#39;My\ComposedClass&#39;</span><span class="p">];</span>
+        <span class="p">}</span>
+
+        <span class="nv">$object</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\My\ComposedClass</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">services</span><span class="p">[</span><span class="s1">&#39;My\ComposedClass&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$object</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$object</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getMyStruct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">services</span><span class="p">[</span><span class="s1">&#39;My\Struct&#39;</span><span class="p">]))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">services</span><span class="p">[</span><span class="s1">&#39;My\Struct&#39;</span><span class="p">];</span>
+        <span class="p">}</span>
+
+        <span class="nv">$object</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\My\Struct</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">services</span><span class="p">[</span><span class="s1">&#39;My\Struct&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$object</span><span class="p">;</span>
+        <span class="k">return</span> <span class="nv">$object</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getComposed</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;My\ComposedClass&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getStruct</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;My\Struct&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>To use this class, you simply consume it as you would a DI container:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$container</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application\Context</span><span class="p">;</span>
+
+<span class="nv">$struct</span> <span class="o">=</span> <span class="nv">$container</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;struct&#39;</span><span class="p">);</span> <span class="c1">// My\Struct instance</span>
+</pre></div>
+</td></tr></table></div>
+<p>One note about this functionality in its current incarnation. Configuration is per-environment only at this time.
+This means that you will need to generate a container per execution environment. Our recommendation is that you do
+so, and then in your environment, specify the container class to use.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Learning Dependency Injection</a><ul>
+<li><a class="reference internal" href="#very-brief-introduction-to-di">Very brief introduction to Di.</a></li>
+<li><a class="reference internal" href="#very-brief-introduction-to-di-container">Very brief introduction to Di Container.</a></li>
+<li><a class="reference internal" href="#simplest-usage-case-2-classes-one-consumes-the-other">Simplest usage case (2 classes, one consumes the other)</a></li>
+<li><a class="reference internal" href="#simplest-usage-case-without-type-hints">Simplest Usage Case Without Type-hints</a></li>
+<li><a class="reference internal" href="#simplest-usage-case-with-compiled-definition">Simplest usage case with Compiled Definition</a></li>
+<li><a class="reference internal" href="#creating-a-precompiled-definition-for-others-to-use">Creating a precompiled definition for others to use</a></li>
+<li><a class="reference internal" href="#using-multiple-definitions-from-multiple-sources">Using Multiple Definitions From Multiple Sources</a></li>
+<li><a class="reference internal" href="#generating-service-locators">Generating Service Locators</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../modules/zendtool.introduction.html"
+                        title="previous chapter">Zend Framework Tool (ZFTool)</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../modules/zend.authentication.intro.html"
+                        title="next chapter">Introduction</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/quickstart.di.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/quickstart.di.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/quickstart.di.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modules/zend.authentication.intro.html" title="Introduction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../modules/zendtool.introduction.html" title="Zend Framework Tool (ZFTool)"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/quickstart.di.rst">
+                Learning Dependency Injection
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

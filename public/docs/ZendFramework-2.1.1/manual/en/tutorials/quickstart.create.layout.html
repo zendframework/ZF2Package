@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Create A Layout &mdash; Zend Framework 2 2.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.1 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="create-a-layout">
+<span id="learning-quickstart-create-layout"></span><h1>Create A Layout<a class="headerlink" href="#create-a-layout" title="Permalink to this headline">¶</a></h1>
+<p>You may have noticed that the view scripts in the previous sections were <em>HTML</em> fragments- not complete pages. This
+is by design; we want our actions to return content only related to the action itself, not the application as a
+whole.</p>
+<p>Now we must compose that generated content into a full <em>HTML</em> page. We&#8217;d also like to have a consistent look and
+feel for the application. We will use a global site layout to accomplish both of these tasks.</p>
+<p>There are two design patterns that Zend Framework uses to implement layouts: <a class="reference external" href="http://martinfowler.com/eaaCatalog/twoStepView.html">Two Step View</a> and <a class="reference external" href="http://java.sun.com/blueprints/corej2eepatterns/Patterns/CompositeView.html">Composite
+View</a>. <strong>Two Step View</strong> is usually associated with the <a class="reference external" href="http://www.martinfowler.com/eaaCatalog/transformView.html">Transform View</a> pattern; the basic idea is that your
+application view creates a representation that is then injected into the master view for final transformation. The
+<strong>Composite View</strong> pattern deals with a view made of one or more atomic, application views.</p>
+<p>In Zend Framework, <em class="xref std std-ref">Zend_Layout</em> combines the ideas behind these patterns. Instead of each
+action view script needing to include site-wide artifacts, they can simply focus on their own responsibilities.</p>
+<p>Occasionally, however, you may need application-specific information in your site-wide view script. Fortunately,
+Zend Framework provides a variety of view <strong>placeholders</strong> to allow you to provide such information from your
+action view scripts.</p>
+<p>To get started using <tt class="docutils literal"><span class="pre">Zend_Layout</span></tt>, first we need to inform our bootstrap to use the <tt class="docutils literal"><span class="pre">Layout</span></tt> resource. This
+can be done using the <tt class="docutils literal"><span class="pre">zf</span> <span class="pre">enable</span> <span class="pre">layout</span></tt> command:</p>
+<div class="highlight-console"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="gp">%</span> zf <span class="nb">enable </span>layout
+<span class="go">Layouts have been enabled, and a default layout created at</span>
+<span class="go">application/layouts/scripts/layout.phtml</span>
+<span class="go">A layout entry has been added to the application config file.</span>
+</pre></div>
+</td></tr></table></div>
+<p>As noted by the command, <tt class="docutils literal"><span class="pre">application/configs/application.ini</span></tt> is updated, and now contains the following within
+the <tt class="docutils literal"><span class="pre">production</span></tt> section:</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">; application/configs/application.ini</span>
+
+<span class="c">; Add to [production] section:</span>
+<span class="na">resources.layout.layoutPath</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/layouts/scripts&quot;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The final <em>INI</em> file should look as follows:</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">; application/configs/application.ini</span>
+
+<span class="k">[production]</span>
+<span class="c">; PHP settings we want to initialize</span>
+<span class="na">phpSettings.display_startup_errors</span> <span class="o">=</span> <span class="s">0</span>
+<span class="na">phpSettings.display_errors</span> <span class="o">=</span> <span class="s">0</span>
+<span class="na">includePaths.library</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/../library&quot;</span>
+<span class="na">bootstrap.path</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/Bootstrap.php&quot;</span>
+<span class="na">bootstrap.class</span> <span class="o">=</span> <span class="s">&quot;Bootstrap&quot;</span>
+<span class="na">appnamespace</span> <span class="o">=</span> <span class="s">&quot;Application&quot;</span>
+<span class="na">resources.frontController.controllerDirectory</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/controllers&quot;</span>
+<span class="na">resources.frontController.params.displayExceptions</span> <span class="o">=</span> <span class="s">0</span>
+<span class="na">resources.layout.layoutPath</span> <span class="o">=</span> <span class="s">APPLICATION_PATH &quot;/layouts/scripts&quot;</span>
+
+<span class="k">[staging : production]</span>
+
+<span class="k">[testing : production]</span>
+<span class="na">phpSettings.display_startup_errors</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">phpSettings.display_errors</span> <span class="o">=</span> <span class="s">1</span>
+
+<span class="k">[development : production]</span>
+<span class="na">phpSettings.display_startup_errors</span> <span class="o">=</span> <span class="s">1</span>
+<span class="na">phpSettings.display_errors</span> <span class="o">=</span> <span class="s">1</span>
+</pre></div>
+</td></tr></table></div>
+<p>This directive tells your application to look for layout view scripts in <tt class="docutils literal"><span class="pre">application/layouts/scripts</span></tt>. If you
+examine your directory tree, you&#8217;ll see that this directory has been created for you now, with the file
+<tt class="docutils literal"><span class="pre">layout.phtml</span></tt>.</p>
+<p>We also want to ensure we have an XHTML DocType declaration for our application. To enable this, we need to add a
+resource to our bootstrap.</p>
+<p>The simplest way to add a bootstrap resource is to simply create a protected method beginning with the phrase
+<tt class="docutils literal"><span class="pre">_init</span></tt>. In this case, we want to initialize the doctype, so we&#8217;ll create an <tt class="docutils literal"><span class="pre">_initDoctype()</span></tt> method within our
+bootstrap class:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// application/Bootstrap.php</span>
+
+<span class="k">class</span> <span class="nc">Bootstrap</span> <span class="k">extends</span> <span class="nx">Zend\Application_Bootstrap\Bootstrap</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">_initDoctype</span><span class="p">()</span>
+    <span class="p">{</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Within that method, we need to hint to the view to use the appropriate doctype. But where will the view object come
+from? The easy solution is to initialize the <tt class="docutils literal"><span class="pre">View</span></tt> resource; once we have, we can pull the view object from the
+bootstrap and use it.</p>
+<p>To initialize the view resource, add the following line to your <tt class="docutils literal"><span class="pre">application/configs/application.ini</span></tt> file, in
+the section marked <tt class="docutils literal"><span class="pre">production</span></tt>:</p>
+<div class="highlight-ini"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="c">; application/configs/application.ini</span>
+
+<span class="c">; Add to [production] section:</span>
+<span class="na">resources.view[]</span> <span class="o">=</span>
+</pre></div>
+</td></tr></table></div>
+<p>This tells us to initialize the view with no options (the &#8216;[]&#8217; indicates that the &#8220;view&#8221; key is an array, and we
+pass nothing to it).</p>
+<p>Now that we have a view, let&#8217;s flesh out our <tt class="docutils literal"><span class="pre">_initDoctype()</span></tt> method. In it, we will first ensure the <tt class="docutils literal"><span class="pre">View</span></tt>
+resource has run, fetch the view object, and then configure it:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// application/Bootstrap.php</span>
+
+<span class="k">class</span> <span class="nc">Bootstrap</span> <span class="k">extends</span> <span class="nx">Zend\Application_Bootstrap\Bootstrap</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="k">function</span> <span class="nf">_initDoctype</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">bootstrap</span><span class="p">(</span><span class="s1">&#39;view&#39;</span><span class="p">);</span>
+        <span class="nv">$view</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getResource</span><span class="p">(</span><span class="s1">&#39;view&#39;</span><span class="p">);</span>
+        <span class="nv">$view</span><span class="o">-&gt;</span><span class="na">doctype</span><span class="p">(</span><span class="s1">&#39;XHTML1_STRICT&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now that we&#8217;ve initialized <tt class="docutils literal"><span class="pre">Zend_Layout</span></tt> and set the Doctype, let&#8217;s create our site-wide layout:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;!--</span> <span class="nx">application</span><span class="o">/</span><span class="nx">layouts</span><span class="o">/</span><span class="nx">scripts</span><span class="o">/</span><span class="nx">layout</span><span class="o">.</span><span class="nx">phtml</span> <span class="o">--&gt;</span>
+<span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">doctype</span><span class="p">()</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;</span>
+<span class="x">&lt;head&gt;</span>
+<span class="x">  &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;</span>
+<span class="x">  &lt;title&gt;Zend Framework Quickstart Application&lt;/title&gt;</span>
+<span class="x">  </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">headLink</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">appendStylesheet</span><span class="p">(</span><span class="s1">&#39;/css/global.css&#39;</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/head&gt;</span>
+<span class="x">&lt;body&gt;</span>
+<span class="x">&lt;div id=&quot;header&quot; style=&quot;background-color: #EEEEEE; height: 30px;&quot;&gt;</span>
+<span class="x">    &lt;div id=&quot;header-logo&quot; style=&quot;float: left&quot;&gt;</span>
+<span class="x">        &lt;b&gt;ZF Quickstart Application&lt;/b&gt;</span>
+<span class="x">    &lt;/div&gt;</span>
+<span class="x">    &lt;div id=&quot;header-navigation&quot; style=&quot;float: right&quot;&gt;</span>
+<span class="x">        &lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span>
+            <span class="k">array</span><span class="p">(</span><span class="s1">&#39;controller&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;guestbook&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;default&#39;</span><span class="p">,</span>
+            <span class="k">true</span><span class="p">)</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;Guestbook&lt;/a&gt;</span>
+<span class="x">    &lt;/div&gt;</span>
+<span class="x">&lt;/div&gt;</span>
+
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">layout</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">content</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">&lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>We grab our application content using the <tt class="docutils literal"><span class="pre">layout()</span></tt> view helper, and accessing the &#8220;content&#8221; key. You may render
+to other response segments if you wish to, but in most cases, this is all that&#8217;s necessary.</p>
+<p>Note also the use of the <tt class="docutils literal"><span class="pre">headLink()</span></tt> placeholder. This is an easy way to generate the <em>HTML</em> for &lt;link&gt;
+elements, as well as to keep track of them throughout your application. If you need to add additional CSS sheets to
+support a single action, you can do so, and be assured it will be present in the final rendered page.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Checkpoint</strong></p>
+<p class="last">Now go to &#8220;<a class="reference external" href="http://localhost">http://localhost</a>&#8221; and check out the source. You should see your XHTML header, head, title, and body
+sections.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/quickstart.create.layout.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/quickstart.create.layout.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/quickstart.create.layout.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/quickstart.create.layout.rst">
+                Create A Layout
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

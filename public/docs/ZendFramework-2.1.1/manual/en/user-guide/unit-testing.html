@@ -1,0 +1,381 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Unit Testing &mdash; Zend Framework 2 2.1.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.1 documentation" href="../index.html" />
+    <link rel="next" title="Modules" href="modules.html" />
+    <link rel="prev" title="Getting started: A skeleton application" href="skeleton-application.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modules.html" title="Modules"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="skeleton-application.html" title="Getting started: A skeleton application"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="unit-testing">
+<span id="user-guide-unit-testing-rst"></span><h1>Unit Testing<a class="headerlink" href="#unit-testing" title="Permalink to this headline">¶</a></h1>
+<p>A solid unit test suite is essential for ongoing development in large
+projects, especially those with many people involved. Going back and
+manually testing every individual component of an application after
+every change is impractical. Your unit tests will help alleviate that
+by automatically testing your application&#8217;s components and alerting
+you when something is not working the same way it was when you wrote
+your tests.</p>
+<p>The Zend Framework 2 API uses <a class="reference external" href="http://phpunit.de/">PHPUnit</a>, and so
+does this tutorial application. A detailed explanation of unit testing
+is beyond the scope of this tutorial, so we will only provide sample
+tests for the components in the pages that follow. This tutorial assumes
+that you already have PHPUnit installed.</p>
+<div class="section" id="setting-up-the-tests-directory">
+<h2>Setting up the tests directory<a class="headerlink" href="#setting-up-the-tests-directory" title="Permalink to this headline">¶</a></h2>
+<p>Start by creating a directory called <tt class="docutils literal"><span class="pre">test</span></tt> in <tt class="docutils literal"><span class="pre">zf2-tutorial\module\Application</span></tt> with
+the following subdirectories:</p>
+<div class="highlight-text"><div class="highlight"><pre>zf2-tutorial/
+    /module
+        /Application
+            /test
+                /ApplicationTest
+                    /Controller
+</pre></div>
+</div>
+<p>The structure of the <tt class="docutils literal"><span class="pre">test</span></tt> directory matches exactly with that of the
+module&#8217;s source files, and it will allow you to keep your tests
+well-organized and easy to find.</p>
+</div>
+<div class="section" id="bootstrapping-your-tests">
+<h2>Bootstrapping your tests<a class="headerlink" href="#bootstrapping-your-tests" title="Permalink to this headline">¶</a></h2>
+<p>Next, create a file called <tt class="docutils literal"><span class="pre">phpunit.xml.dist</span></tt> under <tt class="docutils literal"><span class="pre">zf2-tutorial/module/Application/test</span></tt>:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+
+<span class="nt">&lt;phpunit</span> <span class="na">bootstrap=</span><span class="s">&quot;Bootstrap.php&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;testsuites&gt;</span>
+        <span class="nt">&lt;testsuite</span> <span class="na">name=</span><span class="s">&quot;zf2tutorial&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;directory&gt;</span>./ApplicationTest<span class="nt">&lt;/directory&gt;</span>
+        <span class="nt">&lt;/testsuite&gt;</span>
+    <span class="nt">&lt;/testsuites&gt;</span>
+<span class="nt">&lt;/phpunit&gt;</span>
+</pre></div>
+</div>
+<p>And a file called <tt class="docutils literal"><span class="pre">Bootstrap.php</span></tt>, also under zf-tutorial/tests/:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="nb">chdir</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="nx">__DIR__</span><span class="p">));</span>
+
+<span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../init_autoloader.php&#39;</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>The contents of the bootstrap file are similar to those of zf-tutorial/public/index.php, except
+we don’t initialize the application. We’ll be doing that in our tests to ensure that each test
+is executed against a freshly initialized instance of our application without any previous tests
+influencing the current test’s results.</p>
+</div>
+<div class="section" id="your-first-controller-test">
+<h2>Your first Controller test<a class="headerlink" href="#your-first-controller-test" title="Permalink to this headline">¶</a></h2>
+<p>Next, create <tt class="docutils literal"><span class="pre">IndexControllerTest.php</span></tt> under
+<tt class="docutils literal"><span class="pre">zf-tutorial/module/Application/test/ApplicationTest/Controller</span></tt> with
+the following contents:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+
+<span class="k">namespace</span> <span class="nx">ApplicationTest\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">IndexControllerTest</span> <span class="k">extends</span> <span class="nx">AbstractHttpControllerTestCase</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setUp</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setApplicationConfig</span><span class="p">(</span>
+            <span class="k">include</span> <span class="s1">&#39;/path/to/application/config/test/application.config.php&#39;</span>
+        <span class="p">);</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">setUp</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Add your application config with the <tt class="docutils literal"><span class="pre">setApplicationConfig</span></tt> method. You can use several config
+to test modules dependencies or your current application config.</p>
+<p>Now, add the following function to the <tt class="docutils literal"><span class="pre">IndexControllerTest</span></tt> class:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">testIndexActionCanBeAccessed</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertResponseStatusCode</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertModule</span><span class="p">(</span><span class="s1">&#39;application&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertControllerName</span><span class="p">(</span><span class="s1">&#39;application_index&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertControllerClass</span><span class="p">(</span><span class="s1">&#39;IndexController&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertMatchedRouteName</span><span class="p">(</span><span class="s1">&#39;home&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The test is verifying that the homepage responds with HTTP status code 200 and
+that the controller&#8217;s return value is equal to &#8216;IndexController&#8217;.</p>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>Finally, <tt class="docutils literal"><span class="pre">cd</span></tt> to <tt class="docutils literal"><span class="pre">zf-tutorial/module/Application/test/</span></tt> and run <tt class="docutils literal"><span class="pre">phpunit</span></tt>. If you see something like
+this, then your application is ready for more tests!</p>
+<div class="highlight-text"><div class="highlight"><pre>PHPUnit 3.5.15 by Sebastian Bergmann.
+
+.
+
+Time: 0 seconds, Memory: 15.75Mb
+
+OK (1 test, 5 assertions)
+</pre></div>
+</div>
+</div>
+<div class="section" id="test-your-console-router">
+<h2>Test your console router<a class="headerlink" href="#test-your-console-router" title="Permalink to this headline">¶</a></h2>
+<p>ZendTest component provide a HTTP controller tests case and a console controller. To test your application
+with the console, just switch with the AbstractConsoleControllerTestCaseTest. Now, you can use the same methods
+in your tests controllers :</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">testConsoleActionCanBeAccessed</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">&#39;--your-arg&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertResponseStatusCode</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertModule</span><span class="p">(</span><span class="s1">&#39;application&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertControllerName</span><span class="p">(</span><span class="s1">&#39;application_console&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertControllerClass</span><span class="p">(</span><span class="s1">&#39;ConsoleController&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertMatchedRouteName</span><span class="p">(</span><span class="s1">&#39;myaction&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>More informations at the <tt class="docutils literal"><span class="pre">Zend\Test</span></tt> component documentation page.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Unit Testing</a><ul>
+<li><a class="reference internal" href="#setting-up-the-tests-directory">Setting up the tests directory</a></li>
+<li><a class="reference internal" href="#bootstrapping-your-tests">Bootstrapping your tests</a></li>
+<li><a class="reference internal" href="#your-first-controller-test">Your first Controller test</a></li>
+<li><a class="reference internal" href="#testing">Testing</a></li>
+<li><a class="reference internal" href="#test-your-console-router">Test your console router</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="skeleton-application.html"
+                        title="previous chapter">Getting started: A skeleton application</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="modules.html"
+                        title="next chapter">Modules</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/user-guide/unit-testing.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/user-guide/unit-testing.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/user-guide/unit-testing.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modules.html" title="Modules"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="skeleton-application.html" title="Getting started: A skeleton application"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/user-guide/unit-testing.rst">
+                Unit Testing
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
