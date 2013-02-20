@@ -1,0 +1,400 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Console adapters &mdash; Zend Framework 2 2.1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.2 documentation" href="../index.html" />
+    <link rel="next" title="Console prompts" href="zend.console.prompts.html" />
+    <link rel="prev" title="Console-aware action controllers" href="zend.console.controllers.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.console.prompts.html" title="Console prompts"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.console.controllers.html" title="Console-aware action controllers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="console-adapters">
+<span id="zend-console-adapter"></span><h1>Console adapters<a class="headerlink" href="#console-adapters" title="Permalink to this headline">¶</a></h1>
+<p>Zend Framework 2 provides console abstraction layer, which works around various bugs and limitations in operating
+systems. It handles displaying of colored text, retrieving console window size, charset and provides basic line
+drawing capabilities.</p>
+<div class="admonition-see-also admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last">Console Adapters can be used for a low-level access to the console. If you plan on building functional console
+applications you do not normally need to use adapters. Make sure to
+<a class="reference internal" href="zend.console.introduction.html"><em>read about console MVC integration first</em></a>, because it provides a convenient way
+for running modular console applications without directly writing to or reading from console window.</p>
+</div>
+<div class="section" id="retreving-console-adapter">
+<h2>Retreving console adapter<a class="headerlink" href="#retreving-console-adapter" title="Permalink to this headline">¶</a></h2>
+<p>If you are using <a class="reference internal" href="zend.mvc.controllers.html"><em>MVC controllers</em></a> you can obtain Console adapter instance using
+Service Manager.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Application</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Console\Adapter\AdapterInterface</span> <span class="k">as</span> <span class="nx">Console</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Module</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testAction</span><span class="p">()</span>
+    <span class="p">{</span>
+<span class="hll">        <span class="nv">$console</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getServiceManager</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;console&#39;</span><span class="p">);</span>
+</span>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$console</span> <span class="nx">instanceof</span> <span class="nx">Console</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">&#39;Cannot obtain console adapter. Are we running in a console?&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you are using <tt class="docutils literal"><span class="pre">Zend\Console</span></tt> without MVC, we can get adapter using the following code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Console\Console</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Console\Exception\RuntimeException</span> <span class="k">as</span> <span class="nx">ConsoleException</span><span class="p">;</span>
+
+<span class="k">try</span> <span class="p">{</span>
+<span class="hll">    <span class="nv">$console</span> <span class="o">=</span> <span class="nx">Console</span><span class="o">::</span><span class="na">getInstance</span><span class="p">();</span>
+</span><span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">ConsoleException</span> <span class="nv">$e</span><span class="p">){</span>
+    <span class="c1">// Could not get console adapter - most likely we are not running inside a console window.</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For practical and security reasons, <tt class="docutils literal"><span class="pre">Console::getInstance()</span></tt> will always throw an exception if you attempt to
+get console instance in a non-console environment (i.e. when running on a HTTP server). You can override this
+behavior by manually instantiating one of <tt class="docutils literal"><span class="pre">Zend\Console\Adapter\*</span></tt> classes.</p>
+</div>
+</div>
+<div class="section" id="using-console-adapter">
+<h2>Using console adapter<a class="headerlink" href="#using-console-adapter" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="window-size-and-title">
+<h3>Window size and title<a class="headerlink" href="#window-size-and-title" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>$console-&gt;getWidth()</strong></dt>
+<dd>(<cite>int</cite>) Get real console window width in characters.</dd>
+<dt><strong>$console-&gt;getHeight()</strong></dt>
+<dd>(<cite>int</cite>) Get real console window height in characters.</dd>
+<dt><strong>$console-&gt;getSize()</strong></dt>
+<dd>(<cite>array</cite>) Get an <tt class="docutils literal"><span class="pre">array(</span> <span class="pre">$width,</span> <span class="pre">$height)</span></tt> with current console window dimensions.</dd>
+<dt><strong>$console-&gt;getTitle()</strong></dt>
+<dd>(<cite>string</cite>) Get console window title.</dd>
+</dl>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For UTF-8 enabled consoles (terminals) dimensions represent the number of multibyte characters (real characters).</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">On consoles with virtual buffers (i.e. MS Windows Command Prompt) width and height represent visible (real) size,
+without scrolling the window. For example - if the window scrolling width is 120 chars, but it&#8217;s real, visible width
+is 80 chars, <tt class="docutils literal"><span class="pre">getWidth()</span></tt> will return <tt class="docutils literal"><span class="pre">80</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="character-set">
+<h3>Character set<a class="headerlink" href="#character-set" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>$console-&gt;isUtf8()</strong></dt>
+<dd>(<cite>boolean</cite>) Is the console UTF-8 compatible (can display unicode strings) ?</dd>
+<dt><strong>$console-&gt;getCharset()</strong></dt>
+<dd>(<cite>Zend\Console\Charset\CharsetInterface</cite>) This method will return one of <tt class="docutils literal"><span class="pre">Console\Charset\*</span></tt> classes that represent
+the readable charset that can be used for line-drawing. It is automatically detected by the adapter.</dd>
+</dl>
+</div>
+<div class="section" id="writing-to-console">
+<h3>Writing to console<a class="headerlink" href="#writing-to-console" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>$console-&gt;write( string $text, $color = null, $bgColor = null )</strong></dt>
+<dd>Write a <tt class="docutils literal"><span class="pre">$text</span></tt> to the console, optionally using foreground <tt class="docutils literal"><span class="pre">$color</span></tt> and background <tt class="docutils literal"><span class="pre">$bgColor</span></tt>.
+Color value is one of the constants in <tt class="docutils literal"><span class="pre">Zend\Console\ColorInteface</span></tt>.</dd>
+<dt><strong>$console-&gt;writeLine( string $text, $color = null, $bgColor = null )</strong></dt>
+<dd>Write a single line of <tt class="docutils literal"><span class="pre">$text</span></tt> to the console. This method will output a newline character at the end of text
+moving console cursor to next line.</dd>
+<dt><strong>$console-&gt;writeAt( string $text, int $x, int $y, $color = null, $bgColor = null )</strong></dt>
+<dd>Write <tt class="docutils literal"><span class="pre">$text</span></tt> at the specified <tt class="docutils literal"><span class="pre">$x</span></tt> and <tt class="docutils literal"><span class="pre">$y</span></tt> coordinates of console window. Top left corner of the screen
+has coordinates of <tt class="docutils literal"><span class="pre">$x</span> <span class="pre">=</span> <span class="pre">1;</span> <span class="pre">$x</span> <span class="pre">=</span> <span class="pre">1</span></tt>. To retrieve far-right and bottom coordinates, use <tt class="docutils literal"><span class="pre">getWidth()</span></tt> and
+<tt class="docutils literal"><span class="pre">getHeight()</span></tt> methods.</dd>
+</dl>
+</div>
+<div class="section" id="reading-from-console">
+<h3>Reading from console<a class="headerlink" href="#reading-from-console" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>$console-&gt;readChar( string $mask = null )</strong></dt>
+<dd>(<cite>string</cite>) Read a single character from console. Optional <tt class="docutils literal"><span class="pre">(string)</span> <span class="pre">$mask</span></tt> can be provided to force entering only a
+selected set of characters. For example, to read a single digit, we can use the following syntax:
+<tt class="docutils literal"><span class="pre">$digit</span> <span class="pre">=</span> <span class="pre">$console-&gt;readChar('0123456789');</span></tt></dd>
+<dt><strong>$console-&gt;readLine( int $maxLength = 2048 )</strong></dt>
+<dd>(<cite>string</cite>) Read a single line of input from console. Optional <tt class="docutils literal"><span class="pre">(int)</span> <span class="pre">$maxLength</span></tt> can be used to limit the length
+of data that will be read. The line will be returned <strong>without ending newline character</strong>.</dd>
+</dl>
+</div>
+<div class="section" id="miscellaneous">
+<h3>Miscellaneous<a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><strong>$console-&gt;hideCursor()</strong></dt>
+<dd>Hide blinking cursor from console.</dd>
+<dt><strong>$console-&gt;showCursor()</strong></dt>
+<dd>Show blinking cursor in console.</dd>
+<dt><strong>$console-&gt;clear()</strong></dt>
+<dd>Clear the screen.</dd>
+<dt><strong>$console-&gt;clearLine()</strong></dt>
+<dd>Clear the line that the cursor currently sits at.</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Console adapters</a><ul>
+<li><a class="reference internal" href="#retreving-console-adapter">Retreving console adapter</a></li>
+<li><a class="reference internal" href="#using-console-adapter">Using console adapter</a><ul>
+<li><a class="reference internal" href="#window-size-and-title">Window size and title</a></li>
+<li><a class="reference internal" href="#character-set">Character set</a></li>
+<li><a class="reference internal" href="#writing-to-console">Writing to console</a></li>
+<li><a class="reference internal" href="#reading-from-console">Reading from console</a></li>
+<li><a class="reference internal" href="#miscellaneous">Miscellaneous</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.console.controllers.html"
+                        title="previous chapter">Console-aware action controllers</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.console.prompts.html"
+                        title="next chapter">Console prompts</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.console.adapter.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.console.adapter.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.console.adapter.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.console.prompts.html" title="Console prompts"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.console.controllers.html" title="Console-aware action controllers"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.console.adapter.rst">
+                Console adapters
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

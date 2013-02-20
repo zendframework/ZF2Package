@@ -1,0 +1,326 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>HTTP Client - Static Usage &mdash; Zend Framework 2 2.1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.2 documentation" href="../index.html" />
+    <link rel="next" title="Translating" href="zend.i18n.translating.html" />
+    <link rel="prev" title="HTTP Client - Advanced Usage" href="zend.http.client.advanced.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.i18n.translating.html" title="Translating"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.http.client.advanced.html" title="HTTP Client - Advanced Usage"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="http-client-static-usage">
+<span id="zend-http-client-static"></span><h1>HTTP Client - Static Usage<a class="headerlink" href="#http-client-static-usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-http-client-static-intro"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Http</span></tt> component also provides <tt class="docutils literal"><span class="pre">Zend\Http\ClientStatic</span></tt>, a static
+HTTP client which exposes a simplified API for quickly performing GET and POST
+operations:</p>
+</div>
+<div class="section" id="quick-start">
+<span id="zend-http-client-static-quick-start"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Http\ClientStatic</span><span class="p">;</span>
+
+<span class="c1">// Simple GET request</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nx">ClientStatic</span><span class="o">::</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;http://example.org&#39;</span><span class="p">);</span>
+
+<span class="c1">// More complex GET request, specifying query string &#39;foo=bar&#39; and adding a</span>
+<span class="c1">// custom header to request JSON data be returned (Accept: application/json)</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nx">ClientStatic</span><span class="o">::</span><span class="na">get</span><span class="p">(</span>
+    <span class="s1">&#39;http://example.org&#39;</span><span class="p">,</span>
+    <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;foo&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;bar&#39;</span> <span class="p">),</span>
+    <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;Accept&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;application/json&#39;</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// We can also do a POST request using the same format.  Here we POST</span>
+<span class="c1">// login credentials (username/password) to a login page:</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nx">ClientStatic</span><span class="o">::</span><span class="na">post</span><span class="p">(</span><span class="s1">&#39;https://example.org/login.php&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;username&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="configuration-options">
+<h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>It is not possible to set configuration options on the <tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt> instance
+encapsulated by <tt class="docutils literal"><span class="pre">Zend\Http\ClientStatic</span></tt>. To perform a HTTP request which requires
+non-default configurations, please use <tt class="docutils literal"><span class="pre">Zend\Http\Client</span></tt> directly.</p>
+</div>
+<div class="section" id="available-methods">
+<span id="zend-http-client-static-methods"></span><h2>Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="zend-http-client-static-methods-get">
+<dt><strong>get</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">get(string</span> <span class="pre">$url,</span> <span class="pre">array</span> <span class="pre">$query</span> <span class="pre">=</span> <span class="pre">array(),</span> <span class="pre">array</span> <span class="pre">$headers</span> <span class="pre">=</span> <span class="pre">array(),</span> <span class="pre">mixed</span> <span class="pre">$body</span> <span class="pre">=</span> <span class="pre">null)</span></tt></p>
+<p>Perform an HTTP <tt class="docutils literal"><span class="pre">GET</span></tt> request using the provided URL, query string variables, headers
+and request body.</p>
+<p class="last">Returns Zend\Http\Response</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-http-client-static-methods-post">
+<dt><strong>post</strong></dt>
+<dd><p class="first"><tt class="docutils literal"><span class="pre">post(string</span> <span class="pre">$url,</span> <span class="pre">array</span> <span class="pre">$params,</span> <span class="pre">array</span> <span class="pre">$headers</span> <span class="pre">=</span> <span class="pre">array(),</span> <span class="pre">mixed</span> <span class="pre">$body</span> <span class="pre">=</span> <span class="pre">null)</span></tt></p>
+<p>Perform an HTTP <tt class="docutils literal"><span class="pre">POST</span></tt> request using the provided URL, parameters, headers
+and request body.</p>
+<p class="last">Returns Zend\Http\Response</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">HTTP Client - Static Usage</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#available-methods">Available Methods</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.http.client.advanced.html"
+                        title="previous chapter">HTTP Client - Advanced Usage</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.i18n.translating.html"
+                        title="next chapter">Translating</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.http.client-static.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.http.client-static.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.http.client-static.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.i18n.translating.html" title="Translating"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.http.client.advanced.html" title="HTTP Client - Advanced Usage"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.http.client-static.rst">
+                HTTP Client - Static Usage
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

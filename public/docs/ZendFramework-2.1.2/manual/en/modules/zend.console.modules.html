@@ -1,0 +1,591 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Console-aware modules &mdash; Zend Framework 2 2.1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.2 documentation" href="../index.html" />
+    <link rel="next" title="Console-aware action controllers" href="zend.console.controllers.html" />
+    <link rel="prev" title="Console routes and routing" href="zend.console.routes.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.console.controllers.html" title="Console-aware action controllers"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.console.routes.html" title="Console routes and routing"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="console-aware-modules">
+<span id="zend-console-modules"></span><h1>Console-aware modules<a class="headerlink" href="#console-aware-modules" title="Permalink to this headline">¶</a></h1>
+<p>Zend Framework 2 has <a class="reference internal" href="zend.console.introduction.html"><em>native MVC integration with console</em></a>. The integration also
+works with <a class="reference internal" href="zend.module-manager.intro.html"><em>modules loaded with Module Manager</em></a>.</p>
+<p>ZF2 ships with <tt class="docutils literal"><span class="pre">RouteNotFoundStrategy</span></tt> which is responsible of displaying usage information inside Console,
+in case the user has not provided any arguments, or arguments could not be understood. The strategy currently
+supports two types of information: <a class="reference internal" href="#banner"><em>application banners</em></a> and <a class="reference internal" href="#usage"><em>usage information</em></a>.</p>
+<div class="section" id="application-banner">
+<span id="banner"></span><h2>Application banner<a class="headerlink" href="#application-banner" title="Permalink to this headline">¶</a></h2>
+<p>The first time you run your ZF2 application in a Console, it will not be able to display any usage information or
+present itself. You will see something like this:</p>
+<img alt="../_images/zend.console.empty.png" class="align-center" src="../_images/zend.console.empty.png" style="width: 610px;" />
+<p>Our Application module (and any other module) can provide <strong>application banner</strong>. In order to do so,
+our Module class has to implement <tt class="docutils literal"><span class="pre">Zend\ModuleManager\Feature\ConsoleBannerProviderInterface</span></tt>. Let&#8217;s do this now.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// modules/Application/Module.php</span>
+<span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">namespace</span> <span class="nx">Application</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\ModuleManager\Feature\ConsoleBannerProviderInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Console\Adapter\AdapterInterface</span> <span class="k">as</span> <span class="nx">Console</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Module</span> <span class="k">implements</span> <span class="nx">ConsoleBannerProviderInterface</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * This method is defined in ConsoleBannerProviderInterface</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getConsoleBanner</span><span class="p">(</span><span class="nx">Console</span> <span class="nv">$console</span><span class="p">){</span>
+        <span class="k">return</span>
+            <span class="s2">&quot;==------------------------------------------------------==</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">.</span>
+            <span class="s2">&quot;        Welcome to my ZF2 Console-enabled app             </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">.</span>
+            <span class="s2">&quot;==------------------------------------------------------==</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">.</span>
+            <span class="s2">&quot;Version 0.0.1</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>After running our application, we&#8217;ll see our newly created banner.</p>
+<img alt="../_images/zend.console.banner.png" class="align-center" src="../_images/zend.console.banner.png" style="width: 614px;" />
+<p>Console banners can be provided by 1 or more modules. They will be joined together in the order modules are loaded.</p>
+<p>Let&#8217;s create and load second module that provides a banner.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="c1">// config/application.config.php</span>
+<span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;modules&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;Application&#39;</span><span class="p">,</span>
+<span class="hll">        <span class="s1">&#39;User&#39;</span><span class="p">,</span>     <span class="c1">// &lt; load user module in modules/User</span>
+</span>    <span class="p">),</span>
+</pre></div>
+</td></tr></table></div>
+<p>User module will add-on a short info about itself:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// modules/User/Module.php</span>
+<span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">namespace</span> <span class="nx">User</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\ModuleManager\Feature\ConsoleBannerProviderInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Console\Adapter\AdapterInterface</span> <span class="k">as</span> <span class="nx">Console</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Module</span> <span class="k">implements</span> <span class="nx">ConsoleBannerProviderInterface</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * This method is defined in ConsoleBannerProviderInterface</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getConsoleBanner</span><span class="p">(</span><span class="nx">Console</span> <span class="nv">$console</span><span class="p">){</span>
+        <span class="k">return</span> <span class="s2">&quot;User Module BETA1&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Because <tt class="docutils literal"><span class="pre">User</span></tt> module is loaded after <tt class="docutils literal"><span class="pre">Application</span></tt> module, the result will look like this:</p>
+<img alt="../_images/zend.console.banner2.png" class="align-center" src="../_images/zend.console.banner2.png" style="width: 610px;" />
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Application banner is displayed as-is - no trimming or other adjustments will be performed on the text. If you&#8217;d
+like to fit your banner inside console window, you could check its width with <tt class="docutils literal"><span class="pre">$console-&gt;getWidth()</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="usage-information">
+<span id="usage"></span><h2>Usage information<a class="headerlink" href="#usage-information" title="Permalink to this headline">¶</a></h2>
+<p>In order to display usage information, our Module class has to implement
+<tt class="docutils literal"><span class="pre">Zend\ModuleManager\Feature\ConsoleUsageProviderInterface</span></tt>. Let&#8217;s modify our example and add new method:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// modules/Application/Module.php</span>
+<span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">namespace</span> <span class="nx">Application</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\ModuleManager\Feature\ConsoleBannerProviderInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\ModuleManager\Feature\ConsoleUsageProviderInterface</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Console\Adapter\AdapterInterface</span> <span class="k">as</span> <span class="nx">Console</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Module</span> <span class="k">implements</span> <span class="nx">ConsoleBannerProviderInterface</span><span class="p">,</span> <span class="nx">ConsoleUsageProviderInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getConsoleBanner</span><span class="p">(</span><span class="nx">Console</span> <span class="nv">$console</span><span class="p">){</span> <span class="c1">// ... }</span>
+
+    <span class="sd">/**</span>
+<span class="sd">     * This method is defined in ConsoleUsageProviderInterface</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getConsoleUsage</span><span class="p">(</span><span class="nx">Console</span> <span class="nv">$console</span><span class="p">){</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;show stats&#39;</span>             <span class="o">=&gt;</span> <span class="s1">&#39;Show application statistics&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;run cron&#39;</span>               <span class="o">=&gt;</span> <span class="s1">&#39;Run automated jobs&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;(enable|disable) debug&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Enable or disable debug mode for the application.&#39;</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>This will display the following information:</p>
+<img alt="../_images/zend.console.usage.png" class="align-center" src="../_images/zend.console.usage.png" style="width: 610px;" />
+<p>Similar to <a class="reference internal" href="#banner"><em>application banner</em></a> multiple modules can provide usage information,
+which will be joined together and displayed to the user. The order in which usage information is displayed is the
+order in which modules are loaded.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Usage info provided in modules <strong>does not connect</strong> with <a class="reference internal" href="zend.console.routes.html"><em>console routing</em></a>. You can
+describe console usage in any form you prefer and it does not affect how MVC handles console commands.
+In order to handle real console requests you need to define 1 or more <a class="reference internal" href="zend.console.routes.html"><em>console routes</em></a>.</p>
+</div>
+<div class="section" id="free-form-text">
+<span id="free-form"></span><h3>Free-form text<a class="headerlink" href="#free-form-text" title="Permalink to this headline">¶</a></h3>
+<p>In order to output free-form text as usage information, <tt class="docutils literal"><span class="pre">getConsoleUsage()</span></tt> can return a string,
+or an array of strings, for example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">getConsoleUsage</span><span class="p">(</span><span class="nx">Console</span> <span class="nv">$console</span><span class="p">){</span>
+    <span class="k">return</span> <span class="s1">&#39;User module expects exactly one argument - user name. It will display information for this user.&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<img alt="../_images/zend.console.usage2.png" class="align-center" src="../_images/zend.console.usage2.png" style="width: 612px;" />
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The text provided is displayed as-is - no trimming or other adjustments will be performed. If you&#8217;d
+like to fit your usage information inside console window, you could check its width with <tt class="docutils literal"><span class="pre">$console-&gt;getWidth()</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="list-of-commands">
+<h3>List of commands<a class="headerlink" href="#list-of-commands" title="Permalink to this headline">¶</a></h3>
+<p>If <tt class="docutils literal"><span class="pre">getConsoleUsage()</span></tt> returns and associative array, it will be automatically aligned in 2 columns. The first
+column will be prepended with script name (the entry point for the application). This is useful to display different
+ways of running the application.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">getConsoleUsage</span><span class="p">(</span><span class="nx">Console</span> <span class="nv">$console</span><span class="p">){</span>
+     <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;delete user &lt;userEmail&gt;&#39;</span>        <span class="o">=&gt;</span> <span class="s1">&#39;Delete user with email &lt;userEmail&gt;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;disable user &lt;userEmail&gt;&#39;</span>       <span class="o">=&gt;</span> <span class="s1">&#39;Disable user with email &lt;userEmail&gt;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;list [all|disabled] users&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;Show a list of users&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;find user [--email=] [--name=]&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Attempt to find a user by email or name&#39;</span><span class="p">,</span>
+     <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<img alt="../_images/zend.console.usage3.png" class="align-center" src="../_images/zend.console.usage3.png" style="width: 610px;" />
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Commands and their descriptions will be aligned in two columns, that fit inside Console window. If the window is
+resized, some texts might be wrapped but all content will be aligned accordingly. If you don&#8217;t like this
+behavior, you can always return <a class="reference internal" href="#free-form"><em>free-form text</em></a> that will not be transformed in any way.</p>
+</div>
+</div>
+<div class="section" id="list-of-params-and-flags">
+<h3>List of params and flags<a class="headerlink" href="#list-of-params-and-flags" title="Permalink to this headline">¶</a></h3>
+<p>Returning an array of arrays from <tt class="docutils literal"><span class="pre">getConsoleUsage()</span></tt> will produce a listing of parameters. This is useful for
+explaining flags, switches, possible values and other information. The output will be aligned in multiple columns for
+readability.</p>
+<p>Below is an example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">getConsoleUsage</span><span class="p">(</span><span class="nx">Console</span> <span class="nv">$console</span><span class="p">){</span>
+    <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;&lt;userEmail&gt;&#39;</span>   <span class="p">,</span> <span class="s1">&#39;email of the user&#39;</span> <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;--verbose&#39;</span>     <span class="p">,</span> <span class="s1">&#39;Turn on verbose mode&#39;</span> <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;--quick&#39;</span>       <span class="p">,</span> <span class="s1">&#39;Perform a &quot;quick&quot; operation&#39;</span> <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;-v&#39;</span>            <span class="p">,</span> <span class="s1">&#39;Same as --verbose&#39;</span> <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;-w&#39;</span>            <span class="p">,</span> <span class="s1">&#39;Wide output&#39;</span><span class="p">)</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<img alt="../_images/zend.console.usage4.png" class="align-center" src="../_images/zend.console.usage4.png" style="width: 608px;" />
+<p>Using this method, we can display more than 2 columns of information, for example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">getConsoleUsage</span><span class="p">(</span><span class="nx">Console</span> <span class="nv">$console</span><span class="p">){</span>
+    <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;&lt;userEmail&gt;&#39;</span> <span class="p">,</span> <span class="s1">&#39;user email&#39;</span>        <span class="p">,</span> <span class="s1">&#39;Full email address of the user to find.&#39;</span> <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;--verbose&#39;</span>   <span class="p">,</span> <span class="s1">&#39;verbose mode&#39;</span>      <span class="p">,</span> <span class="s1">&#39;Display additional information during processing&#39;</span> <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;--quick&#39;</span>     <span class="p">,</span> <span class="s1">&#39;&quot;quick&quot; operation&#39;</span> <span class="p">,</span> <span class="s1">&#39;Do not check integrity, just make changes and finish&#39;</span> <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;-v&#39;</span>          <span class="p">,</span> <span class="s1">&#39;Same as --verbose&#39;</span> <span class="p">,</span> <span class="s1">&#39;Display additional information during processing&#39;</span> <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;-w&#39;</span>          <span class="p">,</span> <span class="s1">&#39;wide output&#39;</span>       <span class="p">,</span> <span class="s1">&#39;When listing users, use the whole available screen width&#39;</span> <span class="p">)</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<img alt="../_images/zend.console.usage5.png" class="align-center" src="../_images/zend.console.usage5.png" style="width: 608px;" />
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>All info will be aligned in one or more columns that fit inside Console window. If the window is
+resized, some texts might be wrapped but all content will be aligned accordingly. In case the number of columns
+changes (i.e. the array() contains different number of elements) a new table will be started,
+with new alignment and different column widths.</p>
+<p class="last">If you don&#8217;t like this behavior, you can always return <a class="reference internal" href="#free-form"><em>free-form text</em></a> that will not be
+transformed in any way.</p>
+</div>
+</div>
+<div class="section" id="mixing-styles">
+<h3>Mixing styles<a class="headerlink" href="#mixing-styles" title="Permalink to this headline">¶</a></h3>
+<p>You can use mix together all of the above styles to provide comprehensive usage information, for example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">getConsoleUsage</span><span class="p">(</span><span class="nx">Console</span> <span class="nv">$console</span><span class="p">){</span>
+    <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;Finding and listing users&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;list [all|disabled] users [-w]&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;Show a list of users&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;find user [--email=] [--name=]&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;Attempt to find a user by email or name&#39;</span><span class="p">,</span>
+
+        <span class="k">array</span><span class="p">(</span><span class="s1">&#39;[all|disabled]&#39;</span><span class="p">,</span>    <span class="s1">&#39;Display all users or only disabled accounts&#39;</span><span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span><span class="s1">&#39;--email=EMAIL&#39;</span><span class="p">,</span>     <span class="s1">&#39;Email of the user to find&#39;</span><span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span><span class="s1">&#39;--name=NAME&#39;</span><span class="p">,</span>       <span class="s1">&#39;Full name of the user to find.&#39;</span><span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span><span class="s1">&#39;-w&#39;</span><span class="p">,</span>                <span class="s1">&#39;Wide output - When listing users use the whole available screen width&#39;</span> <span class="p">),</span>
+
+        <span class="s1">&#39;Manipulation of user database:&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;delete user &lt;userEmail&gt; [--verbose|-v] [--quick]&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;Delete user with email &lt;userEmail&gt;&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;disable user &lt;userEmail&gt; [--verbose|-v]&#39;</span>           <span class="o">=&gt;</span> <span class="s1">&#39;Disable user with email &lt;userEmail&gt;&#39;</span><span class="p">,</span>
+
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;&lt;userEmail&gt;&#39;</span> <span class="p">,</span> <span class="s1">&#39;user email&#39;</span>        <span class="p">,</span> <span class="s1">&#39;Full email address of the user to change.&#39;</span> <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;--verbose&#39;</span>   <span class="p">,</span> <span class="s1">&#39;verbose mode&#39;</span>      <span class="p">,</span> <span class="s1">&#39;Display additional information during processing&#39;</span> <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;--quick&#39;</span>     <span class="p">,</span> <span class="s1">&#39;&quot;quick&quot; operation&#39;</span> <span class="p">,</span> <span class="s1">&#39;Do not check integrity, just make changes and finish&#39;</span> <span class="p">),</span>
+        <span class="k">array</span><span class="p">(</span> <span class="s1">&#39;-v&#39;</span>          <span class="p">,</span> <span class="s1">&#39;Same as --verbose&#39;</span> <span class="p">,</span> <span class="s1">&#39;Display additional information during processing&#39;</span> <span class="p">),</span>
+
+    <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<img alt="../_images/zend.console.usage6.png" class="align-center" src="../_images/zend.console.usage6.png" style="width: 752px;" />
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Console-aware modules</a><ul>
+<li><a class="reference internal" href="#application-banner">Application banner</a></li>
+<li><a class="reference internal" href="#usage-information">Usage information</a><ul>
+<li><a class="reference internal" href="#free-form-text">Free-form text</a></li>
+<li><a class="reference internal" href="#list-of-commands">List of commands</a></li>
+<li><a class="reference internal" href="#list-of-params-and-flags">List of params and flags</a></li>
+<li><a class="reference internal" href="#mixing-styles">Mixing styles</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.console.routes.html"
+                        title="previous chapter">Console routes and routing</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.console.controllers.html"
+                        title="next chapter">Console-aware action controllers</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.console.modules.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.console.modules.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.console.modules.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.console.controllers.html" title="Console-aware action controllers"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.console.routes.html" title="Console routes and routing"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.console.modules.rst">
+                Console-aware modules
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

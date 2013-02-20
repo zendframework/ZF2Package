@@ -343,7 +343,10 @@ function getSkeletonApplicationReleases()
     //    apply each to template
     foreach ($tagData as $tagDatum) {
         $tag     = $tagDatum->name;
-        $version = ('zf/' == substr($tag, 0, 3)) ? substr($tag, 3) : $tag;
+        $version = $tag;
+        if (preg_match('#^zf/release-#', $version)) {
+            $version = substr($tag, 11);
+        }
 
         $definition                        = $template;
         $definition['version']             = $version;

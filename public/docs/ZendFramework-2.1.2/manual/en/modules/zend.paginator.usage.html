@@ -1,0 +1,824 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Usage &mdash; Zend Framework 2 2.1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.2 documentation" href="../index.html" />
+    <link rel="next" title="Configuration" href="zend.paginator.configuration.html" />
+    <link rel="prev" title="Introduction" href="zend.paginator.introduction.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.paginator.configuration.html" title="Configuration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.paginator.introduction.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="usage">
+<span id="zend-paginator-usage"></span><h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="paginating-data-collections">
+<span id="zend-paginator-usage-paginating"></span><h2>Paginating data collections<a class="headerlink" href="#paginating-data-collections" title="Permalink to this headline">¶</a></h2>
+<p>In order to paginate items into pages, <tt class="docutils literal"><span class="pre">Zend\Paginator</span></tt> must have a generic way of accessing that data. For that
+reason, all data access takes place through data source adapters. Several adapters ship with Zend Framework by
+default:</p>
+<table border="1" class="docutils" id="zend-paginator-usage-paginating-adapters">
+<caption>Adapters for Zend\Paginator</caption>
+<colgroup>
+<col width="7%" />
+<col width="93%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Adapter</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>ArrayAdapter</td>
+<td>Accepts a PHP array</td>
+</tr>
+<tr class="row-odd"><td>DbSelect</td>
+<td>Accepts a Zend\Db\Sql\Select plus either a Zend\Db\Adapter\Adapter or Zend\Db\Sql\Sql to paginate rows from a database</td>
+</tr>
+<tr class="row-even"><td>Iterator</td>
+<td>Accepts an Iterator instance</td>
+</tr>
+<tr class="row-odd"><td>Null</td>
+<td>Does not use Zend\Paginator to manage data pagination. You can still take advantage of the pagination control feature.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Instead of selecting every matching row of a given query, the DbSelect adapter retrieves only
+the smallest amount of data necessary for displaying the current page.  Because of this, a second query is dynamically generated to determine the total number of matching rows.</p>
+</div>
+<p>To create an instance of <tt class="docutils literal"><span class="pre">Zend\Paginator</span></tt>, you must supply an adapter to the constructor:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$paginator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Zend\Paginator\Paginator</span><span class="p">(</span><span class="k">new</span> <span class="nx">\Zend\Paginator\Adapter\ArrayAdapter</span><span class="p">(</span><span class="nv">$array</span><span class="p">));</span>
+
+<span class="nx">In</span> <span class="nx">the</span> <span class="k">case</span> <span class="nx">of</span> <span class="nx">the</span> <span class="sb">``</span><span class="k">Null</span><span class="sb">``</span> <span class="nx">adapter</span><span class="p">,</span> <span class="nx">in</span> <span class="nx">lieu</span> <span class="nx">of</span> <span class="nx">a</span> <span class="nx">data</span> <span class="nx">collection</span> <span class="nx">you</span> <span class="nx">must</span> <span class="nx">supply</span> <span class="nx">an</span> <span class="nx">item</span> <span class="nb">count</span> <span class="nx">to</span> <span class="nx">its</span>
+<span class="nx">constructor</span><span class="o">.</span>
+</pre></div>
+</td></tr></table></div>
+<p>Although the instance is technically usable in this state, in your controller action you&#8217;ll need to tell the
+paginator what page number the user requested. This allows advancing through the paginated data.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">setCurrentPageNumber</span><span class="p">(</span><span class="nv">$page</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The simplest way to keep track of this value is through a <em>URL</em> parameter.  The following is an example route you might use in an <em>Array</em> configuration file:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;routes&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;paginator&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;type&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;segment&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;route&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/list/[page/:page]&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;defaults&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;page&#39;</span> <span class="o">=&gt;</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>With the above route (and using Zend Framework <em>MVC</em> components), you might set the current page number in your controller action like so:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">setCurrentPageNumber</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">fromRoute</span><span class="p">(</span><span class="s1">&#39;page&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>There are other options available; see <a class="reference internal" href="zend.paginator.configuration.html#zend-paginator-configuration"><em>Configuration</em></a> for more on them.</p>
+<p>Finally, you&#8217;ll need to assign the paginator instance to your view. If you&#8217;re using Zend Framework <em>MVC</em> component, you can assign the paginator object to your view model:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$vm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ViewModel</span><span class="p">();</span>
+<span class="nv">$vm</span><span class="o">-&gt;</span><span class="na">setVariable</span><span class="p">(</span><span class="s1">&#39;paginator&#39;</span><span class="p">,</span> <span class="nv">$paginator</span><span class="p">);</span>
+<span class="k">return</span> <span class="nv">$vm</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="the-dbselect-adapter">
+<span id="zend-paginator-usage-dbselect"></span><h2>The DbSelect adapter<a class="headerlink" href="#the-dbselect-adapter" title="Permalink to this headline">¶</a></h2>
+<p>The usage of most adapters is pretty straight-forward. However, the database adapter requires a more detailed
+explanation regarding the retrieval and count of the data from the database.</p>
+<p>To use the DbSelect adapter you don&#8217;t have to retrieve the data upfront from the database. The adapter will do the
+retrieval for you, as well as the counting of the total pages. If additional work has to be done on the database results
+which cannot be expressed via the provided <tt class="docutils literal"><span class="pre">Zend\Db\Sql\Select</span></tt> object you must extend the adapter and override the
+<tt class="docutils literal"><span class="pre">getItems()</span></tt> method.</p>
+<p>Additionally this adapter does <strong>not</strong> fetch all records from the database in order to count them. Instead, the
+adapter manipulates the original query to produce a corresponding COUNT query. Paginator then executes that
+COUNT query to get the number of rows. This does require an extra round-trip to the database, but this is many
+times faster than fetching an entire result set and using <tt class="docutils literal"><span class="pre">count()</span></tt>, especially with large collections of data.</p>
+<p>The database adapter will try and build the most efficient query that will execute on pretty much any modern
+database. However, depending on your database or even your own schema setup, there might be more efficient ways to
+get a rowcount. For this scenario, you can extend the provided DbSelect adapter and implement a custom <tt class="docutils literal"><span class="pre">getRowCount</span></tt>
+method.  For example, if you keep track of the count of blog posts in a separate table, you could achieve a faster count query with the
+following setup:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MyDbSelect</span> <span class="k">extends</span> <span class="nx">Zend\Paginator\Adapter\DbSelect</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">count</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$select</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Db\Sql\Select</span><span class="p">();</span>
+        <span class="nv">$select</span><span class="o">-&gt;</span><span class="na">from</span><span class="p">(</span><span class="s1">&#39;item_counts&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">columns</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="o">=&gt;</span><span class="s1">&#39;post_count&#39;</span><span class="p">));</span>
+
+        <span class="nv">$statement</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">sql</span><span class="o">-&gt;</span><span class="na">prepareStatementForSqlObject</span><span class="p">(</span><span class="nv">$select</span><span class="p">);</span>
+        <span class="nv">$result</span>    <span class="o">=</span> <span class="nv">$statement</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">();</span>
+        <span class="nv">$row</span>       <span class="o">=</span> <span class="nv">$result</span><span class="o">-&gt;</span><span class="na">current</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">rowCount</span> <span class="o">=</span> <span class="nv">$row</span><span class="p">[</span><span class="s1">&#39;c&#39;</span><span class="p">];</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">rowCount</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MyDbSelect</span><span class="p">(</span><span class="nv">$query</span><span class="p">,</span> <span class="nv">$adapter</span><span class="p">);</span>
+<span class="nv">$paginator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Paginator\Paginator</span><span class="p">(</span><span class="nv">$adapter</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>This approach will probably not give you a huge performance gain on small collections and/or simple select queries.
+However, with complex queries and large collections, a similar approach could give you a significant performance
+boost.</p>
+<p>The DbSelect adapter also supports returning of fetched records using the <tt class="docutils literal"><span class="pre">Zend\Db\ResultSet</span></tt> component of <tt class="docutils literal"><span class="pre">Zend\Db</span></tt>.
+You can override the concrete RowSet implementation by passing an object implementing <tt class="docutils literal"><span class="pre">Zend\Db\ResultSet\ResultSetInterface</span></tt>
+as the third constructor argument to the DbSelect adapter:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// $objectPrototype is an instance of our custom entity</span>
+<span class="c1">// $hydrator is a custom hydrator for our entity (implementing Zend\Stdlib\Hydrator\HydratorInterface)</span>
+<span class="nv">$resultSet</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Db\ResultSet\HydratingResultSet</span><span class="p">(</span><span class="nv">$hydrator</span><span class="p">,</span> <span class="nv">$objectPrototype</span><span class="p">);</span>
+
+<span class="nv">$adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Paginator\Adapter\DbSelect</span><span class="p">(</span><span class="nv">$query</span><span class="p">,</span> <span class="nv">$dbAdapter</span><span class="p">,</span> <span class="nv">$resultSet</span><span class="p">)</span>
+<span class="nv">$paginator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Paginator\Paginator</span><span class="p">(</span><span class="nv">$adapter</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now when we iterate over <tt class="docutils literal"><span class="pre">$paginator</span></tt> we will get instances of our custom entity instead of key-value-pair arrays.</p>
+</div>
+<div class="section" id="rendering-pages-with-view-scripts">
+<span id="zend-paginator-rendering"></span><h2>Rendering pages with view scripts<a class="headerlink" href="#rendering-pages-with-view-scripts" title="Permalink to this headline">¶</a></h2>
+<p>The view script is used to render the page items (if you&#8217;re using <tt class="docutils literal"><span class="pre">Zend\Paginator</span></tt> to do so) and display the
+pagination control.</p>
+<p>Because <tt class="docutils literal"><span class="pre">Zend\Paginator</span></tt> implements the <em>SPL</em> interface <a class="reference external" href="http://www.php.net/~helly/php/ext/spl/interfaceIteratorAggregate.html">IteratorAggregate</a>, looping over your items and
+displaying them is simple.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;</span><span class="nx">html</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nx">body</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="nx">h1</span><span class="o">&gt;</span><span class="nx">Example</span><span class="o">&lt;/</span><span class="nx">h1</span><span class="o">&gt;</span>
+<span class="o">&lt;?</span><span class="nx">php</span> <span class="k">if</span> <span class="p">(</span><span class="nb">count</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">paginator</span><span class="p">))</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;ul&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">paginator</span> <span class="k">as</span> <span class="nv">$item</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;li&gt;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$item</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x">&lt;/li&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endforeach</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/ul&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">paginationControl</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">paginator</span><span class="p">,</span>
+                                    <span class="s1">&#39;Sliding&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;my_pagination_control&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;route&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;application/paginator&#39;</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Notice the view helper call near the end. PaginationControl accepts up to four parameters: the paginator instance,
+a scrolling style, a view script name, and an array of additional parameters.</p>
+<p>The second and third parameters are very important. Whereas the view script name is used to determine how the
+pagination control should <strong>look</strong>, the scrolling style is used to control how it should <strong>behave</strong>. Say the view
+script is in the style of a search pagination control, like the one below:</p>
+<img alt="../_images/zend.paginator.usage.rendering.control.png" class="align-center" src="../_images/zend.paginator.usage.rendering.control.png" />
+<p>What happens when the user clicks the &#8220;next&#8221; link a few times? Well, any number of things could happen. The current
+page number could stay in the middle as you click through (as it does on Yahoo!), or it could advance to the end of
+the page range and then appear again on the left when the user clicks &#8220;next&#8221; one more time. The page numbers might
+even expand and contract as the user advances (or &#8220;scrolls&#8221;) through them (as they do on Google).</p>
+<p>There are four scrolling styles packaged with Zend Framework:</p>
+<table border="1" class="docutils" id="zend-paginator-usage-rendering-scrolling-styles">
+<caption>Scrolling styles for Zend\Paginator</caption>
+<colgroup>
+<col width="8%" />
+<col width="92%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Scrolling style</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>All</td>
+<td>Returns every page. This is useful for dropdown menu pagination controls with relatively few pages. In these cases, you want all pages available to the user at once.</td>
+</tr>
+<tr class="row-odd"><td>Elastic</td>
+<td>A Google-like scrolling style that expands and contracts as a user scrolls through the pages.</td>
+</tr>
+<tr class="row-even"><td>Jumping</td>
+<td>As users scroll through, the page number advances to the end of a given range, then starts again at the beginning of the new range.</td>
+</tr>
+<tr class="row-odd"><td>Sliding</td>
+<td>A Yahoo!-like scrolling style that positions the current page number in the center of the page range, or as close as possible. This is the default style.</td>
+</tr>
+</tbody>
+</table>
+<p>The fourth and final parameter is reserved for an optional associative array of additional variables that you want
+available in your view (available via <tt class="docutils literal"><span class="pre">$this</span></tt>). For instance, these values could include extra <em>URL</em>
+parameters for pagination links.</p>
+<p>By setting the default view script name, default scrolling style, and view instance, you can eliminate the calls to
+PaginationControl completely:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">Zend\Paginator\Paginator</span><span class="o">::</span><span class="na">setDefaultScrollingStyle</span><span class="p">(</span><span class="s1">&#39;Sliding&#39;</span><span class="p">);</span>
+<span class="nx">Zend\View\Helper\PaginationControl</span><span class="o">::</span><span class="na">setDefaultViewPartial</span><span class="p">(</span>
+    <span class="s1">&#39;my_pagination_control&#39;</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>When all of these values are set, you can render the pagination control inside your view script with a simple echo
+statement:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">paginator</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Of course, it&#8217;s possible to use <tt class="docutils literal"><span class="pre">Zend\Paginator</span></tt> with other template engines. For example, with Smarty you
+might do the following:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$smarty</span><span class="o">-&gt;</span><span class="na">assign</span><span class="p">(</span><span class="s1">&#39;pages&#39;</span><span class="p">,</span> <span class="nv">$paginator</span><span class="o">-&gt;</span><span class="na">getPages</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>You could then access paginator values from a template like so:</p>
+<div class="last highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="p">{</span><span class="nv">$pages</span><span class="o">-&gt;</span><span class="na">pageCount</span><span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="example-pagination-controls">
+<span id="zend-paginator-usage-rendering-example-controls"></span><h3>Example pagination controls<a class="headerlink" href="#example-pagination-controls" title="Permalink to this headline">¶</a></h3>
+<p>The following example pagination controls will hopefully help you get started:</p>
+<p>Search pagination:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;!--</span>
+<span class="nx">See</span> <span class="nx">http</span><span class="o">://</span><span class="nx">developer</span><span class="o">.</span><span class="nx">yahoo</span><span class="o">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">ypatterns</span><span class="o">/</span><span class="nx">pattern</span><span class="o">.</span><span class="nx">php</span><span class="o">?</span><span class="nx">pattern</span><span class="o">=</span><span class="nx">searchpagination</span>
+<span class="o">--&gt;</span>
+
+<span class="o">&lt;?</span><span class="nx">php</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">pageCount</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;div class=&quot;paginationControl&quot;&gt;</span>
+<span class="x">&lt;!-- Previous page link --&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">previous</span><span class="p">))</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">route</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;page&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">previous</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="x">    &lt; Previous</span>
+<span class="x">  &lt;/a&gt; |</span>
+<span class="cp">&lt;?php</span> <span class="k">else</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;span class=&quot;disabled&quot;&gt;&lt; Previous&lt;/span&gt; |</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">&lt;!-- Numbered page links --&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">pagesInRange</span> <span class="k">as</span> <span class="nv">$page</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  </span><span class="cp">&lt;?php</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$page</span> <span class="o">!=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">current</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    &lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">route</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;page&#39;</span> <span class="o">=&gt;</span> <span class="nv">$page</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="x">        </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$page</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    &lt;/a&gt; |</span>
+<span class="x">  </span><span class="cp">&lt;?php</span> <span class="k">else</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$page</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"> |</span>
+<span class="x">  </span><span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="cp">&lt;?php</span> <span class="k">endforeach</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">&lt;!-- Next page link --&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">next</span><span class="p">))</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">route</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;page&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">next</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="x">    Next &gt;</span>
+<span class="x">  &lt;/a&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">else</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;span class=&quot;disabled&quot;&gt;Next &gt;&lt;/span&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/div&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<p>Item pagination:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;!--</span>
+<span class="nx">See</span> <span class="nx">http</span><span class="o">://</span><span class="nx">developer</span><span class="o">.</span><span class="nx">yahoo</span><span class="o">.</span><span class="nx">com</span><span class="o">/</span><span class="nx">ypatterns</span><span class="o">/</span><span class="nx">pattern</span><span class="o">.</span><span class="nx">php</span><span class="o">?</span><span class="nx">pattern</span><span class="o">=</span><span class="nx">itempagination</span>
+<span class="o">--&gt;</span>
+
+<span class="o">&lt;?</span><span class="nx">php</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">pageCount</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;div class=&quot;paginationControl&quot;&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">firstItemNumber</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"> - </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">lastItemNumber</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">of </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">totalItemCount</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">&lt;!-- First page link --&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">previous</span><span class="p">))</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">route</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;page&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">first</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="x">    First</span>
+<span class="x">  &lt;/a&gt; |</span>
+<span class="cp">&lt;?php</span> <span class="k">else</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;span class=&quot;disabled&quot;&gt;First&lt;/span&gt; |</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">&lt;!-- Previous page link --&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">previous</span><span class="p">))</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">route</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;page&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">previous</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="x">    &lt; Previous</span>
+<span class="x">  &lt;/a&gt; |</span>
+<span class="cp">&lt;?php</span> <span class="k">else</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;span class=&quot;disabled&quot;&gt;&lt; Previous&lt;/span&gt; |</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">&lt;!-- Next page link --&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">next</span><span class="p">))</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">route</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;page&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">next</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="x">    Next &gt;</span>
+<span class="x">  &lt;/a&gt; |</span>
+<span class="cp">&lt;?php</span> <span class="k">else</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;span class=&quot;disabled&quot;&gt;Next &gt;&lt;/span&gt; |</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">&lt;!-- Last page link --&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">next</span><span class="p">))</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;a href=&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">route</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;page&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">last</span><span class="p">));</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;</span>
+<span class="x">    Last</span>
+<span class="x">  &lt;/a&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">else</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;span class=&quot;disabled&quot;&gt;Last&lt;/span&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">&lt;/div&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<p>Dropdown pagination:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">pageCount</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;select id=&quot;paginationControl&quot; size=&quot;1&quot;&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">foreach</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">pagesInRange</span> <span class="k">as</span> <span class="nv">$page</span><span class="p">)</span><span class="o">:</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  </span><span class="cp">&lt;?php</span> <span class="nv">$selected</span> <span class="o">=</span> <span class="p">(</span><span class="nv">$page</span> <span class="o">==</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">current</span><span class="p">)</span> <span class="o">?</span> <span class="s1">&#39; selected=&quot;selected&quot;&#39;</span> <span class="o">:</span> <span class="s1">&#39;&#39;</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;option value=&quot;</span><span class="cp">&lt;?php</span>
+        <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">route</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;page&#39;</span> <span class="o">=&gt;</span> <span class="nv">$page</span><span class="p">));</span><span class="cp">?&gt;</span><span class="x">&quot;</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$selected</span> <span class="cp">?&gt;</span><span class="x">&gt;</span>
+<span class="x">    </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$page</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">  &lt;/option&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endforeach</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;/select&gt;</span>
+<span class="cp">&lt;?php</span> <span class="k">endif</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">&lt;script type=&quot;text/javascript&quot;</span>
+<span class="x">     src=&quot;http://ajax.googleapis.com/ajax/libs/prototype/1.6.0.2/prototype.js&quot;&gt;</span>
+<span class="x">&lt;/script&gt;</span>
+<span class="x">&lt;script type=&quot;text/javascript&quot;&gt;</span>
+<span class="x">$(&#39;paginationControl&#39;).observe(&#39;change&#39;, function() {</span>
+<span class="x">    window.location = this.options[this.selectedIndex].value;</span>
+<span class="x">})</span>
+<span class="x">&lt;/script&gt;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="listing-of-properties">
+<span id="zend-paginator-usage-rendering-properties"></span><h3>Listing of properties<a class="headerlink" href="#listing-of-properties" title="Permalink to this headline">¶</a></h3>
+<p>The following options are available to pagination control view scripts:</p>
+<table border="1" class="docutils" id="zend-paginator-usage-rendering-properties-table">
+<caption>Properties available to view partials</caption>
+<colgroup>
+<col width="21%" />
+<col width="9%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Property</th>
+<th class="head">Type</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>first</td>
+<td>integer</td>
+<td>First page number (i.e., 1)</td>
+</tr>
+<tr class="row-odd"><td>firstItemNumber</td>
+<td>integer</td>
+<td>Absolute number of the first item on this page</td>
+</tr>
+<tr class="row-even"><td>firstPageInRange</td>
+<td>integer</td>
+<td>First page in the range returned by the scrolling style</td>
+</tr>
+<tr class="row-odd"><td>current</td>
+<td>integer</td>
+<td>Current page number</td>
+</tr>
+<tr class="row-even"><td>currentItemCount</td>
+<td>integer</td>
+<td>Number of items on this page</td>
+</tr>
+<tr class="row-odd"><td>itemCountPerPage</td>
+<td>integer</td>
+<td>Maximum number of items available to each page</td>
+</tr>
+<tr class="row-even"><td>last</td>
+<td>integer</td>
+<td>Last page number</td>
+</tr>
+<tr class="row-odd"><td>lastItemNumber</td>
+<td>integer</td>
+<td>Absolute number of the last item on this page</td>
+</tr>
+<tr class="row-even"><td>lastPageInRange</td>
+<td>integer</td>
+<td>Last page in the range returned by the scrolling style</td>
+</tr>
+<tr class="row-odd"><td>next</td>
+<td>integer</td>
+<td>Next page number</td>
+</tr>
+<tr class="row-even"><td>pageCount</td>
+<td>integer</td>
+<td>Number of pages</td>
+</tr>
+<tr class="row-odd"><td>pagesInRange</td>
+<td>array</td>
+<td>Array of pages returned by the scrolling style</td>
+</tr>
+<tr class="row-even"><td>previous</td>
+<td>integer</td>
+<td>Previous page number</td>
+</tr>
+<tr class="row-odd"><td>totalItemCount</td>
+<td>integer</td>
+<td>Total number of items</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Usage</a><ul>
+<li><a class="reference internal" href="#paginating-data-collections">Paginating data collections</a></li>
+<li><a class="reference internal" href="#the-dbselect-adapter">The DbSelect adapter</a></li>
+<li><a class="reference internal" href="#rendering-pages-with-view-scripts">Rendering pages with view scripts</a><ul>
+<li><a class="reference internal" href="#example-pagination-controls">Example pagination controls</a></li>
+<li><a class="reference internal" href="#listing-of-properties">Listing of properties</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.paginator.introduction.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.paginator.configuration.html"
+                        title="next chapter">Configuration</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.paginator.usage.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.paginator.usage.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.paginator.usage.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.paginator.configuration.html" title="Configuration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.paginator.introduction.html" title="Introduction"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.paginator.usage.rst">
+                Usage
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

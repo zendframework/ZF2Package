@@ -1,0 +1,642 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Stdlib\Hydrator\Filter &mdash; Zend Framework 2 2.1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.2 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Stdlib\Hydrator\Strategy" href="zend.stdlib.hydrator.strategy.html" />
+    <link rel="prev" title="Zend\Stdlib\Hydrator" href="zend.stdlib.hydrator.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.stdlib.hydrator.strategy.html" title="Zend\Stdlib\Hydrator\Strategy"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.stdlib.hydrator.html" title="Zend\Stdlib\Hydrator"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-stdlib-hydrator-filter">
+<span id="id1"></span><h1>Zend\Stdlib\Hydrator\Filter<a class="headerlink" href="#zend-stdlib-hydrator-filter" title="Permalink to this headline">¶</a></h1>
+<p>The hydrator filters, allows you to manipulate the behavior, when you want to <tt class="docutils literal"><span class="pre">extract()</span></tt> your stuff to arrays.
+This is especially useful, if you want to <tt class="docutils literal"><span class="pre">extract()</span></tt> your objects to the userland and strip some internals (e.g.
+<tt class="docutils literal"><span class="pre">getServiceManager()</span></tt>).</p>
+<p>It comes with a helpful Composite Implementation and a few filters for common use cases. The filters are implemented on
+the <tt class="docutils literal"><span class="pre">AbstractHydrator</span></tt>, so you can directly start using them if you extend it - even on custom hydrators.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">namespace</span> <span class="nx">Zend\Stdlib\Hydrator\Filter</span><span class="p">;</span>
+
+<span class="k">interface</span> <span class="nx">FilterInterface</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * Should return true, if the given filter</span>
+<span class="sd">     * does not match</span>
+<span class="sd">     *</span>
+<span class="sd">     * @param string $property The name of the property</span>
+<span class="sd">     * @return bool</span>
+<span class="sd">     */</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">filter</span><span class="p">(</span><span class="nv">$property</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>If it returns true, the key / value pairs will be in the extracted arrays - if it will return false, you&#8217;ll not see
+them again.</p>
+<div class="section" id="filter-implementations">
+<span id="zend-stdlib-hydrator-filter-implementations"></span><h2>Filter implementations<a class="headerlink" href="#filter-implementations" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first"><strong>Zend\Stdlib\Hydrator\Filter\GetFilter</strong></p>
+<p>This filter is used in the <tt class="docutils literal"><span class="pre">ClassMethods</span></tt> hydrator, to decide that getters will be extracted.
+It checks, if the key that should be extracted starts with <tt class="docutils literal"><span class="pre">get</span></tt> or looks like this <tt class="docutils literal"><span class="pre">Zend\Foo\Bar::getFoo</span></tt></p>
+</li>
+<li><p class="first"><strong>Zend\Stdlib\Hydrator\Filter\HasFilter</strong></p>
+<p>This filter is used in the <tt class="docutils literal"><span class="pre">ClassMethods</span></tt> hydrator, to decide that <tt class="docutils literal"><span class="pre">has</span></tt> methods will be extracted.
+It checks, if the key that should be extracted starts with <tt class="docutils literal"><span class="pre">has</span></tt> or looks like this <tt class="docutils literal"><span class="pre">Zend\Foo\Bar::hasFoo</span></tt></p>
+</li>
+<li><p class="first"><strong>Zend\Stdlib\Hydrator\Filter\IsFilter</strong></p>
+<p>This filter is used in the <tt class="docutils literal"><span class="pre">ClassMethods</span></tt> hydrator, to decide that <tt class="docutils literal"><span class="pre">is</span></tt> methods will be extracted.
+It checks, if the key that should be extracted starts with <tt class="docutils literal"><span class="pre">is</span></tt> or looks like this <tt class="docutils literal"><span class="pre">Zend\Foo\Bar::isFoo</span></tt></p>
+</li>
+<li><p class="first"><strong>Zend\Stdlib\Hydrator\Filter\MethodMatchFilter</strong></p>
+<p>This filter allows you to strip methods from the extraction with the correct condition in the composite.
+It checks, if the key that should be extracted matches a method name. Either <tt class="docutils literal"><span class="pre">getServiceLocator</span></tt> or
+<tt class="docutils literal"><span class="pre">Zend\Foo::getServicelocator</span></tt>. The name of the method is specified in the constructor of this filter. The 2nd parameter
+decides whether to use white or blacklisting to decide. Default is blacklisting - pass <tt class="docutils literal"><span class="pre">false</span></tt> to change it.</p>
+</li>
+<li><p class="first"><strong>Zend\Stdlib\Hydrator\Filter\NumberOfParameterFilter</strong></p>
+<p>This filter is used in the <tt class="docutils literal"><span class="pre">ClassMethods</span></tt> hydrator, to check the number of parameters. By convention, the <tt class="docutils literal"><span class="pre">get</span></tt>, <tt class="docutils literal"><span class="pre">has</span></tt>
+and <tt class="docutils literal"><span class="pre">is</span></tt> methods do not get any parameters - but it may happen. You can add your own number of needed parameters,
+simply add the number to the constructor. The default value is 0</p>
+</li>
+</ul>
+</div>
+<div class="section" id="remove-filters">
+<span id="zend-stdlib-hydrator-filter-remove"></span><h2>Remove filters<a class="headerlink" href="#remove-filters" title="Permalink to this headline">¶</a></h2>
+<p>If you want to tell e.g. the <tt class="docutils literal"><span class="pre">ClassMethods</span></tt> hydrator, to not extract methods that start with <tt class="docutils literal"><span class="pre">is</span></tt>, you can do so:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$hydrator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ClassMethods</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
+<span class="nv">$hydrator</span><span class="o">-&gt;</span><span class="na">removeFilter</span><span class="p">(</span><span class="s2">&quot;is&quot;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The key / value pairs for <tt class="docutils literal"><span class="pre">is</span></tt> methods will not end up in your extracted array anymore. The filters can be used in
+any hydrator, but the <tt class="docutils literal"><span class="pre">ClassMethods</span></tt> hydrator is the only one, that has pre-registered filters:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">filterComposite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;is&quot;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">IsFilter</span><span class="p">());</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">filterComposite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;has&quot;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">HasFilter</span><span class="p">());</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">filterComposite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">GetFilter</span><span class="p">());</span>
+<span class="nv">$this</span><span class="o">-&gt;</span><span class="na">filterComposite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;parameter&quot;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">NumberOfParameterFilter</span><span class="p">(),</span> <span class="nx">FilterComposite</span><span class="o">::</span><span class="na">CONDITION_AND</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you&#8217;re not fine with this, you can unregister them as above.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The parameter for the filter on the <tt class="docutils literal"><span class="pre">ClassMethods</span></tt> looks like this by default <tt class="docutils literal"><span class="pre">Zend\Foo\Bar::methodName</span></tt></p>
+</div>
+</div>
+<div class="section" id="add-filters">
+<span id="zend-stdlib-hydrator-filter-add"></span><h2>Add filters<a class="headerlink" href="#add-filters" title="Permalink to this headline">¶</a></h2>
+<p>You can easily add filters to any hydrator, that extends the <tt class="docutils literal"><span class="pre">AbstractHydrator</span></tt>. You can use the <tt class="docutils literal"><span class="pre">FilterInterface</span></tt>
+or any callable:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$hydrator</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;len&quot;</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$property</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$property</span><span class="p">)</span> <span class="o">!==</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">});</span>
+</pre></div>
+</td></tr></table></div>
+<p>By default, every filter you add will be added with a conditional <tt class="docutils literal"><span class="pre">or</span></tt>. If you want to add it with <tt class="docutils literal"><span class="pre">and</span></tt>
+(as the <tt class="docutils literal"><span class="pre">NumberOfParameterFilter</span></tt> that is added to the <tt class="docutils literal"><span class="pre">ClassMethods</span></tt> hydrator by default) you can do that too:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$hydrator</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;len&quot;</span><span class="p">,</span> <span class="k">function</span><span class="p">(</span><span class="nv">$property</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">strlen</span><span class="p">(</span><span class="nv">$property</span><span class="p">)</span> <span class="o">!==</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">},</span> <span class="nx">FilterComposite</span><span class="o">::</span><span class="na">CONDITION_AND</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Or you can add the shipped ones:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$hydrator</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span>
+  <span class="s2">&quot;servicemanager&quot;</span><span class="p">,</span>
+  <span class="k">new</span> <span class="nx">MethodMatchFilter</span><span class="p">(</span><span class="s2">&quot;getServiceManager&quot;</span><span class="p">),</span>
+  <span class="nx">FilterComposite</span><span class="o">::</span><span class="na">CONDITION_AND</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The example above will exclude the <tt class="docutils literal"><span class="pre">getServiceManager</span></tt> method or the key from the extraction, even if the <tt class="docutils literal"><span class="pre">get</span></tt>
+filter wants to add it.</p>
+</div>
+<div class="section" id="use-the-composite-for-complex-filters">
+<span id="zend-stdlib-hydrator-filter-composite"></span><h2>Use the composite for complex filters<a class="headerlink" href="#use-the-composite-for-complex-filters" title="Permalink to this headline">¶</a></h2>
+<p>The composite implements the <tt class="docutils literal"><span class="pre">FilterInterface</span></tt> too, so you can add it as a regular filter to the hydrator. One goody
+of this implementation, is that you can add the filters with a condition and you can do even more complex stuff with
+different composites with different conditions. You can pass the condition to the 3rd parameter, when you add a filter:</p>
+<p><strong>Zend\Stdlib\Hydrator\Filter\FilterComposite::CONDITION_OR</strong></p>
+<blockquote>
+<div>At one level of the composite, one of all filters in that condition block has to return true in order to get extracted</div></blockquote>
+<p><strong>Zend\Stdlib\Hydrator\Filter\FilterComposite::CONDITION_AND</strong></p>
+<blockquote>
+<div>At one level of the composite, all of the filters in that condition block has to return <tt class="docutils literal"><span class="pre">true</span></tt> in order to get extracted</div></blockquote>
+<p>This composition will have a similar logic as the if below:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre> <span class="nv">$composite</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FilterComposite</span><span class="p">();</span>
+
+ <span class="nv">$composite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;one&quot;</span><span class="p">,</span> <span class="nv">$condition1</span><span class="p">);</span>
+ <span class="nv">$composite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;two&quot;</span><span class="p">,</span> <span class="nv">$condition2</span><span class="p">);</span>
+ <span class="nv">$composite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;three&quot;</span><span class="p">,</span> <span class="nv">$condition3</span><span class="p">);</span>
+ <span class="nv">$composite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;four&quot;</span><span class="p">,</span> <span class="nv">$condition4</span><span class="p">,</span> <span class="nx">FilterComposite</span><span class="o">::</span><span class="na">CONDITION_AND</span><span class="p">);</span>
+ <span class="nv">$composite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;five&quot;</span><span class="p">,</span> <span class="nv">$condition5</span><span class="p">,</span> <span class="nx">FilterComposite</span><span class="o">::</span><span class="na">CONDITION_AND</span><span class="p">);</span>
+
+ <span class="c1">// This is what&#39;s happening internally</span>
+ <span class="k">if</span> <span class="p">(</span>
+      <span class="p">(</span>
+         <span class="nv">$condition1</span>
+         <span class="o">||</span> <span class="nv">$condition2</span>
+         <span class="o">||</span> <span class="nv">$condition3</span>
+      <span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span>
+         <span class="nv">$condition4</span>
+         <span class="o">&amp;&amp;</span> <span class="nv">$condition5</span>
+      <span class="p">)</span>
+  <span class="p">)</span> <span class="p">{</span>
+ <span class="c1">//do extraction</span>
+ <span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you&#8217;ve only one condition (only <tt class="docutils literal"><span class="pre">and</span></tt> or <tt class="docutils literal"><span class="pre">or</span></tt>) block, the other one will be completely ignored.</p>
+<p>A bit more complex filter can look like this:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre></div></td><td class="code"><div class="highlight"><pre> <span class="nv">$composite</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FilterComposite</span><span class="p">();</span>
+ <span class="nv">$composite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span>
+     <span class="s2">&quot;servicemanager&quot;</span><span class="p">,</span>
+     <span class="k">new</span> <span class="nx">MethodMatchFilter</span><span class="p">(</span><span class="s2">&quot;getServiceManager&quot;</span><span class="p">),</span>
+     <span class="nx">FilterComposite</span><span class="o">::</span><span class="na">CONDITION_AND</span>
+ <span class="p">);</span>
+ <span class="nv">$composite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span>
+     <span class="s2">&quot;eventmanager&quot;</span><span class="p">,</span>
+     <span class="k">new</span> <span class="nx">MethodMatchFilter</span><span class="p">(</span><span class="s2">&quot;getEventManager&quot;</span><span class="p">),</span>
+     <span class="nx">FilterComposite</span><span class="o">::</span><span class="na">CONDITION_AND</span>
+ <span class="p">);</span>
+
+ <span class="nv">$hydrator</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;excludes&quot;</span><span class="p">,</span> <span class="nv">$composite</span><span class="p">,</span> <span class="nx">FilterComposite</span><span class="o">::</span><span class="na">CONDITION_AND</span><span class="p">);</span>
+
+ <span class="c1">// Internal</span>
+ <span class="k">if</span> <span class="p">(</span>
+      <span class="p">(</span>  <span class="c1">// default composite inside the hydrator</span>
+         <span class="p">(</span>
+             <span class="nv">$getFilter</span>
+             <span class="o">||</span> <span class="nv">$hasFilter</span>
+             <span class="o">||</span> <span class="nv">$isFilter</span>
+          <span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span>
+             <span class="nv">$numberOfParamterFilter</span>
+          <span class="p">)</span>
+      <span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="p">(</span>  <span class="c1">// new composite, added to the one above</span>
+         <span class="nv">$serviceManagerFilter</span>
+         <span class="o">&amp;&amp;</span> <span class="nv">$eventManagerFilter</span>
+      <span class="p">)</span>
+ <span class="p">)</span> <span class="p">{</span>
+ <span class="c1">// do extraction</span>
+ <span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you perform this on the <tt class="docutils literal"><span class="pre">ClassMethods</span></tt> hydrator, all getters will get extracted, but not <tt class="docutils literal"><span class="pre">getServiceManager</span></tt>
+and <tt class="docutils literal"><span class="pre">getEventManager</span></tt>.</p>
+</div>
+<div class="section" id="using-the-provider-interface">
+<span id="zend-stdlib-hydrator-filter-provider"></span><h2>Using the provider interface<a class="headerlink" href="#using-the-provider-interface" title="Permalink to this headline">¶</a></h2>
+<p>There is also a provider interface, that allows you to configure the behavior of the hydrator inside your objects.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre> <span class="k">namespace</span> <span class="nx">Zend\Stdlib\Hydrator\Filter</span><span class="p">;</span>
+
+ <span class="k">interface</span> <span class="nx">FilterProviderInterface</span>
+ <span class="p">{</span>
+     <span class="sd">/**</span>
+<span class="sd">      * Provides a filter for hydration</span>
+<span class="sd">      *</span>
+<span class="sd">      * @return FilterInterface</span>
+<span class="sd">      */</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getFilter</span><span class="p">();</span>
+ <span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">getFilter()</span></tt> method is getting automatically excluded from <tt class="docutils literal"><span class="pre">extract()</span></tt>. If the extracted object implements the
+<tt class="docutils literal"><span class="pre">Zend\Stdlib\Hydrator\Filter\FilterProviderInterface</span></tt>, the returned <tt class="docutils literal"><span class="pre">FilterInterface</span></tt> instance can also be a
+<tt class="docutils literal"><span class="pre">FilterComposite</span></tt>.</p>
+<p>For example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">Class</span> <span class="nc">Foo</span> <span class="k">implements</span> <span class="nx">FilterProviderInterface</span>
+<span class="p">{</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getFoo</span><span class="p">()</span>
+     <span class="p">{</span>
+         <span class="k">return</span> <span class="s2">&quot;foo&quot;</span><span class="p">;</span>
+     <span class="p">}</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">hasFoo</span><span class="p">()</span>
+     <span class="p">{</span>
+         <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+     <span class="p">}</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getServiceManager</span><span class="p">()</span>
+     <span class="p">{</span>
+         <span class="k">return</span> <span class="s2">&quot;servicemanager&quot;</span><span class="p">;</span>
+     <span class="p">}</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getEventManager</span><span class="p">()</span>
+     <span class="p">{</span>
+         <span class="k">return</span> <span class="s2">&quot;eventmanager&quot;</span><span class="p">;</span>
+     <span class="p">}</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getFilter</span><span class="p">()</span>
+     <span class="p">{</span>
+         <span class="nv">$composite</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FilterComposite</span><span class="p">();</span>
+         <span class="nv">$composite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">GetFilter</span><span class="p">());</span>
+
+         <span class="nv">$exclusionComposite</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">FilterComposite</span><span class="p">();</span>
+         <span class="nv">$exclusionComposite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span>
+             <span class="s2">&quot;servicemanager&quot;</span><span class="p">,</span>
+             <span class="k">new</span> <span class="nx">MethodMatchFilter</span><span class="p">(</span><span class="s2">&quot;getServiceManager&quot;</span><span class="p">),</span>
+             <span class="nx">FilterComposite</span><span class="o">::</span><span class="na">CONDITION_AND</span>
+             <span class="p">);</span>
+         <span class="nv">$exclusionComposite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span>
+             <span class="s2">&quot;eventmanager&quot;</span><span class="p">,</span>
+             <span class="k">new</span> <span class="nx">MethodMatchFilter</span><span class="p">(</span><span class="s2">&quot;getEventManager&quot;</span><span class="p">),</span>
+             <span class="nx">FilterComposite</span><span class="o">::</span><span class="na">CONDITION_AND</span>
+         <span class="p">);</span>
+
+         <span class="nv">$composite</span><span class="o">-&gt;</span><span class="na">addFilter</span><span class="p">(</span><span class="s2">&quot;excludes&quot;</span><span class="p">,</span> <span class="nv">$exclusionComposite</span><span class="o">.</span> <span class="nx">FilterComposite</span><span class="o">::</span><span class="na">CONDITION_AND</span><span class="p">);</span>
+
+         <span class="k">return</span> <span class="nv">$composite</span><span class="p">;</span>
+     <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$hydrator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ClassMethods</span><span class="p">(</span><span class="k">false</span><span class="p">);</span>
+<span class="nv">$extractedArray</span> <span class="o">=</span> <span class="nv">$hydrator</span><span class="o">-&gt;</span><span class="na">extract</span><span class="p">(</span><span class="k">new</span> <span class="nx">Foo</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">$extractedArray</span></tt> does only have &#8220;foo&#8221; =&gt; &#8220;foo&#8221; in. All of the others are excluded from the extraction.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">All pre-registered filters from the <tt class="docutils literal"><span class="pre">ClassMethods</span></tt> hydrator are ignored if this interface is used.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Stdlib\Hydrator\Filter</a><ul>
+<li><a class="reference internal" href="#filter-implementations">Filter implementations</a></li>
+<li><a class="reference internal" href="#remove-filters">Remove filters</a></li>
+<li><a class="reference internal" href="#add-filters">Add filters</a></li>
+<li><a class="reference internal" href="#use-the-composite-for-complex-filters">Use the composite for complex filters</a></li>
+<li><a class="reference internal" href="#using-the-provider-interface">Using the provider interface</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.stdlib.hydrator.html"
+                        title="previous chapter">Zend\Stdlib\Hydrator</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.stdlib.hydrator.strategy.html"
+                        title="next chapter">Zend\Stdlib\Hydrator\Strategy</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.stdlib.hydrator.filter.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.stdlib.hydrator.filter.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.stdlib.hydrator.filter.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.stdlib.hydrator.strategy.html" title="Zend\Stdlib\Hydrator\Strategy"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.stdlib.hydrator.html" title="Zend\Stdlib\Hydrator"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.stdlib.hydrator.filter.rst">
+                Zend\Stdlib\Hydrator\Filter
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,1119 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Zend\Db\Sql &mdash; Zend Framework 2 2.1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.2 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Db\TableGateway" href="zend.db.table-gateway.html" />
+    <link rel="prev" title="Zend\Db\ResultSet" href="zend.db.result-set.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.db.table-gateway.html" title="Zend\Db\TableGateway"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.db.result-set.html" title="Zend\Db\ResultSet"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zend-db-sql">
+<span id="id1"></span><h1>Zend\Db\Sql<a class="headerlink" href="#zend-db-sql" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Db\Sql</span></tt> is a SQL abstraction layer for building platform specific SQL queries via a object-oriented API.
+The end result of an <tt class="docutils literal"><span class="pre">Zend\Db\Sql</span></tt> object will be to either produce a Statement and Parameter container that
+represents the target query, or a full string that can be directly executed against the database platform. To
+achieve this, <tt class="docutils literal"><span class="pre">Zend\Db\Sql</span></tt> objects require a <tt class="docutils literal"><span class="pre">Zend\Db\Adapter\Adapter</span></tt> object in order to produce the
+desired results.</p>
+<div class="section" id="zend-db-sql-sql-quickstart">
+<span id="zend-db-sql-sql"></span><h2>Zend\Db\Sql\Sql (Quickstart)<a class="headerlink" href="#zend-db-sql-sql-quickstart" title="Permalink to this headline">¶</a></h2>
+<p>As there are four primary tasks associated with interacting with a database (from the DML, or Data Manipulation
+Language): selecting, inserting, updating and deleting. As such, there are four primary objects that developers can
+interact or building queries, <tt class="docutils literal"><span class="pre">Zend\Db\Sql\Select</span></tt>, <tt class="docutils literal"><span class="pre">Insert</span></tt>, <tt class="docutils literal"><span class="pre">Update</span></tt> and <tt class="docutils literal"><span class="pre">Delete</span></tt>.</p>
+<p>Since these four tasks are so closely related, and generally used together within the same application,
+<tt class="docutils literal"><span class="pre">Zend\Db\Sql\Sql</span></tt> objects help you create them and produce the result you are attempting to achieve.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Db\Sql\Sql</span><span class="p">;</span>
+<span class="nv">$sql</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Sql</span><span class="p">(</span><span class="nv">$adapter</span><span class="p">);</span>
+<span class="nv">$select</span> <span class="o">=</span> <span class="nv">$sql</span><span class="o">-&gt;</span><span class="na">select</span><span class="p">();</span> <span class="c1">// @return Zend\Db\Sql\Select</span>
+<span class="nv">$insert</span> <span class="o">=</span> <span class="nv">$sql</span><span class="o">-&gt;</span><span class="na">insert</span><span class="p">();</span> <span class="c1">// @return Zend\Db\Sql\Insert</span>
+<span class="nv">$update</span> <span class="o">=</span> <span class="nv">$sql</span><span class="o">-&gt;</span><span class="na">update</span><span class="p">();</span> <span class="c1">// @return Zend\Db\Sql\Update</span>
+<span class="nv">$delete</span> <span class="o">=</span> <span class="nv">$sql</span><span class="o">-&gt;</span><span class="na">delete</span><span class="p">();</span> <span class="c1">// @return Zend\Db\Sql\Delete</span>
+</pre></div>
+</td></tr></table></div>
+<p>As a developer, you can now interact with these objects, as described in the sections below, to specialize each
+query. Once they have been populated with values, they are ready to either be prepared or executed.</p>
+<p>To prepare (using a Select object):</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Db\Sql\Sql</span><span class="p">;</span>
+<span class="nv">$sql</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Sql</span><span class="p">(</span><span class="nv">$adapter</span><span class="p">);</span>
+<span class="nv">$select</span> <span class="o">=</span> <span class="nv">$sql</span><span class="o">-&gt;</span><span class="na">select</span><span class="p">();</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">from</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">));</span>
+
+<span class="nv">$statement</span> <span class="o">=</span> <span class="nv">$sql</span><span class="o">-&gt;</span><span class="na">prepareStatementForSqlObject</span><span class="p">(</span><span class="nv">$select</span><span class="p">);</span>
+<span class="nv">$results</span> <span class="o">=</span> <span class="nv">$statement</span><span class="o">-&gt;</span><span class="na">execute</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>To execute (using a Select object)</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Db\Sql\Sql</span><span class="p">;</span>
+<span class="nv">$sql</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Sql</span><span class="p">(</span><span class="nv">$adapter</span><span class="p">);</span>
+<span class="nv">$select</span> <span class="o">=</span> <span class="nv">$sql</span><span class="o">-&gt;</span><span class="na">select</span><span class="p">();</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">from</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">));</span>
+
+<span class="nv">$selectString</span> <span class="o">=</span> <span class="nv">$sql</span><span class="o">-&gt;</span><span class="na">getSqlStringForSqlObject</span><span class="p">(</span><span class="nv">$select</span><span class="p">);</span>
+<span class="nv">$results</span> <span class="o">=</span> <span class="nv">$adapter</span><span class="o">-&gt;</span><span class="na">query</span><span class="p">(</span><span class="nv">$selectString</span><span class="p">,</span> <span class="nv">$adapter</span><span class="o">::</span><span class="na">QUERY_MODE_EXECUTE</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Zend\Db\Sql\Sql objects can also be bound to a particular table so that in getting a select, insert, update, or
+delete object, they are all primarily seeded with the same table when produced.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Db\Sql\Sql</span><span class="p">;</span>
+<span class="nv">$sql</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Sql</span><span class="p">(</span><span class="nv">$adapter</span><span class="p">,</span> <span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+<span class="nv">$select</span> <span class="o">=</span> <span class="nv">$sql</span><span class="o">-&gt;</span><span class="na">select</span><span class="p">();</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">2</span><span class="p">));</span> <span class="c1">// $select already has the from(&#39;foo&#39;) applied</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="zend-db-sql-s-select-insert-update-and-delete">
+<span id="zend-db-sql-sql-objects"></span><h2>Zend\Db\Sql&#8217;s Select, Insert, Update and Delete<a class="headerlink" href="#zend-db-sql-s-select-insert-update-and-delete" title="Permalink to this headline">¶</a></h2>
+<p>Each of these objects implement the following (2) interfaces:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">interface</span> <span class="nx">PreparableSqlInterface</span> <span class="p">{</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">prepareStatement</span><span class="p">(</span><span class="nx">Adapter</span> <span class="nv">$adapter</span><span class="p">,</span> <span class="nx">StatementInterface</span> <span class="nv">$statement</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">interface</span> <span class="nx">SqlInterface</span> <span class="p">{</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getSqlString</span><span class="p">(</span><span class="nx">PlatformInterface</span> <span class="nv">$adapterPlatform</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>These are the functions you can call to either produce (a) a prepared statement, or (b) a string to be executed.</p>
+</div>
+<div class="section" id="zend-db-sql-select">
+<span id="id2"></span><h2>Zend\Db\Sql\Select<a class="headerlink" href="#zend-db-sql-select" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Db\Sql\Select</span></tt> is an object who&#8217;s primary function is to present a unified API for building platform
+specific SQL SELECT queries. The class can be instantiated and consumed without <tt class="docutils literal"><span class="pre">Zend\Db\Sql\Sql</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Db\Sql\Select</span><span class="p">;</span>
+<span class="nv">$select</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Select</span><span class="p">();</span>
+<span class="c1">// or, to produce a $select bound to a specific table</span>
+<span class="nv">$select</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Select</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If a table is provided to the Select object, then from() cannot be called later to change the name of the table.</p>
+<p>Once you have a valid Select object, the following API can be used to further specify various select statement
+parts:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Select</span> <span class="k">extends</span> <span class="nx">AbstractSql</span> <span class="k">implements</span> <span class="nx">SqlInterface</span><span class="p">,</span> <span class="nx">PreparableSqlInterface</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">JOIN_INNER</span> <span class="o">=</span> <span class="s1">&#39;inner&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">JOIN_OUTER</span> <span class="o">=</span> <span class="s1">&#39;outer&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">JOIN_LEFT</span> <span class="o">=</span> <span class="s1">&#39;left&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">JOIN_RIGHT</span> <span class="o">=</span> <span class="s1">&#39;right&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">SQL_STAR</span> <span class="o">=</span> <span class="s1">&#39;*&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">ORDER_ASCENDING</span> <span class="o">=</span> <span class="s1">&#39;ASC&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">ORDER_DESENDING</span> <span class="o">=</span> <span class="s1">&#39;DESC&#39;</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nv">$where</span><span class="p">;</span> <span class="c1">// @param Where $where</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$table</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">from</span><span class="p">(</span><span class="nv">$table</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">columns</span><span class="p">(</span><span class="k">array</span> <span class="nv">$columns</span><span class="p">,</span> <span class="nv">$prefixColumnsWithTable</span> <span class="o">=</span> <span class="k">true</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">join</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$on</span><span class="p">,</span> <span class="nv">$columns</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">SQL_STAR</span><span class="p">,</span> <span class="nv">$type</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">JOIN_INNER</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">where</span><span class="p">(</span><span class="nv">$predicate</span><span class="p">,</span> <span class="nv">$combination</span> <span class="o">=</span> <span class="nx">Predicate\PredicateSet</span><span class="o">::</span><span class="na">OP_AND</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">group</span><span class="p">(</span><span class="nv">$group</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">having</span><span class="p">(</span><span class="nv">$predicate</span><span class="p">,</span> <span class="nv">$combination</span> <span class="o">=</span> <span class="nx">Predicate\PredicateSet</span><span class="o">::</span><span class="na">OP_AND</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">order</span><span class="p">(</span><span class="nv">$order</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">limit</span><span class="p">(</span><span class="nv">$limit</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">offset</span><span class="p">(</span><span class="nv">$offset</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="from">
+<h3>from():<a class="headerlink" href="#from" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// as a string:</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">from</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">);</span>
+
+<span class="c1">// as an array to specify an alias:</span>
+<span class="c1">// produces SELECT &quot;t&quot;.* FROM &quot;table&quot; AS &quot;t&quot;</span>
+
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">from</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;t&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;table&#39;</span><span class="p">));</span>
+
+<span class="c1">// using a Sql\TableIdentifier:</span>
+<span class="c1">// same output as above</span>
+
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">from</span><span class="p">(</span><span class="k">new</span> <span class="nx">TableIdentifier</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;t&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;table&#39;</span><span class="p">)));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="columns">
+<h3>columns():<a class="headerlink" href="#columns" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// as array of names</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">columns</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">));</span>
+
+<span class="c1">// as an associative array with aliases as the keys:</span>
+<span class="c1">// produces &#39;bar&#39; AS &#39;foo&#39;, &#39;bax&#39; AS &#39;baz&#39;</span>
+
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">columns</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;bax&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="join">
+<h3>join():<a class="headerlink" href="#join" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$select</span><span class="o">-&gt;</span><span class="na">join</span><span class="p">(</span>
+     <span class="s1">&#39;foo&#39;</span> <span class="c1">// table name,</span>
+     <span class="s1">&#39;id = bar.id&#39;</span><span class="p">,</span> <span class="c1">// expression to join on (will be quoted by platform object before insertion),</span>
+     <span class="k">array</span><span class="p">(</span><span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span><span class="p">),</span> <span class="c1">// (optional) list of columns, same requiremetns as columns() above</span>
+     <span class="nv">$select</span><span class="o">::</span><span class="na">JOIN_OUTER</span> <span class="c1">// (optional), one of inner, outer, left, right also represented by constants in the API</span>
+<span class="p">);</span>
+
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">from</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;f&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;foo&#39;</span><span class="p">))</span>  <span class="c1">// base table</span>
+    <span class="o">-&gt;</span><span class="na">join</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;b&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;bar&#39;</span><span class="p">),</span>     <span class="c1">// join table with alias</span>
+    <span class="s1">&#39;f.foo_id = b.foo_id&#39;</span><span class="p">);</span>         <span class="c1">// join expression</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="where-having">
+<h3>where(), having():<a class="headerlink" href="#where-having" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Db\Sql\Select</span></tt> object provides bit of flexibility as it regards to what kind of
+parameters are acceptable when calling where() or having().  The method signature is listed as:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">/**</span>
+<span class="sd"> * Create where clause</span>
+<span class="sd"> *</span>
+<span class="sd"> * @param  Where|\Closure|string|array $predicate</span>
+<span class="sd"> * @param  string $combination One of the OP_* constants from Predicate\PredicateSet</span>
+<span class="sd"> * @return Select</span>
+<span class="sd"> */</span>
+<span class="k">public</span> <span class="k">function</span> <span class="nf">where</span><span class="p">(</span><span class="nv">$predicate</span><span class="p">,</span> <span class="nv">$combination</span> <span class="o">=</span> <span class="nx">Predicate\PredicateSet</span><span class="o">::</span><span class="na">OP_AND</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>As you can see, there are a number of different ways to pass criteria to both having() and
+where().</p>
+<p>If you provide a <tt class="docutils literal"><span class="pre">Zend\Db\Sql\Where</span></tt> object to where() or a
+<tt class="docutils literal"><span class="pre">Zend\Db\Sql\Having</span></tt> object to having(), the internal objects for Select will be replaced
+completely.  When the where/having() is processed, this object will be iterated to produce
+the WHERE or HAVING section of the SELECT statement.</p>
+<p>If you provide a <tt class="docutils literal"><span class="pre">Closure</span></tt> to where() or having(), this function will be called with
+the Select&#8217;s <tt class="docutils literal"><span class="pre">Where</span></tt> object as the only parameter.  So the following is possible:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$spec</span> <span class="o">=</span> <span class="k">function</span> <span class="p">(</span><span class="nx">Where</span> <span class="nv">$where</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$where</span><span class="o">-&gt;</span><span class="na">like</span><span class="p">(</span><span class="s1">&#39;username&#39;</span><span class="p">,</span> <span class="s1">&#39;ralph%&#39;</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="nv">$spec</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you provide a string, this string will be used to instantiate a
+<tt class="docutils literal"><span class="pre">Zend\Db\Sql\Predicate\Expression</span></tt> object so that it&#8217;s contents will be applied
+as is.  This means that there will be no quoting in the fragment provided.</p>
+<p>Consider the following code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// SELECT &quot;foo&quot;.* FROM &quot;foo&quot; WHERE x = 5</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">from</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="s1">&#39;x = 5&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you provide an array who&#8217;s values are keyed by an integer, the value can either
+be a string that will be then used to build a <tt class="docutils literal"><span class="pre">Predicate\Expression</span></tt> or any object
+that implements <tt class="docutils literal"><span class="pre">Predicate\PredicateInterface</span></tt>.  These objects are pushed onto the
+Where stack with the $combination provided.</p>
+<p>Consider the following code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// SELECT &quot;foo&quot;.* FROM &quot;foo&quot; WHERE x = 5 AND y = z</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">from</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;x = 5&#39;</span><span class="p">,</span> <span class="s1">&#39;y = z&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you provide an array who&#8217;s values are keyed with a string, these values will
+be handled in the following:</p>
+<ul class="simple">
+<li>PHP value nulls will be made into a <tt class="docutils literal"><span class="pre">Predicate\IsNull</span></tt> object</li>
+<li>PHP value array()s will be made into a <tt class="docutils literal"><span class="pre">Predicate\In</span></tt> object</li>
+<li>PHP value strings will be made into a <tt class="docutils literal"><span class="pre">Predicate\Operator</span></tt> object such that the string key will be identifier, and the value will target value.</li>
+</ul>
+<p>Consider the following code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// SELECT &quot;foo&quot;.* FROM &quot;foo&quot; WHERE &quot;c1&quot; IS NULL AND &quot;c2&quot; IN (?, ?, ?) AND &quot;c3&quot; IS NOT NULL</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">from</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">where</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;c1&#39;</span> <span class="o">=&gt;</span> <span class="k">null</span><span class="p">,</span>
+    <span class="s1">&#39;c2&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="k">new</span> <span class="nx">\Zend\Db\Sql\Predicate\IsNotNull</span><span class="p">(</span><span class="s1">&#39;c3&#39;</span><span class="p">)</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="order">
+<h3>order():<a class="headerlink" href="#order" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$select</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Select</span><span class="p">;</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">order</span><span class="p">(</span><span class="s1">&#39;id DESC&#39;</span><span class="p">);</span> <span class="c1">// produces &#39;id&#39; DESC</span>
+
+<span class="nv">$select</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Select</span><span class="p">;</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">order</span><span class="p">(</span><span class="s1">&#39;id DESC&#39;</span><span class="p">)</span>
+     <span class="o">-&gt;</span><span class="na">order</span><span class="p">(</span><span class="s1">&#39;name ASC, age DESC&#39;</span><span class="p">);</span> <span class="c1">// produces &#39;id&#39; DESC, &#39;name&#39; ASC, &#39;age&#39; DESC</span>
+
+<span class="nv">$select</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Select</span><span class="p">;</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">order</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;name ASC&#39;</span><span class="p">,</span> <span class="s1">&#39;age DESC&#39;</span><span class="p">));</span> <span class="c1">// produces &#39;name&#39; ASC, &#39;age&#39; DESC</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="limit-and-offset">
+<h3>limit() and offset():<a class="headerlink" href="#limit-and-offset" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$select</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Select</span><span class="p">;</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">limit</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span> <span class="c1">// always takes an integer/numeric</span>
+<span class="nv">$select</span><span class="o">-&gt;</span><span class="na">offset</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span> <span class="c1">// similarly takes an integer/numeric</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="zend-db-sql-insert">
+<span id="id3"></span><h2>Zend\Db\Sql\Insert<a class="headerlink" href="#zend-db-sql-insert" title="Permalink to this headline">¶</a></h2>
+<p>The Insert API:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Insert</span> <span class="k">implements</span> <span class="nx">SqlInterface</span><span class="p">,</span> <span class="nx">PreparableSqlInterface</span>
+<span class="p">{</span>
+     <span class="k">const</span> <span class="no">VALUES_MERGE</span> <span class="o">=</span> <span class="s1">&#39;merge&#39;</span><span class="p">;</span>
+     <span class="k">const</span> <span class="no">VALUES_SET</span>   <span class="o">=</span> <span class="s1">&#39;set&#39;</span><span class="p">;</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$table</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">into</span><span class="p">(</span><span class="nv">$table</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">columns</span><span class="p">(</span><span class="k">array</span> <span class="nv">$columns</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">values</span><span class="p">(</span><span class="k">array</span> <span class="nv">$values</span><span class="p">,</span> <span class="nv">$flag</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">VALUES_SET</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Similarly to Select objects, the table can be set at construction time or via into().</p>
+<div class="section" id="id4">
+<h3>columns():<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$insert</span><span class="o">-&gt;</span><span class="na">columns</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span><span class="p">,</span> <span class="s1">&#39;bar&#39;</span><span class="p">));</span> <span class="c1">// set the valid columns</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="values">
+<h3>values():<a class="headerlink" href="#values" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// default behavior of values is to set the values</span>
+<span class="c1">// succesive calls will not preserve values from previous calls</span>
+<span class="nv">$insert</span><span class="o">-&gt;</span><span class="na">values</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+     <span class="s1">&#39;col_1&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;value1&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;col_2&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;value2&#39;</span>
+<span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// merging values with previous calls</span>
+<span class="nv">$insert</span><span class="o">-&gt;</span><span class="na">values</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;col_2&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;value2&#39;</span><span class="p">),</span> <span class="nv">$insert</span><span class="o">::</span><span class="na">VALUES_MERGE</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="zend-db-sql-update">
+<span id="id5"></span><h2>Zend\Db\Sql\Update<a class="headerlink" href="#zend-db-sql-update" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Update</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">VALUES_MERGE</span> <span class="o">=</span> <span class="s1">&#39;merge&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">VALUES_SET</span>   <span class="o">=</span> <span class="s1">&#39;set&#39;</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="nv">$where</span><span class="p">;</span> <span class="c1">// @param Where $where</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$table</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">table</span><span class="p">(</span><span class="nv">$table</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">set</span><span class="p">(</span><span class="k">array</span> <span class="nv">$values</span><span class="p">,</span> <span class="nv">$flag</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">VALUES_SET</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">where</span><span class="p">(</span><span class="nv">$predicate</span><span class="p">,</span> <span class="nv">$combination</span> <span class="o">=</span> <span class="nx">Predicate\PredicateSet</span><span class="o">::</span><span class="na">OP_AND</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="set">
+<h3>set():<a class="headerlink" href="#set" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$update</span><span class="o">-&gt;</span><span class="na">set</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;foo&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;bar&#39;</span><span class="p">,</span> <span class="s1">&#39;baz&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;bax&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="where">
+<h3>where():<a class="headerlink" href="#where" title="Permalink to this headline">¶</a></h3>
+<p>See where section below.</p>
+</div>
+</div>
+<div class="section" id="zend-db-sql-delete">
+<span id="id6"></span><h2>Zend\Db\Sql\Delete<a class="headerlink" href="#zend-db-sql-delete" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Delete</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="nv">$where</span><span class="p">;</span> <span class="c1">// @param Where $where</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$table</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">from</span><span class="p">(</span><span class="nv">$table</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">where</span><span class="p">(</span><span class="nv">$predicate</span><span class="p">,</span> <span class="nv">$combination</span> <span class="o">=</span> <span class="nx">Predicate\PredicateSet</span><span class="o">::</span><span class="na">OP_AND</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="section" id="id7">
+<h3>where():<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h3>
+<p>See where section below.</p>
+</div>
+</div>
+<div class="section" id="zend-db-sql-where-zend-db-sql-having">
+<span id="zend-db-sql-where"></span><h2>Zend\Db\Sql\Where &amp; Zend\Db\Sql\Having<a class="headerlink" href="#zend-db-sql-where-zend-db-sql-having" title="Permalink to this headline">¶</a></h2>
+<p>In the following, we will talk about Where, Having is implies as being the same API.</p>
+<p>Effectively, Where and Having extend from the same base object, a Predicate (and PredicateSet). All of the parts
+that make up a where or having that are and&#8217;ed or or&#8217;d together are called predicates. The full set of predicates
+is called a PredicateSet. This object set generally contains the values (and identifiers) separate from the
+fragment they belong to until the last possible moment when the statement is either used to be prepared
+(parameteritized), or executed. In parameterization, the parameters will be replaced with their proper placeholder
+(a named or positional parameter), and the values stored inside a Adapter\ParameterContainer. When executed, the
+values will be interpolated into the fragments they belong to and properly quoted.</p>
+<p>It is important to know that in this API, a distinction is made between what elements are considered identifiers
+(TYPE_IDENTIFIER) and which of those is a value (TYPE_VALUE). There is also a special use case type for literal
+values (TYPE_LITERAL). These are all exposed via the <tt class="docutils literal"><span class="pre">Zend\Db\Sql\ExpressionInterface</span></tt> interface.</p>
+<p>The Zend\Db\Sql\Where (Predicate/PredicateSet) API:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Where &amp; Having:</span>
+<span class="k">class</span> <span class="nc">Predicate</span> <span class="k">extends</span> <span class="nx">PredicateSet</span>
+<span class="p">{</span>
+     <span class="k">public</span> <span class="nv">$and</span><span class="p">;</span>
+     <span class="k">public</span> <span class="nv">$or</span><span class="p">;</span>
+     <span class="k">public</span> <span class="nv">$AND</span><span class="p">;</span>
+     <span class="k">public</span> <span class="nv">$OR</span><span class="p">;</span>
+     <span class="k">public</span> <span class="nv">$NEST</span><span class="p">;</span>
+     <span class="k">public</span> <span class="nv">$UNNEST</span><span class="p">;</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">nest</span><span class="p">();</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">setUnnest</span><span class="p">(</span><span class="nx">Predicate</span> <span class="nv">$predicate</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">unnest</span><span class="p">();</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">equalTo</span><span class="p">(</span><span class="nv">$left</span><span class="p">,</span> <span class="nv">$right</span><span class="p">,</span> <span class="nv">$leftType</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">TYPE_IDENTIFIER</span><span class="p">,</span> <span class="nv">$rightType</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">TYPE_VALUE</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">lessThan</span><span class="p">(</span><span class="nv">$left</span><span class="p">,</span> <span class="nv">$right</span><span class="p">,</span> <span class="nv">$leftType</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">TYPE_IDENTIFIER</span><span class="p">,</span> <span class="nv">$rightType</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">TYPE_VALUE</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">greaterThan</span><span class="p">(</span><span class="nv">$left</span><span class="p">,</span> <span class="nv">$right</span><span class="p">,</span> <span class="nv">$leftType</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">TYPE_IDENTIFIER</span><span class="p">,</span> <span class="nv">$rightType</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">TYPE_VALUE</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">lessThanOrEqualTo</span><span class="p">(</span><span class="nv">$left</span><span class="p">,</span> <span class="nv">$right</span><span class="p">,</span> <span class="nv">$leftType</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">TYPE_IDENTIFIER</span><span class="p">,</span> <span class="nv">$rightType</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">TYPE_VALUE</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">greaterThanOrEqualTo</span><span class="p">(</span><span class="nv">$left</span><span class="p">,</span> <span class="nv">$right</span><span class="p">,</span> <span class="nv">$leftType</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">TYPE_IDENTIFIER</span><span class="p">,</span> <span class="nv">$rightType</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">TYPE_VALUE</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">like</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">,</span> <span class="nv">$like</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">literal</span><span class="p">(</span><span class="nv">$literal</span><span class="p">,</span> <span class="nv">$parameter</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">isNull</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">isNotNull</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">in</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$valueSet</span> <span class="o">=</span> <span class="k">array</span><span class="p">());</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">between</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">,</span> <span class="nv">$minValue</span><span class="p">,</span> <span class="nv">$maxValue</span><span class="p">);</span>
+
+
+     <span class="c1">// Inherited From PredicateSet</span>
+
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">addPredicate</span><span class="p">(</span><span class="nx">PredicateInterface</span> <span class="nv">$predicate</span><span class="p">,</span> <span class="nv">$combination</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getPredicates</span><span class="p">();</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">orPredicate</span><span class="p">(</span><span class="nx">PredicateInterface</span> <span class="nv">$predicate</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">andPredicate</span><span class="p">(</span><span class="nx">PredicateInterface</span> <span class="nv">$predicate</span><span class="p">);</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">getExpressionData</span><span class="p">();</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">count</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Each method in the Where API will produce a corresponding Predicate object of a similarly named type, described
+below, with the full API of the object:</p>
+<div class="section" id="equalto-lessthan-greaterthan-lessthanorequalto-greaterthanorequalto">
+<h3>equalTo(), lessThan(), greaterThan(), lessThanOrEqualTo(), greaterThanOrEqualTo():<a class="headerlink" href="#equalto-lessthan-greaterthan-lessthanorequalto-greaterthanorequalto" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$where</span><span class="o">-&gt;</span><span class="na">equalTo</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+
+<span class="c1">// same as the following workflow</span>
+<span class="nv">$where</span><span class="o">-&gt;</span><span class="na">addPredicate</span><span class="p">(</span>
+     <span class="k">new</span> <span class="nx">Predicate\Operator</span><span class="p">(</span><span class="nv">$left</span><span class="p">,</span> <span class="nx">Operator</span><span class="o">::</span><span class="na">OPERATOR_EQUAL_TO</span><span class="p">,</span> <span class="nv">$right</span><span class="p">,</span> <span class="nv">$leftType</span><span class="p">,</span> <span class="nv">$rightType</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="k">class</span> <span class="nc">Operator</span> <span class="k">implements</span> <span class="nx">PredicateInterface</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">OPERATOR_EQUAL_TO</span>                  <span class="o">=</span> <span class="s1">&#39;=&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">OP_EQ</span>                              <span class="o">=</span> <span class="s1">&#39;=&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">OPERATOR_NOT_EQUAL_TO</span>              <span class="o">=</span> <span class="s1">&#39;!=&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">OP_NE</span>                              <span class="o">=</span> <span class="s1">&#39;!=&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">OPERATOR_LESS_THAN</span>                 <span class="o">=</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">OP_LT</span>                              <span class="o">=</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">OPERATOR_LESS_THAN_OR_EQUAL_TO</span>     <span class="o">=</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">OP_LTE</span>                             <span class="o">=</span> <span class="s1">&#39;&lt;=&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">OPERATOR_GREATER_THAN</span>              <span class="o">=</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">OP_GT</span>                              <span class="o">=</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">OPERATOR_GREATER_THAN_OR_EQUAL_TO</span>  <span class="o">=</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">;</span>
+    <span class="k">const</span> <span class="no">OP_GTE</span>                             <span class="o">=</span> <span class="s1">&#39;&gt;=&#39;</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$left</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$operator</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">OPERATOR_EQUAL_TO</span><span class="p">,</span> <span class="nv">$right</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$leftType</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">TYPE_IDENTIFIER</span><span class="p">,</span> <span class="nv">$rightType</span> <span class="o">=</span> <span class="nx">self</span><span class="o">::</span><span class="na">TYPE_VALUE</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setLeft</span><span class="p">(</span><span class="nv">$left</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getLeft</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setLeftType</span><span class="p">(</span><span class="nv">$type</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getLeftType</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setOperator</span><span class="p">(</span><span class="nv">$operator</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getOperator</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setRight</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getRight</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setRightType</span><span class="p">(</span><span class="nv">$type</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getRightType</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getExpressionData</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="like-identifier-like">
+<h3>like($identifier, $like):<a class="headerlink" href="#like-identifier-like" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$where</span><span class="o">-&gt;</span><span class="na">like</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">,</span> <span class="nv">$like</span><span class="p">)</span><span class="o">:</span>
+
+<span class="c1">// same as</span>
+<span class="nv">$where</span><span class="o">-&gt;</span><span class="na">addPredicate</span><span class="p">(</span>
+     <span class="k">new</span> <span class="nx">Predicate\Like</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">,</span> <span class="nv">$like</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// full API</span>
+
+<span class="k">class</span> <span class="nc">Like</span> <span class="k">implements</span> <span class="nx">PredicateInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$identifier</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$like</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setIdentifier</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getIdentifier</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setLike</span><span class="p">(</span><span class="nv">$like</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getLike</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="literal-literal-parameter">
+<h3>literal($literal, $parameter);<a class="headerlink" href="#literal-literal-parameter" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$where</span><span class="o">-&gt;</span><span class="na">literal</span><span class="p">(</span><span class="nv">$literal</span><span class="p">,</span> <span class="nv">$parameter</span><span class="p">);</span>
+
+<span class="c1">// same as</span>
+<span class="nv">$where</span><span class="o">-&gt;</span><span class="na">addPredicate</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">Predicate\Expression</span><span class="p">(</span><span class="nv">$literal</span><span class="p">,</span> <span class="nv">$parameter</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// full API</span>
+<span class="k">class</span> <span class="nc">Expression</span> <span class="k">implements</span> <span class="nx">ExpressionInterface</span><span class="p">,</span> <span class="nx">PredicateInterface</span>
+<span class="p">{</span>
+    <span class="k">const</span> <span class="no">PLACEHOLDER</span> <span class="o">=</span> <span class="s1">&#39;?&#39;</span><span class="p">;</span>
+     <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$expression</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$valueParameter</span> <span class="o">=</span> <span class="k">null</span> <span class="cm">/*[, $valueParameter, ... ]*/</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setExpression</span><span class="p">(</span><span class="nv">$expression</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getExpression</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setParameters</span><span class="p">(</span><span class="nv">$parameters</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getParameters</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setTypes</span><span class="p">(</span><span class="k">array</span> <span class="nv">$types</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getTypes</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="isnull-identifier">
+<h3>isNull($identifier);<a class="headerlink" href="#isnull-identifier" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$where</span><span class="o">-&gt;</span><span class="na">isNull</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">);</span>
+
+<span class="c1">// same as</span>
+<span class="nv">$where</span><span class="o">-&gt;</span><span class="na">addPredicate</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">Predicate\IsNull</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// full API</span>
+<span class="k">class</span> <span class="nc">IsNull</span> <span class="k">implements</span> <span class="nx">PredicateInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$identifier</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setIdentifier</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getIdentifier</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="isnotnull-identifier">
+<h3>isNotNull($identifier);<a class="headerlink" href="#isnotnull-identifier" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$where</span><span class="o">-&gt;</span><span class="na">isNotNull</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">);</span>
+
+<span class="c1">// same as</span>
+<span class="nv">$where</span><span class="o">-&gt;</span><span class="na">addPredicate</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">Predicate\IsNotNull</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// full API</span>
+<span class="k">class</span> <span class="nc">IsNotNull</span> <span class="k">implements</span> <span class="nx">PredicateInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$identifier</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setIdentifier</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getIdentifier</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="in-identifier-array-valueset-array">
+<h3>in($identifier, array $valueSet = array());<a class="headerlink" href="#in-identifier-array-valueset-array" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$where</span><span class="o">-&gt;</span><span class="na">in</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$valueSet</span> <span class="o">=</span> <span class="k">array</span><span class="p">());</span>
+
+<span class="c1">// same as</span>
+<span class="nv">$where</span><span class="o">-&gt;</span><span class="na">addPredicate</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">Predicate\In</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">,</span> <span class="nv">$valueSet</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// full API</span>
+<span class="k">class</span> <span class="nc">In</span> <span class="k">implements</span> <span class="nx">PredicateInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$identifier</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="k">array</span> <span class="nv">$valueSet</span> <span class="o">=</span> <span class="k">array</span><span class="p">());</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setIdentifier</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getIdentifier</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setValueSet</span><span class="p">(</span><span class="k">array</span> <span class="nv">$valueSet</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getValueSet</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="between-identifier-minvalue-maxvalue">
+<h3>between($identifier, $minValue, $maxValue);<a class="headerlink" href="#between-identifier-minvalue-maxvalue" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$where</span><span class="o">-&gt;</span><span class="na">between</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">,</span> <span class="nv">$minValue</span><span class="p">,</span> <span class="nv">$maxValue</span><span class="p">);</span>
+
+<span class="c1">// same as</span>
+<span class="nv">$where</span><span class="o">-&gt;</span><span class="na">addPredicate</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">Predicate\Between</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">,</span> <span class="nv">$minValue</span><span class="p">,</span> <span class="nv">$maxValue</span><span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// full API</span>
+<span class="k">class</span> <span class="nc">Between</span> <span class="k">implements</span> <span class="nx">PredicateInterface</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$identifier</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$minValue</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$maxValue</span> <span class="o">=</span> <span class="k">null</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setIdentifier</span><span class="p">(</span><span class="nv">$identifier</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getIdentifier</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setMinValue</span><span class="p">(</span><span class="nv">$minValue</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getMinValue</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setMaxValue</span><span class="p">(</span><span class="nv">$maxValue</span><span class="p">);</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getMaxValue</span><span class="p">();</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setSpecification</span><span class="p">(</span><span class="nv">$specification</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Zend\Db\Sql</a><ul>
+<li><a class="reference internal" href="#zend-db-sql-sql-quickstart">Zend\Db\Sql\Sql (Quickstart)</a></li>
+<li><a class="reference internal" href="#zend-db-sql-s-select-insert-update-and-delete">Zend\Db\Sql&#8217;s Select, Insert, Update and Delete</a></li>
+<li><a class="reference internal" href="#zend-db-sql-select">Zend\Db\Sql\Select</a><ul>
+<li><a class="reference internal" href="#from">from():</a></li>
+<li><a class="reference internal" href="#columns">columns():</a></li>
+<li><a class="reference internal" href="#join">join():</a></li>
+<li><a class="reference internal" href="#where-having">where(), having():</a></li>
+<li><a class="reference internal" href="#order">order():</a></li>
+<li><a class="reference internal" href="#limit-and-offset">limit() and offset():</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zend-db-sql-insert">Zend\Db\Sql\Insert</a><ul>
+<li><a class="reference internal" href="#id4">columns():</a></li>
+<li><a class="reference internal" href="#values">values():</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zend-db-sql-update">Zend\Db\Sql\Update</a><ul>
+<li><a class="reference internal" href="#set">set():</a></li>
+<li><a class="reference internal" href="#where">where():</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zend-db-sql-delete">Zend\Db\Sql\Delete</a><ul>
+<li><a class="reference internal" href="#id7">where():</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zend-db-sql-where-zend-db-sql-having">Zend\Db\Sql\Where &amp; Zend\Db\Sql\Having</a><ul>
+<li><a class="reference internal" href="#equalto-lessthan-greaterthan-lessthanorequalto-greaterthanorequalto">equalTo(), lessThan(), greaterThan(), lessThanOrEqualTo(), greaterThanOrEqualTo():</a></li>
+<li><a class="reference internal" href="#like-identifier-like">like($identifier, $like):</a></li>
+<li><a class="reference internal" href="#literal-literal-parameter">literal($literal, $parameter);</a></li>
+<li><a class="reference internal" href="#isnull-identifier">isNull($identifier);</a></li>
+<li><a class="reference internal" href="#isnotnull-identifier">isNotNull($identifier);</a></li>
+<li><a class="reference internal" href="#in-identifier-array-valueset-array">in($identifier, array $valueSet = array());</a></li>
+<li><a class="reference internal" href="#between-identifier-minvalue-maxvalue">between($identifier, $minValue, $maxValue);</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.db.result-set.html"
+                        title="previous chapter">Zend\Db\ResultSet</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.db.table-gateway.html"
+                        title="next chapter">Zend\Db\TableGateway</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.db.sql.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.db.sql.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.db.sql.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.db.table-gateway.html" title="Zend\Db\TableGateway"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.db.result-set.html" title="Zend\Db\ResultSet"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.db.sql.rst">
+                Zend\Db\Sql
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

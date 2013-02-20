@@ -1,0 +1,1245 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>File Uploading &mdash; Zend Framework 2 2.1.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.2 documentation" href="../index.html" />
+    <link rel="next" title="Advanced use of forms" href="zend.form.advanced-use-of-forms.html" />
+    <link rel="prev" title="Form Collections" href="zend.form.collections.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.form.advanced-use-of-forms.html" title="Advanced use of forms"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.form.collections.html" title="Form Collections"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="file-uploading">
+<span id="zend-form-file-upload"></span><h1>File Uploading<a class="headerlink" href="#file-uploading" title="Permalink to this headline">¶</a></h1>
+<p>Zend Framework provides support for file uploading by using features in <tt class="docutils literal"><span class="pre">Zend\Form</span></tt>,
+<tt class="docutils literal"><span class="pre">Zend\InputFilter</span></tt>, <tt class="docutils literal"><span class="pre">Zend\Validator</span></tt>, <tt class="docutils literal"><span class="pre">Zend\Filter</span></tt>, and <tt class="docutils literal"><span class="pre">Zend\ProgressBar</span></tt>.
+These reusable framework components provide a convenient and secure way for
+handling file uploads in your projects.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the reader has experience with file uploading in Zend Framework v1.x,
+he/she will notice some major differences.
+<tt class="docutils literal"><span class="pre">Zend_File_Transfer</span></tt> has been deprecated in favor of using the standard ZF2 <tt class="docutils literal"><span class="pre">Zend\Form</span></tt>
+and <tt class="docutils literal"><span class="pre">Zend\InputFilter</span></tt> features.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The file upload features described here are specifically for forms using the
+<tt class="docutils literal"><span class="pre">POST</span></tt> method. Zend Framework itself does not currently provide specific support
+for handling uploads via the <tt class="docutils literal"><span class="pre">PUT</span></tt> method, but it is possible with PHP.
+See the <a class="reference external" href="//php.net/manual/en/features.file-upload.put-method.php">PUT Method Support</a> in the PHP documentation for more information.</p>
+</div>
+<div class="section" id="standard-example">
+<h2>Standard Example<a class="headerlink" href="#standard-example" title="Permalink to this headline">¶</a></h2>
+<p>Handling file uploads is <em>essentially</em> the same as how you would use <tt class="docutils literal"><span class="pre">Zend\Form</span></tt>
+for form processing, but with some slight caveats that will be described below.</p>
+<p>In this example we will:</p>
+<ul class="simple">
+<li>Define a <strong>Form</strong> for backend validation and filtering.</li>
+<li>Create a <strong>view template</strong> with a <tt class="docutils literal"><span class="pre">&lt;form&gt;</span></tt> containing a file input.</li>
+<li>Process the form within a <strong>Controller action</strong>.</li>
+</ul>
+<div class="section" id="the-form-and-inputfilter">
+<h3>The Form and InputFilter<a class="headerlink" href="#the-form-and-inputfilter" title="Permalink to this headline">¶</a></h3>
+<p>Here we define a <tt class="docutils literal"><span class="pre">Zend\Form\Element\File</span></tt> input in a Form class named <tt class="docutils literal"><span class="pre">UploadForm</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// File: UploadForm.php</span>
+
+<span class="k">use</span> <span class="nx">Zend\Form\Element</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Form</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">UploadForm</span> <span class="k">extends</span> <span class="nx">Form</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$name</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">addElements</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">addElements</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// File Input</span>
+        <span class="nv">$file</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Element\File</span><span class="p">(</span><span class="s1">&#39;image-file&#39;</span><span class="p">);</span>
+        <span class="nv">$file</span><span class="o">-&gt;</span><span class="na">setLabel</span><span class="p">(</span><span class="s1">&#39;Avatar Image Upload&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;image-file&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$file</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">File</span></tt> element provides some automatic features that happen behind the scenes:</p>
+<ul class="simple">
+<li>The form&#8217;s <tt class="docutils literal"><span class="pre">enctype</span></tt> will automatically be set to <tt class="docutils literal"><span class="pre">multipart/form-data</span></tt> when
+the form <tt class="docutils literal"><span class="pre">prepare()</span></tt> method is called.</li>
+<li>The file element&#8217;s default input specification will create the correct <tt class="docutils literal"><span class="pre">Input</span></tt> type:
+<a class="reference internal" href="zend.input-filter.file-input.html#zend-input-filter-file-input"><em>Zend\InputFilter\FileInput</em></a>.</li>
+<li>The <tt class="docutils literal"><span class="pre">FileInput</span></tt> will automatically prepend an
+<a class="reference internal" href="zend.validator.file.upload-file.html#zend-validator-file-upload-file"><em>UploadFile Validator</em></a>,
+to securely validate that the file is actually an uploaded file, and to report
+other types of upload errors to the user.</li>
+</ul>
+</div>
+<div class="section" id="the-view-template">
+<h3>The View Template<a class="headerlink" href="#the-view-template" title="Permalink to this headline">¶</a></h3>
+<p>In the view template we render the <tt class="docutils literal"><span class="pre">&lt;form&gt;</span></tt>, a file input (with label and errors),
+and a submit button.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// File: upload-form.phtml</span>
+<span class="o">&lt;?</span><span class="nx">php</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">prepare</span><span class="p">();</span> <span class="c1">// The correct enctype is set here ?&gt;</span>
+<span class="o">&lt;?</span><span class="nx">php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">openTag</span><span class="p">(</span><span class="nv">$form</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+
+<span class="x">    &lt;div class=&quot;form-element&quot;&gt;</span>
+<span class="x">        </span><span class="cp">&lt;?php</span> <span class="nv">$fileElement</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;image-file&#39;</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">        </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formLabel</span><span class="p">(</span><span class="nv">$fileElement</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">        </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formFile</span><span class="p">(</span><span class="nv">$fileElement</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">        </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElementErrors</span><span class="p">(</span><span class="nv">$fileElement</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    &lt;/div&gt;</span>
+
+<span class="x">    &lt;button&gt;Submit&lt;/button&gt;</span>
+
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">closeTag</span><span class="p">();</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<p>When rendered, the HTML should look similar to:</p>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;form</span> <span class="na">name=</span><span class="s">&quot;upload-form&quot;</span> <span class="na">id=</span><span class="s">&quot;upload-form&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;form-element&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;image-file&quot;</span><span class="nt">&gt;</span>Avatar Image Upload<span class="nt">&lt;/label&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;file&quot;</span> <span class="na">name=</span><span class="s">&quot;image-file&quot;</span> <span class="na">id=</span><span class="s">&quot;image-file&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+
+    <span class="nt">&lt;button&gt;</span>Submit<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-controller-action">
+<h3>The Controller Action<a class="headerlink" href="#the-controller-action" title="Permalink to this headline">¶</a></h3>
+<p>For the final step, we will instantiate the <tt class="docutils literal"><span class="pre">UploadForm</span></tt> and process any postbacks in
+a Controller action.</p>
+<p>The form processing in the controller action will be similar to normal forms, <em>except</em>
+that you <strong>must</strong> merge the <tt class="docutils literal"><span class="pre">$_FILES</span></tt> information in the request with the other post
+data.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// File: MyController.php</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">uploadFormAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$form</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UploadForm</span><span class="p">(</span><span class="s1">&#39;upload-form&#39;</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">isPost</span><span class="p">())</span> <span class="p">{</span>
+        <span class="c1">// Make certain to merge the files info!</span>
+        <span class="nv">$post</span> <span class="o">=</span> <span class="nb">array_merge_recursive</span><span class="p">(</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getPost</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">(),</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getFiles</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">()</span>
+        <span class="p">);</span>
+
+        <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$post</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+            <span class="nv">$data</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getData</span><span class="p">();</span>
+            <span class="c1">// Form is valid, save the form!</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toRoute</span><span class="p">(</span><span class="s1">&#39;upload-form/success&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;form&#39;</span> <span class="o">=&gt;</span> <span class="nv">$form</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Upon a successful file upload, <tt class="docutils literal"><span class="pre">$form-&gt;getData()</span></tt> would return:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">array</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="s2">&quot;image-file&quot;</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>     <span class="o">=&gt;</span> <span class="nx">string</span><span class="p">(</span><span class="mi">11</span><span class="p">)</span> <span class="s2">&quot;myimage.png&quot;</span>
+        <span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span>     <span class="o">=&gt;</span> <span class="nx">string</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span>  <span class="s2">&quot;image/png&quot;</span>
+        <span class="p">[</span><span class="s2">&quot;tmp_name&quot;</span><span class="p">]</span> <span class="o">=&gt;</span> <span class="nx">string</span><span class="p">(</span><span class="mi">22</span><span class="p">)</span> <span class="s2">&quot;/private/tmp/phpgRXd58&quot;</span>
+        <span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">]</span>    <span class="o">=&gt;</span> <span class="nx">int</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span>     <span class="o">=&gt;</span> <span class="nx">int</span><span class="p">(</span><span class="mi">14908679</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>It is suggested that you always use the <tt class="docutils literal"><span class="pre">Zend\Http\PhpEnvironment\Request</span></tt> object
+to retrieve and merge the <tt class="docutils literal"><span class="pre">$_FILES</span></tt> information with the form, instead of using
+<tt class="docutils literal"><span class="pre">$_FILES</span></tt> directly.</p>
+<p>This is due to how the file information is mapped in the <tt class="docutils literal"><span class="pre">$_FILES</span></tt> array:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="c1">// A $_FILES array with single input and multiple files:</span>
+<span class="k">array</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="s2">&quot;image-file&quot;</span><span class="p">]</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=&gt;</span><span class="nx">string</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="s2">&quot;file0.txt&quot;</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=&gt;</span><span class="nx">string</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="s2">&quot;file1.txt&quot;</span>
+        <span class="p">}</span>
+        <span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=&gt;</span><span class="nx">string</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="s2">&quot;text/plain&quot;</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=&gt;</span><span class="nx">string</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="s2">&quot;text/html&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">// How Zend\Http\PhpEnvironment\Request remaps the $_FILES array:</span>
+<span class="k">array</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="p">[</span><span class="s2">&quot;image-file&quot;</span><span class="p">]</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+            <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">=&gt;</span><span class="nx">string</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="s2">&quot;file0.txt&quot;</span>
+            <span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span><span class="o">=&gt;</span><span class="nx">string</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="s2">&quot;text/plain&quot;</span>
+        <span class="p">},</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=&gt;</span><span class="k">array</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+            <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">=&gt;</span><span class="nx">string</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span><span class="s2">&quot;file1.txt&quot;</span>
+            <span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span><span class="o">=&gt;</span><span class="nx">string</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="s2">&quot;text/html&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p class="last"><a class="reference internal" href="zend.input-filter.file-input.html#zend-input-filter-file-input"><em>Zend\InputFilter\FileInput</em></a>
+expects the file data be in this remapped array format.</p>
+</div>
+</div>
+</div>
+<div class="section" id="file-post-redirect-get-plugin">
+<h2>File Post-Redirect-Get Plugin<a class="headerlink" href="#file-post-redirect-get-plugin" title="Permalink to this headline">¶</a></h2>
+<p>When using other standard form inputs (i.e. <tt class="docutils literal"><span class="pre">text</span></tt>, <tt class="docutils literal"><span class="pre">checkbox</span></tt>, <tt class="docutils literal"><span class="pre">select</span></tt>, etc.)
+along with file inputs in a Form, you can encounter a situation where some inputs may
+become invalid and the user must re-select the file and re-upload. PHP will delete
+uploaded files from the temporary directory at the end of the request if it has not
+been moved away or renamed. Re-uploading a valid file each time another form input is
+invalid is inefficient and annoying to users.</p>
+<p>One strategy to get around this is to split the form into multiple forms. One form for the
+file upload inputs and another for the other standard inputs.</p>
+<p>When you cannot separate the forms,
+the <a class="reference internal" href="zend.mvc.plugins.html#zend-mvc-controller-plugins-file-postredirectget"><em>File Post-Redirect-Get Controller Plugin</em></a>
+can be used to manage the file inputs and save off valid uploads until the entire form
+is valid.</p>
+<p>Changing our earlier example to use the <tt class="docutils literal"><span class="pre">fileprg</span></tt> plugin will require two changes.</p>
+<ol class="arabic">
+<li><p class="first">Adding a <tt class="docutils literal"><span class="pre">RenameUpload</span></tt> filter to our form&#8217;s file input, with details on
+where the valid files should be stored:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// File: UploadForm.php</span>
+
+<span class="k">use</span> <span class="nx">Zend\InputFilter</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Element</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Form</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">UploadForm</span> <span class="k">extends</span> <span class="nx">Form</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$name</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">addElements</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">addInputFilter</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">addElements</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// File Input</span>
+        <span class="nv">$file</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Element\File</span><span class="p">(</span><span class="s1">&#39;image-file&#39;</span><span class="p">);</span>
+        <span class="nv">$file</span><span class="o">-&gt;</span><span class="na">setLabel</span><span class="p">(</span><span class="s1">&#39;Avatar Image Upload&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;image-file&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$file</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">addInputFilter</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$inputFilter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InputFilter\InputFilter</span><span class="p">();</span>
+
+        <span class="c1">// File Input</span>
+        <span class="nv">$fileInput</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InputFilter\FileInput</span><span class="p">(</span><span class="s1">&#39;image-file&#39;</span><span class="p">);</span>
+        <span class="nv">$fileInput</span><span class="o">-&gt;</span><span class="na">setRequired</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+        <span class="nv">$fileInput</span><span class="o">-&gt;</span><span class="na">getFilterChain</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">attachByName</span><span class="p">(</span>
+            <span class="s1">&#39;filerenameupload&#39;</span><span class="p">,</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;target&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;./data/tmpuploads/avatar.png&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;randomize&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">);</span>
+        <span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$fileInput</span><span class="p">);</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setInputFilter</span><span class="p">(</span><span class="nv">$inputFilter</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The <tt class="docutils literal"><span class="pre">filerenameupload</span></tt> options above would cause an uploaded file to be renamed
+and moved to: <tt class="docutils literal"><span class="pre">./data/tmpuploads/avatar_4b3403665fea6.png</span></tt>.</p>
+<p>See the
+<a class="reference internal" href="zend.filter.file.rename-upload.html#zend-filter-file-rename-upload"><em>RenameUpload filter</em></a> documentation for
+more information on its supported options.</p>
+</li>
+<li><p class="first">And, changing the Controller action to use the <tt class="docutils literal"><span class="pre">fileprg</span></tt> plugin:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// File: MyController.php</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">uploadFormAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$form</span>     <span class="o">=</span> <span class="k">new</span> <span class="nx">UploadForm</span><span class="p">(</span><span class="s1">&#39;upload-form&#39;</span><span class="p">);</span>
+    <span class="nv">$tempFile</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+
+    <span class="nv">$prg</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">fileprg</span><span class="p">(</span><span class="nv">$form</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$prg</span> <span class="nx">instanceof</span> <span class="nx">\Zend\Http\PhpEnvironment\Response</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$prg</span><span class="p">;</span> <span class="c1">// Return PRG redirect response</span>
+    <span class="p">}</span> <span class="k">elseif</span> <span class="p">(</span><span class="nb">is_array</span><span class="p">(</span><span class="nv">$prg</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+            <span class="nv">$data</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getData</span><span class="p">();</span>
+            <span class="c1">// Form is valid, save the form!</span>
+            <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toRoute</span><span class="p">(</span><span class="s1">&#39;upload-form/success&#39;</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="c1">// Form not valid, but file uploads might be valid...</span>
+            <span class="c1">// Get the temporary file information to show the user in the view</span>
+            <span class="nv">$fileErrors</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;image-file&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">();</span>
+            <span class="k">if</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$fileErrors</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nv">$tempFile</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;image-file&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">getValue</span><span class="p">();</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;form&#39;</span>     <span class="o">=&gt;</span> <span class="nv">$form</span><span class="p">,</span>
+        <span class="s1">&#39;tempFile&#39;</span> <span class="o">=&gt;</span> <span class="nv">$tempFile</span><span class="p">,</span>
+    <span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ol>
+<p>Behind the scenes, the <tt class="docutils literal"><span class="pre">FilePRG</span></tt> plugin will:</p>
+<ul class="simple">
+<li>Run the Form&#8217;s filters, namely the <tt class="docutils literal"><span class="pre">RenameUpload</span></tt> filter, to move the files out of
+temporary storage.</li>
+<li>Store the valid POST data in the session across requests.</li>
+<li>Change the <tt class="docutils literal"><span class="pre">required</span></tt> flag of any file inputs that had valid uploads to <tt class="docutils literal"><span class="pre">false</span></tt>.
+This is so that form re-submissions without uploads will not cause validation errors.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In the case of a partially valid form, it is up to the developer whether to notify
+the user that files have been uploaded or not.
+For example, you may wish to hide the form input and/or display the file information.
+These things would be implementation details in the view or in a custom view helper.
+Just note that neither the <tt class="docutils literal"><span class="pre">FilePRG</span></tt> plugin nor the <tt class="docutils literal"><span class="pre">formFile</span></tt> view helper will do
+any automatic notifications or view changes when files have been successfully uploaded.</p>
+</div>
+</div>
+<div class="section" id="html5-multi-file-uploads">
+<h2>HTML5 Multi-File Uploads<a class="headerlink" href="#html5-multi-file-uploads" title="Permalink to this headline">¶</a></h2>
+<p>With HTML5 we are able to select multiple files from a single file input using the <tt class="docutils literal"><span class="pre">multiple</span></tt> attribute.
+Not all <a class="reference external" href="http://caniuse.com/#feat=forms">browsers support multiple file uploads</a>, but the file input will safely
+remain a single file upload for those browsers that do not support the feature.</p>
+<p>To enable multiple file uploads in Zend Framework, just set the file element&#8217;s
+<tt class="docutils literal"><span class="pre">multiple</span></tt> attribute to true:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// File: UploadForm.php</span>
+
+<span class="k">use</span> <span class="nx">Zend\InputFilter</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Element</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Form\Form</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">UploadForm</span> <span class="k">extends</span> <span class="nx">Form</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$name</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="nv">$name</span><span class="p">,</span> <span class="nv">$options</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">addElements</span><span class="p">();</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">addInputFilter</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">addElements</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// File Input</span>
+        <span class="nv">$file</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Element\File</span><span class="p">(</span><span class="s1">&#39;image-file&#39;</span><span class="p">);</span>
+        <span class="nv">$file</span><span class="o">-&gt;</span><span class="na">setLabel</span><span class="p">(</span><span class="s1">&#39;Avatar Image Upload&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;image-file&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">setAttribute</span><span class="p">(</span><span class="s1">&#39;multiple&#39;</span><span class="p">,</span> <span class="k">true</span><span class="p">);</span>   <span class="c1">// That&#39;s it</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$file</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">addInputFilter</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$inputFilter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InputFilter\InputFilter</span><span class="p">();</span>
+
+        <span class="c1">// File Input</span>
+        <span class="nv">$fileInput</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">InputFilter\FileInput</span><span class="p">(</span><span class="s1">&#39;image-file&#39;</span><span class="p">);</span>
+        <span class="nv">$fileInput</span><span class="o">-&gt;</span><span class="na">setRequired</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+
+        <span class="c1">// You only need to define validators and filters</span>
+        <span class="c1">// as if only one file was being uploaded. All files</span>
+        <span class="c1">// will be run through the same validators and filters</span>
+        <span class="c1">// automatically.</span>
+        <span class="nv">$fileInput</span><span class="o">-&gt;</span><span class="na">getValidatorChain</span><span class="p">()</span>
+            <span class="o">-&gt;</span><span class="na">attachByName</span><span class="p">(</span><span class="s1">&#39;filesize&#39;</span><span class="p">,</span>      <span class="k">array</span><span class="p">(</span><span class="s1">&#39;max&#39;</span> <span class="o">=&gt;</span> <span class="mi">204800</span><span class="p">))</span>
+            <span class="o">-&gt;</span><span class="na">attachByName</span><span class="p">(</span><span class="s1">&#39;filemimetype&#39;</span><span class="p">,</span>  <span class="k">array</span><span class="p">(</span><span class="s1">&#39;mimeType&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;image/png,image/x-png&#39;</span><span class="p">))</span>
+            <span class="o">-&gt;</span><span class="na">attachByName</span><span class="p">(</span><span class="s1">&#39;fileimagesize&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;maxWidth&#39;</span> <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;maxHeight&#39;</span> <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">));</span>
+
+        <span class="c1">// All files will be renamed, i.e.:</span>
+        <span class="c1">//   ./data/tmpuploads/avatar_4b3403665fea6.png,</span>
+        <span class="c1">//   ./data/tmpuploads/avatar_5c45147660fb7.png</span>
+        <span class="nv">$fileInput</span><span class="o">-&gt;</span><span class="na">getFilterChain</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">attachByName</span><span class="p">(</span>
+            <span class="s1">&#39;filerenameupload&#39;</span><span class="p">,</span>
+            <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;target&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;./data/tmpuploads/avatar.png&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;randomize&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">);</span>
+        <span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$fileInput</span><span class="p">);</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setInputFilter</span><span class="p">(</span><span class="nv">$inputFilter</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>You do not need to do anything special with the validators and filters to support
+multiple file uploads.
+All of the files that are uploaded will have the same validators and filters run
+against them automatically (from logic within <tt class="docutils literal"><span class="pre">FileInput</span></tt>).
+You only need to define them as if one file was being uploaded.</p>
+</div>
+<div class="section" id="upload-progress">
+<h2>Upload Progress<a class="headerlink" href="#upload-progress" title="Permalink to this headline">¶</a></h2>
+<p>While pure client-based upload progress meters are starting to become available with <a class="reference external" href="http://www.w3.org/TR/progress-events/">HTML5&#8217;s Progress Events</a>,
+not all browsers have <a class="reference external" href="http://caniuse.com/#feat=xhr2">XMLHttpRequest level 2 support</a>. For upload progress to work in a greater number of browsers (IE9 and below),
+you must use a server-side progress solution.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\ProgressBar\Upload</span></tt> provides handlers that can give you the actual state of a
+file upload in progress. To use this feature you need to choose one of the
+<a class="reference internal" href="zend.progress-bar.upload.html#zend-progress-bar-upload"><em>Upload Progress Handlers</em></a>
+(APC, uploadprogress, or Session) and ensure that your server setup has the appropriate extension
+or feature enabled.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>For this example we will use PHP <strong>5.4</strong>&#8216;s <a class="reference external" href="http://php.net/manual/en/session.upload-progress.php">Session progress handler</a></p>
+<p><strong>PHP 5.4 is required</strong> and you may need to verify these php.ini settings for it to work:</p>
+<div class="last highlight-ini"><div class="highlight"><pre><span class="na">file_uploads</span> <span class="o">=</span> <span class="s">On</span>
+<span class="na">post_max_size</span> <span class="o">=</span> <span class="s">50M</span>
+<span class="na">upload_max_filesize</span> <span class="o">=</span> <span class="s">50M</span>
+<span class="na">session.upload_progress.enabled</span> <span class="o">=</span> <span class="s">On</span>
+<span class="na">session.upload_progress.freq</span> <span class="o">=</span>  <span class="s">&quot;1%&quot;</span>
+<span class="na">session.upload_progress.min_freq</span> <span class="o">=</span> <span class="s">&quot;1&quot;</span>
+<span class="c">; Also make certain &#39;upload_tmp_dir&#39; is writable</span>
+</pre></div>
+</div>
+</div>
+<p>When uploading a file with a form POST, you must also include the progress identifier in a
+hidden input. The <a class="reference internal" href="zend.form.view.helpers.html#zend-form-view-helper-file"><em>File Upload Progress View Helpers</em></a> provide a
+convenient way to add the hidden input based on your handler type.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// File: upload-form.phtml</span>
+<span class="o">&lt;?</span><span class="nx">php</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">prepare</span><span class="p">();</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">openTag</span><span class="p">(</span><span class="nv">$form</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formFileSessionProgress</span><span class="p">();</span> <span class="c1">// Must come before the file input! ?&gt;</span>
+
+    <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">class</span><span class="o">=</span><span class="s2">&quot;form-element&quot;</span><span class="o">&gt;</span>
+        <span class="o">&lt;?</span><span class="nx">php</span> <span class="nv">$fileElement</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;image-file&#39;</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">        </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formLabel</span><span class="p">(</span><span class="nv">$fileElement</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">        </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formFile</span><span class="p">(</span><span class="nv">$fileElement</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">        </span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">formElementErrors</span><span class="p">(</span><span class="nv">$fileElement</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">    &lt;/div&gt;</span>
+
+<span class="x">    &lt;button&gt;Submit&lt;/button&gt;</span>
+
+<span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">form</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">closeTag</span><span class="p">();</span> <span class="cp">?&gt;</span><span class="x"></span>
+</pre></div>
+</td></tr></table></div>
+<p>When rendered, the HTML should look similar to:</p>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;form</span> <span class="na">name=</span><span class="s">&quot;upload-form&quot;</span> <span class="na">id=</span><span class="s">&quot;upload-form&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">id=</span><span class="s">&quot;progress_key&quot;</span> <span class="na">name=</span><span class="s">&quot;PHP_SESSION_UPLOAD_PROGRESS&quot;</span> <span class="na">value=</span><span class="s">&quot;12345abcde&quot;</span><span class="nt">&gt;</span>
+
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;form-element&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;image-file&quot;</span><span class="nt">&gt;</span>Avatar Image Upload<span class="nt">&lt;/label&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;file&quot;</span> <span class="na">name=</span><span class="s">&quot;image-file&quot;</span> <span class="na">id=</span><span class="s">&quot;image-file&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+
+    <span class="nt">&lt;button&gt;</span>Submit<span class="nt">&lt;/button&gt;</span>
+<span class="nt">&lt;/form&gt;</span>
+</pre></div>
+</div>
+<p>There are a few different methods for getting progress information to the browser
+(long vs. short polling). Here we will use short polling since it is simpler
+and less taxing on server resources, though keep in mind it is not as responsive as long polling.</p>
+<p>When our form is submitted via AJAX, the browser will continuously poll the server for upload progress.</p>
+<p>The following is an example Controller action which provides the progress information:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// File: MyController.php</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">uploadProgressAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$id</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">fromQuery</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">);</span>
+    <span class="nv">$progress</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Zend\ProgressBar\Upload\SessionProgress</span><span class="p">();</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">\Zend\View\Model\JsonModel</span><span class="p">(</span><span class="nv">$progress</span><span class="o">-&gt;</span><span class="na">getProgress</span><span class="p">(</span><span class="nv">$id</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="c1">// Returns JSON</span>
+<span class="c1">//{</span>
+<span class="c1">//    &quot;total&quot;    : 204800,</span>
+<span class="c1">//    &quot;current&quot;  : 10240,</span>
+<span class="c1">//    &quot;rate&quot;     : 1024,</span>
+<span class="c1">//    &quot;message&quot;  : &quot;10kB / 200kB&quot;,</span>
+<span class="c1">//    &quot;done&quot;     : false</span>
+<span class="c1">//}</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This is <em>not</em> the most efficient way of providing upload progress, since each polling request must go
+through the Zend Framework bootstrap process. A better example would be to use a standalone
+php file in the public folder that bypasses the MVC bootstrapping and only uses the essential
+<tt class="docutils literal"><span class="pre">Zend\ProgressBar</span></tt> adapters.</p>
+</div>
+<p>Back in our view template, we will add the JavaScript to perform the AJAX POST of the form data, and
+to start a timeout interval for the progress polling. To keep the example code relatively short, we are using the
+<a class="reference external" href="https://github.com/malsup/form">jQuery Form plugin</a> to do the AJAX form POST. If your project uses a different JavaScript framework
+(or none at all), this will hopefully at least illustrate the necessary high-level logic that would need
+to be performed.</p>
+<div class="highlight-html"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99</pre></div></td><td class="code"><div class="highlight"><pre>// File: upload-form.phtml
+// ...after the form...
+
+<span class="c">&lt;!-- Twitter Bootstrap progress bar styles:</span>
+<span class="c">     http://twitter.github.com/bootstrap/components.html#progress --&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;progress&quot;</span> <span class="na">class=</span><span class="s">&quot;help-block&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;progress progress-info progress-striped&quot;</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;bar&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;/div&gt;</span>
+    <span class="nt">&lt;p&gt;&lt;/p&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/js/jquery.form.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+<span class="kd">var</span> <span class="nx">progressInterval</span><span class="p">;</span>
+
+<span class="kd">function</span> <span class="nx">getProgress</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Poll our controller action with the progress id</span>
+    <span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="s1">&#39;/upload-form/upload-progress?id=&#39;</span> <span class="o">+</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#progress_key&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
+    <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">status</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="nx">data</span><span class="p">.</span><span class="nx">status</span><span class="p">.</span><span class="nx">done</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nx">data</span><span class="p">.</span><span class="nx">status</span><span class="p">.</span><span class="nx">current</span> <span class="o">/</span> <span class="nx">data</span><span class="p">.</span><span class="nx">status</span><span class="p">.</span><span class="nx">total</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">);</span>
+            <span class="nx">showProgress</span><span class="p">(</span><span class="nx">value</span><span class="p">,</span> <span class="s1">&#39;Uploading...&#39;</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="nx">showProgress</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;Complete!&#39;</span><span class="p">);</span>
+            <span class="nx">clearInterval</span><span class="p">(</span><span class="nx">progressInterval</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">startProgress</span><span class="p">()</span> <span class="p">{</span>
+    <span class="nx">showProgress</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;Starting upload...&#39;</span><span class="p">);</span>
+    <span class="nx">progressInterval</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">(</span><span class="nx">getProgress</span><span class="p">,</span> <span class="mi">900</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kd">function</span> <span class="nx">showProgress</span><span class="p">(</span><span class="nx">amount</span><span class="p">,</span> <span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#progress&#39;</span><span class="p">).</span><span class="nx">show</span><span class="p">();</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#progress .bar&#39;</span><span class="p">).</span><span class="nx">width</span><span class="p">(</span><span class="nx">amount</span> <span class="o">+</span> <span class="s1">&#39;%&#39;</span><span class="p">);</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#progress &gt; p&#39;</span><span class="p">).</span><span class="nx">html</span><span class="p">(</span><span class="nx">message</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">amount</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#progress .progress&#39;</span><span class="p">)</span>
+            <span class="p">.</span><span class="nx">addClass</span><span class="p">(</span><span class="s1">&#39;progress-info active&#39;</span><span class="p">)</span>
+            <span class="p">.</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;progress-success&#39;</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#progress .progress&#39;</span><span class="p">)</span>
+            <span class="p">.</span><span class="nx">removeClass</span><span class="p">(</span><span class="s1">&#39;progress-info active&#39;</span><span class="p">)</span>
+            <span class="p">.</span><span class="nx">addClass</span><span class="p">(</span><span class="s1">&#39;progress-success&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c1">// Register a &#39;submit&#39; event listener on the form to perform the AJAX POST</span>
+    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#upload-form&#39;</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;submit&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#image-file&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// No files selected, abort</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="c1">// Perform the submit</span>
+        <span class="c1">//$.fn.ajaxSubmit.debug = true;</span>
+        <span class="nx">$</span><span class="p">(</span><span class="k">this</span><span class="p">).</span><span class="nx">ajaxSubmit</span><span class="p">({</span>
+            <span class="nx">beforeSubmit</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">arr</span><span class="p">,</span> <span class="nx">$form</span><span class="p">,</span> <span class="nx">options</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// Notify backend that submit is via ajax</span>
+                <span class="nx">arr</span><span class="p">.</span><span class="nx">push</span><span class="p">({</span> <span class="nx">name</span><span class="o">:</span> <span class="s2">&quot;isAjax&quot;</span><span class="p">,</span> <span class="nx">value</span><span class="o">:</span> <span class="s2">&quot;1&quot;</span> <span class="p">});</span>
+            <span class="p">},</span>
+            <span class="nx">success</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">response</span><span class="p">,</span> <span class="nx">statusText</span><span class="p">,</span> <span class="nx">xhr</span><span class="p">,</span> <span class="nx">$form</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">clearInterval</span><span class="p">(</span><span class="nx">progressInterval</span><span class="p">);</span>
+                <span class="nx">showProgress</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="s1">&#39;Complete!&#39;</span><span class="p">);</span>
+
+                <span class="c1">// TODO: You&#39;ll need to do some custom logic here to handle a successful</span>
+                <span class="c1">// form post, and when the form is invalid with validation errors.</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">response</span><span class="p">.</span><span class="nx">status</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="c1">// TODO: Do something with a successful form post, like redirect</span>
+                    <span class="c1">// window.location.replace(response.redirect);</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                    <span class="c1">// Clear the file input, otherwise the same file gets re-uploaded</span>
+                    <span class="c1">// http://stackoverflow.com/a/1043969</span>
+                    <span class="kd">var</span> <span class="nx">fileInput</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#image-file&#39;</span><span class="p">);</span>
+                    <span class="nx">fileInput</span><span class="p">.</span><span class="nx">replaceWith</span><span class="p">(</span> <span class="nx">fileInput</span><span class="p">.</span><span class="nx">val</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">).</span><span class="nx">clone</span><span class="p">(</span> <span class="kc">true</span> <span class="p">)</span> <span class="p">);</span>
+
+                    <span class="c1">// TODO: Do something with these errors</span>
+                    <span class="c1">// showErrors(response.formErrors);</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="nx">error</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// NOTE: This callback is *not* called when the form is invalid.</span>
+                <span class="c1">// It is called when the browser is unable to initiate or complete the ajax submit.</span>
+                <span class="c1">// You will need to handle validation errors in the &#39;success&#39; callback.</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">});</span>
+        <span class="c1">// Start the progress polling</span>
+        <span class="nx">startProgress</span><span class="p">();</span>
+    <span class="p">});</span>
+<span class="p">});</span>
+<span class="nt">&lt;/script&gt;</span>
+</pre></div>
+</td></tr></table></div>
+<p>And finally, our Controller action can be modified to return form status and validation messages
+in JSON format if we see the &#8216;isAjax&#8217; post parameter (which was set in the JavaScript just before submit):</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// File: MyController.php</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">uploadFormAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$form</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UploadForm</span><span class="p">(</span><span class="s1">&#39;upload-form&#39;</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">isPost</span><span class="p">())</span> <span class="p">{</span>
+        <span class="c1">// Make certain to merge the files info!</span>
+        <span class="nv">$post</span> <span class="o">=</span> <span class="nb">array_merge_recursive</span><span class="p">(</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getPost</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">(),</span>
+            <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getRequest</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">getFiles</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toArray</span><span class="p">()</span>
+        <span class="p">);</span>
+
+        <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">setData</span><span class="p">(</span><span class="nv">$post</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$form</span><span class="o">-&gt;</span><span class="na">isValid</span><span class="p">())</span> <span class="p">{</span>
+            <span class="nv">$data</span> <span class="o">=</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getData</span><span class="p">();</span>
+            <span class="c1">// Form is valid, save the form!</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$post</span><span class="p">[</span><span class="s1">&#39;isAjax&#39;</span><span class="p">]))</span> <span class="p">{</span>
+                <span class="k">return</span> <span class="k">new</span> <span class="nx">JsonModel</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+                    <span class="s1">&#39;status&#39;</span>   <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                    <span class="s1">&#39;redirect&#39;</span> <span class="o">=&gt;</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">url</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">fromRoute</span><span class="p">(</span><span class="s1">&#39;upload-form/success&#39;</span><span class="p">),</span>
+                    <span class="s1">&#39;formData&#39;</span> <span class="o">=&gt;</span> <span class="nv">$data</span><span class="p">,</span>
+                <span class="p">));</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="c1">// Fallback for non-JS clients</span>
+                <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">redirect</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">toRoute</span><span class="p">(</span><span class="s1">&#39;upload-form/success&#39;</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="k">empty</span><span class="p">(</span><span class="nv">$post</span><span class="p">[</span><span class="s1">&#39;isAjax&#39;</span><span class="p">]))</span> <span class="p">{</span>
+                 <span class="c1">// Send back failure information via JSON</span>
+                 <span class="k">return</span> <span class="k">new</span> <span class="nx">JsonModel</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+                     <span class="s1">&#39;status&#39;</span>     <span class="o">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+                     <span class="s1">&#39;formErrors&#39;</span> <span class="o">=&gt;</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getMessages</span><span class="p">(),</span>
+                     <span class="s1">&#39;formData&#39;</span>   <span class="o">=&gt;</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">getData</span><span class="p">(),</span>
+                 <span class="p">));</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;form&#39;</span> <span class="o">=&gt;</span> <span class="nv">$form</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="additional-info">
+<h2>Additional Info<a class="headerlink" href="#additional-info" title="Permalink to this headline">¶</a></h2>
+<p>Related documentation:</p>
+<ul class="simple">
+<li><a class="reference internal" href="zend.form.elements.html#zend-form-element-file"><em>Form File Element</em></a></li>
+<li><a class="reference internal" href="zend.form.view.helpers.html#zend-form-view-helper-form-file"><em>Form File View Helper</em></a></li>
+<li><a class="reference internal" href="zend.validator.file.html#zend-validator-file"><em>List of File Validators</em></a></li>
+<li><a class="reference internal" href="zend.filter.file.html#zend-filter-file"><em>List of File Filters</em></a></li>
+<li><a class="reference internal" href="zend.mvc.plugins.html#zend-mvc-controller-plugins-file-postredirectget"><em>File Post-Redirect-Get Controller Plugin</em></a></li>
+<li><a class="reference internal" href="zend.input-filter.file-input.html#zend-input-filter-file-input"><em>Zend\InputFilter\FileInput</em></a></li>
+<li><a class="reference internal" href="zend.progress-bar.upload.html#zend-progress-bar-upload"><em>Upload Progress Handlers</em></a></li>
+<li><a class="reference internal" href="zend.form.view.helpers.html#zend-form-view-helper-file"><em>Upload Progress View Helpers</em></a></li>
+</ul>
+<p>External resources and blog posts from the community:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://github.com/cgmartin/ZF2FileUploadExamples">ZF2FileUploadExamples</a>  : A ZF2 module with several file upload examples.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">File Uploading</a><ul>
+<li><a class="reference internal" href="#standard-example">Standard Example</a><ul>
+<li><a class="reference internal" href="#the-form-and-inputfilter">The Form and InputFilter</a></li>
+<li><a class="reference internal" href="#the-view-template">The View Template</a></li>
+<li><a class="reference internal" href="#the-controller-action">The Controller Action</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#file-post-redirect-get-plugin">File Post-Redirect-Get Plugin</a></li>
+<li><a class="reference internal" href="#html5-multi-file-uploads">HTML5 Multi-File Uploads</a></li>
+<li><a class="reference internal" href="#upload-progress">Upload Progress</a></li>
+<li><a class="reference internal" href="#additional-info">Additional Info</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.form.collections.html"
+                        title="previous chapter">Form Collections</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.form.advanced-use-of-forms.html"
+                        title="next chapter">Advanced use of forms</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.form.file-upload.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.form.file-upload.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.form.file-upload.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.form.advanced-use-of-forms.html" title="Advanced use of forms"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.form.collections.html" title="Form Collections"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.2 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.form.file-upload.rst">
+                File Uploading
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
