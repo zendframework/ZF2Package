@@ -85,3 +85,24 @@ function composer_name_to_package_name($composer_name) {
         $composer_name
     );
 }
+
+function get_github_config()
+{
+    static $config;
+
+    if ($config) {
+        return $config;
+    }
+
+    if (!defined('ROOT')) {
+        throw new RuntimeException('ROOT constant has not been declared; cannot fetch github config');
+    }
+
+    if (file_exists(ROOT . '/build/github-config.php')) {
+        $config = include ROOT . '/build/github-config.php';
+        return $config;
+    }
+
+    $config = include ROOT . '/build/github-config.php.dist';
+    return $config;
+}

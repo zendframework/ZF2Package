@@ -1,5 +1,10 @@
 #!/usr/bin/env php
 <?php
+/**
+ * TODO
+ *
+ * - use API token if available in config when using github API
+ */
 
 include 'functions.php';
 
@@ -281,6 +286,8 @@ function getGithubData($uri)
     curl_setopt($ch, CURLOPT_URL, $uri);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+    injectApiTokenHeader($ch);
+
     $json = curl_exec($ch);
     curl_close($ch);
     return json_decode($json);
@@ -385,6 +392,8 @@ function buildComponentSourcePackages($component)
         curl_setopt($ch, CURLOPT_URL, $uri);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        injectApiTokenHeader($ch);
+
         $json = curl_exec($ch);
         curl_close($ch);
 
@@ -466,4 +475,16 @@ function getComponentPackageList()
         'zendframework/zend-view'             => 'ZendView',
         'zendframework/zend-xmlrpc'           => 'ZendXmlRpc',
     ];
+}
+
+function injectApiTokenHeader($curlHandle)
+{
+    $config = get_github_config();
+    if (!isset($config['oauth_token'])
+    ) {
+        return;
+    }
+    curl_setopt($curlHandle, CURLOPT_HTTPHEADER, [
+        sprintf('Authorization: token %s', $config['oauth_token']),
+    ]);
 }
