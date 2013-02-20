@@ -388,7 +388,7 @@ function buildComponentSourcePackages($component)
         $json = curl_exec($ch);
         curl_close($ch);
 
-        $package                   = json_decode($json);
+        $package                   = json_decode($json, true);
         $package['source']         = getLastCommitByBranch($branch, $component);
         $package['version']        = $version;
         $package['source']['type'] = 'git';
