@@ -47,8 +47,17 @@ if ($composer_index_in_root !== false) {
 }
 
 $composer_content['version'] = $package_release;
-$composer_content['dist']['url'] = "http://packages.zendframework.com/composer/{$package_name_full}.zip";
+$composer_content['dist']['url'] = "https://packages.zendframework.com/composer/{$package_name_full}.zip";
 $composer_content['dist']['type'] = "zip";
+
+// Build source package definition
+$source_package_repo = $package_name_full;
+if ('Zend_' == substr($package_name_full, 0, 5)) {
+    $source_package_repo = 'Component_' . str_replace('_', '', $package_name_full);
+}
+$composer_content['source']['type']      = 'git';
+$composer_content['source']['url']       = "git://github.com/zendframework/" . $source_package_repo . '.git';
+$composer_content['source']['reference'] = 'release-' . $package_release;
 
 $zip->addFromString('composer.json', json_encode($composer_content));
 $zip->close();

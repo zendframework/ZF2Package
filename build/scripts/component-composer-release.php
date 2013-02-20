@@ -1,5 +1,14 @@
 #!/usr/bin/env php
 <?php
+/**
+ * TODO
+ *
+ * - Fix issues with skeleton-application versions. Currently they are prefixed 
+ *   with "zf2/", which breaks composer.
+ * - Create dev-master and dev-develop packages for each component.
+ *   This will likely mean either parsing the current packages.json, or adding 
+ *   stub packages for each component to this repo that we use.
+ */
 
 include 'functions.php';
 
@@ -245,6 +254,19 @@ foreach ($composers as $filename => $composer) {
     }
 }
 
+// Create component source packages
+foreach(getComponentPackageList() as $packageName => $component) {
+    if (!isset($packages[$packageName])
+        || !is_array($packages[$packageName])
+    ) {
+        $packages[$packageName] = array();
+    }
+    foreach (buildComponentSourcePackages($component) as $version => $package) {
+        $packages[$packageName][$version] = $package;
+    }
+}
+
+
 echo "\nAdding zendframework/zendframework metapackage; contains following versions:\n"
     . '    ' . implode("\n    ", array_keys($zf2_metapackage)) . "\n\n";
 
@@ -351,4 +373,104 @@ function getSkeletonApplicationReleases()
 
     // Return full list
     return $releases;
+}
+
+function buildComponentSourcePackages($component)
+{
+    $component = 'Component_' . $component;
+    $packages  = array();
+
+    foreach (['master', 'develop'] as $branch) {
+        $version = 'dev-' . $branch;
+        $url     = sprintf(
+            'https://raw.github.com/zendframework/%s/%s/composer.json',
+            $component,
+            $branch
+        );
+
+        $ch  = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $uri);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        $json = curl_exec($ch);
+        curl_close($ch);
+
+        $package                   = json_decode($json);
+        $package['source']         = getLastCommitByBranch($branch, $component);
+        $package['version']        = $version;
+        $package['source']['type'] = 'git';
+        $package['source']['url']  = sprintf('git://github.com/zendframework/%s.git', $component);
+
+        $package['dist'] = [
+            'type' => 'zip',
+            'url'  => sprintf('https://github.com/zendframework/%s/zipball/%s', $component, $branch),
+        ];
+
+        // These lines will need to change as new minor releases are made
+        $package['extra'] = ['branch-alias' => [
+            'dev-master'  => '2.1.x-dev',
+            'dev-develop' => '2.2.x-dev',
+        ]];
+
+        $packages[$version] = $package;
+    }
+
+    return $packages;
+}
+
+// This function will likely need to change as new components are added
+function getComponentPackageList()
+{
+    return [
+        'zend-authentication'   => 'ZendAuthentication',
+        'zend-barcode'          => 'ZendBarcode',
+        'zend-cache'            => 'ZendCache',
+        'zend-captcha'          => 'ZendCaptcha',
+        'zend-code'             => 'ZendCode',
+        'zend-config'           => 'ZendConfig',
+        'zend-console'          => 'ZendConsole',
+        'zend-crypt'            => 'ZendCrypt',
+        'zend-db'               => 'ZendDb',
+        'zend-debug'            => 'ZendDebug',
+        'zend-di'               => 'ZendDi',
+        'zend-dom'              => 'ZendDom',
+        'zend-escaper'          => 'ZendEscaper',
+        'zend-eventmanager'     => 'ZendEventManager',
+        'zend-feed'             => 'ZendFeed',
+        'zend-file'             => 'ZendFile',
+        'zend-filter'           => 'ZendFilter',
+        'zend-form'             => 'ZendForm',
+        'zend-http'             => 'ZendHttp',
+        'zend-i18n'             => 'ZendI18n',
+        'zend-inputfilter'      => 'ZendInputFilter',
+        'zend-json'             => 'ZendJson',
+        'zend-ldap'             => 'ZendLdap',
+        'zend-loader'           => 'ZendLoader',
+        'zend-log'              => 'ZendLog',
+        'zend-mail'             => 'ZendMail',
+        'zend-math'             => 'ZendMath',
+        'zend-memory'           => 'ZendMemory',
+        'zend-mime'             => 'ZendMime',
+        'zend-modulemanager'    => 'ZendModuleManager',
+        'zend-mvc'              => 'ZendMvc',
+        'zend-navigation'       => 'ZendNavigation',
+        'zend-paginator'        => 'ZendPaginator',
+        'zend-permissions-acl'  => 'ZendPermissionsAcl',
+        'zend-permissions-rbac' => 'ZendPermissionsRbac',
+        'zend-progressbar'      => 'ZendProgressBar',
+        'zend-serializer'       => 'ZendSerializer',
+        'zend-server'           => 'ZendServer',
+        'zend-servicemanager'   => 'ZendServiceManager',
+        'zend-session'          => 'ZendSession',
+        'zend-soap'             => 'ZendSoap',
+        'zend-stdlib'           => 'ZendStdlib',
+        'zend-tag'              => 'ZendTag',
+        'zend-test'             => 'ZendTest',
+        'zend-text'             => 'ZendText',
+        'zend-uri'              => 'ZendUri',
+        'zend-validator'        => 'ZendValidator',
+        'zend-version'          => 'ZendVersion',
+        'zend-view'             => 'ZendView',
+        'zend-xmlrpc'           => 'ZendXmlRpc',
+    ];
 }
