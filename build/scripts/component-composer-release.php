@@ -375,7 +375,7 @@ function buildComponentSourcePackages($component)
 
     foreach (['master', 'develop'] as $branch) {
         $version = 'dev-' . $branch;
-        $url     = sprintf(
+        $uri     = sprintf(
             'https://raw.github.com/zendframework/%s/%s/composer.json',
             $component,
             $branch
