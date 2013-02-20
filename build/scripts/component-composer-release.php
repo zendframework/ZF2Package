@@ -1,14 +1,5 @@
 #!/usr/bin/env php
 <?php
-/**
- * TODO
- *
- * - Fix issues with skeleton-application versions. Currently they are prefixed 
- *   with "zf2/", which breaks composer.
- * - Create dev-master and dev-develop packages for each component.
- *   This will likely mean either parsing the current packages.json, or adding 
- *   stub packages for each component to this repo that we use.
- */
 
 include 'functions.php';
 
@@ -344,12 +335,14 @@ function getSkeletonApplicationReleases()
     }
     //    apply each to template
     foreach ($tagData as $tagDatum) {
-        $tag                               = $tagDatum->name;
+        $tag     = $tagDatum->name;
+        $version = ('zf/' == substr($tag, 0, 3)) ? substr($tag, 3) : $tag;
+
         $definition                        = $template;
-        $definition['version']             = $tag;
+        $definition['version']             = $version;
         $definition['source']['reference'] = $tag;
         $definition['dist']['url']         = $tagDatum->zipball_url;
-        $releases[$tag]                    = $definition;
+        $releases[$version]                = $definition;
     }
 
     // Add in branch "master"
