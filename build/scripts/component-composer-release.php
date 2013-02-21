@@ -400,11 +400,16 @@ function buildComponentSourcePackages($component)
         $json = curl_exec($ch);
         curl_close($ch);
 
-        $package                   = json_decode($json, true);
-        $package['source']         = getLastCommitByBranch($branch, $component);
-        $package['version']        = $version;
-        $package['source']['type'] = 'git';
-        $package['source']['url']  = sprintf('git://github.com/zendframework/%s.git', $component);
+        $package       = json_decode($json, true);
+        $sourceDetails = getLastCommitByBranch($branch, $component);
+
+        $package['version'] = $version;
+        $package['source']  = [
+            'type'      => 'git',
+            'url'       => sprintf('git://github.com/zendframework/%s.git', $component),
+            'reference' => $sourceDetails['sha'],
+            'time'      => $sourceDetails['time'],
+        ];
 
         $package['dist'] = [
             'type' => 'zip',
