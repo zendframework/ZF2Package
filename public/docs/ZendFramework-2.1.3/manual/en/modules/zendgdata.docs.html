@@ -1,0 +1,398 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Google Documents List Data API &mdash; Zend Framework 2 2.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.3 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-google-documents-list-data-api">
+<span id="zendgdata-docs"></span><h1>Using Google Documents List Data API<a class="headerlink" href="#using-google-documents-list-data-api" title="Permalink to this headline">¶</a></h1>
+<p>The Google Documents List Data <em>API</em> allows client applications to upload documents to Google Documents and list
+them in the form of Google Data <em>API</em> (&#8220;GData&#8221;) feeds. Your client application can request a list of a user&#8217;s
+documents, and query the content in an existing document.</p>
+<p>See <a class="reference external" href="http://code.google.com/apis/documents/overview.html">http://code.google.com/apis/documents/overview.html</a> for more information about the Google Documents List
+<em>API</em>.</p>
+<div class="section" id="get-a-list-of-documents">
+<span id="zendgdata-docs-listdocuments"></span><h2>Get a List of Documents<a class="headerlink" href="#get-a-list-of-documents" title="Permalink to this headline">¶</a></h2>
+<p>You can get a list of the Google Documents for a particular user by using the <tt class="docutils literal"><span class="pre">getDocumentListFeed()</span></tt> method of
+the docs service. The service will return a <tt class="docutils literal"><span class="pre">ZendGData\Docs\DocumentListFeed</span></tt> object containing a list of
+documents associated with the authenticated user.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$service</span> <span class="o">=</span> <span class="nx">ZendGData\Docs</span><span class="o">::</span><span class="na">AUTH_SERVICE_NAME</span><span class="p">;</span>
+<span class="nv">$client</span> <span class="o">=</span> <span class="nx">ZendGData\ClientLogin</span><span class="o">::</span><span class="na">getHttpClient</span><span class="p">(</span><span class="nv">$user</span><span class="p">,</span> <span class="nv">$pass</span><span class="p">,</span> <span class="nv">$service</span><span class="p">);</span>
+<span class="nv">$docs</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendGData\Docs</span><span class="p">(</span><span class="nv">$client</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$docs</span><span class="o">-&gt;</span><span class="na">getDocumentListFeed</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The resulting <tt class="docutils literal"><span class="pre">ZendGData\Docs\DocumentListFeed</span></tt> object represents the response from the server. This feed
+contains a list of <tt class="docutils literal"><span class="pre">ZendGData\Docs\DocumentListEntry</span></tt> objects (<tt class="docutils literal"><span class="pre">$feed-&gt;entries</span></tt>), each of which represents a
+single Google Document.</p>
+</div>
+<div class="section" id="upload-a-document">
+<span id="zendgdata-docs-creating"></span><h2>Upload a Document<a class="headerlink" href="#upload-a-document" title="Permalink to this headline">¶</a></h2>
+<p>You can create a new Google Document by uploading a word processing document, spreadsheet, or presentation. This
+example is from the interactive Docs.php sample which comes with the library. It demonstrates uploading a file and
+printing information about the result from the server.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</pre></div></td><td class="code"><div class="highlight"><pre><span class="sd">/**</span>
+<span class="sd"> * Upload the specified document</span>
+<span class="sd"> *</span>
+<span class="sd"> * @param ZendGData\Docs $docs The service object to use for communicating</span>
+<span class="sd"> *     with the Google Documents server.</span>
+<span class="sd"> * @param boolean $html True if output should be formatted for display in a</span>
+<span class="sd"> *     web browser.</span>
+<span class="sd"> * @param string $originalFileName The name of the file to be uploaded. The</span>
+<span class="sd"> *     MIME type of the file is determined from the extension on this file</span>
+<span class="sd"> *     name. For example, test.csv is uploaded as a comma separated volume</span>
+<span class="sd"> *     and converted into a spreadsheet.</span>
+<span class="sd"> * @param string $temporaryFileLocation (optional) The file in which the</span>
+<span class="sd"> *     data for the document is stored. This is used when the file has been</span>
+<span class="sd"> *     uploaded from the client&#39;s machine to the server and is stored in</span>
+<span class="sd"> *     a temporary file which does not have an extension. If this parameter</span>
+<span class="sd"> *     is null, the file is read from the originalFileName.</span>
+<span class="sd"> */</span>
+<span class="k">function</span> <span class="nf">uploadDocument</span><span class="p">(</span><span class="nv">$docs</span><span class="p">,</span> <span class="nv">$html</span><span class="p">,</span> <span class="nv">$originalFileName</span><span class="p">,</span>
+                        <span class="nv">$temporaryFileLocation</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nv">$fileToUpload</span> <span class="o">=</span> <span class="nv">$originalFileName</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">$temporaryFileLocation</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$fileToUpload</span> <span class="o">=</span> <span class="nv">$temporaryFileLocation</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="c1">// Upload the file and convert it into a Google Document. The original</span>
+  <span class="c1">// file name is used as the title of the document and the MIME type</span>
+  <span class="c1">// is determined based on the extension on the original file name.</span>
+  <span class="nv">$newDocumentEntry</span> <span class="o">=</span> <span class="nv">$docs</span><span class="o">-&gt;</span><span class="na">uploadFile</span><span class="p">(</span><span class="nv">$fileToUpload</span><span class="p">,</span> <span class="nv">$originalFileName</span><span class="p">,</span>
+      <span class="k">null</span><span class="p">,</span> <span class="nx">ZendGData\Docs</span><span class="o">::</span><span class="na">DOCUMENTS_LIST_FEED_URI</span><span class="p">);</span>
+
+  <span class="k">echo</span> <span class="s2">&quot;New Document Title: &quot;</span><span class="p">;</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="nv">$html</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// Find the URL of the HTML view of this document.</span>
+      <span class="nv">$alternateLink</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">;</span>
+      <span class="k">foreach</span> <span class="p">(</span><span class="nv">$newDocumentEntry</span><span class="o">-&gt;</span><span class="na">link</span> <span class="k">as</span> <span class="nv">$link</span><span class="p">)</span> <span class="p">{</span>
+          <span class="k">if</span> <span class="p">(</span><span class="nv">$link</span><span class="o">-&gt;</span><span class="na">getRel</span><span class="p">()</span> <span class="o">===</span> <span class="s1">&#39;alternate&#39;</span><span class="p">)</span> <span class="p">{</span>
+              <span class="nv">$alternateLink</span> <span class="o">=</span> <span class="nv">$link</span><span class="o">-&gt;</span><span class="na">getHref</span><span class="p">();</span>
+          <span class="p">}</span>
+      <span class="p">}</span>
+      <span class="c1">// Make the title link to the document on docs.google.com.</span>
+      <span class="k">echo</span> <span class="s2">&quot;&lt;a href=</span><span class="se">\&quot;</span><span class="si">$alternateLink</span><span class="se">\&quot;</span><span class="s2">&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">echo</span> <span class="nv">$newDocumentEntry</span><span class="o">-&gt;</span><span class="na">title</span><span class="o">.</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nv">$html</span><span class="p">)</span> <span class="p">{</span><span class="k">echo</span> <span class="s2">&quot;&lt;/a&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="searching-the-documents-feed">
+<span id="zendgdata-docs-queries"></span><h2>Searching the documents feed<a class="headerlink" href="#searching-the-documents-feed" title="Permalink to this headline">¶</a></h2>
+<p>You can search the Document List using some of the <a class="reference external" href="http://code.google.com/apis/gdata/reference.html#Queries">standard Google Data API query parameters</a>. Categories are
+used to restrict the type of document (word processor document, spreadsheet) returned. The full-text query string
+is used to search the content of all the documents. More detailed information on parameters specific to the
+Documents List can be found in the <a class="reference external" href="http://code.google.com/apis/documents/reference.html#Parameters">Documents List Data API Reference Guide</a>.</p>
+<div class="section" id="get-a-list-of-word-processing-documents">
+<span id="zendgdata-docs-listwpdocuments"></span><h3>Get a List of Word Processing Documents<a class="headerlink" href="#get-a-list-of-word-processing-documents" title="Permalink to this headline">¶</a></h3>
+<p>You can also request a feed containing all of your documents of a specific type. For example, to see a list of your
+work processing documents, you would perform a category query as follows.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$docs</span><span class="o">-&gt;</span><span class="na">getDocumentListFeed</span><span class="p">(</span>
+    <span class="s1">&#39;http://docs.google.com/feeds/documents/private/full/-/document&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="get-a-list-of-spreadsheets">
+<span id="zendgdata-docs-listspreadsheets"></span><h3>Get a List of Spreadsheets<a class="headerlink" href="#get-a-list-of-spreadsheets" title="Permalink to this headline">¶</a></h3>
+<p>To request a list of your Google Spreadsheets, use the following category query:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$docs</span><span class="o">-&gt;</span><span class="na">getDocumentListFeed</span><span class="p">(</span>
+    <span class="s1">&#39;http://docs.google.com/feeds/documents/private/full/-/spreadsheet&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="performing-a-text-query">
+<span id="zendgdata-docs-textquery"></span><h3>Performing a text query<a class="headerlink" href="#performing-a-text-query" title="Permalink to this headline">¶</a></h3>
+<p>You can search the content of documents by using a <tt class="docutils literal"><span class="pre">ZendGData\Docs\Query</span></tt> in your request. A Query object can be
+used to construct the query <em>URI</em>, with the search term being passed in as a parameter. Here is an example method
+which queries the documents list for documents which contain the search string:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$docsQuery</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendGData\Docs\Query</span><span class="p">();</span>
+<span class="nv">$docsQuery</span><span class="o">-&gt;</span><span class="na">setQuery</span><span class="p">(</span><span class="nv">$query</span><span class="p">);</span>
+<span class="nv">$feed</span> <span class="o">=</span> <span class="nv">$client</span><span class="o">-&gt;</span><span class="na">getDocumentListFeed</span><span class="p">(</span><span class="nv">$docsQuery</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using Google Documents List Data API</a><ul>
+<li><a class="reference internal" href="#get-a-list-of-documents">Get a List of Documents</a></li>
+<li><a class="reference internal" href="#upload-a-document">Upload a Document</a></li>
+<li><a class="reference internal" href="#searching-the-documents-feed">Searching the documents feed</a><ul>
+<li><a class="reference internal" href="#get-a-list-of-word-processing-documents">Get a List of Word Processing Documents</a></li>
+<li><a class="reference internal" href="#get-a-list-of-spreadsheets">Get a List of Spreadsheets</a></li>
+<li><a class="reference internal" href="#performing-a-text-query">Performing a text query</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendgdata.docs.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendgdata.docs.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendgdata.docs.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendgdata.docs.rst">
+                Using Google Documents List Data API
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,1108 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Unit Testing a Zend Framework 2 application &mdash; Zend Framework 2 2.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.3 documentation" href="../index.html" />
+    <link rel="next" title="Introduction" href="../modules/zend.authentication.intro.html" />
+    <link rel="prev" title="Learning Dependency Injection" href="quickstart.di.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../modules/zend.authentication.intro.html" title="Introduction"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.di.html" title="Learning Dependency Injection"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="unit-testing-a-zend-framework-2-application">
+<span id="tutorials-unittesting-rst"></span><h1>Unit Testing a Zend Framework 2 application<a class="headerlink" href="#unit-testing-a-zend-framework-2-application" title="Permalink to this headline">¶</a></h1>
+<p>A solid unit test suite is essential for ongoing development in large
+projects, especially those with many people involved. Going back and
+manually testing every individual component of an application after
+every change is impractical. Your unit tests will help alleviate that
+by automatically testing your application&#8217;s components and alerting
+you when something is not working the same way it was when you wrote
+your tests.</p>
+<p>This tutorial is written in the hopes of showing how to test different
+parts of a Zend Framework 2 MVC application. As such, this tutorial
+will use the application written in the <a class="reference internal" href="../user-guide/overview.html#user-guide-overview"><em>getting started
+user guide</em></a>. It is in no way a guide to
+unit testing in general, but is here only to help overcome the
+initial hurdles in writing unit tests for ZF2 applications.</p>
+<p>It is recommended to have at least a basic understanding of unit
+tests, assertions and mocks.</p>
+<p>As the Zend Framework 2 API uses <a class="reference external" href="http://phpunit.de/">PHPUnit</a>, so
+will this tutorial. This tutorial assumes that you already have PHPUnit
+installed. The version of PHPUnit used should be 3.7.*</p>
+<div class="section" id="setting-up-the-tests-directory">
+<span id="id1"></span><h2>Setting up the tests directory<a class="headerlink" href="#setting-up-the-tests-directory" title="Permalink to this headline">¶</a></h2>
+<p>As Zend Framework 2 applications are built from modules that should be
+standalone blocks of an application, we don&#8217;t test the application in
+it&#8217;s entirety, but module by module.</p>
+<p>We will show how to set up the minimum requirements to test a module,
+the <tt class="docutils literal"><span class="pre">Album</span></tt> module we wrote in the user guide, and which then can be
+used as a base for testing any other module.</p>
+<p>Start by creating a directory called <tt class="docutils literal"><span class="pre">test</span></tt> in <tt class="docutils literal"><span class="pre">zf2-tutorial\module\Album</span></tt> with
+the following subdirectories:</p>
+<div class="highlight-text"><div class="highlight"><pre>zf2-tutorial/
+    /module
+        /Album
+            /test
+                /AlbumTest
+                    /Controller
+</pre></div>
+</div>
+<p>The structure of the <tt class="docutils literal"><span class="pre">test</span></tt> directory matches exactly with that of the
+module&#8217;s source files, and it will allow you to keep your tests
+well-organized and easy to find.</p>
+</div>
+<div class="section" id="bootstrapping-your-tests">
+<span id="id2"></span><h2>Bootstrapping your tests<a class="headerlink" href="#bootstrapping-your-tests" title="Permalink to this headline">¶</a></h2>
+<p>Next, create a file called <tt class="docutils literal"><span class="pre">phpunit.xml</span></tt> under <tt class="docutils literal"><span class="pre">zf2-tutorial/module/Album/test</span></tt>:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+
+<span class="nt">&lt;phpunit</span> <span class="na">bootstrap=</span><span class="s">&quot;Bootstrap.php&quot;</span> <span class="na">colors=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;testsuites&gt;</span>
+        <span class="nt">&lt;testsuite</span> <span class="na">name=</span><span class="s">&quot;zf2tutorial&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;directory&gt;</span>./AlbumTest<span class="nt">&lt;/directory&gt;</span>
+        <span class="nt">&lt;/testsuite&gt;</span>
+    <span class="nt">&lt;/testsuites&gt;</span>
+<span class="nt">&lt;/phpunit&gt;</span>
+</pre></div>
+</div>
+<p>And a file called <tt class="docutils literal"><span class="pre">Bootstrap.php</span></tt>, also under <tt class="docutils literal"><span class="pre">zf2-tutorial/module/Album/test</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+
+<span class="k">namespace</span> <span class="nx">AlbumTest</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Loader\AutoloaderFactory</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Mvc\Service\ServiceManagerConfig</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\ServiceManager\ServiceManager</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">RuntimeException</span><span class="p">;</span>
+
+<span class="nb">error_reporting</span><span class="p">(</span><span class="k">E_ALL</span> <span class="o">|</span> <span class="nx">E_STRICT</span><span class="p">);</span>
+<span class="nb">chdir</span><span class="p">(</span><span class="nx">__DIR__</span><span class="p">);</span>
+
+<span class="sd">/**</span>
+<span class="sd"> * Test bootstrap, for setting up autoloading</span>
+<span class="sd"> */</span>
+<span class="k">class</span> <span class="nc">Bootstrap</span>
+<span class="p">{</span>
+    <span class="k">protected</span> <span class="k">static</span> <span class="nv">$serviceManager</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">init</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$zf2ModulePaths</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="nb">dirname</span><span class="p">(</span><span class="nx">__DIR__</span><span class="p">)));</span>
+        <span class="k">if</span> <span class="p">((</span><span class="nv">$path</span> <span class="o">=</span> <span class="k">static</span><span class="o">::</span><span class="na">findParentPath</span><span class="p">(</span><span class="s1">&#39;vendor&#39;</span><span class="p">)))</span> <span class="p">{</span>
+            <span class="nv">$zf2ModulePaths</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$path</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">((</span><span class="nv">$path</span> <span class="o">=</span> <span class="k">static</span><span class="o">::</span><span class="na">findParentPath</span><span class="p">(</span><span class="s1">&#39;module&#39;</span><span class="p">))</span> <span class="o">!==</span> <span class="nv">$zf2ModulePaths</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="p">{</span>
+            <span class="nv">$zf2ModulePaths</span><span class="p">[]</span> <span class="o">=</span> <span class="nv">$path</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">static</span><span class="o">::</span><span class="na">initAutoloader</span><span class="p">();</span>
+
+        <span class="c1">// use ModuleManager to load this module and it&#39;s dependencies</span>
+        <span class="nv">$config</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;module_listener_options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;module_paths&#39;</span> <span class="o">=&gt;</span> <span class="nv">$zf2ModulePaths</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;modules&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+<span class="hll">                <span class="s1">&#39;Album&#39;</span>
+</span>            <span class="p">)</span>
+        <span class="p">);</span>
+
+        <span class="nv">$serviceManager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ServiceManager</span><span class="p">(</span><span class="k">new</span> <span class="nx">ServiceManagerConfig</span><span class="p">());</span>
+        <span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">setService</span><span class="p">(</span><span class="s1">&#39;ApplicationConfig&#39;</span><span class="p">,</span> <span class="nv">$config</span><span class="p">);</span>
+        <span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;ModuleManager&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">loadModules</span><span class="p">();</span>
+        <span class="k">static</span><span class="o">::</span><span class="nv">$serviceManager</span> <span class="o">=</span> <span class="nv">$serviceManager</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">getServiceManager</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">static</span><span class="o">::</span><span class="nv">$serviceManager</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">initAutoloader</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$vendorPath</span> <span class="o">=</span> <span class="k">static</span><span class="o">::</span><span class="na">findParentPath</span><span class="p">(</span><span class="s1">&#39;vendor&#39;</span><span class="p">);</span>
+
+        <span class="nv">$zf2Path</span> <span class="o">=</span> <span class="nb">getenv</span><span class="p">(</span><span class="s1">&#39;ZF2_PATH&#39;</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$zf2Path</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">defined</span><span class="p">(</span><span class="s1">&#39;ZF2_PATH&#39;</span><span class="p">))</span> <span class="p">{</span>
+                <span class="nv">$zf2Path</span> <span class="o">=</span> <span class="nx">ZF2_PATH</span><span class="p">;</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">is_dir</span><span class="p">(</span><span class="nv">$vendorPath</span> <span class="o">.</span> <span class="s1">&#39;/ZF2/library&#39;</span><span class="p">))</span> <span class="p">{</span>
+                    <span class="nv">$zf2Path</span> <span class="o">=</span> <span class="nv">$vendorPath</span> <span class="o">.</span> <span class="s1">&#39;/ZF2/library&#39;</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$zf2Path</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nx">RuntimeException</span><span class="p">(</span><span class="s1">&#39;Unable to load ZF2. Run `php composer.phar install` or define a ZF2_PATH environment variable.&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="k">include</span> <span class="nv">$zf2Path</span> <span class="o">.</span> <span class="s1">&#39;/Zend/Loader/AutoloaderFactory.php&#39;</span><span class="p">;</span>
+        <span class="nx">AutoloaderFactory</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;Zend\Loader\StandardAutoloader&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;autoregister_zf&#39;</span> <span class="o">=&gt;</span> <span class="k">true</span><span class="p">,</span>
+                <span class="s1">&#39;namespaces&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="nx">__NAMESPACE__</span> <span class="o">=&gt;</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/&#39;</span> <span class="o">.</span> <span class="nx">__NAMESPACE__</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+
+    <span class="k">protected</span> <span class="k">static</span> <span class="k">function</span> <span class="nf">findParentPath</span><span class="p">(</span><span class="nv">$path</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$dir</span> <span class="o">=</span> <span class="nx">__DIR__</span><span class="p">;</span>
+        <span class="nv">$previousDir</span> <span class="o">=</span> <span class="s1">&#39;.&#39;</span><span class="p">;</span>
+        <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="nb">is_dir</span><span class="p">(</span><span class="nv">$dir</span> <span class="o">.</span> <span class="s1">&#39;/&#39;</span> <span class="o">.</span> <span class="nv">$path</span><span class="p">))</span> <span class="p">{</span>
+            <span class="nv">$dir</span> <span class="o">=</span> <span class="nb">dirname</span><span class="p">(</span><span class="nv">$dir</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nv">$previousDir</span> <span class="o">===</span> <span class="nv">$dir</span><span class="p">)</span> <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+            <span class="nv">$previousDir</span> <span class="o">=</span> <span class="nv">$dir</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="nv">$dir</span> <span class="o">.</span> <span class="s1">&#39;/&#39;</span> <span class="o">.</span> <span class="nv">$path</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">Bootstrap</span><span class="o">::</span><span class="na">init</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The contents of this bootstrap file can be daunting at first site, but all it
+really does is ensuring that all the necessary files are autoloadable for our
+tests. The most important lines is line 38 on which we say what
+modules we want to load for our test. In this case we are only loading the
+<tt class="docutils literal"><span class="pre">Album</span></tt> module as it has no dependencies against other modules.</p>
+<p>Now, if you navigate to the <tt class="docutils literal"><span class="pre">zf2-tutorial/module/Album/test/</span></tt> directory,
+and run <tt class="docutils literal"><span class="pre">phpunit</span></tt>, you should get a similar output to this:</p>
+<div class="highlight-text"><div class="highlight"><pre>PHPUnit 3.7.13 by Sebastian Bergmann.
+
+Configuration read from /var/www/zf2-tutorial/module/Album/test/phpunit.xml
+
+Time: 0 seconds, Memory: 1.75Mb
+
+No tests executed!
+</pre></div>
+</div>
+<p>Even though no tests were executed, we at least know that the autoloader found the
+ZF2 files, otherwise it would throw a <tt class="docutils literal"><span class="pre">RuntimeException</span></tt>, defined on line 69 of
+our bootstrap file.</p>
+</div>
+<div class="section" id="your-first-controller-test">
+<span id="id3"></span><h2>Your first controller test<a class="headerlink" href="#your-first-controller-test" title="Permalink to this headline">¶</a></h2>
+<p>Testing controllers is never an easy task, but Zend Framework 2 comes
+with the <tt class="docutils literal"><span class="pre">Zend\Test</span></tt> component which should make testing much less
+cumbersome.</p>
+<p>First, create <tt class="docutils literal"><span class="pre">IndexControllerTest.php</span></tt> under
+<tt class="docutils literal"><span class="pre">zf2-tutorial/module/Albumtest/AlbumTest/Controller</span></tt> with
+the following contents:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+
+<span class="k">namespace</span> <span class="nx">AlbumTest\Controller</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AlbumControllerTest</span> <span class="k">extends</span> <span class="nx">AbstractHttpControllerTestCase</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">setUp</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">setApplicationConfig</span><span class="p">(</span>
+            <span class="k">include</span> <span class="s1">&#39;/var/www/zf2-tutorial/config/application.config.php&#39;</span>
+        <span class="p">);</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">setUp</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">AbstractHttpControllerTestCase</span></tt> class we extend here helps us setting up the
+application itself, helps with dispatching and other tasks that happen during a request,
+as well offers methods for asserting request params, response headers, redirects and more.
+See <a class="reference internal" href="../modules/zend.test.introduction.html#zend-test-introduction"><em>Zend\Test</em></a> documentation for more.</p>
+<p>One thing that is needed is to set the application config with the <tt class="docutils literal"><span class="pre">setApplicationConfig</span></tt>
+method.</p>
+<p>Now, add the following function to the <tt class="docutils literal"><span class="pre">AlbumControllerTest</span></tt> class:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">testIndexActionCanBeAccessed</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">&#39;/album&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertResponseStatusCode</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertModuleName</span><span class="p">(</span><span class="s1">&#39;Album&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertControllerName</span><span class="p">(</span><span class="s1">&#39;Album\Controller\Album&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertControllerClass</span><span class="p">(</span><span class="s1">&#39;AlbumController&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertMatchedRouteName</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This test case dispatches the <tt class="docutils literal"><span class="pre">/album</span></tt> URL, asserts that the response code is 200,
+and that we ended up in the desired module and controller.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For asserting the <em>controller name</em> we are using the controller name we defined in our
+routing configuration for the Album module. In our example this should be defined on line
+19 of the <tt class="docutils literal"><span class="pre">module.config.php</span></tt> file in the Album module.</p>
+</div>
+</div>
+<div class="section" id="a-failing-test-case">
+<span id="id4"></span><h2>A failing test case<a class="headerlink" href="#a-failing-test-case" title="Permalink to this headline">¶</a></h2>
+<p>Finally, <tt class="docutils literal"><span class="pre">cd</span></tt> to <tt class="docutils literal"><span class="pre">zf2-tutorial/module/Album/test/</span></tt> and run <tt class="docutils literal"><span class="pre">phpunit</span></tt>. Uh-oh! The test
+failed!</p>
+<div class="highlight-text"><div class="highlight"><pre>PHPUnit 3.7.13 by Sebastian Bergmann.
+
+Configuration read from /var/www/zf2-tutorial/module/Album/test/phpunit.xml
+
+F
+
+Time: 0 seconds, Memory: 8.50Mb
+
+There was 1 failure:
+
+1) AlbumTest\Controller\AlbumControllerTest::testIndexActionCanBeAccessed
+Failed asserting response code &quot;200&quot;, actual status code is &quot;500&quot;
+
+/var/www/zf2-tutorial/vendor/ZF2/library/Zend/Test/PHPUnit/Controller/AbstractControllerTestCase.php:373
+/var/www/zf2-tutorial/module/Album/test/AlbumTest/Controller/AlbumControllerTest.php:22
+
+FAILURES!
+Tests: 1, Assertions: 0, Failures: 1.
+</pre></div>
+</div>
+<p>The failure message doesn&#8217;t tell us much, apart from that the expected status code
+is not 200, but 500. To get a bit more information when something goes wrong in a
+test case, we set the protected <tt class="docutils literal"><span class="pre">$traceError</span></tt> member to <tt class="docutils literal"><span class="pre">true</span></tt>. Add the following
+just above the <tt class="docutils literal"><span class="pre">setUp</span></tt> method in our <tt class="docutils literal"><span class="pre">AlbumControllerTest</span></tt> class:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">protected</span> <span class="nv">$traceError</span> <span class="o">=</span> <span class="k">true</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>Running the <tt class="docutils literal"><span class="pre">phpunit</span></tt> command again and we should see some more information about
+what went wrong in our test. The main error message we are interested in should read
+something like:</p>
+<div class="highlight-text"><div class="highlight"><pre>Zend\ServiceManager\Exception\ServiceNotFoundException: Zend\ServiceManager\ServiceManager::get
+was unable to fetch or create an instance for Zend\Db\Adapter\Adapter
+</pre></div>
+</div>
+<p>From this error message it is clear that not all our dependencies are available in the
+service manager. Let us take a look how can we fix this.</p>
+</div>
+<div class="section" id="configuring-the-service-manager-for-the-tests">
+<span id="id5"></span><h2>Configuring the service manager for the tests<a class="headerlink" href="#configuring-the-service-manager-for-the-tests" title="Permalink to this headline">¶</a></h2>
+<p>The error says that the service manager can not create an instance of a database adapter
+for us. The database adapter is indirectly used by our <tt class="docutils literal"><span class="pre">Album\Model\AlbumTable</span></tt> to
+fetch the list of albums from the database.</p>
+<p>The first thought would be to create an instance of an adapter, pass it to the
+service manager and let the code run from there as is. Problem with this approach
+is that we would end up with our test cases doing actualy queries against the database.
+To keep our tests fast, and to reduce the number of possible failure points in our tests,
+this should be avoided.</p>
+<p>The second thought would be then to create a mock of the database adapter, and prevent
+the actual database calls by mocking them out. This is a much better approach, but creating
+the adapter mock is tedious (but no doubt we will have to create it at one point).</p>
+<p>The best thing to do would be to mock out our <tt class="docutils literal"><span class="pre">Album\Model\AlbumTable</span></tt> class which
+retrieves the list of albums from the database. Remember, we are now testing our controller,
+so we can mock out the actual call to <tt class="docutils literal"><span class="pre">fetchAll</span></tt> and replace the return values with
+dummy values. At this point, we are not interested in how does <tt class="docutils literal"><span class="pre">fetchAll</span></tt> retrieve the
+albums, but only that it gets called and that it returns an array of albums, so that is
+why we can get away with this mocking. When we will test <tt class="docutils literal"><span class="pre">AlbumTable</span></tt> itself,
+then we will write the actual tests for the <tt class="docutils literal"><span class="pre">fetchAll</span></tt> method.</p>
+<p>Here is how we can accomplish this, by modifying the <tt class="docutils literal"><span class="pre">testIndexActionCanBeAccessed</span></tt>
+test method as follows:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">testIndexActionCanBeAccessed</span><span class="p">()</span>
+<span class="p">{</span>
+<span class="hll">    <span class="nv">$albumTableMock</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getMockBuilder</span><span class="p">(</span><span class="s1">&#39;Album\Model\AlbumTable&#39;</span><span class="p">)</span>
+</span><span class="hll">                            <span class="o">-&gt;</span><span class="na">disableOriginalConstructor</span><span class="p">()</span>
+</span><span class="hll">                            <span class="o">-&gt;</span><span class="na">getMock</span><span class="p">();</span>
+</span><span class="hll">
+</span><span class="hll">    <span class="nv">$albumTableMock</span><span class="o">-&gt;</span><span class="na">expects</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">once</span><span class="p">())</span>
+</span><span class="hll">                    <span class="o">-&gt;</span><span class="na">method</span><span class="p">(</span><span class="s1">&#39;fetchAll&#39;</span><span class="p">)</span>
+</span><span class="hll">                    <span class="o">-&gt;</span><span class="na">will</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">returnValue</span><span class="p">(</span><span class="k">array</span><span class="p">()));</span>
+</span><span class="hll">
+</span><span class="hll">    <span class="nv">$serviceManager</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getApplicationServiceLocator</span><span class="p">();</span>
+</span><span class="hll">    <span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">setAllowOverride</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+</span><span class="hll">    <span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">setService</span><span class="p">(</span><span class="s1">&#39;Album\Model\AlbumTable&#39;</span><span class="p">,</span> <span class="nv">$albumTableMock</span><span class="p">);</span>
+</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">&#39;/album&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertResponseStatusCode</span><span class="p">(</span><span class="mi">200</span><span class="p">);</span>
+
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertModuleName</span><span class="p">(</span><span class="s1">&#39;Album&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertControllerName</span><span class="p">(</span><span class="s1">&#39;Album\Controller\Album&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertControllerClass</span><span class="p">(</span><span class="s1">&#39;AlbumController&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertMatchedRouteName</span><span class="p">(</span><span class="s1">&#39;album&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>By default, the Service Manager does not allow us to replace existing services. As the
+<tt class="docutils literal"><span class="pre">Album\Model\AlbumTable</span></tt> was already set, we are allowing for overrides (line 12), and then
+replacing the real instance of the <cite>AlbumTable</cite> with a mock. The mock is created so that it
+will return just an empty array when the <tt class="docutils literal"><span class="pre">fetchAll</span></tt> method is called. This allows us to
+test for what we care about in this test, and that is that by dispatching to the <tt class="docutils literal"><span class="pre">/album</span></tt>
+URL we get to the <cite>Album</cite> module&#8217;s <cite>AlbumController</cite>.</p>
+<p>Running the <tt class="docutils literal"><span class="pre">phpunit</span></tt> command at this point, we will get the following output as the
+tests now pass:</p>
+<div class="highlight-text"><div class="highlight"><pre>PHPUnit 3.7.13 by Sebastian Bergmann.
+
+Configuration read from /var/www/zf2-tutorial/module/Album/test/phpunit.xml
+
+.
+
+Time: 0 seconds, Memory: 9.00Mb
+
+OK (1 test, 6 assertions)
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing-actions-with-post">
+<span id="id6"></span><h2>Testing actions with POST<a class="headerlink" href="#testing-actions-with-post" title="Permalink to this headline">¶</a></h2>
+<p>One of the most common actions happening in controllers is submitting a form
+with some POST data. Testing this is surprisingly easy:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">testAddActionRedirectsAfterValidPost</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$albumTableMock</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getMockBuilder</span><span class="p">(</span><span class="s1">&#39;Album\Model\AlbumTable&#39;</span><span class="p">)</span>
+                            <span class="o">-&gt;</span><span class="na">disableOriginalConstructor</span><span class="p">()</span>
+                            <span class="o">-&gt;</span><span class="na">getMock</span><span class="p">();</span>
+
+    <span class="nv">$albumTableMock</span><span class="o">-&gt;</span><span class="na">expects</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">once</span><span class="p">())</span>
+                    <span class="o">-&gt;</span><span class="na">method</span><span class="p">(</span><span class="s1">&#39;saveAlbum&#39;</span><span class="p">)</span>
+                    <span class="o">-&gt;</span><span class="na">will</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">returnValue</span><span class="p">(</span><span class="k">null</span><span class="p">));</span>
+
+    <span class="nv">$serviceManager</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getApplicationServiceLocator</span><span class="p">();</span>
+    <span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">setAllowOverride</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+    <span class="nv">$serviceManager</span><span class="o">-&gt;</span><span class="na">setService</span><span class="p">(</span><span class="s1">&#39;Album\Model\AlbumTable&#39;</span><span class="p">,</span> <span class="nv">$albumTableMock</span><span class="p">);</span>
+
+    <span class="nv">$postData</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Led Zeppelin III&#39;</span><span class="p">,</span> <span class="s1">&#39;artist&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Led Zeppelin&#39;</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">dispatch</span><span class="p">(</span><span class="s1">&#39;/album/add&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">,</span> <span class="nv">$postData</span><span class="p">);</span>
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertResponseStatusCode</span><span class="p">(</span><span class="mi">302</span><span class="p">);</span>
+
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertRedirectTo</span><span class="p">(</span><span class="s1">&#39;/album&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Here we test that when we make a POST request against the <tt class="docutils literal"><span class="pre">/album/add</span></tt> URL, the
+<tt class="docutils literal"><span class="pre">Album\Model\AlbumTable</span></tt>&#8216;s <tt class="docutils literal"><span class="pre">saveAlbum</span></tt> will be called and after that we will
+be redirected back to the <tt class="docutils literal"><span class="pre">/album</span></tt> URL.</p>
+<p>Running <tt class="docutils literal"><span class="pre">phpunit</span></tt> gives us the following output:</p>
+<div class="highlight-text"><div class="highlight"><pre>PHPUnit 3.7.13 by Sebastian Bergmann.
+
+Configuration read from /home/robert/www/zf2-tutorial/module/Album/test/phpunit.xml
+
+..
+
+Time: 0 seconds, Memory: 10.75Mb
+
+OK (2 tests, 9 assertions)
+</pre></div>
+</div>
+<p>Testing the <tt class="docutils literal"><span class="pre">editAction</span></tt> and <tt class="docutils literal"><span class="pre">deleteAction</span></tt> methods can be easily done in a manner similar
+as shown for the <tt class="docutils literal"><span class="pre">addAction</span></tt>.</p>
+</div>
+<div class="section" id="testing-model-entities">
+<span id="id7"></span><h2>Testing model entities<a class="headerlink" href="#testing-model-entities" title="Permalink to this headline">¶</a></h2>
+<p>Now that we know how to test our controllers, let us move to an other important part of our
+application - the model entity.</p>
+<p>Here we want to test that the initial state of the entity is what we expect it to be,
+that we can convert the model&#8217;s parameters to and from an array, and that it has all
+the input filters we need.</p>
+<p>Create the file <tt class="docutils literal"><span class="pre">AlbumTest.php</span></tt> in <tt class="docutils literal"><span class="pre">module/Album/test/AlbumTest/Model</span></tt> directory
+with the following contents:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">namespace</span> <span class="nx">AlbumTest\Model</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Album\Model\Album</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">PHPUnit_Framework_TestCase</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AlbumTest</span> <span class="k">extends</span> <span class="nx">PHPUnit_Framework_TestCase</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testAlbumInitialState</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$album</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Album</span><span class="p">();</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertNull</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">artist</span><span class="p">,</span> <span class="s1">&#39;&quot;artist&quot; should initially be null&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertNull</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span> <span class="s1">&#39;&quot;id&quot; should initially be null&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertNull</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">title</span><span class="p">,</span> <span class="s1">&#39;&quot;title&quot; should initially be null&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testExchangeArraySetsPropertiesCorrectly</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$album</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Album</span><span class="p">();</span>
+        <span class="nv">$data</span>  <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;some artist&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;id&#39;</span>     <span class="o">=&gt;</span> <span class="mi">123</span><span class="p">,</span>
+                       <span class="s1">&#39;title&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;some title&#39;</span><span class="p">);</span>
+
+        <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">exchangeArray</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertSame</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">],</span> <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">artist</span><span class="p">,</span> <span class="s1">&#39;&quot;artist&quot; was not set correctly&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertSame</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span> <span class="s1">&#39;&quot;id&quot; was not set correctly&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertSame</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span> <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">title</span><span class="p">,</span> <span class="s1">&#39;&quot;title&quot; was not set correctly&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testExchangeArraySetsPropertiesToNullIfKeysAreNotPresent</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$album</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Album</span><span class="p">();</span>
+
+        <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">exchangeArray</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;some artist&#39;</span><span class="p">,</span>
+                                    <span class="s1">&#39;id&#39;</span>     <span class="o">=&gt;</span> <span class="mi">123</span><span class="p">,</span>
+                                    <span class="s1">&#39;title&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;some title&#39;</span><span class="p">));</span>
+        <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">exchangeArray</span><span class="p">(</span><span class="k">array</span><span class="p">());</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertNull</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">artist</span><span class="p">,</span> <span class="s1">&#39;&quot;artist&quot; should have defaulted to null&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertNull</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">id</span><span class="p">,</span> <span class="s1">&#39;&quot;id&quot; should have defaulted to null&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertNull</span><span class="p">(</span><span class="nv">$album</span><span class="o">-&gt;</span><span class="na">title</span><span class="p">,</span> <span class="s1">&#39;&quot;title&quot; should have defaulted to null&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testGetArrayCopyReturnsAnArrayWithPropertyValues</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$album</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Album</span><span class="p">();</span>
+        <span class="nv">$data</span>  <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;some artist&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;id&#39;</span>     <span class="o">=&gt;</span> <span class="mi">123</span><span class="p">,</span>
+                       <span class="s1">&#39;title&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;some title&#39;</span><span class="p">);</span>
+
+        <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">exchangeArray</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+        <span class="nv">$copyArray</span> <span class="o">=</span> <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">getArrayCopy</span><span class="p">();</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertSame</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">],</span> <span class="nv">$copyArray</span><span class="p">[</span><span class="s1">&#39;artist&#39;</span><span class="p">],</span> <span class="s1">&#39;&quot;artist&quot; was not set correctly&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertSame</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="nv">$copyArray</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="s1">&#39;&quot;id&quot; was not set correctly&#39;</span><span class="p">);</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertSame</span><span class="p">(</span><span class="nv">$data</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span> <span class="nv">$copyArray</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span> <span class="s1">&#39;&quot;title&quot; was not set correctly&#39;</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testInputFiltersAreSetCorrectly</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$album</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Album</span><span class="p">();</span>
+
+        <span class="nv">$inputFilter</span> <span class="o">=</span> <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">getInputFilter</span><span class="p">();</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertSame</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">count</span><span class="p">());</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertTrue</span><span class="p">(</span><span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">has</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span><span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertTrue</span><span class="p">(</span><span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">has</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">));</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertTrue</span><span class="p">(</span><span class="nv">$inputFilter</span><span class="o">-&gt;</span><span class="na">has</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>We are testing for 5 things:</p>
+<ol class="arabic simple">
+<li>Are all of the Album&#8217;s properties initially set to NULL?</li>
+<li>Will the Album&#8217;s properties be set correctly when we call <tt class="docutils literal"><span class="pre">exchangeArray()</span></tt>?</li>
+<li>Will a default value of NULL be used for properties whose keys are not present in the <tt class="docutils literal"><span class="pre">$data</span></tt> array?</li>
+<li>Can we get an array copy of our model?</li>
+<li>Do all elements have input filters present?</li>
+</ol>
+<p>If we run <tt class="docutils literal"><span class="pre">phpunit</span></tt> again, we will get the following output, confirming that our model is
+indeed correct:</p>
+<div class="highlight-text"><div class="highlight"><pre>PHPUnit 3.7.13 by Sebastian Bergmann.
+
+Configuration read from /var/www/zf2-tutorial/module/Album/test/phpunit.xml
+
+.......
+
+Time: 0 seconds, Memory: 11.00Mb
+
+OK (7 tests, 25 assertions)
+</pre></div>
+</div>
+</div>
+<div class="section" id="testing-model-tables">
+<span id="id8"></span><h2>Testing model tables<a class="headerlink" href="#testing-model-tables" title="Permalink to this headline">¶</a></h2>
+<p>The final step in this unit testing tutorial for Zend Framework 2 applications
+is writing tests for our model tables.</p>
+<p>This test assures that we can get a list of albums, or one album by it&#8217;s ID,
+and that we can save and delete albums from the database.</p>
+<p>To avoid actual interaction with the database itself, we will replace certain
+parts with <cite>mocks</cite>.</p>
+<p>Create a file <tt class="docutils literal"><span class="pre">AlbumTableTest.php</span></tt> in <tt class="docutils literal"><span class="pre">module/Album/test/AlbumTest/Model</span></tt>
+with the following contents:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">namespace</span> <span class="nx">AlbumTest\Model</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="nx">Album\Model\AlbumTable</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Album\Model\Album</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Zend\Db\ResultSet\ResultSet</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">PHPUnit_Framework_TestCase</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">AlbumTableTest</span> <span class="k">extends</span> <span class="nx">PHPUnit_Framework_TestCase</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">testFetchAllReturnsAllAlbums</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nv">$resultSet</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ResultSet</span><span class="p">();</span>
+        <span class="nv">$mockTableGateway</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getMock</span><span class="p">(</span><span class="s1">&#39;Zend\Db\TableGateway\TableGateway&#39;</span><span class="p">,</span>
+                                           <span class="k">array</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">),</span> <span class="k">array</span><span class="p">(),</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+        <span class="nv">$mockTableGateway</span><span class="o">-&gt;</span><span class="na">expects</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">once</span><span class="p">())</span>
+                         <span class="o">-&gt;</span><span class="na">method</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">)</span>
+                         <span class="o">-&gt;</span><span class="na">with</span><span class="p">()</span>
+                         <span class="o">-&gt;</span><span class="na">will</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">returnValue</span><span class="p">(</span><span class="nv">$resultSet</span><span class="p">));</span>
+
+        <span class="nv">$albumTable</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlbumTable</span><span class="p">(</span><span class="nv">$mockTableGateway</span><span class="p">);</span>
+
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertSame</span><span class="p">(</span><span class="nv">$resultSet</span><span class="p">,</span> <span class="nv">$albumTable</span><span class="o">-&gt;</span><span class="na">fetchAll</span><span class="p">());</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Since we are testing the <tt class="docutils literal"><span class="pre">AlbumTable</span></tt> here and not the <tt class="docutils literal"><span class="pre">TableGateway</span></tt>
+class (which has already been tested in Zend Framework),
+we just want to make sure that our <tt class="docutils literal"><span class="pre">AlbumTable</span></tt> class is interacting with the <tt class="docutils literal"><span class="pre">TableGateway</span></tt>
+class the way that we expect it to. Above, we&#8217;re testing to see if the <tt class="docutils literal"><span class="pre">fetchAll()</span></tt> method
+of <tt class="docutils literal"><span class="pre">AlbumTable</span></tt> will call the <tt class="docutils literal"><span class="pre">select()</span></tt> method of the <tt class="docutils literal"><span class="pre">$tableGateway</span></tt> property with
+no parameters. If it does, it should return a <tt class="docutils literal"><span class="pre">ResultSet</span></tt> object. Finally, we expect that
+this same <tt class="docutils literal"><span class="pre">ResultSet</span></tt> object will be returned to the calling method. This test should run
+fine, so now we can add the rest of the test methods:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">testCanRetrieveAnAlbumByItsId</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$album</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Album</span><span class="p">();</span>
+    <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">exchangeArray</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span>     <span class="o">=&gt;</span> <span class="mi">123</span><span class="p">,</span>
+                                <span class="s1">&#39;artist&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;The Military Wives&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;title&#39;</span>  <span class="o">=&gt;</span> <span class="s1">&#39;In My Dreams&#39;</span><span class="p">));</span>
+
+    <span class="nv">$resultSet</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ResultSet</span><span class="p">();</span>
+    <span class="nv">$resultSet</span><span class="o">-&gt;</span><span class="na">setArrayObjectPrototype</span><span class="p">(</span><span class="k">new</span> <span class="nx">Album</span><span class="p">());</span>
+    <span class="nv">$resultSet</span><span class="o">-&gt;</span><span class="na">initialize</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="nv">$album</span><span class="p">));</span>
+
+    <span class="nv">$mockTableGateway</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getMock</span><span class="p">(</span><span class="s1">&#39;Zend\Db\TableGateway\TableGateway&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">),</span> <span class="k">array</span><span class="p">(),</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+    <span class="nv">$mockTableGateway</span><span class="o">-&gt;</span><span class="na">expects</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">once</span><span class="p">())</span>
+                     <span class="o">-&gt;</span><span class="na">method</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">)</span>
+                     <span class="o">-&gt;</span><span class="na">with</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">123</span><span class="p">))</span>
+                     <span class="o">-&gt;</span><span class="na">will</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">returnValue</span><span class="p">(</span><span class="nv">$resultSet</span><span class="p">));</span>
+
+    <span class="nv">$albumTable</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlbumTable</span><span class="p">(</span><span class="nv">$mockTableGateway</span><span class="p">);</span>
+
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertSame</span><span class="p">(</span><span class="nv">$album</span><span class="p">,</span> <span class="nv">$albumTable</span><span class="o">-&gt;</span><span class="na">getAlbum</span><span class="p">(</span><span class="mi">123</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">testCanDeleteAnAlbumByItsId</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$mockTableGateway</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getMock</span><span class="p">(</span><span class="s1">&#39;Zend\Db\TableGateway\TableGateway&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;delete&#39;</span><span class="p">),</span> <span class="k">array</span><span class="p">(),</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+    <span class="nv">$mockTableGateway</span><span class="o">-&gt;</span><span class="na">expects</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">once</span><span class="p">())</span>
+                     <span class="o">-&gt;</span><span class="na">method</span><span class="p">(</span><span class="s1">&#39;delete&#39;</span><span class="p">)</span>
+                     <span class="o">-&gt;</span><span class="na">with</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">123</span><span class="p">));</span>
+
+    <span class="nv">$albumTable</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlbumTable</span><span class="p">(</span><span class="nv">$mockTableGateway</span><span class="p">);</span>
+    <span class="nv">$albumTable</span><span class="o">-&gt;</span><span class="na">deleteAlbum</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">testSaveAlbumWillInsertNewAlbumsIfTheyDontAlreadyHaveAnId</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$albumData</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;The Military Wives&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;In My Dreams&#39;</span><span class="p">);</span>
+    <span class="nv">$album</span>     <span class="o">=</span> <span class="k">new</span> <span class="nx">Album</span><span class="p">();</span>
+    <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">exchangeArray</span><span class="p">(</span><span class="nv">$albumData</span><span class="p">);</span>
+
+    <span class="nv">$mockTableGateway</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getMock</span><span class="p">(</span><span class="s1">&#39;Zend\Db\TableGateway\TableGateway&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;insert&#39;</span><span class="p">),</span> <span class="k">array</span><span class="p">(),</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+    <span class="nv">$mockTableGateway</span><span class="o">-&gt;</span><span class="na">expects</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">once</span><span class="p">())</span>
+                     <span class="o">-&gt;</span><span class="na">method</span><span class="p">(</span><span class="s1">&#39;insert&#39;</span><span class="p">)</span>
+                     <span class="o">-&gt;</span><span class="na">with</span><span class="p">(</span><span class="nv">$albumData</span><span class="p">);</span>
+
+    <span class="nv">$albumTable</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlbumTable</span><span class="p">(</span><span class="nv">$mockTableGateway</span><span class="p">);</span>
+    <span class="nv">$albumTable</span><span class="o">-&gt;</span><span class="na">saveAlbum</span><span class="p">(</span><span class="nv">$album</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">testSaveAlbumWillUpdateExistingAlbumsIfTheyAlreadyHaveAnId</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$albumData</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">123</span><span class="p">,</span> <span class="s1">&#39;artist&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;The Military Wives&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;In My Dreams&#39;</span><span class="p">);</span>
+    <span class="nv">$album</span>     <span class="o">=</span> <span class="k">new</span> <span class="nx">Album</span><span class="p">();</span>
+    <span class="nv">$album</span><span class="o">-&gt;</span><span class="na">exchangeArray</span><span class="p">(</span><span class="nv">$albumData</span><span class="p">);</span>
+
+    <span class="nv">$resultSet</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ResultSet</span><span class="p">();</span>
+    <span class="nv">$resultSet</span><span class="o">-&gt;</span><span class="na">setArrayObjectPrototype</span><span class="p">(</span><span class="k">new</span> <span class="nx">Album</span><span class="p">());</span>
+    <span class="nv">$resultSet</span><span class="o">-&gt;</span><span class="na">initialize</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="nv">$album</span><span class="p">));</span>
+
+    <span class="nv">$mockTableGateway</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getMock</span><span class="p">(</span><span class="s1">&#39;Zend\Db\TableGateway\TableGateway&#39;</span><span class="p">,</span>
+                                       <span class="k">array</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">,</span> <span class="s1">&#39;update&#39;</span><span class="p">),</span> <span class="k">array</span><span class="p">(),</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+    <span class="nv">$mockTableGateway</span><span class="o">-&gt;</span><span class="na">expects</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">once</span><span class="p">())</span>
+                     <span class="o">-&gt;</span><span class="na">method</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">)</span>
+                     <span class="o">-&gt;</span><span class="na">with</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">123</span><span class="p">))</span>
+                     <span class="o">-&gt;</span><span class="na">will</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">returnValue</span><span class="p">(</span><span class="nv">$resultSet</span><span class="p">));</span>
+    <span class="nv">$mockTableGateway</span><span class="o">-&gt;</span><span class="na">expects</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">once</span><span class="p">())</span>
+                     <span class="o">-&gt;</span><span class="na">method</span><span class="p">(</span><span class="s1">&#39;update&#39;</span><span class="p">)</span>
+                     <span class="o">-&gt;</span><span class="na">with</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;artist&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;The Military Wives&#39;</span><span class="p">,</span> <span class="s1">&#39;title&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;In My Dreams&#39;</span><span class="p">),</span>
+                            <span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">123</span><span class="p">));</span>
+
+    <span class="nv">$albumTable</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlbumTable</span><span class="p">(</span><span class="nv">$mockTableGateway</span><span class="p">);</span>
+    <span class="nv">$albumTable</span><span class="o">-&gt;</span><span class="na">saveAlbum</span><span class="p">(</span><span class="nv">$album</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">testExceptionIsThrownWhenGettingNonExistentAlbum</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$resultSet</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ResultSet</span><span class="p">();</span>
+    <span class="nv">$resultSet</span><span class="o">-&gt;</span><span class="na">setArrayObjectPrototype</span><span class="p">(</span><span class="k">new</span> <span class="nx">Album</span><span class="p">());</span>
+    <span class="nv">$resultSet</span><span class="o">-&gt;</span><span class="na">initialize</span><span class="p">(</span><span class="k">array</span><span class="p">());</span>
+
+    <span class="nv">$mockTableGateway</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">getMock</span><span class="p">(</span><span class="s1">&#39;Zend\Db\TableGateway\TableGateway&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">),</span> <span class="k">array</span><span class="p">(),</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="k">false</span><span class="p">);</span>
+    <span class="nv">$mockTableGateway</span><span class="o">-&gt;</span><span class="na">expects</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">once</span><span class="p">())</span>
+                     <span class="o">-&gt;</span><span class="na">method</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">)</span>
+                     <span class="o">-&gt;</span><span class="na">with</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;id&#39;</span> <span class="o">=&gt;</span> <span class="mi">123</span><span class="p">))</span>
+                     <span class="o">-&gt;</span><span class="na">will</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">returnValue</span><span class="p">(</span><span class="nv">$resultSet</span><span class="p">));</span>
+
+    <span class="nv">$albumTable</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AlbumTable</span><span class="p">(</span><span class="nv">$mockTableGateway</span><span class="p">);</span>
+
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="nv">$albumTable</span><span class="o">-&gt;</span><span class="na">getAlbum</span><span class="p">(</span><span class="mi">123</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">catch</span> <span class="p">(</span><span class="nx">\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">assertSame</span><span class="p">(</span><span class="s1">&#39;Could not find row 123&#39;</span><span class="p">,</span> <span class="nv">$e</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">());</span>
+        <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">fail</span><span class="p">(</span><span class="s1">&#39;Expected exception was not thrown&#39;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>These tests are nothing complicated and they should be self explanatory. In each test
+we are injecting a mock table gateway into our <tt class="docutils literal"><span class="pre">AlbumTable</span></tt> and set our expectations
+accordingly.</p>
+<p>We are testing that:</p>
+<ol class="arabic simple">
+<li>We can retrieve an individual album by its ID.</li>
+<li>We can delete albums.</li>
+<li>We can save new album.</li>
+<li>We can update existing albums.</li>
+<li>We will encounter an exception if we&#8217;re trying to retrieve an album that doesn&#8217;t exist.</li>
+</ol>
+<p>Running <tt class="docutils literal"><span class="pre">phpunit</span></tt> command for one last time, we get the output as follows:</p>
+<div class="highlight-text"><div class="highlight"><pre>PHPUnit 3.7.13 by Sebastian Bergmann.
+
+Configuration read from /var/www/zf2-tutorial/module/Album/test/phpunit.xml
+
+.............
+
+Time: 0 seconds, Memory: 11.50Mb
+
+OK (13 tests, 34 assertions)
+</pre></div>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>Conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<p>In this short tutorial we gave a few examples how different parts of a Zend
+Framework 2 MVC application can be tested. We covered <a class="reference internal" href="#setting-up-the-tests-directory"><em>setting up</em></a> the environment
+for testing, how to test <a class="reference internal" href="#testing-actions-with-post"><em>controllers and actions</em></a>,
+how to approach <a class="reference internal" href="#a-failing-test-case"><em>failing test cases</em></a>, how to configure
+<a class="reference internal" href="#configuring-the-service-manager-for-the-tests"><em>the service manager</em></a>,
+as well as how to test <a class="reference internal" href="#testing-model-entities"><em>model entities</em></a>
+and <a class="reference internal" href="#testing-model-tables"><em>model tables</em></a>.</p>
+<p>This tutorial is by no means a definitive guide to writing unit tests, just
+a small stepping stone helping you develop applications of higher quality.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Unit Testing a Zend Framework 2 application</a><ul>
+<li><a class="reference internal" href="#setting-up-the-tests-directory">Setting up the tests directory</a></li>
+<li><a class="reference internal" href="#bootstrapping-your-tests">Bootstrapping your tests</a></li>
+<li><a class="reference internal" href="#your-first-controller-test">Your first controller test</a></li>
+<li><a class="reference internal" href="#a-failing-test-case">A failing test case</a></li>
+<li><a class="reference internal" href="#configuring-the-service-manager-for-the-tests">Configuring the service manager for the tests</a></li>
+<li><a class="reference internal" href="#testing-actions-with-post">Testing actions with POST</a></li>
+<li><a class="reference internal" href="#testing-model-entities">Testing model entities</a></li>
+<li><a class="reference internal" href="#testing-model-tables">Testing model tables</a></li>
+<li><a class="reference internal" href="#conclusion">Conclusion</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="quickstart.di.html"
+                        title="previous chapter">Learning Dependency Injection</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../modules/zend.authentication.intro.html"
+                        title="next chapter">Introduction</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/unittesting.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/unittesting.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/unittesting.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../modules/zend.authentication.intro.html" title="Introduction"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="quickstart.di.html" title="Learning Dependency Injection"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/unittesting.rst">
+                Unit Testing a Zend Framework 2 application
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

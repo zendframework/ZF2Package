@@ -1,0 +1,461 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>AutoDiscovery &mdash; Zend Framework 2 2.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.3 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Stdlib\Hydrator" href="zend.stdlib.hydrator.html" />
+    <link rel="prev" title="WSDL Accessor" href="zend.soap.wsdl.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.stdlib.hydrator.html" title="Zend\Stdlib\Hydrator"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.soap.wsdl.html" title="WSDL Accessor"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="autodiscovery">
+<span id="zend-soap-autodiscovery"></span><h1>AutoDiscovery<a class="headerlink" href="#autodiscovery" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="autodiscovery-introduction">
+<span id="zend-soap-autodiscovery-introduction"></span><h2>AutoDiscovery Introduction<a class="headerlink" href="#autodiscovery-introduction" title="Permalink to this headline">¶</a></h2>
+<p><em>SOAP</em> functionality implemented within Zend Framework is intended to make all steps required for <em>SOAP</em>
+communications more simple.</p>
+<p><em>SOAP</em> is language independent protocol. So it may be used not only for <em>PHP</em>-to-PHP communications.</p>
+<p>There are three configurations for <em>SOAP</em> applications where Zend Framework may be utilized:</p>
+<ul class="simple">
+<li>SOAP server <em>PHP</em> application &lt;&#8212;&gt; <em>SOAP</em> client <em>PHP</em> application</li>
+<li>SOAP server non-PHP application &lt;&#8212;&gt; <em>SOAP</em> client <em>PHP</em> application</li>
+<li>SOAP server <em>PHP</em> application &lt;&#8212;&gt; <em>SOAP</em> client non-PHP application</li>
+</ul>
+<p>We always have to know, which functionality is provided by <em>SOAP</em> server to operate with it. <a class="reference external" href="http://www.w3.org/TR/wsdl">WSDL</a> is used to
+describe network service <em>API</em> in details.</p>
+<p>WSDL language is complex enough (see <a class="reference external" href="http://www.w3.org/TR/wsdl">http://www.w3.org/TR/wsdl</a> for the details). So it&#8217;s difficult to prepare
+correct WSDL description.</p>
+<p>Another problem is synchronizing changes in network service <em>API</em> with already existing WSDL.</p>
+<p>Both these problem may be solved by WSDL autogeneration. A prerequisite for this is a <em>SOAP</em> server autodiscovery.
+It constructs object similar to object used in <em>SOAP</em> server application, extracts necessary information and
+generates correct WSDL using this information.</p>
+<p>There are two ways for using Zend Framework for <em>SOAP</em> server application:</p>
+<ul class="simple">
+<li>Use separated class.</li>
+<li>Use set of functions.</li>
+</ul>
+<p>Both methods are supported by Zend Framework Autodiscovery functionality.</p>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Soap\AutoDiscover</span></tt> class also supports datatypes mapping from <em>PHP</em> to <a class="reference external" href="http://www.w3.org/TR/xmlschema-2/">XSD types</a>.</p>
+<p>Here is an example of common usage of the autodiscovery functionality. The <tt class="docutils literal"><span class="pre">generate()</span></tt> function generates the
+WSDL object and in conjunction with <tt class="docutils literal"><span class="pre">toXml()</span></tt> function you can posts it to the browser.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">MySoapServerClass</span> <span class="p">{</span>
+<span class="o">...</span>
+<span class="p">}</span>
+
+<span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
+<span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;MySoapServerClass&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://localhost/server.php&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">setServiceName</span><span class="p">(</span><span class="s1">&#39;MySoapService&#39;</span><span class="p">);</span>
+<span class="nv">$wsdl</span> <span class="o">=</span> <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">generate</span><span class="p">();</span>
+<span class="k">echo</span> <span class="nv">$wsdl</span><span class="o">-&gt;</span><span class="na">toXml</span><span class="p">();</span>
+<span class="nv">$wsdl</span><span class="o">-&gt;</span><span class="na">dump</span><span class="p">(</span><span class="s2">&quot;/path/to/file.wsdl&quot;</span><span class="p">);</span>
+<span class="nv">$dom</span> <span class="o">=</span> <span class="nv">$wsdl</span><span class="o">-&gt;</span><span class="na">toDomDocument</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>ZendSoapAutodiscover is not a Soap Server</strong></p>
+<p>It is very important to note, that the class <tt class="docutils literal"><span class="pre">Zend\Soap\AutoDiscover</span></tt> does not act as a <em>SOAP</em> Server on its
+own.</p>
+<div class="last highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;wsdl&#39;</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
+    <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;HelloWorldService&#39;</span><span class="p">)</span>
+                 <span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://example.com/soap.php&#39;</span><span class="p">);</span>
+    <span class="k">echo</span> <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">toXml</span><span class="p">();</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="c1">// pointing to the current file here</span>
+    <span class="nv">$soap</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\Server</span><span class="p">(</span><span class="s2">&quot;http://example.com/soap.php?wsdl&quot;</span><span class="p">);</span>
+    <span class="nv">$soap</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;HelloWorldService&#39;</span><span class="p">);</span>
+    <span class="nv">$soap</span><span class="o">-&gt;</span><span class="na">handle</span><span class="p">();</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="class-autodiscovering">
+<span id="zend-soap-autodiscovery-class"></span><h2>Class autodiscovering<a class="headerlink" href="#class-autodiscovering" title="Permalink to this headline">¶</a></h2>
+<p>If a class is used to provide SOAP server functionality, then the same class should be provided to
+<tt class="docutils literal"><span class="pre">Zend\Soap\AutoDiscover</span></tt> for WSDL generation:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
+<span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setClass</span><span class="p">(</span><span class="s1">&#39;My_SoapServer_Class&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">setUri</span><span class="p">(</span><span class="s1">&#39;http://localhost/server.php&#39;</span><span class="p">)</span>
+             <span class="o">-&gt;</span><span class="na">setServiceName</span><span class="p">(</span><span class="s1">&#39;MySoapService&#39;</span><span class="p">);</span>
+<span class="nv">$wsdl</span> <span class="o">=</span> <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">generate</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The following rules are used while WSDL generation:</p>
+<ul class="simple">
+<li>Generated WSDL describes an RPC/Encoded style Web Service. If you want to use a document/literal server use the
+<tt class="docutils literal"><span class="pre">setBindingStyle()</span></tt> and <tt class="docutils literal"><span class="pre">setOperationBodyStyle()</span></tt> methods.</li>
+<li>Class name is used as a name of the Web Service being described unless <tt class="docutils literal"><span class="pre">setServiceName()</span></tt> is used explicitly to
+set the name. When only functions are used for generation the service name has to be set explicitly or an exception
+is thrown during generation of the WSDL document.</li>
+<li>You can set the endpoint of the actual SOAP Server via the <tt class="docutils literal"><span class="pre">setUri()</span></tt> method. This is a required option.</li>
+</ul>
+<p>It&#8217;s also used as a target namespace for all service related names (including described complex types).</p>
+<ul class="simple">
+<li>Class methods are joined into one <a class="reference external" href="http://www.w3.org/TR/wsdl#_porttypes">Port Type</a>. <em>$serviceName . &#8216;Port&#8217;</em> is used as Port Type name.</li>
+<li>Each class method/function is registered as a corresponding port operation.</li>
+<li>Only the &#8220;longest&#8221; available method prototype is used for generation of the WSDL.</li>
+<li>WSDL autodiscover utilizes the <em>PHP</em> docblocks provided by the developer to determine the parameter and return
+types. In fact, for scalar types, this is the only way to determine the parameter types, and for return types,
+this is the only way to determine them. That means, providing correct and fully detailed docblocks is not only
+best practice, but is required for discovered class.</li>
+</ul>
+</div>
+<div class="section" id="functions-autodiscovering">
+<span id="zend-soap-autodiscovery-functions"></span><h2>Functions autodiscovering<a class="headerlink" href="#functions-autodiscovering" title="Permalink to this headline">¶</a></h2>
+<p>If set of functions are used to provide SOAP server functionality, then the same set should be provided to
+<tt class="docutils literal"><span class="pre">Zend\Soap\AutoDiscovery</span></tt> for WSDL generation:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
+<span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">addFunction</span><span class="p">(</span><span class="s1">&#39;function1&#39;</span><span class="p">);</span>
+<span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">addFunction</span><span class="p">(</span><span class="s1">&#39;function2&#39;</span><span class="p">);</span>
+<span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">addFunction</span><span class="p">(</span><span class="s1">&#39;function3&#39;</span><span class="p">);</span>
+<span class="o">...</span>
+<span class="nv">$wsdl</span> <span class="o">=</span> <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">generate</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>The same rules apply to generation as described in the class audodiscover seection above.</p>
+</div>
+<div class="section" id="autodiscovering-datatypes">
+<span id="zend-soap-autodiscovery-datatypes"></span><h2>Autodiscovering Datatypes<a class="headerlink" href="#autodiscovering-datatypes" title="Permalink to this headline">¶</a></h2>
+<p>Input/output datatypes are converted into network service types using the following mapping:</p>
+<ul class="simple">
+<li>PHP strings &lt;-&gt; <em>xsd:string</em>.</li>
+<li>PHP integers &lt;-&gt; <em>xsd:int</em>.</li>
+<li>PHP floats and doubles &lt;-&gt; <em>xsd:float</em>.</li>
+<li>PHP booleans &lt;-&gt; <em>xsd:boolean</em>.</li>
+<li>PHP arrays &lt;-&gt; <em>soap-enc:Array</em>.</li>
+<li>PHP object &lt;-&gt; <em>xsd:struct</em>.</li>
+<li><em>PHP</em> class &lt;-&gt; based on complex type strategy (See: <a class="reference internal" href="zend.soap.wsdl.html#zend-soap-wsdl-types-add-complex"><em>this section</em></a>) <a class="footnote-reference" href="#id2" id="id1">[1]</a>.</li>
+<li>type[] or object[] (ie. int[]) &lt;-&gt; based on complex type strategy</li>
+<li>PHP void &lt;-&gt; empty type.</li>
+<li>If type is not matched to any of these types by some reason, then <em>xsd:anyType</em> is used.</li>
+</ul>
+<p>Where <em>xsd:</em> is &#8220;<a class="reference external" href="http://www.w3.org/2001/XMLSchema">http://www.w3.org/2001/XMLSchema</a>&#8221; namespace, <em>soap-enc:</em> is a
+&#8220;<a class="reference external" href="http://schemas.xmlsoap.org/soap/encoding/">http://schemas.xmlsoap.org/soap/encoding/</a>&#8221; namespace, <em>tns:</em> is a &#8220;target namespace&#8221; for a service.</p>
+</div>
+<div class="section" id="wsdl-binding-styles">
+<span id="zend-soap-autodiscovery-wsdlstyles"></span><h2>WSDL Binding Styles<a class="headerlink" href="#wsdl-binding-styles" title="Permalink to this headline">¶</a></h2>
+<p>WSDL offers different transport mechanisms and styles. This affects the <em>soap:binding</em> and <em>soap:body</em> tags within
+the Binding section of WSDL. Different clients have different requirements as to what options really work.
+Therefore you can set the styles before you call any <em>setClass</em> or <em>addFunction</em> method on the AutoDiscover class.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$autodiscover</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Soap\AutoDiscover</span><span class="p">();</span>
+<span class="c1">// Default is &#39;use&#39; =&gt; &#39;encoded&#39; and</span>
+<span class="c1">// &#39;encodingStyle&#39; =&gt; &#39;http://schemas.xmlsoap.org/soap/encoding/&#39;</span>
+<span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setOperationBodyStyle</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;use&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;literal&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;namespace&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://framework.zend.com&#39;</span><span class="p">)</span>
+                <span class="p">);</span>
+
+<span class="c1">// Default is &#39;style&#39; =&gt; &#39;rpc&#39; and</span>
+<span class="c1">// &#39;transport&#39; =&gt; &#39;http://schemas.xmlsoap.org/soap/http&#39;</span>
+<span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">setBindingStyle</span><span class="p">(</span>
+                    <span class="k">array</span><span class="p">(</span><span class="s1">&#39;style&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;document&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;transport&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;http://framework.zend.com&#39;</span><span class="p">)</span>
+                <span class="p">);</span>
+<span class="o">...</span>
+<span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">addFunction</span><span class="p">(</span><span class="s1">&#39;myfunc1&#39;</span><span class="p">);</span>
+<span class="nv">$wsdl</span> <span class="o">=</span> <span class="nv">$autodiscover</span><span class="o">-&gt;</span><span class="na">generate</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><tt class="docutils literal"><span class="pre">Zend\Soap\AutoDiscover</span></tt> will be created with the
+<tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl\ComplexTypeStrategy\DefaultComplexType</span></tt> class as detection algorithm for complex
+types. The first parameter of the AutoDiscover constructor takes any complex type strategy implementing
+<tt class="docutils literal"><span class="pre">Zend\Soap\Wsdl\ComplexTypeStrategy\ComplexTypeStrategyInterface</span></tt> or a string with the name of the class.
+See the <a class="reference internal" href="zend.soap.wsdl.html#zend-soap-wsdl-types-add-complex"><em>Zend\Soap\Wsdl manual on adding complex</em></a> types for more
+information.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">AutoDiscovery</a><ul>
+<li><a class="reference internal" href="#autodiscovery-introduction">AutoDiscovery Introduction</a></li>
+<li><a class="reference internal" href="#class-autodiscovering">Class autodiscovering</a></li>
+<li><a class="reference internal" href="#functions-autodiscovering">Functions autodiscovering</a></li>
+<li><a class="reference internal" href="#autodiscovering-datatypes">Autodiscovering Datatypes</a></li>
+<li><a class="reference internal" href="#wsdl-binding-styles">WSDL Binding Styles</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.soap.wsdl.html"
+                        title="previous chapter">WSDL Accessor</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.stdlib.hydrator.html"
+                        title="next chapter">Zend\Stdlib\Hydrator</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.soap.auto-discovery.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.soap.auto-discovery.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.soap.auto-discovery.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.stdlib.hydrator.html" title="Zend\Stdlib\Hydrator"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.soap.wsdl.html" title="WSDL Accessor"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.soap.auto-discovery.rst">
+                AutoDiscovery
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

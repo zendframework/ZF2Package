@@ -1,0 +1,287 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Indexing &mdash; Zend Framework 2 2.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.3 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="indexing">
+<span id="learning-lucene-indexing"></span><h1>Indexing<a class="headerlink" href="#indexing" title="Permalink to this headline">¶</a></h1>
+<p>Indexing is performed by adding a new document to an existing or new index:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$index</span><span class="o">-&gt;</span><span class="na">addDocument</span><span class="p">(</span><span class="nv">$doc</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>There are two ways to create document object. The first is to do it manually.</p>
+<p class="rubric" id="learning-lucene-indexing-doc-creation">Manual Document Construction</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Search_Lucene\Document</span><span class="p">();</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search_Lucene\Field</span><span class="o">::</span><span class="na">Text</span><span class="p">(</span><span class="s1">&#39;url&#39;</span><span class="p">,</span> <span class="nv">$docUrl</span><span class="p">));</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search_Lucene\Field</span><span class="o">::</span><span class="na">Text</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="nv">$docTitle</span><span class="p">));</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search_Lucene\Field</span><span class="o">::</span><span class="na">unStored</span><span class="p">(</span><span class="s1">&#39;contents&#39;</span><span class="p">,</span> <span class="nv">$docBody</span><span class="p">));</span>
+<span class="nv">$doc</span><span class="o">-&gt;</span><span class="na">addField</span><span class="p">(</span><span class="nx">Zend\Search_Lucene\Field</span><span class="o">::</span><span class="na">binary</span><span class="p">(</span><span class="s1">&#39;avatar&#39;</span><span class="p">,</span> <span class="nv">$avatarData</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>The second method is to load it from <em>HTML</em> or Microsoft Office 2007 files:</p>
+<p class="rubric" id="learning-lucene-indexing-doc-loading">Document loading</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Html</span><span class="o">::</span><span class="na">loadHTML</span><span class="p">(</span><span class="nv">$htmlString</span><span class="p">);</span>
+<span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Docx</span><span class="o">::</span><span class="na">loadDocxFile</span><span class="p">(</span><span class="nv">$path</span><span class="p">);</span>
+<span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Pptx</span><span class="o">::</span><span class="na">loadPptFile</span><span class="p">(</span><span class="nv">$path</span><span class="p">);</span>
+<span class="nv">$doc</span> <span class="o">=</span> <span class="nx">Zend\Search\Lucene\Document\Xlsx</span><span class="o">::</span><span class="na">loadXlsxFile</span><span class="p">(</span><span class="nv">$path</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If a document is loaded from one of the supported formats, it still can be extended manually with new user defined
+fields.</p>
+<div class="section" id="indexing-policy">
+<span id="learning-lucene-indexing-policy"></span><h2>Indexing Policy<a class="headerlink" href="#indexing-policy" title="Permalink to this headline">¶</a></h2>
+<p>You should define indexing policy within your application architectural design.</p>
+<p>You may need an on-demand indexing configuration (something like <em>OLTP</em> system). In such systems, you usually add
+one document per user request. As such, the <strong>MaxBufferedDocs</strong> option will not affect the system. On the other
+hand, <strong>MaxMergeDocs</strong> is really helpful as it allows you to limit maximum script execution time. <strong>MergeFactor</strong>
+should be set to a value that keeps balance between the average indexing time (it&#8217;s also affected by average
+auto-optimization time) and search performance (index optimization level is dependent on the number of segments).</p>
+<p>If you will be primarily performing batch index updates, your configuration should use a <strong>MaxBufferedDocs</strong> option
+set to the maximum value supported by the available amount of memory. <strong>MaxMergeDocs</strong> and <strong>MergeFactor</strong> have to
+be set to values reducing auto-optimization involvement as much as possible <a class="footnote-reference" href="#id2" id="id1">[1]</a>. Full index optimization should be
+applied after indexing.</p>
+<p class="rubric" id="learning-lucene-indexing-optimization">Index optimization</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$index</span><span class="o">-&gt;</span><span class="na">optimize</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p>In some configurations, it&#8217;s more effective to serialize index updates by organizing update requests into a queue
+and processing several update requests in a single script execution. This reduces index opening overhead, and
+allows utilizing index document buffering.</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>An additional limit is the maximum file handlers supported by the operation system for concurrent open
+operations</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Indexing</a><ul>
+<li><a class="reference internal" href="#indexing-policy">Indexing Policy</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/lucene.indexing.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/lucene.indexing.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/lucene.indexing.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/lucene.indexing.rst">
+                Indexing
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>File Upload Handlers &mdash; Zend Framework 2 2.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.3 documentation" href="../index.html" />
+    <link rel="next" title="Introduction to Zend\Serializer" href="zend.serializer.html" />
+    <link rel="prev" title="Progress Bars" href="zend.progress-bar.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.serializer.html" title="Introduction to Zend\Serializer"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.progress-bar.html" title="Progress Bars"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="file-upload-handlers">
+<span id="zend-progress-bar-upload"></span><h1>File Upload Handlers<a class="headerlink" href="#file-upload-handlers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zend-progress-bar-upload-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\ProgressBar\Upload</span></tt> provides handlers that can give you the actual state of a
+file upload in progress. To use this feature you need to choose one of the upload progress handlers
+(APC, uploadprogress, or Session) and ensure that your server setup has the appropriate extension
+or feature enabled. All of the progress handlers use the same interface.</p>
+<p>When uploading a file with a form POST, you must also include the progress identifier in a
+hidden input. The <a class="reference internal" href="zend.form.view.helpers.html#zend-form-view-helper-file"><em>File Upload Progress View Helpers</em></a> provide a
+convenient way to add the hidden input based on your handler type.</p>
+</div>
+<div class="section" id="methods-of-reporting-progress">
+<h2>Methods of Reporting Progress<a class="headerlink" href="#methods-of-reporting-progress" title="Permalink to this headline">¶</a></h2>
+<p>There are two methods for reporting the current upload progress status.
+By either using a ProgressBar Adapter, or by using the returned status array manually.</p>
+<div class="section" id="using-a-progressbar-adapter">
+<h3>Using a ProgressBar Adapter<a class="headerlink" href="#using-a-progressbar-adapter" title="Permalink to this headline">¶</a></h3>
+<p>A <tt class="docutils literal"><span class="pre">Zend\ProgressBar</span></tt> adapter can be used to display upload progress to your users.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$adapter</span>  <span class="o">=</span> <span class="k">new</span> <span class="nx">\Zend\ProgressBar\Adapter\JsPush</span><span class="p">();</span>
+<span class="nv">$progress</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Zend\ProgressBar\Upload\SessionProgress</span><span class="p">();</span>
+
+<span class="nv">$filter</span>   <span class="o">=</span> <span class="k">new</span> <span class="nx">\Zend\I18n\Filter\Alnum</span><span class="p">(</span><span class="k">false</span><span class="p">,</span> <span class="s1">&#39;en_US&#39;</span><span class="p">);</span>
+<span class="nv">$id</span>       <span class="o">=</span> <span class="nv">$filter</span><span class="o">-&gt;</span><span class="na">filter</span><span class="p">(</span><span class="nv">$_GET</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]);</span>
+
+<span class="nv">$status</span>   <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="k">empty</span><span class="p">(</span><span class="nv">$status</span><span class="p">[</span><span class="s1">&#39;done&#39;</span><span class="p">]))</span> <span class="p">{</span>
+    <span class="nv">$status</span> <span class="o">=</span> <span class="nv">$progress</span><span class="o">-&gt;</span><span class="na">getProgress</span><span class="p">(</span><span class="nv">$id</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Each time the <tt class="docutils literal"><span class="pre">getProgress()</span></tt> method is called, the ProgressBar
+adapter will be updated.</p>
+</div>
+<div class="section" id="using-the-status-array">
+<h3>Using the Status Array<a class="headerlink" href="#using-the-status-array" title="Permalink to this headline">¶</a></h3>
+<p>You can also work manually with <tt class="docutils literal"><span class="pre">getProgress()</span></tt> without using a <tt class="docutils literal"><span class="pre">Zend\ProgressBar</span></tt> adapter.</p>
+<p>The <tt class="docutils literal"><span class="pre">getProgress()</span></tt> will return you an array with several keys.
+They will sometimes differ based on the specific Upload handler used,
+but the following keys are always standard:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">total</span></tt>: The total file size of the uploaded file(s) in bytes as integer.</li>
+<li><tt class="docutils literal"><span class="pre">current</span></tt>: The current uploaded file size in bytes as integer.</li>
+<li><tt class="docutils literal"><span class="pre">rate</span></tt>: The average upload speed in bytes per second as integer.</li>
+<li><tt class="docutils literal"><span class="pre">done</span></tt>: Returns <tt class="docutils literal"><span class="pre">TRUE</span></tt> when the upload is finished and <tt class="docutils literal"><span class="pre">FALSE</span></tt> otherwise.</li>
+<li><tt class="docutils literal"><span class="pre">message</span></tt>: A status message. Either the progress as text in the form &#8220;10kB / 200kB&#8221;,
+or a helpful error message in the case of a problem. Problems such as:
+no upload in progress, failure while retrieving the data for the progress,
+or that the upload has been canceled.</li>
+</ul>
+<p>All other returned keys are provided directly from the specific handler.</p>
+<p>An example of using the status array manually:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// In a Controller...</span>
+
+<span class="k">public</span> <span class="k">function</span> <span class="nf">sessionProgressAction</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="nv">$id</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">params</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">fromQuery</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">);</span>
+    <span class="nv">$progress</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">\Zend\ProgressBar\Upload\SessionProgress</span><span class="p">();</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nx">\Zend\View\Model\JsonModel</span><span class="p">(</span><span class="nv">$progress</span><span class="o">-&gt;</span><span class="na">getProgress</span><span class="p">(</span><span class="nv">$id</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="c1">// Returns JSON</span>
+<span class="c1">//{</span>
+<span class="c1">//    &quot;total&quot;    : 204800,</span>
+<span class="c1">//    &quot;current&quot;  : 10240,</span>
+<span class="c1">//    &quot;rate&quot;     : 1024,</span>
+<span class="c1">//    &quot;message&quot;  : &quot;10kB / 200kB&quot;,</span>
+<span class="c1">//    &quot;done&quot;     : false</span>
+<span class="c1">//}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="standard-handlers">
+<span id="zend-progressbar-upload-handlers"></span><h2>Standard Handlers<a class="headerlink" href="#standard-handlers" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\ProgressBar\Upload</span></tt> comes with the following three upload handlers:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="zend.progress-bar.upload.apc-progress.html#zend-progress-bar-upload-apc-progress"><em>Zend\Progressbar\Upload\ApcProgress</em></a></li>
+<li><a class="reference internal" href="zend.progress-bar.upload.session-progress.html#zend-progress-bar-upload-session-progress"><em>Zend\ProgressBar\Upload\SessionProgress</em></a></li>
+<li><a class="reference internal" href="zend.progress-bar.upload.upload-progress.html#zend-progress-bar-upload-upload-progress"><em>Zend\Progressbar\Upload\UploadProgress</em></a></li>
+</ul>
+</div></blockquote>
+<div class="section" id="apc-progress-handler">
+<span id="zend-progress-bar-upload-apc-progress"></span><h3>APC Progress Handler<a class="headerlink" href="#apc-progress-handler" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">Zend\ProgressBar\Upload\ApcProgress</span></tt> handler uses the <a class="reference external" href="http://php.net/manual/en/book.apc.php">APC extension</a>
+for tracking upload progress.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <a class="reference external" href="http://php.net/manual/en/book.apc.php">APC extension</a> is required.</p>
+</div>
+<p>This handler is best used with the <a class="reference internal" href="zend.form.view.helpers.html#zend-form-view-helper-form-file-apc-progress"><em>FormFileApcProgress</em></a>
+view helper, to provide a hidden element with the upload progress identifier.</p>
+</div>
+<div class="section" id="session-progress-handler">
+<span id="zend-progress-bar-upload-session-progress"></span><h3>Session Progress Handler<a class="headerlink" href="#session-progress-handler" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">Zend\ProgressBar\Upload\SessionProgress</span></tt> handler uses the the PHP 5.4 <a class="reference external" href="http://php.net/manual/en/session.upload-progress.php">Session Progress</a>
+feature for tracking upload progress.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">PHP 5.4 is required.</p>
+</div>
+<p>This handler is best used with the <a class="reference internal" href="zend.form.view.helpers.html#zend-form-view-helper-form-file-session-progress"><em>FormFileSessionProgress</em></a>
+view helper, to provide a hidden element with the upload progress identifier.</p>
+</div>
+<div class="section" id="upload-progress-handler">
+<span id="zend-progress-bar-upload-upload-progress"></span><h3>Upload Progress Handler<a class="headerlink" href="#upload-progress-handler" title="Permalink to this headline">¶</a></h3>
+<p>The <tt class="docutils literal"><span class="pre">Zend\ProgressBar\Upload\UploadProgress</span></tt> handler uses the <a class="reference external" href="http://php.net/manual/en/book.apc.php">PECL Uploadprogress extension</a>
+for tracking upload progress.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <a class="reference external" href="http://php.net/manual/en/book.apc.php">PECL Uploadprogress extension</a> is required.</p>
+</div>
+<p>This handler is best used with the <a class="reference internal" href="zend.form.view.helpers.html#zend-form-view-helper-form-file-upload-progress"><em>FormFileUploadProgress</em></a>
+view helper, to provide a hidden element with the upload progress identifier.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">File Upload Handlers</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#methods-of-reporting-progress">Methods of Reporting Progress</a><ul>
+<li><a class="reference internal" href="#using-a-progressbar-adapter">Using a ProgressBar Adapter</a></li>
+<li><a class="reference internal" href="#using-the-status-array">Using the Status Array</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#standard-handlers">Standard Handlers</a><ul>
+<li><a class="reference internal" href="#apc-progress-handler">APC Progress Handler</a></li>
+<li><a class="reference internal" href="#session-progress-handler">Session Progress Handler</a></li>
+<li><a class="reference internal" href="#upload-progress-handler">Upload Progress Handler</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.progress-bar.html"
+                        title="previous chapter">Progress Bars</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.serializer.html"
+                        title="next chapter">Introduction to Zend\Serializer</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.progress-bar.upload.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.progress-bar.upload.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.progress-bar.upload.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.serializer.html" title="Introduction to Zend\Serializer"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.progress-bar.html" title="Progress Bars"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.progress-bar.upload.rst">
+                File Upload Handlers
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

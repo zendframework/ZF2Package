@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ZendServiceAkismet &mdash; Zend Framework 2 2.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.3 documentation" href="../index.html" />
+    <link rel="next" title="ZendServiceAmazon" href="zendservice.amazon.html" />
+    <link rel="prev" title="Zend\XmlRpc\Server" href="zend.xmlrpc.server.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zendservice.amazon.html" title="ZendServiceAmazon"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.xmlrpc.server.html" title="Zend\XmlRpc\Server"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zendserviceakismet">
+<span id="zendservice-akismet"></span><h1>ZendServiceAkismet<a class="headerlink" href="#zendserviceakismet" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<span id="zendservice-akismet-introduction"></span><h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">ZendService\Akismet</span></tt> provides a client for the <a class="reference external" href="http://akismet.com/development/api/">Akismet API</a>. The Akismet service is used to determine if
+incoming data is potentially spam. It also exposes methods for submitting data as known spam or as false positives
+(ham). It was originally intended to help categorize and identify spam for Wordpress, but it can be used for any
+type of data.</p>
+<p>Akismet requires an <em>API</em> key for usage. You can get one by signing up for a <a class="reference external" href="http://wordpress.com/">WordPress.com</a> account. You do not
+need to activate a blog. Simply acquiring the account will provide you with the <em>API</em> key.</p>
+<p>Akismet requires that all requests contain a <em>URL</em> to the resource for which data is being filtered. Because of
+Akismet&#8217;s origins in WordPress, this resource is called the blog <em>URL</em>. This value should be passed as the second
+argument to the constructor, but may be reset at any time using the <tt class="docutils literal"><span class="pre">setBlogUrl()</span></tt> method, or overridden by
+specifying a &#8216;blog&#8217; key in the various method calls.</p>
+</div>
+<div class="section" id="verify-an-api-key">
+<span id="zendservice-akismet-verifykey"></span><h2>Verify an API key<a class="headerlink" href="#verify-an-api-key" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">ZendService\Akismet\Akismet::verifyKey($key)</span></tt> is used to verify that an Akismet <em>API</em> key is valid. In most cases, you
+will not need to check, but if you need a sanity check, or to determine if a newly acquired key is active, you may
+do so with this method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Instantiate with the API key and a URL to the application or</span>
+<span class="c1">// resource being used</span>
+<span class="nv">$akismet</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZendService\Akismet\Akismet</span><span class="p">(</span><span class="nv">$apiKey</span><span class="p">,</span>
+                                    <span class="s1">&#39;http://framework.zend.com/wiki/&#39;</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$akismet</span><span class="o">-&gt;</span><span class="na">verifyKey</span><span class="p">(</span><span class="nv">$apiKey</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Key is valid.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Key is not valid</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>If called with no arguments, <tt class="docutils literal"><span class="pre">verifyKey()</span></tt> uses the <em>API</em> key provided to the constructor.</p>
+<p><tt class="docutils literal"><span class="pre">verifyKey()</span></tt> implements Akismet&#8217;s <em>verify-key</em> REST method.</p>
+</div>
+<div class="section" id="check-for-spam">
+<span id="zendservice-akismet-isspam"></span><h2>Check for spam<a class="headerlink" href="#check-for-spam" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">ZendService\Akismet\Akismet::isSpam($data)</span></tt> is used to determine if the data provided is considered spam by Akismet. It
+accepts an associative array as the sole argument. That array requires the following keys be set:</p>
+<ul class="simple">
+<li><em>user_ip</em>, the IP address of the user submitting the data (not your IP address, but that of a user on your site).</li>
+<li><em>user_agent</em>, the reported UserAgent string (browser and version) of the user submitting the data.</li>
+</ul>
+<p>The following keys are also recognized specifically by the <em>API</em>:</p>
+<ul class="simple">
+<li><em>blog</em>, the fully qualified <em>URL</em> to the resource or application. If not specified, the <em>URL</em> provided to the
+constructor will be used.</li>
+<li><em>referrer</em>, the content of the HTTP_REFERER header at the time of submission. (Note spelling; it does not follow
+the header name.)</li>
+<li><em>permalink</em>, the permalink location, if any, of the entry the data was submitted to.</li>
+<li><em>comment_type</em>, the type of data provided. Values specified in the <em>API</em> include &#8216;comment&#8217;, &#8216;trackback&#8217;,
+&#8216;pingback&#8217;, and an empty string (&#8216;&#8217;), but it may be any value.</li>
+<li><em>comment_author</em>, the name of the person submitting the data.</li>
+<li><em>comment_author_email</em>, the email of the person submitting the data.</li>
+<li><em>comment_author_url</em>, the <em>URL</em> or home page of the person submitting the data.</li>
+<li><em>comment_content</em>, the actual data content submitted.</li>
+</ul>
+<p>You may also submit any other environmental variables you feel might be a factor in determining if data is spam.
+Akismet suggests the contents of the entire $_SERVER array.</p>
+<p>The <tt class="docutils literal"><span class="pre">isSpam()</span></tt> method will return either <tt class="docutils literal"><span class="pre">TRUE</span></tt> or <tt class="docutils literal"><span class="pre">FALSE</span></tt>, or throw an exception if the <em>API</em> key is
+invalid.</p>
+<p class="rubric" id="zendservice-akismet-isspam-example-1">isSpam() Usage</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$data</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;user_ip&#39;</span>              <span class="o">=&gt;</span> <span class="s1">&#39;111.222.111.222&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;user_agent&#39;</span>           <span class="o">=&gt;</span> <span class="s1">&#39;Mozilla/5.0 &#39;</span> <span class="o">.</span> <span class="s1">&#39;(Windows; U; Windows NT &#39;</span> <span class="o">.</span>
+                              <span class="s1">&#39;5.2; en-GB; rv:1.8.1) Gecko/20061010 &#39;</span> <span class="o">.</span>
+                              <span class="s1">&#39;Firefox/2.0&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;comment_type&#39;</span>         <span class="o">=&gt;</span> <span class="s1">&#39;contact&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;comment_author&#39;</span>       <span class="o">=&gt;</span> <span class="s1">&#39;John Doe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;comment_author_email&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;nospam@myhaus.net&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;comment_content&#39;</span>      <span class="o">=&gt;</span> <span class="s2">&quot;I&#39;m not a spammer, honest!&quot;</span>
+<span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="nv">$akismet</span><span class="o">-&gt;</span><span class="na">isSpam</span><span class="p">(</span><span class="nv">$data</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Sorry, but we think you&#39;re a spammer.&quot;</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Welcome to our site!&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">isSpam()</span></tt> implements the <em>comment-check</em> Akismet <em>API</em> method.</p>
+</div>
+<div class="section" id="submitting-known-spam">
+<span id="zendservice-akismet-submitspam"></span><h2>Submitting known spam<a class="headerlink" href="#submitting-known-spam" title="Permalink to this headline">¶</a></h2>
+<p>Spam data will occasionally get through the filter. If you discover spam that you feel should have been caught, you
+can submit it to Akismet to help improve their filter.</p>
+<p><tt class="docutils literal"><span class="pre">ZendService\Akismet\Akismet::submitSpam()</span></tt> takes the same data array as passed to <tt class="docutils literal"><span class="pre">isSpam()</span></tt>, but does not return a
+value. An exception will be raised if the <em>API</em> key used is invalid.</p>
+<p class="rubric" id="zendservice-akismet-submitspam-example-1">submitSpam() Usage</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$data</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;user_ip&#39;</span>              <span class="o">=&gt;</span> <span class="s1">&#39;111.222.111.222&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;user_agent&#39;</span>           <span class="o">=&gt;</span> <span class="s1">&#39;Mozilla/5.0 (Windows; U; Windows NT 5.2;&#39;</span> <span class="o">.</span>
+                              <span class="s1">&#39;en-GB; rv:1.8.1) Gecko/20061010 Firefox/2.0&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;comment_type&#39;</span>         <span class="o">=&gt;</span> <span class="s1">&#39;contact&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;comment_author&#39;</span>       <span class="o">=&gt;</span> <span class="s1">&#39;John Doe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;comment_author_email&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;nospam@myhaus.net&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;comment_content&#39;</span>      <span class="o">=&gt;</span> <span class="s2">&quot;I&#39;m not a spammer, honest!&quot;</span>
+<span class="p">);</span>
+<span class="nv">$akismet</span><span class="o">-&gt;</span><span class="na">submitSpam</span><span class="p">(</span><span class="nv">$data</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">submitSpam()</span></tt> implements the <em>submit-spam</em> Akismet <em>API</em> method.</p>
+</div>
+<div class="section" id="submitting-false-positives-ham">
+<span id="zendservice-akismet-submitham"></span><h2>Submitting false positives (ham)<a class="headerlink" href="#submitting-false-positives-ham" title="Permalink to this headline">¶</a></h2>
+<p>Data will occasionally be trapped erroneously as spam by Akismet. For this reason, you should probably keep a log
+of all data trapped as spam by Akismet and review it periodically. If you find such occurrences, you can submit the
+data to Akismet as &#8220;ham&#8221;, or a false positive (ham is good, spam is not).</p>
+<p><tt class="docutils literal"><span class="pre">ZendService\Akismet\Akismet::submitHam()</span></tt> takes the same data array as passed to <tt class="docutils literal"><span class="pre">isSpam()</span></tt> or <tt class="docutils literal"><span class="pre">submitSpam()</span></tt>, and,
+like <tt class="docutils literal"><span class="pre">submitSpam()</span></tt>, does not return a value. An exception will be raised if the <em>API</em> key used is invalid.</p>
+<p class="rubric" id="zendservice-akismet-submitham-example-1">submitHam() Usage</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$data</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;user_ip&#39;</span>              <span class="o">=&gt;</span> <span class="s1">&#39;111.222.111.222&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;user_agent&#39;</span>           <span class="o">=&gt;</span> <span class="s1">&#39;Mozilla/5.0 (Windows; U; Windows NT 5.2;&#39;</span> <span class="o">.</span>
+                              <span class="s1">&#39;en-GB; rv:1.8.1) Gecko/20061010 Firefox/2.0&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;comment_type&#39;</span>         <span class="o">=&gt;</span> <span class="s1">&#39;contact&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;comment_author&#39;</span>       <span class="o">=&gt;</span> <span class="s1">&#39;John Doe&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;comment_author_email&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;nospam@myhaus.net&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;comment_content&#39;</span>      <span class="o">=&gt;</span> <span class="s2">&quot;I&#39;m not a spammer, honest!&quot;</span>
+<span class="p">);</span>
+<span class="nv">$akismet</span><span class="o">-&gt;</span><span class="na">submitHam</span><span class="p">(</span><span class="nv">$data</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">submitHam()</span></tt> implements the <em>submit-ham</em> Akismet <em>API</em> method.</p>
+</div>
+<div class="section" id="zend-specific-methods">
+<span id="zendservice-akismet-accessors"></span><h2>Zend-specific Methods<a class="headerlink" href="#zend-specific-methods" title="Permalink to this headline">¶</a></h2>
+<p>While the Akismet <em>API</em> only specifies four methods, <tt class="docutils literal"><span class="pre">ZendService\Akismet\Akismet</span></tt> has several additional methods that
+may be used for retrieving and modifying internal properties.</p>
+<ul>
+<li><p class="first"><tt class="docutils literal"><span class="pre">getBlogUrl()</span></tt> and <tt class="docutils literal"><span class="pre">setBlogUrl()</span></tt> allow you to retrieve and modify the blog <em>URL</em> used in requests.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">getApiKey()</span></tt> and <tt class="docutils literal"><span class="pre">setApiKey()</span></tt> allow you to retrieve and modify the <em>API</em> key used in requests.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">getCharset()</span></tt> and <tt class="docutils literal"><span class="pre">setCharset()</span></tt> allow you to retrieve and modify the character set used to make the
+request.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">getPort()</span></tt> and <tt class="docutils literal"><span class="pre">setPort()</span></tt> allow you to retrieve and modify the <em>TCP</em> port used to make the request.</p>
+</li>
+<li><p class="first"><tt class="docutils literal"><span class="pre">getUserAgent()</span></tt> and <tt class="docutils literal"><span class="pre">setUserAgent()</span></tt> allow you to retrieve and modify the <em>HTTP</em> user agent used to make the
+request. Note: this is not the user_agent used in data submitted to the service, but rather the value provided in
+the <em>HTTP</em> User-Agent header when making a request to the service.</p>
+<p>The value used to set the user agent should be of the form <em>some user agent/version | Akismet/version</em>. The
+default is <em>Zend Framework/ZF-VERSION | Akismet/1.11</em>, where <em>ZF-VERSION</em> is the current Zend Framework version
+as stored in the <tt class="docutils literal"><span class="pre">Zend\Version\Version::VERSION</span></tt> constant.</p>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ZendServiceAkismet</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#verify-an-api-key">Verify an API key</a></li>
+<li><a class="reference internal" href="#check-for-spam">Check for spam</a></li>
+<li><a class="reference internal" href="#submitting-known-spam">Submitting known spam</a></li>
+<li><a class="reference internal" href="#submitting-false-positives-ham">Submitting false positives (ham)</a></li>
+<li><a class="reference internal" href="#zend-specific-methods">Zend-specific Methods</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.xmlrpc.server.html"
+                        title="previous chapter">Zend\XmlRpc\Server</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zendservice.amazon.html"
+                        title="next chapter">ZendServiceAmazon</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendservice.akismet.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendservice.akismet.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendservice.akismet.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zendservice.amazon.html" title="ZendServiceAmazon"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.xmlrpc.server.html" title="Zend\XmlRpc\Server"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendservice.akismet.rst">
+                ZendServiceAkismet
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

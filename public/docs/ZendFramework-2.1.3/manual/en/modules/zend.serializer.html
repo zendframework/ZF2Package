@@ -1,0 +1,497 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction to Zend\Serializer &mdash; Zend Framework 2 2.1.3 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.3 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Serializer\Adapter" href="zend.serializer.adapters.html" />
+    <link rel="prev" title="File Upload Handlers" href="zend.progress-bar.upload.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.serializer.adapters.html" title="Zend\Serializer\Adapter"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.progress-bar.upload.html" title="File Upload Handlers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction-to-zend-serializer">
+<span id="zend-serializer"></span><h1>Introduction to Zend\Serializer<a class="headerlink" href="#introduction-to-zend-serializer" title="Permalink to this headline">¶</a></h1>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Serializer</span></tt> component provides an adapter based interface to
+simply generate storable representation of <a class="reference external" href="http://php.net">PHP</a> types by different facilities,
+and recover.</p>
+<p>For more information what a serializer is read the wikipedia page of <a class="reference external" href="http://en.wikipedia.org/wiki/Serialization">Serialization</a>.</p>
+<div class="section" id="quick-start">
+<span id="zend-serializer-quick-start"></span><h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>Serializing adapters can either be created from the provided
+<tt class="docutils literal"><span class="pre">Zend\Serializer\Serializer::factory</span></tt> method, or by simply instantiating one
+of the <tt class="docutils literal"><span class="pre">Zend\Serializer\Adapter\*</span></tt> classes.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Serializer\Serializer</span><span class="p">;</span>
+
+<span class="c1">// Via factory:</span>
+<span class="nv">$serializer</span> <span class="o">=</span> <span class="nx">Zend\Serializer\Serializer</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;PhpSerialize&#39;</span><span class="p">);</span>
+
+<span class="c1">// Alternately:</span>
+<span class="nv">$serializer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Serializer\Adapter\PhpSerialize</span><span class="p">();</span>
+
+<span class="c1">// Now $serializer is an instance of Zend\Serializer\Adapter\AdapterInterface,</span>
+<span class="c1">// specifically Zend\Serializer\Adapter\PhpSerialize</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$serialized</span> <span class="o">=</span> <span class="nv">$serializer</span><span class="o">-&gt;</span><span class="na">serialize</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+    <span class="c1">// now $serialized is a string</span>
+
+    <span class="nv">$unserialized</span> <span class="o">=</span> <span class="nv">$serializer</span><span class="o">-&gt;</span><span class="na">unserialize</span><span class="p">(</span><span class="nv">$serialized</span><span class="p">);</span>
+    <span class="c1">// now $data == $unserialized</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend\Serializer\Exception\ExceptionInterface</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$e</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The method <tt class="docutils literal"><span class="pre">serialize()</span></tt> generates a storable string. To regenerate this
+serialized data you can simply call the method <tt class="docutils literal"><span class="pre">unserialize()</span></tt>.</p>
+<p>Any time an error is encountered serializing or unserializing,
+<tt class="docutils literal"><span class="pre">Zend\Serializer</span></tt> will throw a <tt class="docutils literal"><span class="pre">Zend\Serializer\Exception\ExceptionInterface</span></tt>.</p>
+<p>Because of an application often uses internally only one serializer it is
+possible to define and use a default serializer. That serializer will be used
+by defaut by other components like <tt class="docutils literal"><span class="pre">Zend\Cache\Storage\Plugin\Serializer</span></tt>.</p>
+<p>To use the default serializer you can simply use the static serialization
+methods of the basic <tt class="docutils literal"><span class="pre">Zend\Serializer\Serializer</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">use</span> <span class="nx">Zend\Serializer\Serializer</span><span class="p">;</span>
+
+<span class="k">try</span> <span class="p">{</span>
+    <span class="nv">$serialized</span> <span class="o">=</span> <span class="nx">Serializer</span><span class="o">::</span><span class="na">serialize</span><span class="p">(</span><span class="nv">$data</span><span class="p">);</span>
+    <span class="c1">// now $serialized is a string</span>
+
+    <span class="nv">$unserialized</span> <span class="o">=</span> <span class="nx">Serializer</span><span class="o">::</span><span class="na">unserialize</span><span class="p">(</span><span class="nv">$serialized</span><span class="p">);</span>
+    <span class="c1">// now $data == $unserialized</span>
+<span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend\Serializer\Exception\ExceptionInterface</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="nv">$e</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="basic-configuration-options">
+<span id="zend-serializer-options"></span><h2>Basic configuration Options<a class="headerlink" href="#basic-configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>To configure a serializer adapter, you can optionally use an instance of
+<tt class="docutils literal"><span class="pre">Zend\Serializer\Adapter\AdapterOptions</span></tt>, an instance of one of the adapter
+specific options class, an <tt class="docutils literal"><span class="pre">array</span></tt> or an instance of <tt class="docutils literal"><span class="pre">Traversable</span></tt>.
+The adapter will convert it into the adapter specífic options class instance
+(if present) or into the basic <tt class="docutils literal"><span class="pre">Zend\Serializer\Adapter\AdapterOptions</span></tt> class
+instance.</p>
+<p>Options can be passed as second argument to the provided
+<tt class="docutils literal"><span class="pre">Zend\Serializer\Serializer::factory</span></tt> method, using the method <tt class="docutils literal"><span class="pre">setOptions</span></tt>
+or set as constructor argument.</p>
+</div>
+<div class="section" id="available-methods">
+<span id="zend-serializer-serializer-methods"></span><h2>Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<p>Each serializer implements the interface <tt class="docutils literal"><span class="pre">Zend\Serializer\Adapter\AdapterInterface</span></tt>.</p>
+<p>This interface defines the following methods:</p>
+<dl class="function">
+<dt>
+<tt class="descname">serialize</tt><big>(</big><em>mixed $value</em><big>)</big></dt>
+<dd><p>Generates a storable representation of a value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">unserialize</tt><big>(</big><em>string $value</em><big>)</big></dt>
+<dd><p>Creates a PHP value from a stored representation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mixed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p>The basic class <tt class="docutils literal"><span class="pre">Zend\Serializer\Serializer</span></tt> will be used to instantiate the
+adapters, to configure the factory and to handle static serializing.</p>
+<p>It defines the following <strong>static</strong> methods:</p>
+<dl class="function">
+<dt>
+<tt class="descname">factory</tt><big>(</big><em>string|Zend\Serializer\Adapter\AdapterInterface $adapterName</em>, <em>Zend\Serializer\Adapter\AdapterOptions|array|Traversable|null $adapterOptions = null</em><big>)</big></dt>
+<dd><p>Create a serializer adapter instance.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Zend\Serializer\Adapter\AdapterInterface</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">setAdapterPluginManager</tt><big>(</big><em>Zend\Serializer\AdapterPluginManager $adapters</em><big>)</big></dt>
+<dd><p>Change the adapter plugin manager.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">void</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">getAdapterPluginManager</tt><big>(</big><big>)</big></dt>
+<dd><p>Get the adapter plugin manager.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Zend\Serializer\AdapterPluginManager</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">resetAdapterPluginManager</tt><big>(</big><big>)</big></dt>
+<dd><p>Resets the internal adapter plugin manager.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">void</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">setDefaultAdapter</tt><big>(</big><em>string|Zend\Serializer\Adapter\AdapterInterface $adapter</em>, <em>Zend\Serializer\Adapter\AdapterOptions|array|Traversable|null $adapterOptions = null</em><big>)</big></dt>
+<dd><p>Change the default adapter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">void</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">getDefaultAdapter</tt><big>(</big><big>)</big></dt>
+<dd><p>Get the default adapter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Zend\Serializer\Adapter\AdapterInterface</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">serialize</tt><big>(</big><em>mixed $value</em>, <em>string|Zend\Serializer\Adapter\AdapterInterface|null $adapter = null</em>, <em>Zend\Serializer\Adapter\AdapterOptions|array|Traversable|null $adapterOptions = null</em><big>)</big></dt>
+<dd><p>Generates a storable representation of a value using the default adapter.
+Optionally different adapter could be provided as second argument.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<tt class="descname">unserialize</tt><big>(</big><em>string $value</em>, <em>string|Zend\Serializer\Adapter\AdapterInterface|null $adapter = null</em>, <em>Zend\Serializer\Adapter\AdapterOptions|array|Traversable|null $adapterOptions = null</em><big>)</big></dt>
+<dd><p>Creates a PHP value from a stored representation using the default adapter.
+Optionally different adapter could be provided as second argument.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">mixed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction to Zend\Serializer</a><ul>
+<li><a class="reference internal" href="#quick-start">Quick Start</a></li>
+<li><a class="reference internal" href="#basic-configuration-options">Basic configuration Options</a></li>
+<li><a class="reference internal" href="#available-methods">Available Methods</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.progress-bar.upload.html"
+                        title="previous chapter">File Upload Handlers</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.serializer.adapters.html"
+                        title="next chapter">Zend\Serializer\Adapter</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.serializer.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.serializer.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.serializer.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.serializer.adapters.html" title="Zend\Serializer\Adapter"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.progress-bar.upload.html" title="File Upload Handlers"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.3 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.serializer.rst">
+                Introduction to Zend\Serializer
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
