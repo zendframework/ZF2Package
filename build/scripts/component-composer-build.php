@@ -51,9 +51,9 @@ $composer_content['dist']['url'] = "https://packages.zendframework.com/composer/
 $composer_content['dist']['type'] = "zip";
 
 // Build source package definition
-$source_package_repo = $package_name_full;
-if ('Zend_' == substr($package_name_full, 0, 5)) {
-    $source_package_repo = 'Component_' . str_replace('_', '', $package_name_full);
+$source_package_repo = $package_name;
+if ('Zend_' == substr($package_name, 0, 5)) {
+    $source_package_repo = 'Component_' . str_replace('_', '', $package_name);
 }
 $composer_content['source']['type']      = 'git';
 $composer_content['source']['url']       = "git://github.com/zendframework/" . $source_package_repo . '.git';
