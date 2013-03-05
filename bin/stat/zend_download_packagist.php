@@ -1,9 +1,13 @@
+#!/usr/local/bin/php
 <?php
 /**
  * Get the ZF download statistics from packagist.org
  * 
  * @author Enrico Zimuel (enrico@zend.com)
  */
+
+// set the same timezone of packagist.org
+date_default_timezone_set('UTC');
 
 Class Zend_Download_Packagist {
     CONST ZF2_URL = 'https://packagist.org/packages/zendframework/zendframework.json';
@@ -28,7 +32,7 @@ Class Zend_Download_Packagist {
     }
 }
 
-$filestat = 'data/packagist.ser';
+$filestat = __DIR__ . '/data/packagist.ser';
 
 $data = array();
 
@@ -39,6 +43,10 @@ if (file_exists($filestat)) {
 $packagist = new Zend_Download_Packagist();
 $downloads = $packagist->getZfDownloads();
 
+if ($downloads === false) {
+    die();
+}
+
 $year  = (string) date("Y");
 $day   = (string) date("d");
 $month = (string) date("m");
@@ -47,4 +55,5 @@ $data['days'][$year][$month][$day] = $downloads['day'];
 $data['months'][$year][$month] = $downloads['month'];
 $data['total'] = $downloads['total'];
 
-file_put_contents($filestat, '<?php return '. var_export($data, true) . ';');
+$update = date("Y-m-d H:i:s");
+file_put_contents($filestat, "<?php // Last update $update\nreturn ". var_export($data, true) . ';');
