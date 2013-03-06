@@ -325,7 +325,7 @@ function getSkeletonApplicationReleases()
         ),
         'dist' => array(
             'type' => 'zip',
-            'url' => '%s',
+            'url' => 'https://github.com/zendframework/ZendSkeletonApplication/archive/zf/release-%s.zip',
         ),
         'require' => array(
             'php' => '>=5.3.3',
@@ -351,7 +351,7 @@ function getSkeletonApplicationReleases()
         $definition                        = $template;
         $definition['version']             = $version;
         $definition['source']['reference'] = $tag;
-        $definition['dist']['url']         = $tagDatum->zipball_url;
+        $definition['dist']['url']         = sprintf($definition['dist']['url'], $version);
         $releases[$version]                = $definition;
     }
 
