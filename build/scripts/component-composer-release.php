@@ -226,6 +226,16 @@ foreach ($composers as $filename => $composer) {
     if (!isset($composer['type'])) {
         $composer['type'] = 'library';
     }
+
+    // Ensure that the source URL does not include the version
+    if (isset($composer['source']) && isset($composer['source']['url'])
+        && preg_match('#/(ZendService|Component_|Zend[GPQORCATM])#', $composer['source']['url'])
+    ) {
+        if (preg_match('/(-' . preg_quote($composer['version']) . ')\.git$/', $composer['source']['url'], $matches)) {
+            $composer['source']['url'] = str_replace($matches[1], '', $composer['source']['url']);
+        }
+    }
+
     $packages[$composer['name']][$composer['version']] = $composer;
 
     if (!preg_match('#^zendframework/zend-#', $composer['name'])) {
