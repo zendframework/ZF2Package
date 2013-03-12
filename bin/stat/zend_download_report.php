@@ -42,7 +42,6 @@ require_once "vendor/autoload.php";
 
 $start = microtime(true);
 
-
 class Zend_Apache_Log_DownloadCount
 {
 
@@ -142,15 +141,12 @@ class Zend_Apache_Log_DownloadCount
         $worksheet->setActiveSheetIndex($sheet);
         $worksheet->getActiveSheet()
                   ->setCellValueByColumnAndRow(0, 1, 'Date');
-        //$worksheet->write(0, 0, 'Date', $this->_format['header']);
-        //$worksheet->setColumn(0, 0, 10);
+
         foreach ($this->_resources as $resource => $col) {
             $worksheet->getActiveSheet()
                   ->setCellValueByColumnAndRow($col, 1, $resource);
-            //$worksheet->write(0, $col, $resource, $this->_format['header']);
-            //$worksheet->setColumn($col, $col, 11);
+
         }
-        //$worksheet->freezePanes(array(1, 1, 1, 1));
     }
 
     /**
@@ -165,15 +161,12 @@ class Zend_Apache_Log_DownloadCount
         $worksheet->setActiveSheetIndex($sheet);
         $worksheet->getActiveSheet()
                   ->setCellValueByColumnAndRow(0, $row, 'TOTAL');
-        //$worksheet->write($row, 0, 'TOTAL', $this->_format['totalBottom']);
 
         if ($writeRightTotal) {
             // Write upper right TOTAL header label
             $col = count($this->_resources)+1;
             $worksheet->getActiveSheet()
                   ->setCellValueByColumnAndRow($col, 0, 'TOTAL');
-            //$worksheet->write(0, $col, 'TOTAL', $this->_format['header']);
-            //$worksheet->setColumn($col, $col, 11);
 
             // Write end-of-row totals
             $col = count($this->_resources)+1;
@@ -182,7 +175,6 @@ class Zend_Apache_Log_DownloadCount
                 $cell2 = PHPExcel_Cell::stringFromColumnIndex($col - 1) . $i;
                 $worksheet->getActiveSheet()
                           ->setCellValueByColumnAndRow($col, $i, "=SUM($cell1:$cell2)");
-                //$worksheet->writeFormula($i, $col, "=SUM($cell1:$cell2)", $this->_format['totalRight']);
             }
         }
 
@@ -192,7 +184,6 @@ class Zend_Apache_Log_DownloadCount
             $cell2 = PHPExcel_Cell::stringFromColumnIndex($col) . (integer) ($row - 1);
             $worksheet->getActiveSheet()
                       ->setCellValueByColumnAndRow($col, $row, "=SUM($cell1:$cell2)");
-            //$worksheet->writeFormula($row, $col, "=SUM($cell1:$cell2)", $this->_format['totalBottom']);
         }
 
         if ($writeRightTotal) {
@@ -202,7 +193,6 @@ class Zend_Apache_Log_DownloadCount
             $col = count($this->_resources)+1;
             $worksheet->getActiveSheet()
                       ->setCellValueByColumnAndRow($col, $row, "=SUM($cell1:$cell2)");
-            //$worksheet->writeFormula($row, $col, "=SUM($cell1:$cell2)", $this->_format['grandTotal']);
         }
     }
 
@@ -214,10 +204,6 @@ class Zend_Apache_Log_DownloadCount
      */
     protected function excelDate($year, $month = null, $day = null)
     {
-//        $ts = mktime(0, 0, 0, $month, $day+1, $year);
-//        $seconds_in_a_day = 86400;
-//        $ut_to_ed_diff = $seconds_in_a_day * 25569;
-//        return ($ts + $ut_to_ed_diff) / $seconds_in_a_day;
         if (($day !== null) && ($month !== null)) {
             return sprintf("%04d-%02d-%02d", $year, $month, $day);
         } elseif (($day === null) && ($month !== null)) {
@@ -255,51 +241,6 @@ class Zend_Apache_Log_DownloadCount
             $wsFullData = new PHPExcel_Worksheet($workbook, 'Full Data');
             $workbook->addSheet($wsFullData, 3);
         } 
-        
-        /**
-         * Create formats
-         */
-        
-//        $this->_format['header'] =& $workbook->addFormat();
-//        $this->_format['header']->setBold();
-//        $this->_format['header']->setBottom(2);
-//        $this->_format['header']->setPattern();
-//        $this->_format['header']->setFgColor(18);
-//        $this->_format['header']->setColor('white');
-//        $this->_format['header']->setTextWrap();
-//
-//        $this->_format['number'] =& $workbook->addFormat();
-//        $this->_format['number']->setNumFormat('#,##0');
-//
-//        $this->_format['totalBottom'] =& $workbook->addFormat();
-//        $this->_format['totalBottom']->setBold();
-//        $this->_format['totalBottom']->setTop(2);
-//        $this->_format['totalBottom']->setNumFormat('#,##0');
-//        $this->_format['totalBottom']->setPattern();
-//        $this->_format['totalBottom']->setFgColor(22);
-//
-//        $this->_format['totalRight'] =& $workbook->addFormat();
-//        $this->_format['totalRight']->setBold();
-//        $this->_format['totalRight']->setLeft(2);
-//        $this->_format['totalRight']->setNumFormat('#,##0');
-//        $this->_format['totalRight']->setPattern();
-//        $this->_format['totalRight']->setFgColor(22);
-//
-//        $this->_format['grandTotal'] =& $workbook->addFormat();
-//        $this->_format['grandTotal']->setBold();
-//        $this->_format['grandTotal']->setBorder(2);
-//        $this->_format['grandTotal']->setNumFormat('#,##0');
-//        $this->_format['grandTotal']->setPattern();
-//        $this->_format['grandTotal']->setFgColor('cyan');
-//
-//        $this->_format['date'] =& $workbook->addFormat();
-//        $this->_format['date']->setNumFormat('YYYY-MM-DD');
-//
-//        $this->_format['month'] =& $workbook->addFormat();
-//        $this->_format['month']->setNumFormat('YYYY-MM');
-//
-//        $this->_format['year'] =& $workbook->addFormat();
-//        $this->_format['year']->setNumFormat('YYYY');
 
         $dayRow = 1;
         $monthRow = 1;
@@ -364,16 +305,10 @@ class Zend_Apache_Log_DownloadCount
                     $workbook->getActiveSheet()
                              ->setCellValueByColumnAndRow(0, $dayRow, $this->excelDate($year, $month, $day));
 
-//                    $wsDay->write($dayRow, 0,
-//                        $this->excelDate($year, $month, $day),
-//                        $this->_format['date']);
                     if ($this->_fullData) {
                         $workbook->setActiveSheetIndex(3);
                         $workbook->getActiveSheet()
                              ->setCellValueByColumnAndRow(0, $dayRow, $this->excelDate($year, $month, $day));
-//                        $wsFullData->write($dayRow, 0,
-//                            $this->excelDate($year, $month, $day),
-//                            $this->_format['date']);
                     }
 
                     /**
@@ -395,7 +330,6 @@ class Zend_Apache_Log_DownloadCount
                         $workbook->setActiveSheetIndex(2);
                         $workbook->getActiveSheet()
                                  ->setCellValueByColumnAndRow($col, $dayRow, $count);
-                        //$wsDay->write($dayRow, $col, $count, $this->_format['number']);
 
                         if ($this->_fullData) {
                             if (!is_array($ipArray)) {
@@ -406,7 +340,6 @@ class Zend_Apache_Log_DownloadCount
                             $workbook->setActiveSheetIndex(3);
                             $workbook->getActiveSheet()
                                      ->setCellValueByColumnAndRow($col, $dayRow, $sum);
-                            //$wsFullData->write($dayRow, $col, $sum, $this->_format['number']);
                         }
 
                         if (!isset($monthTotal[$resource])) {
@@ -430,9 +363,6 @@ class Zend_Apache_Log_DownloadCount
                 $workbook->setActiveSheetIndex(1);
                 $workbook->getActiveSheet()
                          ->setCellValueByColumnAndRow(0, $monthRow, $this->excelDate($year, $month));
-//                $wsMonth->write($monthRow, 0,
-//                    $this->excelDate($year, $month, 1),
-//                    $this->_format['month']);
 
                 /**
                  * Write totals per resource per month
@@ -445,7 +375,6 @@ class Zend_Apache_Log_DownloadCount
 
                     $workbook->getActiveSheet()
                              ->setCellValueByColumnAndRow($col, $monthRow, $monthTotal[$resource]);
-                    //$wsMonth->write($monthRow, $col, $monthTotal[$resource], $this->_format['number']);
                 }
 
                 ++$monthRow;
@@ -457,9 +386,6 @@ class Zend_Apache_Log_DownloadCount
             $workbook->setActiveSheetIndex(0);
             $workbook->getActiveSheet()
                      ->setCellValueByColumnAndRow(0, $totalRow, $this->excelDate($year));
-//            $wsYear->write($totalRow, 0,
-//                $this->excelDate($year, 1, 1),
-//                $this->_format['year']);
 
             /**
              * Write totals per resource per year
@@ -470,7 +396,6 @@ class Zend_Apache_Log_DownloadCount
                 }
                 $workbook->getActiveSheet()
                      ->setCellValueByColumnAndRow($col, $totalRow, $yearTotal[$resource]);
-                //$wsYear->write($totalRow, $col, $yearTotal[$resource], $this->_format['number']);
             }
 
             ++$totalRow;
@@ -491,11 +416,11 @@ class Zend_Apache_Log_DownloadCount
      * @var array
      */
     protected $_rexpr = array(
-        'ZF'       => '^/releases/ZendFramework-(\d+.\d+.\d+)',
-        'Gdata'    => '^/releases/ZendG[Dd]ata-(\d+.\d+)',
-        'Infocard' => '^/releases/ZendInfo[Cc]ard-(\d+.\d+)',
-        'AMF'      => '^/releases/Zend[Aa][Mm][Ff]-(\d+.\d+)',
-        'Zend'     => '^/composer/Zend(_[a-zA-Z0-9]+)-(\d+.\d+.\d+)'
+        'ZF'       => '^/releases/ZendFramework-(\d+.\d+)',
+        //'Gdata'    => '^/releases/ZendG[Dd]ata-(\d+.\d+)',
+        //'Infocard' => '^/releases/ZendInfo[Cc]ard-(\d+.\d+)',
+        //'AMF'      => '^/releases/Zend[Aa][Mm][Ff]-(\d+.\d+)',
+        'ZF2 components' => '^/composer/Zend_'
     );
 
     /**
@@ -697,12 +622,12 @@ class Zend_Apache_Log_DownloadCount
         } else {
             return false;
         }
-        $resource = 'Packagist.org';
+        $resource = 'ZF2 from packagist.org';
         $this->_resources[$resource] = 1;
         foreach ($data['days'] as $year => $monthArray) {
             foreach ($monthArray as $month => $dayArray) {
                 foreach ($dayArray as $day => $downloads) {
-                    $this->_logData[$year][$month][$day][$resource] = (integer) $downloads;
+                    $this->_logData[(integer) $year][(integer) $month][(integer) $day][$resource] = (integer) $downloads;
                 }
             }
         }
