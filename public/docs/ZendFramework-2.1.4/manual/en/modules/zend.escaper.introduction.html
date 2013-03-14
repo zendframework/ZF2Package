@@ -1,0 +1,288 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; Zend Framework 2 2.1.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.4 documentation" href="../index.html" />
+    <link rel="next" title="Theory of Operation" href="zend.escaper.theory-of-operation.html" />
+    <link rel="prev" title="Zend\Dom\Query" href="zend.dom.query.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.escaper.theory-of-operation.html" title="Theory of Operation"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.dom.query.html" title="Zend\Dom\Query"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<span id="zend-escaper-introduction"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference external" href="https://www.owasp.org/index.php/Top_10_2010-Main">OWASP Top 10 web security risks</a> study lists Cross-Site Scripting (XSS) in second place. PHP&#8217;s sole functionality
+against XSS is limited to two functions of which one is commonly misapplied. Thus, the <tt class="docutils literal"><span class="pre">Zend\Escaper</span></tt> component
+was written. It offers developers a way to escape output and defend from XSS and related vulnerabilities by introducing
+<strong>contextual escaping based on peer-reviewed rules</strong>.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Escaper</span></tt> was written with ease of use in mind, so it can be used completely stand-alone from the rest of
+the framework, and as such can be installed with <a class="reference external" href="http://getcomposer.org/">Composer</a>.</p>
+<p>For easier use of the Escaper component within the framework itself, especially with the <tt class="docutils literal"><span class="pre">Zend\View</span></tt> component,
+a <a class="reference internal" href="zend.view.helpers.html#zend-view-helpers"><em>set of view helpers</em></a> is provided.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">Zend\Escaper</span></tt> is a security related component. As such, if you believe you found an issue with this
+component, we ask that you follow our <a class="reference external" href="http://www.framework.zend.com/security/">Security Policy</a> and report security issues accordingly. The Zend
+Framework team and the contributors thanks you in advance.</p>
+</div>
+<div class="section" id="overview">
+<span id="zend-escaper-introduction-overview"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Escaper</span></tt> component provides one class, <tt class="docutils literal"><span class="pre">Zend\Escaper\Escaper</span></tt> which in turn, provides five methods
+for escaping output. Which method to use when, depends on the context in which the outputted data is used. It is
+up to the developer to use the right methods in the right context.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Escaper\Escaper</span></tt> has the following escaping methods available for each context:</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>escapeHtml</strong>: escape a string for the HTML Body context.</li>
+<li><strong>escapeHtmlAttr</strong>: escape a string for the HTML Attribute context.</li>
+<li><strong>escapeJs</strong>: escape a string for the Javascript context.</li>
+<li><strong>escapeCss</strong>: escape a string for the CSS context.</li>
+<li><strong>escapeUrl</strong>: escape a string for the URI or Parameter contexts.</li>
+</ul>
+</div></blockquote>
+<p>Usage of each method will be discussed in detail in later chapters.</p>
+</div>
+<div class="section" id="what-zend-escaper-is-not">
+<span id="zend-escaper-introduction-what-zend-escaper-is-not"></span><h2>What Zend\Escaper is not<a class="headerlink" href="#what-zend-escaper-is-not" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Escaper</span></tt> is meant to be used only for escaping data that is to be output, and as such should not be misused
+for filtering input data. For such tasks, the <a class="reference internal" href="../index.html#zend-filter"><em>Zend\Filter component</em></a>, <a class="reference external" href="http://htmlpurifier.org/">HTMLPurifier</a> or PHP&#8217;s
+<a class="reference external" href="http://php.net/manual/en/book.filter.php">Filter</a> component should be used.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#what-zend-escaper-is-not">What Zend\Escaper is not</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.dom.query.html"
+                        title="previous chapter">Zend\Dom\Query</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.escaper.theory-of-operation.html"
+                        title="next chapter">Theory of Operation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.escaper.introduction.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.escaper.introduction.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.escaper.introduction.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.escaper.theory-of-operation.html" title="Theory of Operation"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.dom.query.html" title="Zend\Dom\Query"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.escaper.introduction.rst">
+                Introduction
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

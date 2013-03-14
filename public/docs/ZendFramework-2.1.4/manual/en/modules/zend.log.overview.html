@@ -1,0 +1,420 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Overview &mdash; Zend Framework 2 2.1.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.4 documentation" href="../index.html" />
+    <link rel="next" title="Writers" href="zend.log.writers.html" />
+    <link rel="prev" title="The Class Map Generator utility: bin/classmap_generator.php" href="zend.loader.classmap-generator.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.log.writers.html" title="Writers"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.loader.classmap-generator.html" title="The Class Map Generator utility: bin/classmap_generator.php"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="overview">
+<span id="zend-log-overview"></span><h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Log\Logger</span></tt> is a component for general purpose logging. It supports multiple log backends, formatting
+messages sent to the log, and filtering messages from being logged. These functions are divided into the following
+objects:</p>
+<ul class="simple">
+<li>A Logger (instance of <tt class="docutils literal"><span class="pre">Zend\Log\Logger</span></tt>) is the object that your application uses the most. You can have as
+many Logger objects as you like; they do not interact. A Logger object must contain at least one Writer, and can
+optionally contain one or more Filters.</li>
+<li>A Writer (inherits from <tt class="docutils literal"><span class="pre">Zend\Log\Writer\AbstractWriter</span></tt>) is responsible for saving data to storage.</li>
+<li>A Filter (implements <tt class="docutils literal"><span class="pre">Zend\Log\Filter</span></tt>) blocks log data from being saved. A filter is applied to an  individual
+writer. Filters can be chained.</li>
+<li>A Formatter (inheriting from <tt class="docutils literal"><span class="pre">Zend\Log\Formatter\AbstractFormatter</span></tt>) can format the log data before it is
+written by a Writer. Each Writer has exactly one Formatter.</li>
+</ul>
+<div class="section" id="creating-a-log">
+<span id="zend-log-overview-creating-a-logger"></span><h2>Creating a Log<a class="headerlink" href="#creating-a-log" title="Permalink to this headline">¶</a></h2>
+<p>To get started logging, instantiate a Writer and then pass it to a Logger instance:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Logger</span><span class="p">;</span>
+<span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Writer\Stream</span><span class="p">(</span><span class="s1">&#39;php://output&#39;</span><span class="p">);</span>
+
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">addWriter</span><span class="p">(</span><span class="nv">$writer</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>It is important to note that the Logger must have at least one Writer. You can add any number of Writers using the
+Log&#8217;s <tt class="docutils literal"><span class="pre">addWriter()</span></tt> method.</p>
+<p>You can also add a priority to each writer. The priority is specified as number and passed as second argument in
+the <tt class="docutils literal"><span class="pre">addWriter()</span></tt> method.</p>
+<p>Another way to add a writer to a Logger is to use the name of the writer as follow:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Logger</span><span class="p">;</span>
+
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">addWriter</span><span class="p">(</span><span class="s1">&#39;stream&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;stream&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;php://output&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>In this example we passed the stream <tt class="docutils literal"><span class="pre">php://output</span></tt> as parameter (as array).</p>
+</div>
+<div class="section" id="logging-messages">
+<span id="zend-log-overview-logging-messages"></span><h2>Logging Messages<a class="headerlink" href="#logging-messages" title="Permalink to this headline">¶</a></h2>
+<p>To log a message, call the <tt class="docutils literal"><span class="pre">log()</span></tt> method of a Log instance and pass it the message with a corresponding
+priority:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="nx">Zend\Log\Logger</span><span class="o">::</span><span class="na">INFO</span><span class="p">,</span> <span class="s1">&#39;Informational message&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>The first parameter of the <tt class="docutils literal"><span class="pre">log()</span></tt> method is an integer <tt class="docutils literal"><span class="pre">priority</span></tt> and the second parameter is a string
+<tt class="docutils literal"><span class="pre">message</span></tt>. The priority must be one of the priorities recognized by the Logger instance. This is explained in the
+next section. There is also an optional third parameter used to pass extra informations to the writer&#8217;s log.</p>
+<p>A shortcut is also available. Instead of calling the <tt class="docutils literal"><span class="pre">log()</span></tt> method, you can call a method by the same name as
+the priority:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="nx">Zend\Log\Logger</span><span class="o">::</span><span class="na">INFO</span><span class="p">,</span> <span class="s1">&#39;Informational message&#39;</span><span class="p">);</span>
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">info</span><span class="p">(</span><span class="s1">&#39;Informational message&#39;</span><span class="p">);</span>
+
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">log</span><span class="p">(</span><span class="nx">Zend\Log\Logger</span><span class="o">::</span><span class="na">EMERG</span><span class="p">,</span> <span class="s1">&#39;Emergency message&#39;</span><span class="p">);</span>
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">emerg</span><span class="p">(</span><span class="s1">&#39;Emergency message&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="destroying-a-log">
+<span id="zend-log-overview-destroying-a-logger"></span><h2>Destroying a Log<a class="headerlink" href="#destroying-a-log" title="Permalink to this headline">¶</a></h2>
+<p>If the Logger object is no longer needed, set the variable containing it to <tt class="docutils literal"><span class="pre">NULL</span></tt> to destroy it. This will
+automatically call the <tt class="docutils literal"><span class="pre">shutdown()</span></tt> instance method of each attached Writer before the Log object is destroyed:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$logger</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Explicitly destroying the log in this way is optional and is performed automatically at <em>PHP</em> shutdown.</p>
+</div>
+<div class="section" id="using-built-in-priorities">
+<span id="zend-log-overview-builtin-priorities"></span><h2>Using Built-in Priorities<a class="headerlink" href="#using-built-in-priorities" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Log\Logger</span></tt> class defines the following priorities:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nx">EMERG</span>   <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>  <span class="c1">// Emergency: system is unusable</span>
+<span class="nx">ALERT</span>   <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>  <span class="c1">// Alert: action must be taken immediately</span>
+<span class="nx">CRIT</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>  <span class="c1">// Critical: critical conditions</span>
+<span class="nx">ERR</span>     <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>  <span class="c1">// Error: error conditions</span>
+<span class="nx">WARN</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>  <span class="c1">// Warning: warning conditions</span>
+<span class="nx">NOTICE</span>  <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>  <span class="c1">// Notice: normal but significant condition</span>
+<span class="nx">INFO</span>    <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>  <span class="c1">// Informational: informational messages</span>
+<span class="nx">DEBUG</span>   <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>  <span class="c1">// Debug: debug messages</span>
+</pre></div>
+</td></tr></table></div>
+<p>These priorities are always available, and a convenience method of the same name is available for each one.</p>
+<p>The priorities are not arbitrary. They come from the BSD syslog protocol, which is described in <a class="reference external" href="http://tools.ietf.org/html/rfc3164">RFC-3164</a>. The
+names and corresponding priority numbers are also compatible with another <em>PHP</em> logging system, <a class="reference external" href="http://pear.php.net/package/log">PEAR Log</a>, which
+perhaps promotes interoperability between it and <tt class="docutils literal"><span class="pre">Zend\Log\Logger</span></tt>.</p>
+<p>Priority numbers descend in order of importance. <tt class="docutils literal"><span class="pre">EMERG</span></tt> (0) is the most important priority. <tt class="docutils literal"><span class="pre">DEBUG</span></tt> (7) is the
+least important priority of the built-in priorities. You may define priorities of lower importance than <tt class="docutils literal"><span class="pre">DEBUG</span></tt>.
+When selecting the priority for your log message, be aware of this priority hierarchy and choose appropriately.</p>
+</div>
+<div class="section" id="understanding-log-events">
+<span id="zend-log-overview-understanding-fields"></span><h2>Understanding Log Events<a class="headerlink" href="#understanding-log-events" title="Permalink to this headline">¶</a></h2>
+<p>When you call the <tt class="docutils literal"><span class="pre">log()</span></tt> method or one of its shortcuts, a log event is created. This is simply an associative
+array with data describing the event that is passed to the writers. The following keys are always created in this
+array: <tt class="docutils literal"><span class="pre">timestamp</span></tt>, <tt class="docutils literal"><span class="pre">message</span></tt>, <tt class="docutils literal"><span class="pre">priority</span></tt>, and <tt class="docutils literal"><span class="pre">priorityName</span></tt>.</p>
+<p>The creation of the <tt class="docutils literal"><span class="pre">event</span></tt> array is completely transparent.</p>
+</div>
+<div class="section" id="log-php-errors">
+<span id="zend-log-overview-as-errorhandler"></span><h2>Log PHP Errors<a class="headerlink" href="#log-php-errors" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Log\Logger</span></tt> can also be used to log <em>PHP</em> errors and intercept Exceptions. Calling the static method
+<tt class="docutils literal"><span class="pre">registerErrorHandler($logger)</span></tt> will add the $logger object before the current PHP error handler, and will pass
+the error along as well.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$logger</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Logger</span><span class="p">;</span>
+<span class="nv">$writer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Log\Writer\Stream</span><span class="p">(</span><span class="s1">&#39;php://output&#39;</span><span class="p">);</span>
+
+<span class="nv">$logger</span><span class="o">-&gt;</span><span class="na">addWriter</span><span class="p">(</span><span class="nv">$writer</span><span class="p">);</span>
+
+<span class="nx">Zend\Log\Logger</span><span class="o">::</span><span class="na">registerErrorHandler</span><span class="p">(</span><span class="nv">$logger</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you want to unregister the error handler you can use the <tt class="docutils literal"><span class="pre">unregisterErrorHandler()</span></tt> static method.</p>
+<table border="1" class="docutils" id="zend-log-overview-as-errorhandler-properties-table">
+<caption>Zend\Log\Logger events from PHP errors fields matching handler ( int $errno , string $errstr [, string $errfile [, int $errline [, array $errcontext ]]] ) from set_error_handler</caption>
+<colgroup>
+<col width="2%" />
+<col width="8%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Error Handler Parameter</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>message</td>
+<td>errstr</td>
+<td>Contains the error message, as a string.</td>
+</tr>
+<tr class="row-odd"><td>errno</td>
+<td>errno</td>
+<td>Contains the level of the error raised, as an integer.</td>
+</tr>
+<tr class="row-even"><td>file</td>
+<td>errfile</td>
+<td>Contains the filename that the error was raised in, as a string.</td>
+</tr>
+<tr class="row-odd"><td>line</td>
+<td>errline</td>
+<td>Contains the line number the error was raised at, as an integer.</td>
+</tr>
+<tr class="row-even"><td>context</td>
+<td>errcontext</td>
+<td>(optional) An array that points to the active symbol table at the point the error occurred. In other words, errcontext will contain an array of every variable that existed in the scope the error was triggered in. User error handler must not modify error context.</td>
+</tr>
+</tbody>
+</table>
+<p>You can also configure a Logger to intercept Exceptions using the static method
+<tt class="docutils literal"><span class="pre">registerExceptionHandler($logger)</span></tt>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overview</a><ul>
+<li><a class="reference internal" href="#creating-a-log">Creating a Log</a></li>
+<li><a class="reference internal" href="#logging-messages">Logging Messages</a></li>
+<li><a class="reference internal" href="#destroying-a-log">Destroying a Log</a></li>
+<li><a class="reference internal" href="#using-built-in-priorities">Using Built-in Priorities</a></li>
+<li><a class="reference internal" href="#understanding-log-events">Understanding Log Events</a></li>
+<li><a class="reference internal" href="#log-php-errors">Log PHP Errors</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.loader.classmap-generator.html"
+                        title="previous chapter">The Class Map Generator utility: bin/classmap_generator.php</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.log.writers.html"
+                        title="next chapter">Writers</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.log.overview.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.log.overview.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.log.overview.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.log.writers.html" title="Writers"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.loader.classmap-generator.html" title="The Class Map Generator utility: bin/classmap_generator.php"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.log.overview.rst">
+                Overview
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

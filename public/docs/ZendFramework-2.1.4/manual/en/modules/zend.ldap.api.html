@@ -1,0 +1,1562 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API overview &mdash; Zend Framework 2 2.1.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.4 documentation" href="../index.html" />
+    <link rel="next" title="Usage Scenarios" href="zend.ldap.usage.html" />
+    <link rel="prev" title="Introduction" href="zend.ldap.introduction.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.ldap.usage.html" title="Usage Scenarios"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.ldap.introduction.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="api-overview">
+<span id="zend-ldap-api"></span><h1>API overview<a class="headerlink" href="#api-overview" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="configuration-options">
+<span id="zend-ldap-api-configuration"></span><h2>Configuration / options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">Zend\Ldap\Ldap</span></tt> component accepts an array of options either supplied to the constructor or through the
+<tt class="docutils literal"><span class="pre">setOptions()</span></tt> method. The permitted options are as follows:</p>
+<table border="1" class="docutils" id="zend-ldap-api-configuration-table">
+<caption>Zend\Ldap\Ldap Options</caption>
+<colgroup>
+<col width="4%" />
+<col width="96%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>host</td>
+<td>The default hostname of LDAP server if not supplied to connect() (also may be used when trying to canonicalize usernames in bind()).</td>
+</tr>
+<tr class="row-odd"><td>port</td>
+<td>Default port of LDAP server if not supplied to connect().</td>
+</tr>
+<tr class="row-even"><td>useStartTls</td>
+<td>Whether or not the LDAP client should use TLS (aka SSLv2) encrypted transport. A value of TRUE is strongly favored in production environments to prevent passwords from be transmitted in clear text. The default value is FALSE, as servers frequently require that a certificate be installed separately after installation. The useSsl and useStartTls options are mutually exclusive. The useStartTls option should be favored over useSsl but not all servers support this newer mechanism.</td>
+</tr>
+<tr class="row-odd"><td>useSsl</td>
+<td>Whether or not the LDAP client should use SSL encrypted transport. The useSsl and useStartTls options are mutually exclusive.</td>
+</tr>
+<tr class="row-even"><td>username</td>
+<td>The default credentials username. Some servers require that this be in DN form. This must be given in DN form if the LDAP server requires a DN to bind and binding should be possible with simple usernames.</td>
+</tr>
+<tr class="row-odd"><td>password</td>
+<td>The default credentials password (used only with username above).</td>
+</tr>
+<tr class="row-even"><td>bindRequiresDn</td>
+<td>If TRUE, this instructs Zend\Ldap\Ldap to retrieve the DN for the account used to bind if the username is not already in DN form. The default value is FALSE.</td>
+</tr>
+<tr class="row-odd"><td>baseDn</td>
+<td>The default base DN used for searching (e.g., for accounts). This option is required for most account related operations and should indicate the DN under which accounts are located.</td>
+</tr>
+<tr class="row-even"><td>accountCanonicalForm</td>
+<td>A small integer indicating the form to which account names should be canonicalized. See the Account Name Canonicalization section below.</td>
+</tr>
+<tr class="row-odd"><td>accountDomainName</td>
+<td>The FQDN domain for which the target LDAP server is an authority (e.g., example.com).</td>
+</tr>
+<tr class="row-even"><td>accountDomainNameShort</td>
+<td>The &#8216;short&#8217; domain for which the target LDAP server is an authority. This is usually used to specify the NetBIOS domain name for Windows networks but may also be used by non-AD servers.</td>
+</tr>
+<tr class="row-odd"><td>accountFilterFormat</td>
+<td>The LDAP search filter used to search for accounts. This string is a sprintf() style expression that must contain one &#8216;%s&#8217; to accommodate the username. The default value is &#8216;(&amp;(objectClass=user)(sAMAccountName=%s))&#8217; unless bindRequiresDn is set to TRUE, in which case the default is &#8216;(&amp;(objectClass=posixAccount)(uid=%s))&#8217;. Users of custom schemas may need to change this option.</td>
+</tr>
+<tr class="row-even"><td>allowEmptyPassword</td>
+<td>Some LDAP servers can be configured to accept an empty string password as an anonymous bind. This behavior is almost always undesirable. For this reason, empty passwords are explicitly disallowed. Set this value to TRUE to allow an empty string password to be submitted during the bind.</td>
+</tr>
+<tr class="row-odd"><td>optReferrals</td>
+<td>If set to TRUE, this option indicates to the LDAP client that referrals should be followed. The default value is FALSE.</td>
+</tr>
+<tr class="row-even"><td>tryUsernameSplit</td>
+<td>If set to FALSE, this option indicates that the given username should not be split at the first &#64; or \ character to separate the username from the domain during the binding-procedure. This allows the user to use usernames that contain an &#64; or \ character that do not inherit some domain-information, e.g. using email-addresses for binding. The default value is TRUE.</td>
+</tr>
+<tr class="row-odd"><td>networkTimeout</td>
+<td>Number of seconds to wait for LDAP connection before fail. If not set the default value is the system value.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="api-reference">
+<span id="zend-ldap-api-reference"></span><h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Method names in <strong>italics</strong> are static methods.</p>
+</div>
+</div>
+</div>
+<div class="section" id="zend-ldap-ldap">
+<span id="zend-ldap-api-reference-zend-ldap"></span><h1>Zend\Ldap\Ldap<a class="headerlink" href="#zend-ldap-ldap" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Ldap\Ldap</span></tt> is the base interface into a <em>LDAP</em> server. It provides connection and binding methods as well
+as methods to operate on the <em>LDAP</em> tree.</p>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-table">
+<caption>Zend\Ldap\Ldap API</caption>
+<colgroup>
+<col width="11%" />
+<col width="89%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>__construct($options)</td>
+<td>Constructor. The $options parameter is optional and can be set to an array or a Traversable object. If no options are provided at instantiation, the connection parameters must be passed to the instance using Zend\Ldap\Ldap::setOptions(). The allowed options are specified in Zend\Ldap\Ldap Options</td>
+</tr>
+<tr class="row-odd"><td>resource getResource()</td>
+<td>Returns the raw LDAP extension (ext/ldap) resource.</td>
+</tr>
+<tr class="row-even"><td>integer getLastErrorCode()</td>
+<td>Returns the LDAP error number of the last LDAP command.</td>
+</tr>
+<tr class="row-odd"><td>string getLastError(integer &amp;$errorCode, array &amp;$errorMessages)</td>
+<td>Returns the LDAP error message of the last LDAP command. The optional $errorCode parameter is set to the LDAP error number when given. The optional $errorMessages array will be filled with the raw error messages when given. The various LDAP error retrieval functions can return different things, so they are all collected if $errorMessages is given.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Ldap setOptions($options)</td>
+<td>Sets the LDAP connection and binding parameters. $options can be an array or an Traversable object. The allowed options are specified in Zend\Ldap\Ldap Options</td>
+</tr>
+<tr class="row-odd"><td>array getOptions()</td>
+<td>Returns the current connection and binding parameters.</td>
+</tr>
+<tr class="row-even"><td>string getBaseDn()</td>
+<td>Returns the base DN this LDAP connection is bound to.</td>
+</tr>
+<tr class="row-odd"><td>string getCanonicalAccountName(string $acctname, integer $form)</td>
+<td>Returns the canonical account name of the given account name $acctname. $form specifies the format into which the account name is canonicalized. See Account Name Canonicalization for more details.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Ldap disconnect()</td>
+<td>Disconnects the Zend\Ldap\Ldap instance from the LDAP server.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Ldap connect(string $host, integer $port, boolean $useSsl, boolean $useStartTls, integer $networkTimeout)</td>
+<td>Connects the Zend\Ldap\Ldap instance to the given LDAP server. All parameters are optional and will be taken from the LDAP connection and binding parameters passed to the instance via the constructor or via Zend\Ldap\Ldap::setOptions() when set to NULL.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Ldap bind(string $username, string $password)</td>
+<td>Authenticates $username with $password at the LDAP server. If both parameters are omitted the binding will be carried out with the credentials given in the connection and binding parameters. If no credentials are given in the connection and binding parameters an anonymous bind will be performed. Note that this requires anonymous binds to be allowed on the LDAP server. An empty string &#8216;&#8217; can be passed as $password together with a username if, and only if, allowEmptyPassword is set to TRUE in the connection and binding parameters.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Collection search(string|Zend\Ldap\Filter\AbstractFilter $filter, string|Zend\Ldap\Dn $basedn, integer $scope, array $attributes, string $sort, string $collectionClass, integer $sizelimit, integer $timelimit)</td>
+<td>Searches the LDAP tree with the given $filter and the given search parameters. string|Zend\Ldap\Filter\AbstractFilter $filter The filter string to be used in the search, e.g. (objectClass=posixAccount). string|Zend\Ldap\Dn $basedn The search base for the search. If omitted or NULL, the baseDn from the connection and binding parameters is used. integer $scope The search scope. Zend\Ldap\Ldap::SEARCH_SCOPE_SUB searches the complete subtree including the $baseDn node. Zend\Ldap\Ldap::SEARCH_SCOPE_ONE restricts search to one level below $baseDn. Zend\Ldap\Ldap::SEARCH_SCOPE_BASE restricts search to the $baseDn itself; this can be used to efficiently retrieve a single entry by its DN. The default value is Zend\Ldap\Ldap::SEARCH_SCOPE_SUB. array $attributes Specifies the attributes contained in the returned entries. To include all possible attributes (ACL restrictions can disallow certain attribute to be retrieved by a given user) pass either an empty array array() or array(&#8216;*&#8217;) to the method. On some LDAP servers you can retrieve special internal attributes by passing array(&#8216;*&#8217;, &#8216;+&#8217;) to the method. string $sort If given the result collection will be sorted after the attribute $sort. Results can only be sorted after one single attribute as this parameter uses the ext/ldap function ldap_sort(). string $collectionClass If given the result will be wrapped in an object of type $collectionClass. By default an object of type Zend\Ldap\Collection will be returned. The custom class must extend Zend\Ldap\Collection and will be passed a Zend\Ldap\Collection\Iterator\Default on instantiation. integer $sizelimit Enables you to limit the count of entries fetched. Setting this to 0 means no limit. integer $timelimit Sets the number of seconds how long is spend on the search. Setting this to 0 means no limit.</td>
+</tr>
+<tr class="row-even"><td>integer count(string|Zend\Ldap\Filter\AbstractFilter $filter, string|Zend\Ldap\Dn $basedn, integer $scope)</td>
+<td>Counts the elements returned by the given search parameters. See Zend\Ldap\Ldap::search() for a detailed description of the method parameters.</td>
+</tr>
+<tr class="row-odd"><td>integer countChildren(string|Zend\Ldap\Dn $dn)</td>
+<td>Counts the direct descendants (children) of the entry identified by the given $dn.</td>
+</tr>
+<tr class="row-even"><td>boolean exists(string|Zend\Ldap\Dn $dn)</td>
+<td>Checks whether the entry identified by the given $dn exists.</td>
+</tr>
+<tr class="row-odd"><td>array searchEntries(string|Zend\Ldap\Filter\AbstractFilter $filter, string|Zend\Ldap\Dn $basedn, integer $scope, array $attributes, string $sort, string $reverseSort, integer $sizelimit, integer $timelimit)</td>
+<td>Performs a search operation and returns the result as an PHP array. This is essentially the same method as Zend\Ldap\Ldap::search() except for the return type. See Zend\Ldap\Ldap::search() for a detailed description of the method parameters.</td>
+</tr>
+<tr class="row-even"><td>array getEntry(string|Zend\Ldap\Dn $dn, array $attributes, boolean $throwOnNotFound)</td>
+<td>Retrieves the LDAP entry identified by $dn with the attributes specified in $attributes. if $attributes is omitted, all attributes (array()) are included in the result. $throwOnNotFound is FALSE by default, so the method will return NULL if the specified entry cannot be found. If set to TRUE, a Zend\Ldap\Exception\LdapException will be thrown instead.</td>
+</tr>
+<tr class="row-odd"><td>void prepareLdapEntryArray(array &amp;$entry)</td>
+<td>Prepare an array for the use in LDAP modification operations. This method does not need to be called by the end-user as it&#8217;s implicitly called on every data modification method.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Ldap add(string|Zend\Ldap\Dn $dn, array $entry)</td>
+<td>Adds the entry identified by $dn with its attributes $entry to the LDAP tree. Throws a Zend\Ldap\Exception\LdapException if the entry could not be added.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Ldap update(string|Zend\Ldap\Dn $dn, array $entry)</td>
+<td>Updates the entry identified by $dn with its attributes $entry to the LDAP tree. Throws a Zend\Ldap\Exception\LdapException if the entry could not be modified.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Ldap save(string|Zend\Ldap\Dn $dn, array $entry)</td>
+<td>Saves the entry identified by $dn with its attributes $entry to the LDAP tree. Throws a Zend\Ldap\Exception\LdapException if the entry could not be saved. This method decides by querying the LDAP tree if the entry will be added or updated.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Ldap delete(string|Zend\Ldap\Dn $dn, boolean $recursively)</td>
+<td>Deletes the entry identified by $dn from the LDAP tree. Throws a Zend\Ldap\Exception\LdapException if the entry could not be deleted. $recursively is FALSE by default. If set to TRUE the deletion will be carried out recursively and will effectively delete a complete subtree. Deletion will fail if $recursively is FALSE and the entry $dn is not a leaf entry.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Ldap moveToSubtree(string|Zend\Ldap\Dn $from, string|Zend\Ldap\Dn $to, boolean $recursively, boolean $alwaysEmulate)</td>
+<td>Moves the entry identified by $from to a location below $to keeping its RDN unchanged. $recursively specifies if the operation will be carried out recursively (FALSE by default) so that the entry $from and all its descendants will be moved. Moving will fail if $recursively is FALSE and the entry $from is not a leaf entry. $alwaysEmulate controls whether the ext/ldap function ldap_rename() should be used if available. This can only work for leaf entries and for servers and for ext/ldap supporting this function. Set to TRUE to always use an emulated rename operation. All move-operations are carried out by copying and then deleting the corresponding entries in the LDAP tree. These operations are not atomic so that failures during the operation will result in an inconsistent state on the LDAP server. The same is true for all recursive operations. They also are by no means atomic. Please keep this in mind.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Ldap move(string|Zend\Ldap\Dn $from, string|Zend\Ldap\Dn $to, boolean $recursively, boolean $alwaysEmulate)</td>
+<td>This is an alias for Zend\Ldap\Ldap::rename().</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Ldap rename(string|Zend\Ldap\Dn $from, string|Zend\Ldap\Dn $to, boolean $recursively, boolean $alwaysEmulate)</td>
+<td>Renames the entry identified by $from to $to. $recursively specifies if the operation will be carried out recursively (FALSE by default) so that the entry $from and all its descendants will be moved. Moving will fail if $recursively is FALSE and the entry $from is not a leaf entry. $alwaysEmulate controls whether the ext/ldap function ldap_rename() should be used if available. This can only work for leaf entries and for servers and for ext/ldap supporting this function. Set to TRUE to always use an emulated rename operation.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Ldap copyToSubtree(string|Zend\Ldap\Dn $from, string|Zend\Ldap\Dn $to, boolean $recursively)</td>
+<td>Copies the entry identified by $from to a location below $to keeping its RDN unchanged. $recursively specifies if the operation will be carried out recursively (FALSE by default) so that the entry $from and all its descendants will be copied. Copying will fail if $recursively is FALSE and the entry $from is not a leaf entry.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Ldap copy(string|Zend\Ldap\Dn $from, string|Zend\Ldap\Dn $to, boolean $recursively)</td>
+<td>Copies the entry identified by $from to $to. $recursively specifies if the operation will be carried out recursively (FALSE by default) so that the entry $from and all its descendants will be copied. Copying will fail if $recursively is FALSE and the entry $from is not a leaf entry.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node getNode(string|Zend\Ldap\Dn $dn)</td>
+<td>Returns the entry $dn wrapped in a Zend\Ldap\Node.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node getBaseNode()</td>
+<td>Returns the entry for the base DN $baseDn wrapped in a Zend\Ldap\Node.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node\RootDse getRootDse()</td>
+<td>Returns the RootDSE for the current server.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node\Schema getSchema()</td>
+<td>Returns the LDAP schema for the current server.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="zend-ldap-collection">
+<span id="zend-ldap-api-reference-zend-ldap-zend-ldap-collection"></span><h2>Zend\Ldap\Collection<a class="headerlink" href="#zend-ldap-collection" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Ldap\Collection</span></tt> implements <em>Iterator</em> to allow for item traversal using <tt class="docutils literal"><span class="pre">foreach()</span></tt> and <em>Countable</em> to
+be able to respond to <tt class="docutils literal"><span class="pre">count()</span></tt>. With its protected <tt class="docutils literal"><span class="pre">createEntry()</span></tt> method it provides a simple extension point
+for developers needing custom result objects.</p>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-zend-ldap-collection-table">
+<caption>Zend\Ldap\Collection API</caption>
+<colgroup>
+<col width="22%" />
+<col width="78%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>__construct(Zend\Ldap\Collection\Iterator\Interface $iterator)</td>
+<td>Constructor. The constructor must be provided by a Zend\Ldap\Collection\Iterator\Interface which does the real result iteration. Zend\Ldap\Collection\Iterator\Default is the default implementation for iterating ext/ldap results.</td>
+</tr>
+<tr class="row-odd"><td>boolean close()</td>
+<td>Closes the internal iterator. This is also called in the destructor.</td>
+</tr>
+<tr class="row-even"><td>array toArray()</td>
+<td>Returns all entries as an array.</td>
+</tr>
+<tr class="row-odd"><td>array getFirst()</td>
+<td>Returns the first entry in the collection or NULL if the collection is empty.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="zend-ldap-attribute">
+<span id="zend-ldap-api-reference-zend-ldap-attribute"></span><h1>Zend\Ldap\Attribute<a class="headerlink" href="#zend-ldap-attribute" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Ldap\Attribute</span></tt> is a helper class providing only static methods to manipulate arrays suitable to the
+structure used in <tt class="docutils literal"><span class="pre">Zend\Ldap\Ldap</span></tt> data modification methods and to the data format required by the <em>LDAP</em>
+server. <em>PHP</em> data types are converted using <tt class="docutils literal"><span class="pre">Zend\Ldap\Converter\Converter</span></tt> methods.</p>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-attribute-table">
+<caption>Zend\Ldap\Attribute API</caption>
+<colgroup>
+<col width="18%" />
+<col width="82%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>void setAttribute(array &amp;$data, string $attribName, mixed $value, boolean $append)</td>
+<td>Sets the attribute $attribName in $data to the value $value. If $append is TRUE (FALSE by default) $value will be appended to the attribute. $value can be a scalar value or an array of scalar values. Conversion will take place.</td>
+</tr>
+<tr class="row-odd"><td>array|mixed getAttribute(array $data, string $attribName, integer|null $index)</td>
+<td>Returns the attribute $attribName from $data. If $index is NULL (default) an array will be returned containing all the values for the given attribute. An empty array will be returned if the attribute does not exist in the given array. If an integer index is specified the corresponding value at the given index will be returned. If the index is out of bounds, NULL will be returned. Conversion will take place.</td>
+</tr>
+<tr class="row-even"><td>boolean attributeHasValue(array &amp;$data, string $attribName, mixed|array $value)</td>
+<td>Checks if the attribute $attribName in $data has the value(s) given in $value. The method returns TRUE only if all values in $value are present in the attribute. Comparison is done strictly (respecting the data type).</td>
+</tr>
+<tr class="row-odd"><td>void removeDuplicatesFromAttribute(array &amp;$data, string $attribName)</td>
+<td>Removes all duplicates from the attribute $attribName in $data.</td>
+</tr>
+<tr class="row-even"><td>void removeFromAttribute(array &amp;$data, string $attribName, mixed|array $value)</td>
+<td>Removes the value(s) given in $value from the attribute $attribName in $data.</td>
+</tr>
+<tr class="row-odd"><td>void setPassword(array &amp;$data, string $password, string $hashType, string $attribName)</td>
+<td>Sets a LDAP password for the attribute $attribName in $data. $attribName defaults to &#8216;userPassword&#8217; which is the standard password attribute. The password hash can be specified with $hashType. The default value here is Zend\Ldap\Attribute::PASSWORD_HASH_MD5 with Zend\Ldap\Attribute::PASSWORD_HASH_SHA as the other possibility.</td>
+</tr>
+<tr class="row-even"><td>string createPassword(string $password, string $hashType)</td>
+<td>Creates a LDAP password. The password hash can be specified with $hashType. The default value here is Zend\Ldap\Attribute::PASSWORD_HASH_MD5 with Zend\Ldap\Attribute::PASSWORD_HASH_SHA as the other possibility.</td>
+</tr>
+<tr class="row-odd"><td>void setDateTimeAttribute(array &amp;$data, string $attribName, integer|array $value, boolean $utc, boolean $append)</td>
+<td>Sets the attribute $attribName in $data to the date/time value $value. if $append is TRUE (FALSE by default) $value will be appended to the attribute. $value can be an integer value or an array of integers. Date-time-conversion according to Zend\Ldap\Converter\Converter::toLdapDateTime() will take place.</td>
+</tr>
+<tr class="row-even"><td>array|integer getDateTimeAttribute(array $data, string $attribName, integer|null $index)</td>
+<td>Returns the date/time attribute $attribName from $data. If $index is NULL (default) an array will be returned containing all the date/time values for the given attribute. An empty array will be returned if the attribute does not exist in the given array. If an integer index is specified the corresponding date/time value at the given index will be returned. If the index is out of bounds, NULL will be returned. Date-time-conversion according to Zend\Ldap\Converter\Converter::fromLdapDateTime() will take place.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="zend-ldap-converter-converter">
+<span id="zend-ldap-api-reference-zend-ldap-converter-converter"></span><h1>Zend\Ldap\Converter\Converter<a class="headerlink" href="#zend-ldap-converter-converter" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Ldap\Converter\Converter</span></tt> is a helper class providing only static methods to manipulate arrays suitable to
+the data format required by the <em>LDAP</em> server. <em>PHP</em> data types are converted the following way:</p>
+<dl class="docutils">
+<dt><strong>string</strong></dt>
+<dd>No conversion will be done.</dd>
+<dt><strong>integer and float</strong></dt>
+<dd>The value will be converted to a string.</dd>
+<dt><strong>boolean</strong></dt>
+<dd><tt class="docutils literal"><span class="pre">TRUE</span></tt> will be converted to <strong>&#8216;TRUE&#8217;</strong> and <tt class="docutils literal"><span class="pre">FALSE</span></tt> to <strong>&#8216;FALSE&#8217;</strong></dd>
+<dt><strong>object and array</strong></dt>
+<dd>The value will be converted to a string by using <tt class="docutils literal"><span class="pre">serialize()</span></tt>.</dd>
+<dt><strong>Date/Time</strong></dt>
+<dd>The value will be converted to a string with the following <tt class="docutils literal"><span class="pre">date()</span></tt> format <em>YmdHisO</em>, UTC timezone (+0000)
+will be replaced with a <em>Z</em>. For example <em>01-30-2011 01:17:32 PM GMT-6</em> will be <em>20113001131732-0600</em> and
+<em>30-01-2012 15:17:32 UTC</em> will be <em>20120130151732Z</em></dd>
+<dt><strong>resource</strong></dt>
+<dd>If a <em>stream</em> resource is given, the data will be fetched by calling <tt class="docutils literal"><span class="pre">stream_get_contents()</span></tt>.</dd>
+<dt><strong>others</strong></dt>
+<dd>All other data types (namely non-stream resources) will be omitted.</dd>
+</dl>
+<p>On reading values the following conversion will take place:</p>
+<dl class="docutils">
+<dt><strong>&#8216;TRUE&#8217;</strong></dt>
+<dd>Converted to <tt class="docutils literal"><span class="pre">TRUE</span></tt>.</dd>
+<dt><strong>&#8216;FALSE&#8217;</strong></dt>
+<dd>Converted to <tt class="docutils literal"><span class="pre">FALSE</span></tt>.</dd>
+<dt><strong>others</strong></dt>
+<dd>All other strings won&#8217;t be automatically converted and are passed as they are.</dd>
+</dl>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-converter-converter-table">
+<caption>Zend\Ldap\Converter\Converter API</caption>
+<colgroup>
+<col width="19%" />
+<col width="81%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>string ascToHex32(string $string)</td>
+<td>Convert all Ascii characters with decimal value less than 32 to hexadecimal value.</td>
+</tr>
+<tr class="row-odd"><td>string hex32ToAsc(string $string)</td>
+<td>Convert all hexadecimal characters by his Ascii value.</td>
+</tr>
+<tr class="row-even"><td>string|null toLdap(mixed $value, int $type)</td>
+<td>Converts a PHP data type into its LDAP representation. $type argument is used to set the conversion method by default Converter::STANDARD where the function will try to guess the conversion method to use, others possibilities are Converter::BOOLEAN and Converter::GENERALIZED_TIME See introduction for details.</td>
+</tr>
+<tr class="row-odd"><td>mixed fromLdap(string $value, int $type, boolean $dateTimeAsUtc)</td>
+<td>Converts an LDAP value into its PHP data type. See introduction and toLdap() and toLdapDateTime() for details.</td>
+</tr>
+<tr class="row-even"><td>string|null toLdapDateTime(integer|string|DateTime $date, boolean $asUtc)</td>
+<td>Converts a timestamp, a DateTime Object, a string that is parseable by strtotime() or a DateTime into its LDAP date/time representation. If $asUtc is TRUE ( FALSE by default) the resulting LDAP date/time string will be inUTC, otherwise a local date/time string will be returned.</td>
+</tr>
+<tr class="row-odd"><td>DateTime fromLdapDateTime(string $date, boolean $asUtc)</td>
+<td>Converts LDAP date/time representation into a PHP DateTime object.</td>
+</tr>
+<tr class="row-even"><td>string toLdapBoolean(boolean|integer|string $value)</td>
+<td>Converts a PHP data type into its LDAP boolean representation. By default always return &#8216;FALSE&#8217; except if the value is true , &#8216;true&#8217; or 1</td>
+</tr>
+<tr class="row-odd"><td>boolean fromLdapBoolean(string $value)</td>
+<td>Converts LDAP boolean representation into a PHP boolean data type.</td>
+</tr>
+<tr class="row-even"><td>string toLdapSerialize(mixed $value)</td>
+<td>The value will be converted to a string by using serialize().</td>
+</tr>
+<tr class="row-odd"><td>mixed fromLdapUnserialize(string $value)</td>
+<td>The value will be converted from a string by using unserialize().</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="zend-ldap-dn">
+<span id="zend-ldap-api-reference-zend-ldap-dn"></span><h1>Zend\Ldap\Dn<a class="headerlink" href="#zend-ldap-dn" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Ldap\Dn</span></tt> provides an object-oriented interface to manipulating <em>LDAP</em> distinguished names (DN). The
+parameter <tt class="docutils literal"><span class="pre">$caseFold</span></tt> that is used in several methods determines the way DN attributes are handled regarding
+their case. Allowed values for this parameter are:</p>
+<dl class="docutils">
+<dt><strong>ZendLdapDn::ATTR_CASEFOLD_NONE</strong></dt>
+<dd>No case-folding will be done.</dd>
+<dt><strong>ZendLdapDn::ATTR_CASEFOLD_UPPER</strong></dt>
+<dd>All attributes will be converted to upper-case.</dd>
+<dt><strong>ZendLdapDn::ATTR_CASEFOLD_LOWER</strong></dt>
+<dd>All attributes will be converted to lower-case.</dd>
+</dl>
+<p>The default case-folding is <tt class="docutils literal"><span class="pre">Zend\Ldap\Dn::ATTR_CASEFOLD_NONE</span></tt> and can be set with
+<tt class="docutils literal"><span class="pre">Zend\Ldap\Dn::setDefaultCaseFold()</span></tt>. Each instance of <tt class="docutils literal"><span class="pre">Zend\Ldap\Dn</span></tt> can have its own case-folding-setting. If
+the <tt class="docutils literal"><span class="pre">$caseFold</span></tt> parameter is omitted in method-calls it defaults to the instance&#8217;s case-folding setting.</p>
+<p>The class implements <em>ArrayAccess</em> to allow indexer-access to the different parts of the DN. The
+<em>ArrayAccess</em>-methods proxy to <tt class="docutils literal"><span class="pre">Zend\Ldap\Dn::get($offset,</span> <span class="pre">1,</span> <span class="pre">null)</span></tt> for <em>offsetGet(integer $offset)</em>, to
+<tt class="docutils literal"><span class="pre">Zend\Ldap\Dn::set($offset,</span> <span class="pre">$value)</span></tt> for <tt class="docutils literal"><span class="pre">offsetSet()</span></tt> and to <tt class="docutils literal"><span class="pre">Zend\Ldap\Dn::remove($offset,</span> <span class="pre">1)</span></tt> for
+<tt class="docutils literal"><span class="pre">offsetUnset()</span></tt>. <tt class="docutils literal"><span class="pre">offsetExists()</span></tt> simply checks if the index is within the bounds.</p>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-dn-table">
+<caption>Zend\Ldap\Dn API</caption>
+<colgroup>
+<col width="18%" />
+<col width="82%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Zend\Ldap\Dn factory(string|array $dn, string|null $caseFold)</td>
+<td>Creates a Zend\Ldap\Dn instance from an array or a string. The array must conform to the array structure detailed under Zend\Ldap\Dn::implodeDn().</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Dn fromString(string $dn, string|null $caseFold)</td>
+<td>Creates a Zend\Ldap\Dn instance from a string.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Dn fromArray(array $dn, string|null $caseFold)</td>
+<td>Creates a Zend\Ldap\Dn instance from an array. The array must conform to the array structure detailed under Zend\Ldap\Dn::implodeDn().</td>
+</tr>
+<tr class="row-odd"><td>array getRdn(string|null $caseFold)</td>
+<td>Gets the RDN of the current DN. The return value is an array with the RDN attribute names its keys and the RDN attribute values.</td>
+</tr>
+<tr class="row-even"><td>string getRdnString(string|null $caseFold)</td>
+<td>Gets the RDN of the current DN. The return value is a string.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Dn getParentDn(integer $levelUp)</td>
+<td>Gets the DN of the current DN&#8217;s ancestor $levelUp levels up the tree. $levelUp defaults to 1.</td>
+</tr>
+<tr class="row-even"><td>array get(integer $index, integer $length, string|null $caseFold)</td>
+<td>Returns a slice of the current DN determined by $index and $length. $index starts with 0 on the DN part from the left.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Dn set(integer $index, array $value)</td>
+<td>Replaces a DN part in the current DN. This operation manipulates the current instance.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Dn remove(integer $index, integer $length)</td>
+<td>Removes a DN part from the current DN. This operation manipulates the current instance. $length defaults to 1</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Dn append(array $value)</td>
+<td>Appends a DN part to the current DN. This operation manipulates the current instance.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Dn prepend(array $value)</td>
+<td>Prepends a DN part to the current DN. This operation manipulates the current instance.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Dn insert(integer $index, array $value)</td>
+<td>Inserts a DN part after the index $index to the current DN. This operation manipulates the current instance.</td>
+</tr>
+<tr class="row-even"><td>void setCaseFold(string|null $caseFold)</td>
+<td>Sets the case-folding option to the current DN instance. If $caseFold is NULL the default case-folding setting (Zend\Ldap\Dn::ATTR_CASEFOLD_NONE by default or set via Zend\Ldap\Dn::setDefaultCaseFold() will be set for the current instance.</td>
+</tr>
+<tr class="row-odd"><td>string toString(string|null $caseFold)</td>
+<td>Returns DN as a string.</td>
+</tr>
+<tr class="row-even"><td>array toArray(string|null $caseFold)</td>
+<td>Returns DN as an array.</td>
+</tr>
+<tr class="row-odd"><td>string __toString()</td>
+<td>Returns DN as a string - proxies to Zend\Ldap\Dn::toString(null).</td>
+</tr>
+<tr class="row-even"><td>void setDefaultCaseFold(string $caseFold)</td>
+<td>Sets the default case-folding option used by all instances on creation by default. Already existing instances are not affected by this setting.</td>
+</tr>
+<tr class="row-odd"><td>array escapeValue(string|array $values)</td>
+<td>Escapes a DN value according to RFC 2253.</td>
+</tr>
+<tr class="row-even"><td>array unescapeValue(string|array $values)</td>
+<td>Undoes the conversion done by Zend\Ldap\Dn::escapeValue().</td>
+</tr>
+<tr class="row-odd"><td>array explodeDn(string $dn, array &amp;$keys, array &amp;$vals, string|null $caseFold)</td>
+<td>Explodes the DN $dn into an array containing all parts of the given DN. $keys optionally receive DN keys (e.g. CN, OU, DC, ...). $vals optionally receive DN values. The resulting array will be of type array( array(&#8220;cn&#8221; =&gt; &#8220;name1&#8221;, &#8220;uid&#8221; =&gt; &#8220;user&#8221;), array(&#8220;cn&#8221; =&gt; &#8220;name2&#8221;), array(&#8220;dc&#8221; =&gt; &#8220;example&#8221;), array(&#8220;dc&#8221; =&gt; &#8220;org&#8221;) ) for a DN of cn=name1+uid=user,cn=name2,dc=example,dc=org.</td>
+</tr>
+<tr class="row-even"><td>boolean checkDn(string $dn, array &amp;$keys, array &amp;$vals, string|null $caseFold)</td>
+<td>Checks if a given DN $dn is malformed. If $keys or $keys and $vals are given, these arrays will be filled with the appropriate DN keys and values.</td>
+</tr>
+<tr class="row-odd"><td>string implodeRdn(array $part, string|null $caseFold)</td>
+<td>Returns a DN part in the form $attribute=$value</td>
+</tr>
+<tr class="row-even"><td>string implodeDn(array $dnArray, string|null $caseFold, string $separator)</td>
+<td>Implodes an array in the form delivered by Zend\Ldap\Dn::explodeDn() to a DN string. $separator defaults to &#8216;,&#8217; but some LDAP servers also understand &#8216;;&#8217;. $dnArray must of type array( array(&#8220;cn&#8221; =&gt; &#8220;name1&#8221;, &#8220;uid&#8221; =&gt; &#8220;user&#8221;), array(&#8220;cn&#8221; =&gt; &#8220;name2&#8221;), array(&#8220;dc&#8221; =&gt; &#8220;example&#8221;), array(&#8220;dc&#8221; =&gt; &#8220;org&#8221;) )</td>
+</tr>
+<tr class="row-odd"><td>boolean isChildOf(string|Zend\Ldap\Dn $childDn, string|Zend\Ldap\Dn $parentDn)</td>
+<td>Checks if given $childDn is beneath $parentDn subtree.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="zend-ldap-filter">
+<span id="zend-ldap-api-reference-zend-ldap-filter"></span><h1>Zend\Ldap\Filter<a class="headerlink" href="#zend-ldap-filter" title="Permalink to this headline">¶</a></h1>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-filter-table">
+<caption>Zend\Ldap\Filter API</caption>
+<colgroup>
+<col width="18%" />
+<col width="82%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Zend\Ldap\Filter equals(string $attr, string $value)</td>
+<td>Creates an &#8216;equals&#8217; filter: (attr=value).</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Filter begins(string $attr, string $value)</td>
+<td>Creates an &#8216;begins with&#8217; filter: (attr=value*).</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Filter ends(string $attr, string $value)</td>
+<td>Creates an &#8216;ends with&#8217; filter: (attr=*value).</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Filter contains(string $attr, string $value)</td>
+<td>Creates an &#8216;contains&#8217; filter: (attr=*value*).</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Filter greater(string $attr, string $value)</td>
+<td>Creates an &#8216;greater&#8217; filter: (attr&gt;value).</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Filter greaterOrEqual(string $attr, string $value)</td>
+<td>Creates an &#8216;greater or equal&#8217; filter: (attr&gt;=value).</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Filter less(string $attr, string $value)</td>
+<td>Creates an &#8216;less&#8217; filter: (attr&lt;value).</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Filter lessOrEqual(string $attr, string $value)</td>
+<td>Creates an &#8216;less or equal&#8217; filter: (attr&lt;=value).</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Filter approx(string $attr, string $value)</td>
+<td>Creates an &#8216;approx&#8217; filter: (attr~=value).</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Filter any(string $attr)</td>
+<td>Creates an &#8216;any&#8217; filter: (attr=*).</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Filter string(string $filter)</td>
+<td>Creates a simple custom string filter. The user is responsible for all value-escaping as the filter is used as is.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Filter mask(string $mask, string $value,...)</td>
+<td>Creates a filter from a string mask. All $value parameters will be escaped and substituted into $mask by using sprintf()</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Filter andFilter(Zend\Ldap\Filter\AbstractFilter $filter,...)</td>
+<td>Creates an &#8216;and&#8217; filter from all arguments given.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Filter orFilter(Zend\Ldap\Filter\AbstractFilter $filter,...)</td>
+<td>Creates an &#8216;or&#8217; filter from all arguments given.</td>
+</tr>
+<tr class="row-even"><td>__construct(string $attr, string $value, string $filtertype, string|null $prepend, string|null $append)</td>
+<td>Constructor. Creates an arbitrary filter according to the parameters supplied. The resulting filter will be a concatenation $attr . $filtertype . $prepend . $value . $append. Normally this constructor is not needed as all filters can be created by using the appropriate factory methods.</td>
+</tr>
+<tr class="row-odd"><td>string toString()</td>
+<td>Returns a string representation of the filter.</td>
+</tr>
+<tr class="row-even"><td>string __toString()</td>
+<td>Returns a string representation of the filter. Proxies to Zend\Ldap\Filter::toString().</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Filter\AbstractFilter negate()</td>
+<td>Negates the current filter.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Filter\AbstractFilter addAnd(Zend\Ldap\Filter\AbstractFilter $filter,...)</td>
+<td>Creates an &#8216;and&#8217; filter from the current filter and all filters passed in as the arguments.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Filter\AbstractFilter addOr(Zend\Ldap\Filter\AbstractFilter $filter,...)</td>
+<td>Creates an &#8216;or&#8217; filter from the current filter and all filters passed in as the arguments.</td>
+</tr>
+<tr class="row-even"><td>string|array escapeValue(string|array $values)</td>
+<td>Escapes the given $values according to RFC 2254 so that they can be safely used in LDAP filters. If a single string is given, a string is returned - otherwise an array is returned. Any control characters with an ASCII code &lt; 32 as well as the characters with special meaning in LDAP filters &#8220;*&#8221;, &#8220;(&#8221;, &#8221;)&#8221;, and &#8220;\&#8221; (the backslash) are converted into the representation of a backslash followed by two hex digits representing the hexadecimal value of the character.</td>
+</tr>
+<tr class="row-odd"><td>string|array unescapeValue(string|array $values)</td>
+<td>Undoes the conversion done by Zend\Ldap\Filter::escapeValue(). Converts any sequences of a backslash followed by two hex digits into the corresponding character.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="zend-ldap-node">
+<span id="zend-ldap-api-reference-zend-ldap-node"></span><h1>Zend\Ldap\Node<a class="headerlink" href="#zend-ldap-node" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Ldap\Node</span></tt> includes the magic property accessors <tt class="docutils literal"><span class="pre">__set()</span></tt>, <tt class="docutils literal"><span class="pre">__get()</span></tt>, <tt class="docutils literal"><span class="pre">__unset()</span></tt> and <tt class="docutils literal"><span class="pre">__isset()</span></tt>
+to access the attributes by their name. They proxy to <tt class="docutils literal"><span class="pre">Zend\Ldap\Node::setAttribute()</span></tt>,
+<tt class="docutils literal"><span class="pre">Zend\Ldap\Node::getAttribute()</span></tt>, <tt class="docutils literal"><span class="pre">Zend\Ldap\Node::deleteAttribute()</span></tt> and <tt class="docutils literal"><span class="pre">Zend\Ldap\Node::existsAttribute()</span></tt>
+respectively. Furthermore the class implements <em>ArrayAccess</em> for array-style-access to the attributes.
+<tt class="docutils literal"><span class="pre">Zend\Ldap\Node</span></tt> also implements <em>Iterator</em> and <em>RecursiveIterator</em> to allow for recursive tree-traversal.</p>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-table">
+<caption>Zend\Ldap\Node API</caption>
+<colgroup>
+<col width="27%" />
+<col width="73%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Zend\Ldap\Ldap getLdap()</td>
+<td>Returns the current LDAP connection. Throws Zend\Ldap\Exception\LdapException if current node is in detached mode (not connected to a Zend\Ldap\Ldap instance).</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node attachLdap(Zend\Ldap\Ldap $ldap)</td>
+<td>Attach the current node to the $ldapZend\Ldap\Ldap instance. Throws Zend\Ldap\Exception\LdapException if $ldap is not responsible for the current node (node is not a child of the $ldap base DN).</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node detachLdap()</td>
+<td>Detach node from LDAP connection.</td>
+</tr>
+<tr class="row-odd"><td>boolean isAttached()</td>
+<td>Checks if the current node is attached to a LDAP connection.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node create(string|array|Zend\Ldap\Dn $dn, array $objectClass)</td>
+<td>Factory method to create a new detached Zend\Ldap\Node for a given DN. Creates a new Zend\Ldap\Node with the DN $dn and the object-classes $objectClass.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node fromLdap(string|array|Zend\Ldap\Dn $dn, Zend\Ldap\Ldap $ldap)</td>
+<td>Factory method to create an attached Zend\Ldap\Node for a given DN. Loads an existing Zend\Ldap\Node with the DN $dn from the LDAP connection $ldap.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node fromArray((array $data, boolean $fromDataSource)</td>
+<td>Factory method to create a detached Zend\Ldap\Node from array data $data. if $fromDataSource is TRUE (FALSE by default), the data is treated as being present in a LDAP tree.</td>
+</tr>
+<tr class="row-odd"><td>boolean isNew()</td>
+<td>Tells if the node is considered as new (not present on the server). Please note, that this doesn&#8217;t tell if the node is really present on the server. Use Zend\Ldap\Node::exists() to see if a node is already there.</td>
+</tr>
+<tr class="row-even"><td>boolean willBeDeleted()</td>
+<td>Tells if this node is going to be deleted once Zend\Ldap\Node::update() is called.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node delete()</td>
+<td>Marks this node as to be deleted. Node will be deleted on calling Zend\Ldap\Node::update() if Zend\Ldap\Node::willBeDeleted() is TRUE.</td>
+</tr>
+<tr class="row-even"><td>boolean willBeMoved()</td>
+<td>Tells if this node is going to be moved once Zend\Ldap\Node::update() is called.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node update(Zend\Ldap\Ldap $ldap)</td>
+<td>Sends all pending changes to the LDAP server. If $ldap is omitted the current LDAP connection is used. If the current node is detached from a LDAP connection a Zend\Ldap\Exception\LdapException will be thrown. If $ldap is provided the current node will be attached to the given LDAP connection.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Dn getCurrentDn()</td>
+<td>Gets the current DN of the current node as a Zend\Ldap\Dn. This does not reflect possible rename-operations.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Dn getDn()</td>
+<td>Gets the original DN of the current node as a Zend\Ldap\Dn. This reflects possible rename-operations.</td>
+</tr>
+<tr class="row-even"><td>string getDnString(string $caseFold)</td>
+<td>Gets the original DN of the current node as a string. This reflects possible rename-operations.</td>
+</tr>
+<tr class="row-odd"><td>array getDnArray(string $caseFold)</td>
+<td>Gets the original DN of the current node as an array. This reflects possible rename-operations.</td>
+</tr>
+<tr class="row-even"><td>string getRdnString(string $caseFold)</td>
+<td>Gets the RDN of the current node as a string. This reflects possible rename-operations.</td>
+</tr>
+<tr class="row-odd"><td>array getRdnArray(string $caseFold)</td>
+<td>Gets the RDN of the current node as an array. This reflects possible rename-operations.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node setDn(Zend\Ldap\Dn|string|array $newDn)</td>
+<td>Sets the new DN for this node effectively moving the node once Zend\Ldap\Node::update() is called.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node move(Zend\Ldap\Dn|string|array $newDn)</td>
+<td>This is an alias for Zend\Ldap\Node::setDn().</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node rename(Zend\Ldap\Dn|string|array $newDn)</td>
+<td>This is an alias for Zend\Ldap\Node::setDn().</td>
+</tr>
+<tr class="row-odd"><td>array getObjectClass()</td>
+<td>Returns the objectClass of the node.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node setObjectClass(array|string $value)</td>
+<td>Sets the objectClass attribute.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node appendObjectClass(array|string $value)</td>
+<td>Appends to the objectClass attribute.</td>
+</tr>
+<tr class="row-even"><td>string toLdif(array $options)</td>
+<td>Returns a LDIF representation of the current node. $options will be passed to the Zend\Ldap\Ldif\Encoder.</td>
+</tr>
+<tr class="row-odd"><td>array getChangedData()</td>
+<td>Gets changed node data. The array contains all changed attributes. This format can be used in Zend\Ldap\Ldap::add() and Zend\Ldap\Ldap::update().</td>
+</tr>
+<tr class="row-even"><td>array getChanges()</td>
+<td>Returns all changes made.</td>
+</tr>
+<tr class="row-odd"><td>string toString()</td>
+<td>Returns the DN of the current node - proxies to Zend\Ldap\Dn::getDnString().</td>
+</tr>
+<tr class="row-even"><td>string __toString()</td>
+<td>Casts to string representation - proxies to Zend\Ldap\Dn::toString().</td>
+</tr>
+<tr class="row-odd"><td>array toArray(boolean $includeSystemAttributes)</td>
+<td>Returns an array representation of the current node. If $includeSystemAttributes is FALSE (defaults to TRUE) the system specific attributes are stripped from the array. Unlike Zend\Ldap\Node::getAttributes() the resulting array contains the DN with key &#8216;dn&#8217;.</td>
+</tr>
+<tr class="row-even"><td>string toJson(boolean $includeSystemAttributes)</td>
+<td>Returns a JSON representation of the current node using Zend\Ldap\Node::toArray().</td>
+</tr>
+<tr class="row-odd"><td>array getData(boolean $includeSystemAttributes)</td>
+<td>Returns the node&#8217;s attributes. The array contains all attributes in its internal format (no conversion).</td>
+</tr>
+<tr class="row-even"><td>boolean existsAttribute(string $name, boolean $emptyExists)</td>
+<td>Checks whether a given attribute exists. If $emptyExists is FALSE empty attributes (containing only array()) are treated as non-existent returning FALSE. If $emptyExists is TRUE empty attributes are treated as existent returning TRUE. In this case the method returns FALSE only if the attribute name is missing in the key-collection.</td>
+</tr>
+<tr class="row-odd"><td>boolean attributeHasValue(string $name, mixed|array $value)</td>
+<td>Checks if the given value(s) exist in the attribute. The method returns TRUE only if all values in $value are present in the attribute. Comparison is done strictly (respecting the data type).</td>
+</tr>
+<tr class="row-even"><td>integer count()</td>
+<td>Returns the number of attributes in the node. Implements Countable.</td>
+</tr>
+<tr class="row-odd"><td>mixed getAttribute(string $name, integer|null $index)</td>
+<td>Gets a LDAP attribute. Data conversion is applied using Zend\Ldap\Attribute::getAttribute().</td>
+</tr>
+<tr class="row-even"><td>array getAttributes(boolean $includeSystemAttributes)</td>
+<td>Gets all attributes of node. If $includeSystemAttributes is FALSE (defaults to TRUE) the system specific attributes are stripped from the array.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node setAttribute(string $name, mixed $value)</td>
+<td>Sets a LDAP attribute. Data conversion is applied using Zend\Ldap\Attribute::setAttribute().</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node appendToAttribute(string $name, mixed $value)</td>
+<td>Appends to a LDAP attribute. Data conversion is applied using Zend\Ldap\Attribute::setAttribute().</td>
+</tr>
+<tr class="row-odd"><td>array|integer getDateTimeAttribute(string $name, integer|null $index)</td>
+<td>Gets a LDAP date/time attribute. Data conversion is applied using Zend\Ldap\Attribute::getDateTimeAttribute().</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node setDateTimeAttribute(string $name, integer|array $value, boolean $utc)</td>
+<td>Sets a LDAP date/time attribute. Data conversion is applied using Zend\Ldap\Attribute::setDateTimeAttribute().</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node appendToDateTimeAttribute(string $name, integer|array $value, boolean $utc)</td>
+<td>Appends to a LDAP date/time attribute. Data conversion is applied using Zend\Ldap\Attribute::setDateTimeAttribute().</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node setPasswordAttribute(string $password, string $hashType, string $attribName)</td>
+<td>Sets a LDAP password on $attribName (defaults to &#8216;userPassword&#8217;) to $password with the hash type $hashType (defaults to Zend\Ldap\Attribute::PASSWORD_HASH_MD5).</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node deleteAttribute(string $name)</td>
+<td>Deletes a LDAP attribute.</td>
+</tr>
+<tr class="row-even"><td>void removeDuplicatesFromAttribute(string$name)</td>
+<td>Removes duplicate values from a LDAP attribute.</td>
+</tr>
+<tr class="row-odd"><td>void removeFromAttribute(string $attribName, mixed|array $value)</td>
+<td>Removes the given values from a LDAP attribute.</td>
+</tr>
+<tr class="row-even"><td>boolean exists(Zend\Ldap\Ldap $ldap)</td>
+<td>Checks if the current node exists on the given LDAP server (current server is used if NULL is passed).</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node reload(Zend\Ldap\Ldap $ldap)</td>
+<td>Reloads the current node&#8217;s attributes from the given LDAP server (current server is used if NULL is passed).</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node\Collection searchSubtree(string|Zend\Ldap\Filter\AbstractFilter $filter, integer $scope, string $sort)</td>
+<td>Searches the nodes&#8217;s subtree with the given $filter and the given search parameters. See Zend\Ldap\Ldap::search() for details on the parameters $scope and $sort.</td>
+</tr>
+<tr class="row-odd"><td>integer countSubtree(string|Zend\Ldap\Filter\AbstractFilter $filter, integer $scope)</td>
+<td>Count the nodes&#8217;s subtree items matching the given $filter and the given search scope. See Zend\Ldap\Ldap::search() for details on the $scope parameter.</td>
+</tr>
+<tr class="row-even"><td>integer countChildren()</td>
+<td>Count the nodes&#8217;s children.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node\Collection searchChildren(string|Zend\Ldap\Filter\AbstractFilter $filter, string $sort)</td>
+<td>Searches the nodes&#8217;s children matching the given $filter. See Zend\Ldap\Ldap::search() for details on the $sort parameter.</td>
+</tr>
+<tr class="row-even"><td>boolean hasChildren()</td>
+<td>Returns whether the current node has children.</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node\ChildrenIterator getChildren()</td>
+<td>Returns all children of the current node.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node getParent(Zend\Ldap\Ldap $ldap)</td>
+<td>Returns the parent of the current node using the LDAP connection $ldap (uses the current LDAP connection if omitted).</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="zend-ldap-node-rootdse">
+<span id="zend-ldap-api-reference-zend-ldap-node-rootdse"></span><h1>Zend\Ldap\Node\RootDse<a class="headerlink" href="#zend-ldap-node-rootdse" title="Permalink to this headline">¶</a></h1>
+<p>The following methods are available on all vendor-specific subclasses.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Ldap\Node\RootDse</span></tt> includes the magic property accessors <tt class="docutils literal"><span class="pre">__get()</span></tt> and <tt class="docutils literal"><span class="pre">__isset()</span></tt> to access the
+attributes by their name. They proxy to <tt class="docutils literal"><span class="pre">Zend\Ldap\Node\RootDse::getAttribute()</span></tt> and
+<tt class="docutils literal"><span class="pre">Zend\Ldap\Node\RootDse::existsAttribute()</span></tt> respectively. <tt class="docutils literal"><span class="pre">__set()</span></tt> and <tt class="docutils literal"><span class="pre">__unset()</span></tt> are also implemented but
+they throw a <em>BadMethodCallException</em> as modifications are not allowed on RootDSE nodes. Furthermore the class
+implements <em>ArrayAccess</em> for array-style-access to the attributes. <tt class="docutils literal"><span class="pre">offsetSet()</span></tt> and <tt class="docutils literal"><span class="pre">offsetUnset()</span></tt> also throw
+a <em>BadMethodCallException</em> due ro obvious reasons.</p>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-rootdse-table">
+<caption>Zend\Ldap\Node\RootDse API</caption>
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Zend\Ldap\Dn getDn()</td>
+<td>Gets the DN of the current node as a Zend\Ldap\Dn.</td>
+</tr>
+<tr class="row-odd"><td>string getDnString(string $caseFold)</td>
+<td>Gets the DN of the current node as a string.</td>
+</tr>
+<tr class="row-even"><td>array getDnArray(string $caseFold)</td>
+<td>Gets the DN of the current node as an array.</td>
+</tr>
+<tr class="row-odd"><td>string getRdnString(string $caseFold)</td>
+<td>Gets the RDN of the current node as a string.</td>
+</tr>
+<tr class="row-even"><td>array getRdnArray(string $caseFold)</td>
+<td>Gets the RDN of the current node as an array.</td>
+</tr>
+<tr class="row-odd"><td>array getObjectClass()</td>
+<td>Returns the objectClass of the node.</td>
+</tr>
+<tr class="row-even"><td>string toString()</td>
+<td>Returns the DN of the current node - proxies to Zend\Ldap\Dn::getDnString().</td>
+</tr>
+<tr class="row-odd"><td>string __toString()</td>
+<td>Casts to string representation - proxies to Zend\Ldap\Dn::toString().</td>
+</tr>
+<tr class="row-even"><td>array toArray(boolean $includeSystemAttributes)</td>
+<td>Returns an array representation of the current node. If $includeSystemAttributes is FALSE (defaults to TRUE) the system specific attributes are stripped from the array. Unlike Zend\Ldap\Node\RootDse::getAttributes() the resulting array contains the DN with key &#8216;dn&#8217;.</td>
+</tr>
+<tr class="row-odd"><td>string toJson(boolean $includeSystemAttributes)</td>
+<td>Returns a JSON representation of the current node using Zend\Ldap\Node\RootDse::toArray().</td>
+</tr>
+<tr class="row-even"><td>array getData(boolean $includeSystemAttributes)</td>
+<td>Returns the node&#8217;s attributes. The array contains all attributes in its internal format (no conversion).</td>
+</tr>
+<tr class="row-odd"><td>boolean existsAttribute(string $name, boolean $emptyExists)</td>
+<td>Checks whether a given attribute exists. If $emptyExists is FALSE, empty attributes (containing only array()) are treated as non-existent returning FALSE. If $emptyExists is TRUE, empty attributes are treated as existent returning TRUE. In this case the method returns FALSE only if the attribute name is missing in the key-collection.</td>
+</tr>
+<tr class="row-even"><td>boolean attributeHasValue(string $name, mixed|array $value)</td>
+<td>Checks if the given value(s) exist in the attribute. The method returns TRUE only if all values in $value are present in the attribute. Comparison is done strictly (respecting the data type).</td>
+</tr>
+<tr class="row-odd"><td>integer count()</td>
+<td>Returns the number of attributes in the node. Implements Countable.</td>
+</tr>
+<tr class="row-even"><td>mixed getAttribute(string $name, integer|null $index)</td>
+<td>Gets a LDAP attribute. Data conversion is applied using Zend\Ldap\Attribute::getAttribute().</td>
+</tr>
+<tr class="row-odd"><td>array getAttributes(boolean $includeSystemAttributes)</td>
+<td>Gets all attributes of node. If $includeSystemAttributes is FALSE (defaults to TRUE) the system specific attributes are stripped from the array.</td>
+</tr>
+<tr class="row-even"><td>array|integer getDateTimeAttribute(string $name, integer|null $index)</td>
+<td>Gets a LDAP date/time attribute. Data conversion is applied using Zend\Ldap\Attribute::getDateTimeAttribute().</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node\RootDse reload(Zend\Ldap\Ldap $ldap)</td>
+<td>Reloads the current node&#8217;s attributes from the given LDAP server.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node\RootDse create(Zend\Ldap\Ldap $ldap)</td>
+<td>Factory method to create the RootDSE.</td>
+</tr>
+<tr class="row-odd"><td>array getNamingContexts()</td>
+<td>Gets the namingContexts.</td>
+</tr>
+<tr class="row-even"><td>string|null getSubschemaSubentry()</td>
+<td>Gets the subschemaSubentry.</td>
+</tr>
+<tr class="row-odd"><td>boolean supportsVersion(string|int|array $versions)</td>
+<td>Determines if the LDAP version is supported.</td>
+</tr>
+<tr class="row-even"><td>boolean supportsSaslMechanism(string|array $mechlist)</td>
+<td>Determines if the sasl mechanism is supported.</td>
+</tr>
+<tr class="row-odd"><td>integer getServerType()</td>
+<td>Gets the server type. Returns Zend\Ldap\Node\RootDse::SERVER_TYPE_GENERICfor unknown LDAP serversZend\Ldap\Node\RootDse::SERVER_TYPE_OPENLDAPfor OpenLDAP serversZend\Ldap\Node\RootDse::SERVER_TYPE_ACTIVEDIRECTORYfor Microsoft ActiveDirectory serversZend\Ldap\Node\RootDse::SERVER_TYPE_EDIRECTORYFor Novell eDirectory servers</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Dn getSchemaDn()</td>
+<td>Returns the schema DN.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="openldap">
+<span id="zend-ldap-api-reference-zend-ldap-node-rootdse-openldap"></span><h2>OpenLDAP<a class="headerlink" href="#openldap" title="Permalink to this headline">¶</a></h2>
+<p>Additionally the common methods above apply to instances of <tt class="docutils literal"><span class="pre">Zend\Ldap\Node\RootDse\OpenLdap</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Refer to <a class="reference external" href="http://www.zytrax.com/books/ldap/ch3/#operational">LDAP Operational Attributes and Objects</a> for information on the attributes of OpenLDAP RootDSE.</p>
+</div>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-rootdse-openldap-table">
+<caption>Zend\Ldap\Node\RootDse\OpenLdap API</caption>
+<colgroup>
+<col width="37%" />
+<col width="63%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>integer getServerType()</td>
+<td>Gets the server type. Returns Zend\Ldap\Node\RootDse::SERVER_TYPE_OPENLDAP</td>
+</tr>
+<tr class="row-odd"><td>string|null getConfigContext()</td>
+<td>Gets the configContext.</td>
+</tr>
+<tr class="row-even"><td>string|null getMonitorContext()</td>
+<td>Gets the monitorContext.</td>
+</tr>
+<tr class="row-odd"><td>boolean supportsControl(string|array $oids)</td>
+<td>Determines if the control is supported.</td>
+</tr>
+<tr class="row-even"><td>boolean supportsExtension(string|array $oids)</td>
+<td>Determines if the extension is supported.</td>
+</tr>
+<tr class="row-odd"><td>boolean supportsFeature(string|array $oids)</td>
+<td>Determines if the feature is supported.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="activedirectory">
+<span id="zend-ldap-api-reference-zend-ldap-node-rootdse-activedirectory"></span><h2>ActiveDirectory<a class="headerlink" href="#activedirectory" title="Permalink to this headline">¶</a></h2>
+<p>Additionally the common methods above apply to instances of <tt class="docutils literal"><span class="pre">Zend\Ldap\Node\RootDse\ActiveDirectory</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Refer to <a class="reference external" href="http://msdn.microsoft.com/en-us/library/ms684291(VS.85).aspx">RootDSE</a> for information on the attributes of Microsoft ActiveDirectory RootDSE.</p>
+</div>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-rootdse-activedirectory-table">
+<caption>Zend\Ldap\Node\RootDse\ActiveDirectory API</caption>
+<colgroup>
+<col width="35%" />
+<col width="65%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>integer getServerType()</td>
+<td>Gets the server type. Returns Zend\Ldap\Node\RootDse::SERVER_TYPE_ACTIVEDIRECTORY</td>
+</tr>
+<tr class="row-odd"><td>string|null getConfigurationNamingContext()</td>
+<td>Gets the configurationNamingContext.</td>
+</tr>
+<tr class="row-even"><td>string|null getCurrentTime()</td>
+<td>Gets the currentTime.</td>
+</tr>
+<tr class="row-odd"><td>string|null getDefaultNamingContext()</td>
+<td>Gets the defaultNamingContext.</td>
+</tr>
+<tr class="row-even"><td>string|null getDnsHostName()</td>
+<td>Gets the dnsHostName.</td>
+</tr>
+<tr class="row-odd"><td>string|null getDomainControllerFunctionality()</td>
+<td>Gets the domainControllerFunctionality.</td>
+</tr>
+<tr class="row-even"><td>string|null getDomainFunctionality()</td>
+<td>Gets the domainFunctionality.</td>
+</tr>
+<tr class="row-odd"><td>string|null getDsServiceName()</td>
+<td>Gets the dsServiceName.</td>
+</tr>
+<tr class="row-even"><td>string|null getForestFunctionality()</td>
+<td>Gets the forestFunctionality.</td>
+</tr>
+<tr class="row-odd"><td>string|null getHighestCommittedUSN()</td>
+<td>Gets the highestCommittedUSN.</td>
+</tr>
+<tr class="row-even"><td>string|null getIsGlobalCatalogReady()</td>
+<td>Gets the isGlobalCatalogReady.</td>
+</tr>
+<tr class="row-odd"><td>string|null getIsSynchronized()</td>
+<td>Gets the isSynchronized.</td>
+</tr>
+<tr class="row-even"><td>string|null getLdapServiceName()</td>
+<td>Gets the ldapServiceName.</td>
+</tr>
+<tr class="row-odd"><td>string|null getRootDomainNamingContext()</td>
+<td>Gets the rootDomainNamingContext.</td>
+</tr>
+<tr class="row-even"><td>string|null getSchemaNamingContext()</td>
+<td>Gets the schemaNamingContext.</td>
+</tr>
+<tr class="row-odd"><td>string|null getServerName()</td>
+<td>Gets the serverName.</td>
+</tr>
+<tr class="row-even"><td>boolean supportsCapability(string|array $oids)</td>
+<td>Determines if the capability is supported.</td>
+</tr>
+<tr class="row-odd"><td>boolean supportsControl(string|array $oids)</td>
+<td>Determines if the control is supported.</td>
+</tr>
+<tr class="row-even"><td>boolean supportsPolicy(string|array $policies)</td>
+<td>Determines if the version is supported.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="edirectory">
+<span id="zend-ldap-api-reference-zend-ldap-node-rootdse-edirectory"></span><h2>eDirectory<a class="headerlink" href="#edirectory" title="Permalink to this headline">¶</a></h2>
+<p>Additionally the common methods above apply to instances of <em>ZendLdapNodeRootDseeDirectory</em>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Refer to <a class="reference external" href="http://www.novell.com/documentation/edir88/edir88/index.html?page=/documentation/edir88/edir88/data/ah59jqq.html">Getting Information about the LDAP Server</a> for information on the attributes of Novell eDirectory
+RootDSE.</p>
+</div>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-rootdse-edirectory-table">
+<caption>Zend\Ldap\Node\RootDse\eDirectory API</caption>
+<colgroup>
+<col width="38%" />
+<col width="62%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>integer getServerType()</td>
+<td>Gets the server type. Returns Zend\Ldap\Node\RootDse::SERVER_TYPE_EDIRECTORY</td>
+</tr>
+<tr class="row-odd"><td>boolean supportsExtension(string|array $oids)</td>
+<td>Determines if the extension is supported.</td>
+</tr>
+<tr class="row-even"><td>string|null getVendorName()</td>
+<td>Gets the vendorName.</td>
+</tr>
+<tr class="row-odd"><td>string|null getVendorVersion()</td>
+<td>Gets the vendorVersion.</td>
+</tr>
+<tr class="row-even"><td>string|null getDsaName()</td>
+<td>Gets the dsaName.</td>
+</tr>
+<tr class="row-odd"><td>string|null getStatisticsErrors()</td>
+<td>Gets the server statistics &#8220;errors&#8221;.</td>
+</tr>
+<tr class="row-even"><td>string|null getStatisticsSecurityErrors()</td>
+<td>Gets the server statistics &#8220;securityErrors&#8221;.</td>
+</tr>
+<tr class="row-odd"><td>string|null getStatisticsChainings()</td>
+<td>Gets the server statistics &#8220;chainings&#8221;.</td>
+</tr>
+<tr class="row-even"><td>string|null getStatisticsReferralsReturned()</td>
+<td>Gets the server statistics &#8220;referralsReturned&#8221;.</td>
+</tr>
+<tr class="row-odd"><td>string|null getStatisticsExtendedOps()</td>
+<td>Gets the server statistics &#8220;extendedOps&#8221;.</td>
+</tr>
+<tr class="row-even"><td>string|null getStatisticsAbandonOps()</td>
+<td>Gets the server statistics &#8220;abandonOps&#8221;.</td>
+</tr>
+<tr class="row-odd"><td>string|null getStatisticsWholeSubtreeSearchOps()</td>
+<td>Gets the server statistics &#8220;wholeSubtreeSearchOps&#8221;.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="zend-ldap-node-schema">
+<span id="zend-ldap-api-reference-zend-ldap-node-schema"></span><h1>Zend\Ldap\Node\Schema<a class="headerlink" href="#zend-ldap-node-schema" title="Permalink to this headline">¶</a></h1>
+<p>The following methods are available on all vendor-specific subclasses.</p>
+<p><em>ZendLdapNodeSchema</em> includes the magic property accessors <em>__get()</em> and <em>__isset()</em> to access the attributes by
+their name. They proxy to <em>ZendLdapNodeSchema::getAttribute()</em> and <em>ZendLdapNodeSchema::existsAttribute()</em>
+respectively. <em>__set()</em> and <em>__unset()</em> are also implemented, but they throw a <em>BadMethodCallException</em> as
+modifications are not allowed on RootDSE nodes. Furthermore the class implements <em>ArrayAccess</em> for
+array-style-access to the attributes. <em>offsetSet()</em> and <em>offsetUnset()</em> also throw a <em>BadMethodCallException</em> due
+to obvious reasons.</p>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-schema-table">
+<caption>Zend\Ldap\Node\Schema API</caption>
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Zend\Ldap\Dn getDn()</td>
+<td>Gets the DN of the current node as a Zend\Ldap\Dn.</td>
+</tr>
+<tr class="row-odd"><td>string getDnString(string $caseFold)</td>
+<td>Gets the DN of the current node as a string.</td>
+</tr>
+<tr class="row-even"><td>array getDnArray(string $caseFold)</td>
+<td>Gets the DN of the current node as an array.</td>
+</tr>
+<tr class="row-odd"><td>string getRdnString(string $caseFold)</td>
+<td>Gets the RDN of the current node as a string.</td>
+</tr>
+<tr class="row-even"><td>array getRdnArray(string $caseFold)</td>
+<td>Gets the RDN of the current node as an array.</td>
+</tr>
+<tr class="row-odd"><td>array getObjectClass()</td>
+<td>Returns the objectClass of the node.</td>
+</tr>
+<tr class="row-even"><td>string toString()</td>
+<td>Returns the DN of the current node - proxies to Zend\Ldap\Dn::getDnString().</td>
+</tr>
+<tr class="row-odd"><td>string __toString()</td>
+<td>Casts to string representation - proxies to Zend\Ldap\Dn::toString().</td>
+</tr>
+<tr class="row-even"><td>array toArray(boolean $includeSystemAttributes)</td>
+<td>Returns an array representation of the current node. If $includeSystemAttributes is FALSE (defaults to TRUE), the system specific attributes are stripped from the array. Unlike Zend\Ldap\Node\Schema::getAttributes(), the resulting array contains the DN with key &#8216;dn&#8217;.</td>
+</tr>
+<tr class="row-odd"><td>string toJson(boolean $includeSystemAttributes)</td>
+<td>Returns a JSON representation of the current node using Zend\Ldap\Node\Schema::toArray().</td>
+</tr>
+<tr class="row-even"><td>array getData(boolean $includeSystemAttributes)</td>
+<td>Returns the node&#8217;s attributes. The array contains all attributes in its internal format (no conversion).</td>
+</tr>
+<tr class="row-odd"><td>boolean existsAttribute(string $name, boolean $emptyExists)</td>
+<td>Checks whether a given attribute exists. If $emptyExists is FALSE, empty attributes (containing only array()) are treated as non-existent returning FALSE. If $emptyExists is TRUE, empty attributes are treated as existent returning TRUE. In this case the method returns FALSE only if the attribute name is missing in the key-collection.</td>
+</tr>
+<tr class="row-even"><td>boolean attributeHasValue(string $name, mixed|array $value)</td>
+<td>Checks if the given value(s) exist in the attribute. The method returns TRUE only if all values in $value are present in the attribute. Comparison is done strictly (respecting the data type).</td>
+</tr>
+<tr class="row-odd"><td>integer count()</td>
+<td>Returns the number of attributes in the node. Implements Countable.</td>
+</tr>
+<tr class="row-even"><td>mixed getAttribute(string $name, integer|null $index)</td>
+<td>Gets a LDAP attribute. Data conversion is applied using Zend\Ldap\Attribute::getAttribute().</td>
+</tr>
+<tr class="row-odd"><td>array getAttributes(boolean $includeSystemAttributes)</td>
+<td>Gets all attributes of node. If $includeSystemAttributes is FALSE (defaults to TRUE) the system specific attributes are stripped from the array.</td>
+</tr>
+<tr class="row-even"><td>array|integer getDateTimeAttribute(string $name, integer|null $index)</td>
+<td>Gets a LDAP date/time attribute. Data conversion is applied using Zend\Ldap\Attribute::getDateTimeAttribute().</td>
+</tr>
+<tr class="row-odd"><td>Zend\Ldap\Node\Schema reload(Zend\Ldap\Ldap $ldap)</td>
+<td>Reloads the current node&#8217;s attributes from the given LDAP server.</td>
+</tr>
+<tr class="row-even"><td>Zend\Ldap\Node\Schema create(Zend\Ldap\Ldap $ldap)</td>
+<td>Factory method to create the Schema node.</td>
+</tr>
+<tr class="row-odd"><td>array getAttributeTypes()</td>
+<td>Gets the attribute types as an array of .</td>
+</tr>
+<tr class="row-even"><td>array getObjectClasses()</td>
+<td>Gets the object classes as an array of Zend\Ldap\Node\Schema\ObjectClass\Interface.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-schema-attributetype-interface-table">
+<caption>Zend\Ldap\Node\Schema\AttributeType\Interface API</caption>
+<colgroup>
+<col width="36%" />
+<col width="64%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>string getName()</td>
+<td>Gets the attribute name.</td>
+</tr>
+<tr class="row-odd"><td>string getOid()</td>
+<td>Gets the attribute OID.</td>
+</tr>
+<tr class="row-even"><td>string getSyntax()</td>
+<td>Gets the attribute syntax.</td>
+</tr>
+<tr class="row-odd"><td>int|null getMaxLength()</td>
+<td>Gets the attribute maximum length.</td>
+</tr>
+<tr class="row-even"><td>boolean isSingleValued()</td>
+<td>Returns if the attribute is single-valued.</td>
+</tr>
+<tr class="row-odd"><td>string getDescription()</td>
+<td>Gets the attribute description</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-schema-objectclass-interface-table">
+<caption>Zend\Ldap\Node\Schema\ObjectClass\Interface API</caption>
+<colgroup>
+<col width="6%" />
+<col width="94%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>string getName()</td>
+<td>Returns the objectClass name.</td>
+</tr>
+<tr class="row-odd"><td>string getOid()</td>
+<td>Returns the objectClass OID.</td>
+</tr>
+<tr class="row-even"><td>array getMustContain()</td>
+<td>Returns the attributes that this objectClass must contain.</td>
+</tr>
+<tr class="row-odd"><td>array getMayContain()</td>
+<td>Returns the attributes that this objectClass may contain.</td>
+</tr>
+<tr class="row-even"><td>string getDescription()</td>
+<td>Returns the attribute description</td>
+</tr>
+<tr class="row-odd"><td>integer getType()</td>
+<td>Returns the objectClass type. The method returns one of the following values: Zend\Ldap\Node\Schema::OBJECTCLASS_TYPE_UNKNOWNfor unknown class typesZend\Ldap\Node\Schema::OBJECTCLASS_TYPE_STRUCTURALfor structural classesZend\Ldap\Node\Schema::OBJECTCLASS_TYPE_ABSTRACTfor abstract classesZend\Ldap\Node\Schema::OBJECTCLASS_TYPE_AUXILIARYfor auxiliary classes</td>
+</tr>
+<tr class="row-even"><td>array getParentClasses()</td>
+<td>Returns the parent objectClasses of this class. This includes structural, abstract and auxiliary objectClasses.</td>
+</tr>
+</tbody>
+</table>
+<p>Classes representing attribute types and object classes extend <em>ZendLdapNodeSchemaAbstractItem</em> which provides
+some core methods to access arbitrary attributes on the underlying <em>LDAP</em> node.
+<em>ZendLdapNodeSchemaAbstractItem</em> includes the magic property accessors <em>__get()</em> and <em>__isset()</em> to access the
+attributes by their name. Furthermore the class implements <em>ArrayAccess</em> for array-style-access to the attributes.
+<em>offsetSet()</em> and <em>offsetUnset()</em> throw a <em>BadMethodCallException</em> as modifications are not allowed on schema
+information nodes.</p>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-schema-schema-item-table">
+<caption>Zend\Ldap\Node\Schema\AbstractItem API</caption>
+<colgroup>
+<col width="15%" />
+<col width="85%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>array getData()</td>
+<td>Gets all the underlying data from the schema information node.</td>
+</tr>
+<tr class="row-odd"><td>integer count()</td>
+<td>Returns the number of attributes in this schema information node. Implements Countable.</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="zend-ldap-api-reference-zend-ldap-node-schema-openldap">
+<span id="id1"></span><h2>OpenLDAP<a class="headerlink" href="#zend-ldap-api-reference-zend-ldap-node-schema-openldap" title="Permalink to this headline">¶</a></h2>
+<p>Additionally the common methods above apply to instances of <em>ZendLdapNodeSchemaOpenLDAP</em>.</p>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-schema-openldap-table">
+<caption>Zend\Ldap\Node\Schema\OpenLDAP API</caption>
+<colgroup>
+<col width="49%" />
+<col width="51%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>array getLdapSyntaxes()</td>
+<td>Gets the LDAP syntaxes.</td>
+</tr>
+<tr class="row-odd"><td>array getMatchingRules()</td>
+<td>Gets the matching rules.</td>
+</tr>
+<tr class="row-even"><td>array getMatchingRuleUse()</td>
+<td>Gets the matching rule use.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-schema-openldap-attributetype-interface-table">
+<caption>Zend\Ldap\Node\Schema\AttributeType\OpenLDAP API</caption>
+<colgroup>
+<col width="48%" />
+<col width="52%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Zend\Ldap\Node\Schema\AttributeType\OpenLdap|null getParent()</td>
+<td>Returns the parent attribute type in the inheritance tree if one exists.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-schema-openldap-objectclass-interface-table">
+<caption>Zend\Ldap\Node\Schema\ObjectClass\OpenLDAP API</caption>
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>array getParents()</td>
+<td>Returns the parent object classes in the inheritance tree if one exists. The returned array is an array of Zend\Ldap\Node\Schema\ObjectClass\OpenLdap.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="zend-ldap-api-reference-zend-ldap-node-schema-activedirectory">
+<span id="id2"></span><h2>ActiveDirectory<a class="headerlink" href="#zend-ldap-api-reference-zend-ldap-node-schema-activedirectory" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>Schema browsing on ActiveDirectory servers</strong></p>
+<p class="last">Due to restrictions on Microsoft ActiveDirectory servers regarding the number of entries returned by generic
+search routines and due to the structure of the ActiveDirectory schema repository, schema browsing is currently
+<strong>not</strong> available for Microsoft ActiveDirectory servers.</p>
+</div>
+<p><em>ZendLdapNodeSchemaActiveDirectory</em> does not provide any additional methods.</p>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-schema-activedirectory-attributetype-interface-table">
+<caption>Zend\Ldap\Node\Schema\AttributeType\ActiveDirectory API</caption>
+<colgroup>
+<col width="100%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Zend\Ldap\Node\Schema\AttributeType\ActiveDirectory does not provide any additional methods.</td>
+</tr>
+</tbody>
+</table>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-node-schema-activedirectory-objectclass-interface-table">
+<caption>Zend\Ldap\Node\Schema\ObjectClass\ActiveDirectory API</caption>
+<colgroup>
+<col width="100%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Zend\Ldap\Node\Schema\ObjectClass\ActiveDirectory does not provide any additional methods.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="section" id="zend-ldap-ldif-encoder">
+<span id="zend-ldap-api-reference-zend-ldap-ldif-encoder"></span><h1>Zend\Ldap\Ldif\Encoder<a class="headerlink" href="#zend-ldap-ldif-encoder" title="Permalink to this headline">¶</a></h1>
+<table border="1" class="docutils" id="zend-ldap-api-reference-zend-ldap-ldif-encoder-table">
+<caption>Zend\Ldap\Ldif\Encoder API</caption>
+<colgroup>
+<col width="16%" />
+<col width="84%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Method</th>
+<th class="head">Description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>array decode(string $string)</td>
+<td>Decodes the string $string into an array of LDIF items.</td>
+</tr>
+<tr class="row-odd"><td>string encode(scalar|array|Zend\Ldap\Node $value, array $options)</td>
+<td>Encode $value into a LDIF representation. $options is an array that may contain the following keys: &#8216;sort&#8217; Sort the given attributes with dn following objectClass and following all other attributes sorted alphabetically. TRUE by default. &#8216;version&#8217; The LDIF format version. 1 by default. &#8216;wrap&#8217; The line-length. 78 by default to conform to the LDIF specification.</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">API overview</a><ul>
+<li><a class="reference internal" href="#configuration-options">Configuration / options</a></li>
+<li><a class="reference internal" href="#api-reference">API Reference</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zend-ldap-ldap">Zend\Ldap\Ldap</a><ul>
+<li><a class="reference internal" href="#zend-ldap-collection">Zend\Ldap\Collection</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zend-ldap-attribute">Zend\Ldap\Attribute</a></li>
+<li><a class="reference internal" href="#zend-ldap-converter-converter">Zend\Ldap\Converter\Converter</a></li>
+<li><a class="reference internal" href="#zend-ldap-dn">Zend\Ldap\Dn</a></li>
+<li><a class="reference internal" href="#zend-ldap-filter">Zend\Ldap\Filter</a></li>
+<li><a class="reference internal" href="#zend-ldap-node">Zend\Ldap\Node</a></li>
+<li><a class="reference internal" href="#zend-ldap-node-rootdse">Zend\Ldap\Node\RootDse</a><ul>
+<li><a class="reference internal" href="#openldap">OpenLDAP</a></li>
+<li><a class="reference internal" href="#activedirectory">ActiveDirectory</a></li>
+<li><a class="reference internal" href="#edirectory">eDirectory</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zend-ldap-node-schema">Zend\Ldap\Node\Schema</a><ul>
+<li><a class="reference internal" href="#zend-ldap-api-reference-zend-ldap-node-schema-openldap">OpenLDAP</a></li>
+<li><a class="reference internal" href="#zend-ldap-api-reference-zend-ldap-node-schema-activedirectory">ActiveDirectory</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#zend-ldap-ldif-encoder">Zend\Ldap\Ldif\Encoder</a></li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.ldap.introduction.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.ldap.usage.html"
+                        title="next chapter">Usage Scenarios</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.ldap.api.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.ldap.api.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.ldap.api.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.ldap.usage.html" title="Usage Scenarios"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.ldap.introduction.html" title="Introduction"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.ldap.api.rst">
+                API overview
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

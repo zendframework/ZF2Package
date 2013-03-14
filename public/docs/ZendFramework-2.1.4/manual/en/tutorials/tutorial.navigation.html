@@ -1,0 +1,429 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Zend\Navigation in your Album module &mdash; Zend Framework 2 2.1.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.4 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-zend-navigation-in-your-album-module">
+<h1>Using Zend\Navigation in your Album module<a class="headerlink" href="#using-zend-navigation-in-your-album-module" title="Permalink to this headline">¶</a></h1>
+<p>In this tutorial we will use <tt class="docutils literal"><span class="pre">Zend\Navigation</span></tt> to add a navigation
+menu to the black bar at the top of the screen, and add breadcrumbs
+above the main site content.</p>
+<div class="section" id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
+<p>In a real world application, the album browser would be only a portion of a working website. Usually the user would land on a homepage first, and be able to view albums by using a standard navigation menu. So that we have a site that is more realistic than just the albums feature, lets make the standard skeleton welcome page our homepage, with the <cite>/album</cite> route still showing our album module.
+In order to make this change, we need to undo some work we did earlier. Currently, navigating to the root of your
+app (/) routes you to the <tt class="docutils literal"><span class="pre">AlbumController</span></tt>&#8216;s default action. Let&#8217;s
+undo this route change so we have two discrete entry points to the app,
+a home page, and an albums area.</p>
+<p><tt class="docutils literal"><span class="pre">module/Application/config/module.config.php</span></tt></p>
+<div class="highlight-python"><pre>'home' =&gt; array(
+   'type' =&gt; 'Zend\Mvc\Router\Http\Literal',
+    'options' =&gt; array(
+        'route'    =&gt; '/',
+        'defaults' =&gt; array(
+            'controller' =&gt; 'Application\Controller\Album', // &lt;-- change back here
+            'action'     =&gt; 'index',
+        ),
+    ),
+),</pre>
+</div>
+<p>This change means that if you go to the home page of your application
+(<a class="reference external" href="http://zf2-tutorial.localhost/">http://zf2-tutorial.localhost/</a>), you see the default skeleton
+application introduction. Your list of albums is still available at the
+/album route.</p>
+</div>
+<div class="section" id="setting-up-zend-navigation">
+<h2>Setting Up Zend\Navigation<a class="headerlink" href="#setting-up-zend-navigation" title="Permalink to this headline">¶</a></h2>
+<p>Firstly, we need to tell our application which <tt class="docutils literal"><span class="pre">NavigationFactory</span></tt> to
+use when using the bundled navigation view helpers. Thankfully, ZF2
+comes with a default factory that will suit our needs just fine. To tell
+ZF2 to use this default factory, we simply add a <tt class="docutils literal"><span class="pre">navigation</span></tt> key to
+the service manager. Its best to do this in the <tt class="docutils literal"><span class="pre">Application</span></tt> module,
+because, like the translation data, this is specific to the entire
+application, and not just to our album pages:</p>
+<p><tt class="docutils literal"><span class="pre">module/Application/config/module.config.php</span></tt></p>
+<div class="highlight-python"><pre>'service_manager' =&gt; array(
+    'factories' =&gt; array(
+        'translator' =&gt; 'Zend\I18n\Translator\TranslatorServiceFactory',
+        'navigation' =&gt; 'Zend\Navigation\Service\DefaultNavigationFactory', \\ &lt;-- add this
+    ),
+),</pre>
+</div>
+</div>
+<div class="section" id="configuring-our-site-map">
+<h2>Configuring our Site Map<a class="headerlink" href="#configuring-our-site-map" title="Permalink to this headline">¶</a></h2>
+<p>Next up, we need <tt class="docutils literal"><span class="pre">Zend\Navigation</span></tt> to understand the hierarchy of our
+site. Thankfully, if we add a <tt class="docutils literal"><span class="pre">navigation</span></tt> key to our merged config,
+the navigation factory will automagically create the container and pages
+needed to use the view helpers. Let&#8217;s do this in the <tt class="docutils literal"><span class="pre">Application</span></tt>
+module:</p>
+<p><tt class="docutils literal"><span class="pre">module/Application/config/module.config.php</span></tt></p>
+<div class="highlight-python"><pre>return array(
+...
+'navigation' =&gt; array(
+    'default' =&gt; array(
+        array(
+            'label' =&gt; 'Home',
+            'route' =&gt; 'home',
+        ),
+        array(
+            'label' =&gt; 'Album',
+            'route' =&gt; 'album',
+            'pages' =&gt; array(
+                array(
+                    'label' =&gt; 'Add',
+                    'route' =&gt; 'album',
+                    'action' =&gt; 'add',
+                ),
+                array(
+                    'label' =&gt; 'Edit',
+                    'route' =&gt; 'album',
+                    'action' =&gt; 'edit',
+                ),
+                array(
+                    'label' =&gt; 'Delete',
+                    'route' =&gt; 'album',
+                    'action' =&gt; 'delete',
+                ),
+            ),
+        ),
+    ),
+),
+...
+);</pre>
+</div>
+<p>This configuration maps out the pages we&#8217;ve defined in our controller,
+with labels linking to the given route names. You can define highly
+complex heirachical sites here with pages and sub-pages linking to route
+names, controller/action pairs or external uris. For more information
+see the docs
+<a class="reference external" href="http://framework.zend.com/manual/2.1/en/modules/zend.navigation.quick-start.html">here</a>.</p>
+</div>
+<div class="section" id="adding-the-menu-view-helper">
+<h2>Adding the Menu View Helper<a class="headerlink" href="#adding-the-menu-view-helper" title="Permalink to this headline">¶</a></h2>
+<p>Now that we have the navigation helper configured by our service manager
+and merged config, we can easily add the menu to the title bar to our
+layout by using the <tt class="docutils literal"><span class="pre">menu</span></tt> view helper:</p>
+<p><tt class="docutils literal"><span class="pre">module/Application/view/layout/layout.phtml</span></tt></p>
+<div class="highlight-python"><pre>...
+&lt;a class="brand"
+       href="&lt;?php echo $this-&gt;url('home') ?&gt;"&gt;&lt;?php echo $this-&gt;translate('Skeleton Application') ?&gt;&lt;/a&gt;
+&lt;?php // &lt;-- Add this !!
+echo $this-&gt;navigation('navigation')-&gt;menu();
+?&gt;
+...</pre>
+</div>
+<p>The navigation helper is built in to Zend Framework 2, and uses the
+service manager configuration we&#8217;ve already defined to configure itself
+automatically. Refreshing your application you will see a working (but
+ugly) menu, with just a few tweaks however, we can make it look awesome:</p>
+<p><tt class="docutils literal"><span class="pre">module/Application/view/layout/layout.phtml</span></tt></p>
+<div class="highlight-python"><pre>&lt;a class="brand"
+   href="&lt;?php echo $this-&gt;url('home') ?&gt;"&gt;&lt;?php echo $this-&gt;translate('Skeleton Application') ?&gt;&lt;/a&gt;
+&lt;?php // &lt;-- Update this !!
+echo $this-&gt;navigation('navigation')
+    -&gt;menu()
+    -&gt;setMinDepth(0)
+    -&gt;setMaxDepth(0)
+    -&gt;setUlClass('nav')
+    -&gt;render();
+?&gt;</pre>
+</div>
+<p>Here we tell the renderer to give the root UL the class of &#8216;nav&#8217; so that
+Twitter Bootstrap styles the menu correctly, and only render the first
+level of any given page. If you view your application in your browser,
+you will now see a nicely styled menu appear in the title bar. The great
+thing about <tt class="docutils literal"><span class="pre">Zend\Navigation</span></tt> is that it integrates with ZF2&#8217;s route
+so can tell which page you are currently viewing. Because of this, it
+sets the active page to have a class of <tt class="docutils literal"><span class="pre">active</span></tt> in the menu. Twitter
+Bootstrap uses this to highlight your current page accordingly.</p>
+</div>
+<div class="section" id="adding-breadcrumbs">
+<h2>Adding Breadcrumbs<a class="headerlink" href="#adding-breadcrumbs" title="Permalink to this headline">¶</a></h2>
+<p>Adding breadcrumbs is initially just as simple. In our <tt class="docutils literal"><span class="pre">layout.phtml</span></tt>
+we want to add breadcrumbs above the main content pane, so our foolish
+user knows exactly where they are in our complex website. Inside the
+container div, before we output the content from the view, let&#8217;s add a
+simple breadcrumb:</p>
+<p><tt class="docutils literal"><span class="pre">module/Application/view/layout/layout.phtml</span></tt></p>
+<div class="highlight-python"><pre>...
+&lt;div class="container"&gt;
+    &lt;?php echo $this-&gt;navigation('navigation')-&gt;breadcrumbs()-&gt;setMinDepth(0); // &lt;-- Add this!! ?&gt;
+    &lt;?php echo $this-&gt;content; ?&gt;
+&lt;/div&gt;
+...</pre>
+</div>
+<p>This adds a simple but functional breadcrumb to every page (we simply
+tell it to render from a depth of 0 so we see all level of pages) but we
+can do better than that! Because Bootstrap has a styled breadcrumb as
+part of it&#8217;s base CSS, so let&#8217;s add a partial that outputs the UL in
+bootstrap happy CSS. We&#8217;ll create it in the <tt class="docutils literal"><span class="pre">view</span></tt> directory of the
+<tt class="docutils literal"><span class="pre">Application</span></tt> module (this partial is application wide, rather than
+album specific):</p>
+<p><tt class="docutils literal"><span class="pre">module/Application/view/partial/breadcrumb.phtml</span></tt></p>
+<div class="highlight-python"><pre>&lt;ul class="breadcrumb"&gt;
+    &lt;?php
+    // iterate through the pages
+    foreach ($this-&gt;pages as $key =&gt; $page):
+        ?&gt;
+        &lt;li&gt;
+            &lt;?php
+            // if this isn't the last page, add a link and the seperator
+            if ($key &lt; count($this-&gt;pages) - 1):
+                ?&gt;
+                &lt;a href="&lt;?php echo $page-&gt;getHref(); ?&gt;"&gt;&lt;?php echo $page-&gt;getLabel(); ?&gt;&lt;/a&gt;
+                &lt;span class="divider"&gt;/&lt;/span&gt;
+            &lt;?php // otherwise, just output the name
+            else:
+            ?&gt;
+                &lt;?php echo $page-&gt;getLabel(); ?&gt;
+            &lt;?php endif; ?&gt;
+        &lt;/li&gt;
+        &lt;?php endforeach; ?&gt;
+&lt;/ul&gt;</pre>
+</div>
+<p>Notice how the partial is passed a <tt class="docutils literal"><span class="pre">Zend\View\Model\ViewModel</span></tt> instance with the <tt class="docutils literal"><span class="pre">pages</span></tt>
+property set to an array of pages to render. Now all we have to do is
+tell the breadcrumb helper to use the partial we have just written:</p>
+<p><tt class="docutils literal"><span class="pre">module/Application/view/layout/layout.phtml</span></tt></p>
+<div class="highlight-python"><pre>...
+&lt;div class="container"&gt;
+    &lt;?php echo $this-&gt;navigation('navigation') // &lt;-- Update this!!
+    -&gt;breadcrumbs()
+    -&gt;setMinDepth(0)
+    -&gt;setPartial(array('partial/breadcrumb.phtml', 'Album'));
+    ?&gt;
+    &lt;?php echo $this-&gt;content; ?&gt;
+&lt;/div&gt;
+...</pre>
+</div>
+<p>Refreshing the page now gives us a lovely styled set of breadcrumbs on
+each page.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Using Zend\Navigation in your Album module</a><ul>
+<li><a class="reference internal" href="#preparation">Preparation</a></li>
+<li><a class="reference internal" href="#setting-up-zend-navigation">Setting Up Zend\Navigation</a></li>
+<li><a class="reference internal" href="#configuring-our-site-map">Configuring our Site Map</a></li>
+<li><a class="reference internal" href="#adding-the-menu-view-helper">Adding the Menu View Helper</a></li>
+<li><a class="reference internal" href="#adding-breadcrumbs">Adding Breadcrumbs</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/tutorials/tutorial.navigation.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/tutorials/tutorial.navigation.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/tutorial.navigation.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/tutorials/tutorial.navigation.rst">
+                Using Zend\Navigation in your Album module
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
