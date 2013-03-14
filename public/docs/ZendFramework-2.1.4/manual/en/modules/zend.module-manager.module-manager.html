@@ -1,0 +1,468 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The Module Manager &mdash; Zend Framework 2 2.1.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.4 documentation" href="../index.html" />
+    <link rel="next" title="The Module Class" href="zend.module-manager.module-class.html" />
+    <link rel="prev" title="Introduction to the Module System" href="zend.module-manager.intro.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.module-manager.module-class.html" title="The Module Class"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.module-manager.intro.html" title="Introduction to the Module System"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-module-manager">
+<span id="zend-module-manager-module-manager"></span><h1>The Module Manager<a class="headerlink" href="#the-module-manager" title="Permalink to this headline">¶</a></h1>
+<p>The module manager, <tt class="docutils literal"><span class="pre">Zend\ModuleManager\ModuleManager</span></tt>, is a very simple class which is responsible for iterating
+over an array of module names and triggering a sequence of events for each. Instantiation of module classes,
+initialization tasks, and configuration are all performed by attached event listeners.</p>
+<div class="section" id="module-manager-events">
+<span id="zend-module-manager-module-manager-module-manager-events"></span><h2>Module Manager Events<a class="headerlink" href="#module-manager-events" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Events triggered by <tt class="docutils literal"><span class="pre">Zend\ModuleManager\ModuleManager</span></tt></p>
+<dl class="docutils">
+<dt><strong>loadModules</strong></dt>
+<dd>This event is primarily used internally to help encapsulate the work of loading modules in event listeners, and
+allow the loadModules.post event to be more user-friendly. Internal listeners will attach to this event with a
+negative priority instead of loadModules.post so that users can safely assume things like config merging have
+been done once loadModules.post is triggered, without having to worry about priorities at all.</dd>
+<dt><strong>loadModule.resolve</strong></dt>
+<dd><p class="first">Triggered for each module that is to be loaded. The listener(s) to this event are responsible for taking a
+module name and resolving it to an instance of some class. The default module resolver shipped with ZF2 simply
+looks for the class <tt class="docutils literal"><span class="pre">{modulename}\Module</span></tt>, instantiating and returning it if it exists.</p>
+<p class="last">The name of the module may be retrieved by listeners using the <tt class="docutils literal"><span class="pre">getModuleName()</span></tt> method of the <tt class="docutils literal"><span class="pre">Event</span></tt>
+object; a listener should then take that name and resolve it to an object instance representing the given
+module. Multiple listeners can be attached to this event, and the module manager will trigger them in order of
+their priority until one returns an object. This allows you to attach additional listeners which have
+alternative methods of resolving modules from a given module name.</p>
+</dd>
+<dt><strong>loadModule</strong></dt>
+<dd>Once a module resolver listener has resolved the module name to an object, the module manager then triggers this
+event, passing the newly created object to all listeners.</dd>
+<dt><strong>loadModules.post</strong></dt>
+<dd>This event is triggered by the module manager to allow any listeners to perform work after every module has
+finished loading. For example, the default configuration listener,
+<tt class="docutils literal"><span class="pre">Zend\ModuleManager\Listener\ConfigListener</span></tt> (covered later), attaches to this event to merge additional
+user-supplied configuration which is meant to override the default supplied configurations of installed modules.</dd>
+</dl>
+</div>
+<div class="section" id="module-manager-listeners">
+<span id="zend-module-manager-module-manager-module-manager-listeners"></span><h2>Module Manager Listeners<a class="headerlink" href="#module-manager-listeners" title="Permalink to this headline">¶</a></h2>
+<p>By default, Zend Framework provides several useful module manager listeners.</p>
+<p class="rubric">Provided Module Manager Listeners</p>
+<dl class="docutils">
+<dt><strong>Zend\ModuleManager\Listener\DefaultListenerAggregate</strong></dt>
+<dd>To help simplify the most common use case of the module manager, ZF2 provides this default aggregate listener.
+In most cases, this will be the only listener you will need to attach to use the module manager, as it will take
+care of properly attaching the requisite listeners (those listed below) for the module system to function
+properly.</dd>
+<dt><strong>Zend\ModuleManager\Listener\AutoloaderListener</strong></dt>
+<dd>This listener checks each module to see if it has implemented
+<tt class="docutils literal"><span class="pre">Zend\ModuleManager\Feature\AutoloaderProviderInterface</span></tt> or simply defined the <tt class="docutils literal"><span class="pre">getAutoloaderConfig()</span></tt>
+method. If so, it calls the <tt class="docutils literal"><span class="pre">getAutoloaderConfig()</span></tt> method on the module class and passes the returned array
+to <tt class="docutils literal"><span class="pre">Zend\Loader\AutoloaderFactory</span></tt>.</dd>
+<dt><strong>Zend\ModuleManager\Listener\ModuleDependencyCheckerListener</strong></dt>
+<dd>This listener checks each module to verify if all the modules it depends on were loaded.
+When a module class implements <tt class="docutils literal"><span class="pre">Zend\ModuleManager\Feature\DependencyIndicatorInterface</span></tt> or simply
+has a defined <tt class="docutils literal"><span class="pre">getDependencyModules()</span></tt> method, the listener will call <tt class="docutils literal"><span class="pre">getDependencyModules()</span></tt>. Each of
+the values returned by the method is checked against the loaded modules list: if one of the values is not in
+that list, a <tt class="docutils literal"><span class="pre">Zend\ModuleManager\Exception\MissingDependencyModuleException</span></tt> is be thrown.</dd>
+<dt><strong>Zend\ModuleManager\Listener\ConfigListener</strong></dt>
+<dd>If a module class has a <tt class="docutils literal"><span class="pre">getConfig()</span></tt> method, or implements <tt class="docutils literal"><span class="pre">Zend\ModuleManager\Feature\ConfigProviderInterface</span></tt>,
+this listener will call it and merge the returned array (or <tt class="docutils literal"><span class="pre">Traversable</span></tt> object) into the main application configuration.</dd>
+<dt><strong>Zend\ModuleManager\Listener\InitTrigger</strong></dt>
+<dd><p class="first">If a module class either implements <tt class="docutils literal"><span class="pre">Zend\ModuleManager\Feature\InitProviderInterface</span></tt>, or simply defines an
+<tt class="docutils literal"><span class="pre">init()</span></tt> method, this listener will call <tt class="docutils literal"><span class="pre">init()</span></tt> and pass the current instance of
+<tt class="docutils literal"><span class="pre">Zend\ModuleManager\ModuleManager</span></tt> as the sole parameter.</p>
+<p class="last">Like the <tt class="docutils literal"><span class="pre">OnBootstrapListener</span></tt>, the <tt class="docutils literal"><span class="pre">init()</span></tt> method is called for <strong>every</strong> module implementing this feature,
+on <strong>every</strong> page request and should <strong>only</strong> be used for performing <strong>lightweight</strong> tasks such as registering
+event listeners.</p>
+</dd>
+<dt><strong>Zend\ModuleManager\Listener\LocatorRegistrationListener</strong></dt>
+<dd>If a module class implements <tt class="docutils literal"><span class="pre">Zend\ModuleManager\Feature\LocatorRegisteredInterface</span></tt>, this listener will
+inject the module class instance into the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> using the module class name as the service name.
+This allows you to later retrieve the module class from the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>.</dd>
+<dt><strong>Zend\ModuleManager\Listener\ModuleResolverListener</strong></dt>
+<dd>This is the default module resolver. It attaches to the &#8220;loadModule.resolve&#8221; event and simply returns an
+instance of <tt class="docutils literal"><span class="pre">{moduleName}\Module</span></tt>.</dd>
+<dt><strong>Zend\ModuleManager\Listener\OnBootstrapListener</strong></dt>
+<dd><p class="first">If a module class implements <tt class="docutils literal"><span class="pre">Zend\ModuleManager\Feature\BootstrapListenerInterface</span></tt>, or simply defines an
+<tt class="docutils literal"><span class="pre">onBootstrap()</span></tt> method, this listener will register the <tt class="docutils literal"><span class="pre">onBootstrap()</span></tt> method with the
+<tt class="docutils literal"><span class="pre">Zend\Mvc\Application</span></tt> <tt class="docutils literal"><span class="pre">bootstrap</span></tt> event. This method will then be triggered during the <tt class="docutils literal"><span class="pre">bootstrap</span></tt> event
+(and passed an <tt class="docutils literal"><span class="pre">MvcEvent</span></tt> instance).</p>
+<p class="last">Like the <tt class="docutils literal"><span class="pre">InitTrigger</span></tt>, the <tt class="docutils literal"><span class="pre">onBootstrap()</span></tt> method is called for <strong>every</strong> module implementing this feature,
+on <strong>every</strong> page request, and should <strong>only</strong> be used for performing <strong>lightweight</strong> tasks such as registering
+event listeners.</p>
+</dd>
+<dt><strong>Zend\ModuleManager\Listener\ServiceListener</strong></dt>
+<dd><p class="first">If a module class implements <tt class="docutils literal"><span class="pre">Zend\ModuleManager\Feature\ServiceProviderInterface</span></tt>, or simply defines an
+<tt class="docutils literal"><span class="pre">getServiceConfig()</span></tt> method, this listener will call that method and aggregate the return values for
+use in configuring the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>.</p>
+<p>The <tt class="docutils literal"><span class="pre">getServiceConfig()</span></tt> method may return either an array of configuration compatible with
+<tt class="docutils literal"><span class="pre">Zend\ServiceManager\Config</span></tt>, an instance of that class, or the string name of a class that extends it.
+Values are merged and aggregated on completion, and then merged with any configuration from the
+<tt class="docutils literal"><span class="pre">ConfigListener</span></tt> falling under the <tt class="docutils literal"><span class="pre">service_manager</span></tt> key. For more information, see the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>
+documentation.</p>
+<p>Unlike the other listeners, this listener is not managed by the <tt class="docutils literal"><span class="pre">DefaultListenerAggregate</span></tt>; instead, it is
+created and instantiated within the <tt class="docutils literal"><span class="pre">Zend\Mvc\Service\ModuleManagerFactory</span></tt>, where it is injected with the
+current <tt class="docutils literal"><span class="pre">ServiceManager</span></tt> instance before being registered with the <tt class="docutils literal"><span class="pre">ModuleManager</span></tt> events.</p>
+<p>Additionally, this listener manages a variety of plugin managers, including
+<a class="reference internal" href="zend.view.helpers.html#zend-view-helpers"><em>view helpers</em></a>, <a class="reference internal" href="zend.mvc.controllers.html#zend-mvc-controllers"><em>controllers</em></a>, and <a class="reference internal" href="zend.mvc.plugins.html#zend-mvc-controller-plugins"><em>controller plugins</em></a>.
+In each case, you may either specify configuration to define plugins, or
+provide configuration via a <tt class="docutils literal"><span class="pre">Module</span></tt> class. Configuration follows the same
+format as for the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>. The following table outlines the plugin
+managers that may be configured this way (including the <tt class="docutils literal"><span class="pre">ServiceManager</span></tt>),
+the configuration key to use, the <tt class="docutils literal"><span class="pre">ModuleManager</span></tt> feature interface to
+optionally implement (all interfaces specified live in the
+<tt class="docutils literal"><span class="pre">Zend\ModuleManager\Feature</span></tt> namespace) , and the module method to
+optionally define to provide configuration.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="31%" />
+<col width="18%" />
+<col width="28%" />
+<col width="23%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Plugin Manager</th>
+<th class="head">Config Key</th>
+<th class="head">Interface</th>
+<th class="head">Module Method</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">Zend\ServiceManager\ServiceManager</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">service_manager</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">ServiceProviderInterface</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">getServiceConfig</span></tt></td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">Zend\View\HelperPluginManager</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">view_helpers</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">ViewHelperProviderInterface</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">getViewHelperConfig</span></tt></td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">Zend\Mvc\Controller\ControllerManager</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">controllers</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">ControllerProviderInterface</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">getControllerConfig</span></tt></td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">Zend\Mvc\Controller\PluginManager</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">controller_plugins</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">ControllerPluginProviderInterface</span></tt></td>
+<td><tt class="docutils literal"><span class="pre">getControllerPluginConfig</span></tt></td>
+</tr>
+</tbody>
+</table>
+<p>Configuration follows the examples in the <a class="reference internal" href="zend.service-manager.quick-start.html#zend-service-manager-quick-start-config"><em>ServiceManager configuration
+section</em></a>. As a brief recap, the
+following configuration keys and values are allowed:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="29%" />
+<col width="71%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Config Key</th>
+<th class="head">Allowed values</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">services</span></tt></td>
+<td>service name/instance pairs (these should likely be
+defined only in <tt class="docutils literal"><span class="pre">Module</span></tt> classes)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">invokables</span></tt></td>
+<td>service name/class name pairs of classes that may be
+invoked without constructor arguments</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">factories</span></tt></td>
+<td>service names pointing to factories. Factories may be any
+PHP callable, or a string class name of a class
+implementing <tt class="docutils literal"><span class="pre">Zend\ServiceManager\FactoryInterface</span></tt>, or
+of a class implementing the <tt class="docutils literal"><span class="pre">__invoke</span></tt> method  (if a
+callable is used, it should be defined only in <tt class="docutils literal"><span class="pre">Module</span></tt>
+classes)</td>
+</tr>
+<tr class="row-odd"><td><tt class="docutils literal"><span class="pre">abstract_factories</span></tt></td>
+<td>array of either concrete instances of
+<tt class="docutils literal"><span class="pre">Zend\ServiceManager\AbstractFactoryInterface</span></tt>, or
+string class names of classes implementing that interface
+(if an instance is used, it should be defined only in
+<tt class="docutils literal"><span class="pre">Module</span></tt> classes)</td>
+</tr>
+<tr class="row-even"><td><tt class="docutils literal"><span class="pre">initializers</span></tt></td>
+<td>array of PHP callables or string class names of classes
+implementing <tt class="docutils literal"><span class="pre">Zend\ServiceManager\InitializerInterface</span></tt>
+(if a callable is used, it should be defined only in
+<tt class="docutils literal"><span class="pre">Module</span></tt> classes)</td>
+</tr>
+</tbody>
+</table>
+<p>When working with plugin managers, you will be passed the plugin manager
+instance to factories, abstract factories, and initializers. If you need
+access to the application services, you can use the <tt class="docutils literal"><span class="pre">getServiceLocator()</span></tt>
+method, as in the following example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">public</span> <span class="k">function</span> <span class="nf">getViewHelperConfig</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;factories&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;foo&#39;</span> <span class="o">=&gt;</span> <span class="k">function</span> <span class="p">(</span><span class="nv">$helpers</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$services</span> <span class="o">=</span> <span class="nv">$helpers</span><span class="o">-&gt;</span><span class="na">getServiceLocator</span><span class="p">();</span>
+            <span class="nv">$someService</span> <span class="o">=</span> <span class="nv">$services</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;SomeService&#39;</span><span class="p">);</span>
+            <span class="nv">$helper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Helper\Foo</span><span class="p">(</span><span class="nv">$someService</span><span class="p">);</span>
+            <span class="k">return</span> <span class="nv">$helper</span><span class="p">;</span>
+        <span class="p">},</span>
+    <span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p class="last">This is a powerful technique, as it allows your various plugins to remain
+agnostic with regards to where and how dependencies are injected, and thus
+allows you to use Inversion of Control principals even with plugins.</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The Module Manager</a><ul>
+<li><a class="reference internal" href="#module-manager-events">Module Manager Events</a></li>
+<li><a class="reference internal" href="#module-manager-listeners">Module Manager Listeners</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.module-manager.intro.html"
+                        title="previous chapter">Introduction to the Module System</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.module-manager.module-class.html"
+                        title="next chapter">The Module Class</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.module-manager.module-manager.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.module-manager.module-manager.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.module-manager.module-manager.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.module-manager.module-class.html" title="The Module Class"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.module-manager.intro.html" title="Introduction to the Module System"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.module-manager.module-manager.rst">
+                The Module Manager
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

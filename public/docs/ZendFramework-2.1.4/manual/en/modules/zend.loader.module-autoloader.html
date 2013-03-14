@@ -1,0 +1,370 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>The ModuleAutoloader &mdash; Zend Framework 2 2.1.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.4 documentation" href="../index.html" />
+    <link rel="next" title="The SplAutoloader Interface" href="zend.loader.spl-autoloader.html" />
+    <link rel="prev" title="The ClassMapAutoloader" href="zend.loader.class-map-autoloader.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.loader.spl-autoloader.html" title="The SplAutoloader Interface"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.loader.class-map-autoloader.html" title="The ClassMapAutoloader"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="the-moduleautoloader">
+<span id="zend-loader-module-autoloader"></span><h1>The ModuleAutoloader<a class="headerlink" href="#the-moduleautoloader" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<span id="zend-loader-module-autoloader-intro"></span><h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">Zend\Loader\ModuleAutoloader</span></tt> is a special implementation of the <a class="reference internal" href="zend.loader.spl-autoloader.html#zend-loader-spl-autoloader"><em>Zend\Loader\SplAutoloader</em></a> interface, used by <a class="reference internal" href="zend.module-manager.intro.html#zend-module-manager-intro"><em>Zend\ModuleManager</em></a> to
+autoload <tt class="docutils literal"><span class="pre">Module</span></tt> classes from different sources.</p>
+<p>Apart from being able to autoload modules from directories, the <tt class="docutils literal"><span class="pre">ModuleAutoloader</span></tt> can also autoload modules
+packaged as <a class="reference external" href="http://php.net/phar">Phar archives</a>, which allows for packaging your modules in a single file for easier distribution.
+Supported archive formats are: <tt class="docutils literal"><span class="pre">.phar</span></tt>, <tt class="docutils literal"><span class="pre">.phar.gz</span></tt>, <tt class="docutils literal"><span class="pre">.phar.bz2</span></tt>, <tt class="docutils literal"><span class="pre">.phar.tar</span></tt>, <tt class="docutils literal"><span class="pre">.phar.tar.gz</span></tt>,
+<tt class="docutils literal"><span class="pre">.phar.tar.bz2</span></tt>, <tt class="docutils literal"><span class="pre">.phar.zip</span></tt>, <tt class="docutils literal"><span class="pre">.tar</span></tt>, <tt class="docutils literal"><span class="pre">tar.gz</span></tt>, <tt class="docutils literal"><span class="pre">.tar.bz2</span></tt> and <tt class="docutils literal"><span class="pre">.zip</span></tt>. It is, however, recommended
+to avoid compressing your packages (be it either <cite>gz</cite>, <cite>bz2</cite> or <cite>zip</cite> compression), as it introduces additional
+CPU overhead to every request.</p>
+</div>
+<div class="section" id="quickstart">
+<span id="zend-loader-module-autoloader-quickstart"></span><h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h2>
+<p>As the <tt class="docutils literal"><span class="pre">ModuleAutoloader</span></tt> is meant to be used with the <tt class="docutils literal"><span class="pre">ModuleManager</span></tt>, for examples of it&#8217;s usage and
+how to configure it, please see the <a class="reference internal" href="zend.module-manager.module-autoloader.html#zend-module-manager-module-autoloader-usage"><em>Module Autoloader Usage</em></a> section of the <tt class="docutils literal"><span class="pre">ModuleManager</span></tt> documentation.</p>
+</div>
+<div class="section" id="configuration-options">
+<span id="zend-loader-module-autoloader-options"></span><h2>Configuration Options<a class="headerlink" href="#configuration-options" title="Permalink to this headline">¶</a></h2>
+<p>The <tt class="docutils literal"><span class="pre">ModuleAutoloader</span></tt> defines the following options.</p>
+<p class="rubric">ModuleAutoloader Options</p>
+<dl class="docutils">
+<dt><strong>$options</strong></dt>
+<dd><p class="first">The <tt class="docutils literal"><span class="pre">ModuleAutoloader</span></tt> expects an array of options, where each option is either a path to scan for modules,
+or a key/value pair of explicit module paths. In the case of explicit module paths, the key is the module&#8217;s
+name, and the value is the path to that module.</p>
+<div class="last highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$options</span> <span class="o">=</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;/path/to/modules&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;/path/to/other/modules&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;MyModule&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;/explicit/path/mymodule-v1.2&#39;</span>
+<span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</dd>
+</dl>
+</div>
+<div class="section" id="available-methods">
+<span id="zend-loader-module-autoloader-methods"></span><h2>Available Methods<a class="headerlink" href="#available-methods" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils" id="zend-loader-class-map-autoloader-methods-constructor">
+<dt>__construct</dt>
+<dd><p class="first">Initialize and configure the object
+<tt class="docutils literal"><span class="pre">__construct($options</span> <span class="pre">=</span> <span class="pre">null)</span></tt></p>
+<p class="last"><strong>Constructor</strong>
+Used during instantiation of the object. Optionally, pass options, which may be either an array or
+<tt class="docutils literal"><span class="pre">Traversable</span></tt> object; this argument will be passed to <a class="reference internal" href="#zend-loader-module-autoloader-methods-set-options"><em>setOptions()</em></a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-module-autoloader-methods-set-options">
+<dt>setOptions</dt>
+<dd><p class="first">Configure the module autoloader
+<tt class="docutils literal"><span class="pre">setOptions($options)</span></tt></p>
+<p class="last"><strong>setOptions()</strong>
+Configures the state of the autoloader, registering paths to modules. Expects an array or <tt class="docutils literal"><span class="pre">Traversable</span></tt>
+object; the argument will be passed to <a class="reference internal" href="#zend-loader-module-autoloader-methods-register-paths"><em>registerPaths()</em></a>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-module-autoloader-methods-autoload">
+<dt>autoload</dt>
+<dd><p class="first">Attempt to load a <tt class="docutils literal"><span class="pre">Module</span></tt> class.
+<tt class="docutils literal"><span class="pre">autoload($class)</span></tt></p>
+<p class="last"><strong>autoload()</strong>
+Attempts to load the specified <tt class="docutils literal"><span class="pre">Module</span></tt> class. Returns a boolean <tt class="docutils literal"><span class="pre">false</span></tt> on failure, or a string indicating
+the class loaded on success.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-module-autoloader-methods-register">
+<dt>register</dt>
+<dd><p class="first">Register with spl_autoload.
+<tt class="docutils literal"><span class="pre">register()</span></tt></p>
+<p class="last"><strong>register()</strong>
+Registers the <tt class="docutils literal"><span class="pre">autoload()</span></tt> method of the current instance with <tt class="docutils literal"><span class="pre">spl_autoload_register()</span></tt>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-module-autoloader-methods-unregister">
+<dt>unregister</dt>
+<dd><p class="first">Unregister with spl_autoload.
+<tt class="docutils literal"><span class="pre">unregister()</span></tt></p>
+<p class="last"><strong>unregister()</strong>
+Unregisters the <tt class="docutils literal"><span class="pre">autoload()</span></tt> method of the current instance with <tt class="docutils literal"><span class="pre">spl_autoload_unregister()</span></tt>.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-module-autoloader-methods-register-paths">
+<dt>registerPaths</dt>
+<dd><p class="first">Register multiple paths with the autoloader.
+<tt class="docutils literal"><span class="pre">registerPaths($paths)</span></tt></p>
+<p class="last"><strong>registerPaths()</strong>
+Register a paths to modules. Expects an array or <tt class="docutils literal"><span class="pre">Traversable</span></tt> object. For an example array, please see the
+<a class="reference internal" href="#zend-loader-module-autoloader-options"><em>Configuration options</em></a> section.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-module-autoloader-methods-register-path">
+<dt>registerPath</dt>
+<dd><p class="first">Register a single path with the autoloader.
+<tt class="docutils literal"><span class="pre">registerPath($path,</span> <span class="pre">$moduleName=false)</span></tt></p>
+<p class="last"><strong>registerPath()</strong>
+Register a single path with the autoloader. The first parameter, <tt class="docutils literal"><span class="pre">$path</span></tt>, is expected to be a string. The
+second paremeter, <tt class="docutils literal"><span class="pre">$moduleName</span></tt>, is expected to be a module name, which allows for registering an explicit
+path to that module.</p>
+</dd>
+</dl>
+<dl class="docutils" id="zend-loader-module-autoloader-methods-getpaths">
+<dt>getPaths</dt>
+<dd><p class="first">Get all paths registered with the autoloader.
+<tt class="docutils literal"><span class="pre">getPaths()</span></tt></p>
+<p class="last"><strong>getPaths()</strong>
+Returns an array of all the paths registered with the current instance of the autoloader.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<span id="zend-loader-module-autoloader-examples"></span><h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h2>
+<p>Please review the <a class="reference internal" href="#zend-loader-module-autoloader-quickstart"><em>examples in the quick start</em></a> for usage.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">The ModuleAutoloader</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#quickstart">Quickstart</a></li>
+<li><a class="reference internal" href="#configuration-options">Configuration Options</a></li>
+<li><a class="reference internal" href="#available-methods">Available Methods</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.loader.class-map-autoloader.html"
+                        title="previous chapter">The ClassMapAutoloader</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.loader.spl-autoloader.html"
+                        title="next chapter">The SplAutoloader Interface</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.loader.module-autoloader.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.loader.module-autoloader.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.loader.module-autoloader.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.loader.spl-autoloader.html" title="The SplAutoloader Interface"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.loader.class-map-autoloader.html" title="The ClassMapAutoloader"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.loader.module-autoloader.rst">
+                The ModuleAutoloader
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

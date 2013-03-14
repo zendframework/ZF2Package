@@ -1,0 +1,1172 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Reading Mail Messages &mdash; Zend Framework 2 2.1.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.4 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="reading-mail-messages">
+<span id="zend-mail-read"></span><h1>Reading Mail Messages<a class="headerlink" href="#reading-mail-messages" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">Zend\Mail</span></tt> can read mail messages from several local or remote mail storages. All of them have the same basic
+<em>API</em> to count and fetch messages and some of them implement additional interfaces for not so common features. For
+a feature overview of the implemented storages, see the following table.</p>
+<table border="1" class="docutils" id="zend-mail-read-table-1">
+<caption>Mail Read Feature Overview</caption>
+<colgroup>
+<col width="40%" />
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
+<col width="15%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Feature</th>
+<th class="head">Mbox</th>
+<th class="head">Maildir</th>
+<th class="head">Pop3</th>
+<th class="head">IMAP</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Storage type</td>
+<td>local</td>
+<td>local</td>
+<td>remote</td>
+<td>remote</td>
+</tr>
+<tr class="row-odd"><td>Fetch message</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr class="row-even"><td>Fetch MIME-part</td>
+<td>emulated</td>
+<td>emulated</td>
+<td>emulated</td>
+<td>emulated</td>
+</tr>
+<tr class="row-odd"><td>Folders</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr class="row-even"><td>Create message/folder</td>
+<td>No</td>
+<td>todo</td>
+<td>No</td>
+<td>todo</td>
+</tr>
+<tr class="row-odd"><td>Flags</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr class="row-even"><td>Quota</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<div class="section" id="simple-example-using-pop3">
+<span id="zend-mail-read-example"></span><h2>Simple example using Pop3<a class="headerlink" href="#simple-example-using-pop3" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Pop3</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;host&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;user&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">));</span>
+
+<span class="k">echo</span> <span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">countMessages</span><span class="p">()</span> <span class="o">.</span> <span class="s2">&quot; messages found</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$mail</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;Mail from &#39;</span><span class="si">{</span><span class="nv">$message</span><span class="o">-&gt;</span><span class="na">from</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="nv">$message</span><span class="o">-&gt;</span><span class="na">subject</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="opening-a-local-storage">
+<span id="zend-mail-read-open-local"></span><h2>Opening a local storage<a class="headerlink" href="#opening-a-local-storage" title="Permalink to this headline">¶</a></h2>
+<p>Mbox and Maildir are the two supported formats for local mail storages, both in their most simple formats.</p>
+<p>If you want to read from a Mbox file you only need to give the filename to the constructor of
+<tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Mbox</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Mbox</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;filename&#39;</span> <span class="o">=&gt;</span>
+                                             <span class="s1">&#39;/home/test/mail/inbox&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>Maildir is very similar but needs a dirname:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Maildir</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;dirname&#39;</span> <span class="o">=&gt;</span>
+                                                <span class="s1">&#39;/home/test/mail/&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>Both constructors throw a <tt class="docutils literal"><span class="pre">Zend\Mail\Exception</span></tt> if the storage can&#8217;t be read.</p>
+</div>
+<div class="section" id="opening-a-remote-storage">
+<span id="zend-mail-read-open-remote"></span><h2>Opening a remote storage<a class="headerlink" href="#opening-a-remote-storage" title="Permalink to this headline">¶</a></h2>
+<p>For remote storages the two most popular protocols are supported: Pop3 and Imap. Both need at least a host and a
+user to connect and login. The default password is an empty string, the default port as given in the protocol
+<em>RFC</em>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// connecting with Pop3</span>
+<span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Pop3</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;host&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;example.com&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;user&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">));</span>
+
+<span class="c1">// connecting with Imap</span>
+<span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Imap</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;host&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;example.com&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;user&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">));</span>
+
+<span class="c1">// example for a none standard port</span>
+<span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Pop3</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;host&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;example.com&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;port&#39;</span>     <span class="o">=&gt;</span> <span class="mi">1120</span>
+                                         <span class="s1">&#39;user&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>For both storages <em>SSL</em> and TLS are supported. If you use <em>SSL</em> the default port changes as given in the <em>RFC</em>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// examples for Zend\Mail\Storage\Pop3, same works for Zend\Mail\Storage\Imap</span>
+
+<span class="c1">// use SSL on different port (default is 995 for Pop3 and 993 for Imap)</span>
+<span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Pop3</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;host&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;example.com&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;user&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;ssl&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;SSL&#39;</span><span class="p">));</span>
+
+<span class="c1">// use TLS</span>
+<span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Pop3</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;host&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;example.com&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;user&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;ssl&#39;</span>      <span class="o">=&gt;</span> <span class="s1">&#39;TLS&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>Both constructors can throw <tt class="docutils literal"><span class="pre">Zend\Mail\Exception</span></tt> or <tt class="docutils literal"><span class="pre">Zend\Mail\Protocol\Exception</span></tt> (extends
+<tt class="docutils literal"><span class="pre">Zend\Mail\Exception</span></tt>), depending on the type of error.</p>
+</div>
+<div class="section" id="fetching-messages-and-simple-methods">
+<span id="zend-mail-read-fetching"></span><h2>Fetching messages and simple methods<a class="headerlink" href="#fetching-messages-and-simple-methods" title="Permalink to this headline">¶</a></h2>
+<p>Messages can be fetched after you&#8217;ve opened the storage . You need the message number, which is a counter starting
+with 1 for the first message. To fetch the message, you use the method <tt class="docutils literal"><span class="pre">getMessage()</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$message</span> <span class="o">=</span> <span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">(</span><span class="nv">$messageNum</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Array access is also supported, but this access method won&#8217;t supported any additional parameters that could be
+added to <tt class="docutils literal"><span class="pre">getMessage()</span></tt>. As long as you don&#8217;t mind, and can live with the default values, you may use:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$message</span> <span class="o">=</span> <span class="nv">$mail</span><span class="p">[</span><span class="nv">$messageNum</span><span class="p">];</span>
+</pre></div>
+</td></tr></table></div>
+<p>For iterating over all messages the Iterator interface is implemented:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">foreach</span> <span class="p">(</span><span class="nv">$mail</span> <span class="k">as</span> <span class="nv">$messageNum</span> <span class="o">=&gt;</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// do stuff ...</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>To count the messages in the storage, you can either use the method <tt class="docutils literal"><span class="pre">countMessages()</span></tt> or use array access:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// method</span>
+<span class="nv">$maxMessage</span> <span class="o">=</span> <span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">countMessages</span><span class="p">();</span>
+
+<span class="c1">// array access</span>
+<span class="nv">$maxMessage</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="nv">$mail</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>To remove a mail, you use the method <tt class="docutils literal"><span class="pre">removeMessage()</span></tt> or again array access:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// method</span>
+<span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">removeMessage</span><span class="p">(</span><span class="nv">$messageNum</span><span class="p">);</span>
+
+<span class="c1">// array access</span>
+<span class="nb">unset</span><span class="p">(</span><span class="nv">$mail</span><span class="p">[</span><span class="nv">$messageNum</span><span class="p">]);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="working-with-messages">
+<span id="zend-mail-read-message"></span><h2>Working with messages<a class="headerlink" href="#working-with-messages" title="Permalink to this headline">¶</a></h2>
+<p>After you fetch the messages with <tt class="docutils literal"><span class="pre">getMessage()</span></tt> you want to fetch headers, the content or single parts of a
+multipart message. All headers can be accessed via properties or the method <tt class="docutils literal"><span class="pre">getHeader()</span></tt> if you want more
+control or have unusual header names. The header names are lower-cased internally, thus the case of the header name
+in the mail message doesn&#8217;t matter. Also headers with a dash can be written in camel-case. If no header is found
+for both notations an exception is thrown. To encounter this the method <tt class="docutils literal"><span class="pre">headerExists()</span></tt> can be used to check the
+existence of a header.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// get the message object</span>
+<span class="nv">$message</span> <span class="o">=</span> <span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="c1">// output subject of message</span>
+<span class="k">echo</span> <span class="nv">$message</span><span class="o">-&gt;</span><span class="na">subject</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+
+<span class="c1">// get content-type header</span>
+<span class="nv">$type</span> <span class="o">=</span> <span class="nv">$message</span><span class="o">-&gt;</span><span class="na">contentType</span><span class="p">;</span>
+
+<span class="c1">// check if CC isset:</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">isset</span><span class="p">(</span><span class="nv">$message</span><span class="o">-&gt;</span><span class="na">cc</span><span class="p">))</span> <span class="p">{</span> <span class="c1">// or $message-&gt;headerExists(&#39;cc&#39;);</span>
+    <span class="nv">$cc</span> <span class="o">=</span> <span class="nv">$message</span><span class="o">-&gt;</span><span class="na">cc</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you have multiple headers with the same name- i.e. the Received headers- you might want an array instead of a
+string. In this case, use the <tt class="docutils literal"><span class="pre">getHeader()</span></tt> method.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// get header as property - the result is always a string,</span>
+<span class="c1">// with new lines between the single occurrences in the message</span>
+<span class="nv">$received</span> <span class="o">=</span> <span class="nv">$message</span><span class="o">-&gt;</span><span class="na">received</span><span class="p">;</span>
+
+<span class="c1">// the same via getHeader() method</span>
+<span class="nv">$received</span> <span class="o">=</span> <span class="nv">$message</span><span class="o">-&gt;</span><span class="na">getHeader</span><span class="p">(</span><span class="s1">&#39;received&#39;</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">);</span>
+
+<span class="c1">// better an array with a single entry for every occurrences</span>
+<span class="nv">$received</span> <span class="o">=</span> <span class="nv">$message</span><span class="o">-&gt;</span><span class="na">getHeader</span><span class="p">(</span><span class="s1">&#39;received&#39;</span><span class="p">,</span> <span class="s1">&#39;array&#39;</span><span class="p">);</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$received</span> <span class="k">as</span> <span class="nv">$line</span><span class="p">)</span> <span class="p">{</span>
+    <span class="c1">// do stuff</span>
+<span class="p">}</span>
+
+<span class="c1">// if you don&#39;t define a format you&#39;ll get the internal representation</span>
+<span class="c1">// (string for single headers, array for multiple)</span>
+<span class="nv">$received</span> <span class="o">=</span> <span class="nv">$message</span><span class="o">-&gt;</span><span class="na">getHeader</span><span class="p">(</span><span class="s1">&#39;received&#39;</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="nb">is_string</span><span class="p">(</span><span class="nv">$received</span><span class="p">))</span> <span class="p">{</span>
+    <span class="c1">// only one received header found in message</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>The method <tt class="docutils literal"><span class="pre">getHeaders()</span></tt> returns all headers as array with the lower-cased name as key and the value as and
+array for multiple headers or as string for single headers.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// dump all headers</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$message</span><span class="o">-&gt;</span><span class="na">getHeaders</span><span class="p">()</span> <span class="k">as</span> <span class="nv">$name</span> <span class="o">=&gt;</span> <span class="nv">$value</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">is_string</span><span class="p">(</span><span class="nv">$value</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="si">$name</span><span class="s2">: </span><span class="si">$value</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+        <span class="k">continue</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="nv">$value</span> <span class="k">as</span> <span class="nv">$entry</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s2">&quot;</span><span class="si">$name</span><span class="s2">: </span><span class="si">$entry</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you don&#8217;t have a multipart message, fetching the content is easily done via <tt class="docutils literal"><span class="pre">getContent()</span></tt>. Unlike the
+headers, the content is only fetched when needed (aka late-fetch).</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// output message content for HTML</span>
+<span class="k">echo</span> <span class="s1">&#39;&lt;pre&gt;&#39;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="nv">$message</span><span class="o">-&gt;</span><span class="na">getContent</span><span class="p">();</span>
+<span class="k">echo</span> <span class="s1">&#39;&lt;/pre&gt;&#39;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>Checking for multipart messages is done with the method <tt class="docutils literal"><span class="pre">isMultipart()</span></tt>. If you have multipart message you can
+get an instance of <tt class="docutils literal"><span class="pre">Zend\Mail\Part</span></tt> with the method <tt class="docutils literal"><span class="pre">getPart()</span></tt>. <tt class="docutils literal"><span class="pre">Zend\Mail\Part</span></tt> is the base class of
+<tt class="docutils literal"><span class="pre">Zend\Mail\Message</span></tt>, so you have the same methods: <tt class="docutils literal"><span class="pre">getHeader()</span></tt>, <tt class="docutils literal"><span class="pre">getHeaders()</span></tt>, <tt class="docutils literal"><span class="pre">getContent()</span></tt>,
+<tt class="docutils literal"><span class="pre">getPart()</span></tt>, <tt class="docutils literal"><span class="pre">isMultipart()</span></tt> and the properties for headers.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// get the first none multipart part</span>
+<span class="nv">$part</span> <span class="o">=</span> <span class="nv">$message</span><span class="p">;</span>
+<span class="k">while</span> <span class="p">(</span><span class="nv">$part</span><span class="o">-&gt;</span><span class="na">isMultipart</span><span class="p">())</span> <span class="p">{</span>
+    <span class="nv">$part</span> <span class="o">=</span> <span class="nv">$message</span><span class="o">-&gt;</span><span class="na">getPart</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="k">echo</span> <span class="s1">&#39;Type of this part is &#39;</span> <span class="o">.</span> <span class="nx">strtok</span><span class="p">(</span><span class="nv">$part</span><span class="o">-&gt;</span><span class="na">contentType</span><span class="p">,</span> <span class="s1">&#39;;&#39;</span><span class="p">)</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s2">&quot;Content:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="nv">$part</span><span class="o">-&gt;</span><span class="na">getContent</span><span class="p">();</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">Zend\Mail\Part</span></tt> also implements <tt class="docutils literal"><span class="pre">RecursiveIterator</span></tt>, which makes it easy to scan through all parts. And for
+easy output, it also implements the magic method <tt class="docutils literal"><span class="pre">__toString()</span></tt>, which returns the content.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// output first text/plain part</span>
+<span class="nv">$foundPart</span> <span class="o">=</span> <span class="k">null</span><span class="p">;</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="k">new</span> <span class="nx">RecursiveIteratorIterator</span><span class="p">(</span><span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">getMessage</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="k">as</span> <span class="nv">$part</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">try</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nx">strtok</span><span class="p">(</span><span class="nv">$part</span><span class="o">-&gt;</span><span class="na">contentType</span><span class="p">,</span> <span class="s1">&#39;;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;text/plain&#39;</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$foundPart</span> <span class="o">=</span> <span class="nv">$part</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend\Mail\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// ignore</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$foundPart</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;no plain text part found&#39;</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s2">&quot;plain text part: </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">.</span> <span class="nv">$foundPart</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="checking-for-flags">
+<span id="zend-mail-read-flags"></span><h2>Checking for flags<a class="headerlink" href="#checking-for-flags" title="Permalink to this headline">¶</a></h2>
+<p>Maildir and IMAP support storing flags. The class <tt class="docutils literal"><span class="pre">Zend\Mail\Storage</span></tt> has constants for all known maildir and
+IMAP system flags, named <tt class="docutils literal"><span class="pre">Zend\Mail\Storage::FLAG_&lt;flagname&gt;</span></tt>. To check for flags <tt class="docutils literal"><span class="pre">Zend\Mail\Message</span></tt> has a
+method called <tt class="docutils literal"><span class="pre">hasFlag()</span></tt>. With <tt class="docutils literal"><span class="pre">getFlags()</span></tt> you&#8217;ll get all set flags.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// find unread messages</span>
+<span class="k">echo</span> <span class="s2">&quot;Unread mails:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$mail</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$message</span><span class="o">-&gt;</span><span class="na">hasFlag</span><span class="p">(</span><span class="nx">Zend\Mail\Storage</span><span class="o">::</span><span class="na">FLAG_SEEN</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">continue</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">// mark recent/new mails</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$message</span><span class="o">-&gt;</span><span class="na">hasFlag</span><span class="p">(</span><span class="nx">Zend\Mail\Storage</span><span class="o">::</span><span class="na">FLAG_RECENT</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s1">&#39;! &#39;</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s1">&#39;  &#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">echo</span> <span class="nv">$message</span><span class="o">-&gt;</span><span class="na">subject</span> <span class="o">.</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// check for known flags</span>
+<span class="nv">$flags</span> <span class="o">=</span> <span class="nv">$message</span><span class="o">-&gt;</span><span class="na">getFlags</span><span class="p">();</span>
+<span class="k">echo</span> <span class="s2">&quot;Message is flagged as: &quot;</span><span class="p">;</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$flags</span> <span class="k">as</span> <span class="nv">$flag</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="nv">$flag</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="nx">Zend\Mail\Storage</span><span class="o">::</span><span class="na">FLAG_ANSWERED</span><span class="o">:</span>
+            <span class="k">echo</span> <span class="s1">&#39;Answered &#39;</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+        <span class="k">case</span> <span class="nx">Zend\Mail\Storage</span><span class="o">::</span><span class="na">FLAG_FLAGGED</span><span class="o">:</span>
+            <span class="k">echo</span> <span class="s1">&#39;Flagged &#39;</span><span class="p">;</span>
+            <span class="k">break</span><span class="p">;</span>
+
+        <span class="c1">// ...</span>
+        <span class="c1">// check for other flags</span>
+        <span class="c1">// ...</span>
+
+        <span class="k">default</span><span class="o">:</span>
+            <span class="k">echo</span> <span class="nv">$flag</span> <span class="o">.</span> <span class="s1">&#39;(unknown flag) &#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>As IMAP allows user or client defined flags, you could get flags that don&#8217;t have a constant in
+<tt class="docutils literal"><span class="pre">Zend\Mail\Storage</span></tt>. Instead, they are returned as strings and can be checked the same way with <tt class="docutils literal"><span class="pre">hasFlag()</span></tt>.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// check message for client defined flags $IsSpam, $SpamTested</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$message</span><span class="o">-&gt;</span><span class="na">hasFlag</span><span class="p">(</span><span class="s1">&#39;$SpamTested&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;message has not been tested for spam&#39;</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nv">$message</span><span class="o">-&gt;</span><span class="na">hasFlag</span><span class="p">(</span><span class="s1">&#39;$IsSpam&#39;</span><span class="p">))</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;this message is spam&#39;</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="k">echo</span> <span class="s1">&#39;this message is ham&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="using-folders">
+<span id="zend-mail-read-folders"></span><h2>Using folders<a class="headerlink" href="#using-folders" title="Permalink to this headline">¶</a></h2>
+<p>All storages, except Pop3, support folders, also called mailboxes. The interface implemented by all storages
+supporting folders is called <tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Folder\Interface</span></tt>. Also all of these classes have an additional
+optional parameter called <tt class="docutils literal"><span class="pre">folder</span></tt>, which is the folder selected after login, in the constructor.</p>
+<p>For the local storages you need to use separate classes called <tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Folder\Mbox</span></tt> or
+<tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Folder\Maildir</span></tt>. Both need one parameter called <tt class="docutils literal"><span class="pre">dirname</span></tt> with the name of the base dir. The
+format for maildir is as defined in maildir++ (with a dot as default delimiter), Mbox is a directory hierarchy with
+Mbox files. If you don&#8217;t have a Mbox file called INBOX in your Mbox base dir you need to set another folder in the
+constructor.</p>
+<p><tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Imap</span></tt> already supports folders by default. Examples for opening these storages:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// mbox with folders</span>
+<span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Folder\Mbox</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;dirname&#39;</span> <span class="o">=&gt;</span>
+                                                    <span class="s1">&#39;/home/test/mail/&#39;</span><span class="p">));</span>
+
+<span class="c1">// mbox with a default folder not called INBOX, also works</span>
+<span class="c1">// with Zend\Mail\Storage\Folder\Maildir and Zend\Mail\Storage\Imap</span>
+<span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Folder\Mbox</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;dirname&#39;</span> <span class="o">=&gt;</span>
+                                                    <span class="s1">&#39;/home/test/mail/&#39;</span><span class="p">,</span>
+                                                <span class="s1">&#39;folder&#39;</span>  <span class="o">=&gt;</span>
+                                                    <span class="s1">&#39;Archive&#39;</span><span class="p">));</span>
+
+<span class="c1">// maildir with folders</span>
+<span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Folder\Maildir</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;dirname&#39;</span> <span class="o">=&gt;</span>
+                                                       <span class="s1">&#39;/home/test/mail/&#39;</span><span class="p">));</span>
+
+<span class="c1">// maildir with colon as delimiter, as suggested in Maildir++</span>
+<span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Folder\Maildir</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;dirname&#39;</span> <span class="o">=&gt;</span>
+                                                       <span class="s1">&#39;/home/test/mail/&#39;</span><span class="p">,</span>
+                                                   <span class="s1">&#39;delim&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;:&#39;</span><span class="p">));</span>
+
+<span class="c1">// imap is the same with and without folders</span>
+<span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Imap</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;host&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;example.com&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;user&#39;</span>     <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;password&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>With the method getFolders($root = null) you can get the folder hierarchy starting with the root folder or the
+given folder. It&#8217;s returned as an instance of <tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Folder</span></tt>, which implements <tt class="docutils literal"><span class="pre">RecursiveIterator</span></tt>
+and all children are also instances of <tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Folder</span></tt>. Each of these instances has a local and a
+global name returned by the methods <tt class="docutils literal"><span class="pre">getLocalName()</span></tt> and <tt class="docutils literal"><span class="pre">getGlobalName()</span></tt>. The global name is the absolute
+name from the root folder (including delimiters), the local name is the name in the parent folder.</p>
+<table border="1" class="docutils" id="zend-mail-read-folders-table-1">
+<caption>Mail Folder Names</caption>
+<colgroup>
+<col width="60%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Global Name</th>
+<th class="head">Local Name</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>/INBOX</td>
+<td>INBOX</td>
+</tr>
+<tr class="row-odd"><td>/Archive/2005</td>
+<td>2005</td>
+</tr>
+<tr class="row-even"><td>List.ZF.General</td>
+<td>General</td>
+</tr>
+</tbody>
+</table>
+<p>If you use the iterator, the key of the current element is the local name. The global name is also returned by the
+magic method <tt class="docutils literal"><span class="pre">__toString()</span></tt>. Some folders may not be selectable, which means they can&#8217;t store messages and
+selecting them results in an error. This can be checked with the method <tt class="docutils literal"><span class="pre">isSelectable()</span></tt>. So it&#8217;s very easy to
+output the whole tree in a view:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$folders</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">RecursiveIteratorIterator</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">mail</span><span class="o">-&gt;</span><span class="na">getFolders</span><span class="p">(),</span>
+                                         <span class="nx">RecursiveIteratorIterator</span><span class="o">::</span><span class="na">SELF_FIRST</span><span class="p">);</span>
+<span class="k">echo</span> <span class="s1">&#39;&lt;select name=&quot;folder&quot;&gt;&#39;</span><span class="p">;</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="nv">$folders</span> <span class="k">as</span> <span class="nv">$localName</span> <span class="o">=&gt;</span> <span class="nv">$folder</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nv">$localName</span> <span class="o">=</span> <span class="nb">str_pad</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="nv">$folders</span><span class="o">-&gt;</span><span class="na">getDepth</span><span class="p">(),</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="nx">STR_PAD_LEFT</span><span class="p">)</span> <span class="o">.</span>
+                 <span class="nv">$localName</span><span class="p">;</span>
+    <span class="k">echo</span> <span class="s1">&#39;&lt;option&#39;</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$folder</span><span class="o">-&gt;</span><span class="na">isSelectable</span><span class="p">())</span> <span class="p">{</span>
+        <span class="k">echo</span> <span class="s1">&#39; disabled=&quot;disabled&quot;&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">echo</span> <span class="s1">&#39; value=&quot;&#39;</span> <span class="o">.</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$folder</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;&quot;&gt;&#39;</span>
+        <span class="o">.</span> <span class="nb">htmlspecialchars</span><span class="p">(</span><span class="nv">$localName</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;&lt;/option&gt;&#39;</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">echo</span> <span class="s1">&#39;&lt;/select&gt;&#39;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>The current selected folder is returned by the method <tt class="docutils literal"><span class="pre">getSelectedFolder()</span></tt>. Changing the folder is done with the
+method <tt class="docutils literal"><span class="pre">selectFolder()</span></tt>, which needs the global name as parameter. If you want to avoid to write delimiters you
+can also use the properties of a <tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Folder</span></tt> instance:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// depending on your mail storage and its settings $rootFolder-&gt;Archive-&gt;2005</span>
+<span class="c1">// is the same as:</span>
+<span class="c1">//   /Archive/2005</span>
+<span class="c1">//  Archive:2005</span>
+<span class="c1">//  INBOX.Archive.2005</span>
+<span class="c1">//  ...</span>
+<span class="nv">$folder</span> <span class="o">=</span> <span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">getFolders</span><span class="p">()</span><span class="o">-&gt;</span><span class="na">Archive</span><span class="o">-&gt;</span><span class="mi">2005</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;Last folder was &#39;</span>
+   <span class="o">.</span> <span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">getSelectedFolder</span><span class="p">()</span>
+   <span class="o">.</span> <span class="s2">&quot;new folder is </span><span class="si">$folder</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">selectFolder</span><span class="p">(</span><span class="nv">$folder</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="advanced-use">
+<span id="zend-mail-read-advanced"></span><h2>Advanced Use<a class="headerlink" href="#advanced-use" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="using-noop">
+<span id="zend-mail-read-advanced-noop"></span><h3>Using NOOP<a class="headerlink" href="#using-noop" title="Permalink to this headline">¶</a></h3>
+<p>If you&#8217;re using a remote storage and have some long tasks you might need to keep the connection alive via noop:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">foreach</span> <span class="p">(</span><span class="nv">$mail</span> <span class="k">as</span> <span class="nv">$message</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="c1">// do some calculations ...</span>
+
+    <span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">noop</span><span class="p">();</span> <span class="c1">// keep alive</span>
+
+    <span class="c1">// do something else ...</span>
+
+    <span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">noop</span><span class="p">();</span> <span class="c1">// keep alive</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="caching-instances">
+<span id="zend-mail-read-advanced-caching"></span><h3>Caching instances<a class="headerlink" href="#caching-instances" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Mbox</span></tt>, <tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Folder\Mbox</span></tt>, <tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Maildir</span></tt> and
+<tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Folder\Maildir</span></tt> implement the magic methods <tt class="docutils literal"><span class="pre">__sleep()</span></tt> and <tt class="docutils literal"><span class="pre">__wakeup()</span></tt>, which means they
+are serializable. This avoids parsing the files or directory tree more than once. The disadvantage is that your
+Mbox or Maildir storage should not change. Some easy checks may be done, like reparsing the current Mbox file if
+the modification time changes, or reparsing the folder structure if a folder has vanished (which still results in
+an error, but you can search for another folder afterwards). It&#8217;s better if you have something like a signal file
+for changes and check it before using the cached instance.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// there&#39;s no specific cache handler/class used here,</span>
+<span class="c1">// change the code to match your cache handler</span>
+<span class="nv">$signal_file</span> <span class="o">=</span> <span class="s1">&#39;/home/test/.mail.last_change&#39;</span><span class="p">;</span>
+<span class="nv">$mbox_basedir</span> <span class="o">=</span> <span class="s1">&#39;/home/test/mail/&#39;</span><span class="p">;</span>
+<span class="nv">$cache_id</span> <span class="o">=</span> <span class="s1">&#39;example mail cache &#39;</span> <span class="o">.</span> <span class="nv">$mbox_basedir</span> <span class="o">.</span> <span class="nv">$signal_file</span><span class="p">;</span>
+
+<span class="nv">$cache</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Your_Cache_Class</span><span class="p">();</span>
+<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">isCached</span><span class="p">(</span><span class="nv">$cache_id</span><span class="p">)</span> <span class="o">||</span>
+    <span class="nb">filemtime</span><span class="p">(</span><span class="nv">$signal_file</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">getMTime</span><span class="p">(</span><span class="nv">$cache_id</span><span class="p">))</span> <span class="p">{</span>
+    <span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Folder\Pop3</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;dirname&#39;</span> <span class="o">=&gt;</span>
+                                                        <span class="nv">$mbox_basedir</span><span class="p">));</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nv">$mail</span> <span class="o">=</span> <span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="nv">$cache_id</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">// do stuff ...</span>
+
+<span class="nv">$cache</span><span class="o">-&gt;</span><span class="na">set</span><span class="p">(</span><span class="nv">$cache_id</span><span class="p">,</span> <span class="nv">$mail</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="extending-protocol-classes">
+<span id="zend-mail-read-advanced-extending"></span><h3>Extending Protocol Classes<a class="headerlink" href="#extending-protocol-classes" title="Permalink to this headline">¶</a></h3>
+<p>Remote storages use two classes: <tt class="docutils literal"><span class="pre">Zend\Mail\Storage\&lt;Name&gt;</span></tt> and <tt class="docutils literal"><span class="pre">Zend\Mail\Protocol\&lt;Name&gt;</span></tt>. The protocol class
+translates the protocol commands and responses from and to <em>PHP</em>, like methods for the commands or variables with
+different structures for data. The other/main class implements the common interface.</p>
+<p>If you need additional protocol features, you can extend the protocol class and use it in the constructor of the
+main class. As an example, assume we need to knock different ports before we can connect to POP3.</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Example_Mail_Exception</span> <span class="k">extends</span> <span class="nx">Zend\Mail\Exception</span>
+<span class="p">{</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Example_Mail_Protocol_Exception</span> <span class="k">extends</span> <span class="nx">Zend\Mail\Protocol\Exception</span>
+<span class="p">{</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Example_Mail_Protocol_Pop3_Knock</span> <span class="k">extends</span> <span class="nx">Zend\Mail\Protocol\Pop3</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="nv">$host</span><span class="p">,</span> <span class="nv">$port</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="nv">$host</span><span class="p">,</span> <span class="nv">$port</span> <span class="o">=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// no auto connect in this class</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">host</span> <span class="o">=</span> <span class="nv">$host</span><span class="p">;</span>
+        <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">port</span> <span class="o">=</span> <span class="nv">$port</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">knock</span><span class="p">(</span><span class="nv">$port</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$sock</span> <span class="o">=</span> <span class="o">@</span><span class="nb">fsockopen</span><span class="p">(</span><span class="nv">$this</span><span class="o">-&gt;</span><span class="na">host</span><span class="p">,</span> <span class="nv">$port</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$sock</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nb">fclose</span><span class="p">(</span><span class="nv">$sock</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">connect</span><span class="p">(</span><span class="nv">$host</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$port</span> <span class="o">=</span> <span class="k">null</span><span class="p">,</span> <span class="nv">$ssl</span> <span class="o">=</span> <span class="k">false</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$host</span> <span class="o">===</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$host</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">host</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nv">$port</span> <span class="o">===</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$port</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">port</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">connect</span><span class="p">(</span><span class="nv">$host</span><span class="p">,</span> <span class="nv">$port</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">Example_Mail_Pop3_Knock</span> <span class="k">extends</span> <span class="nx">Zend\Mail\Storage\Pop3</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">__construct</span><span class="p">(</span><span class="k">array</span> <span class="nv">$params</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="c1">// ... check $params here! ...</span>
+        <span class="nv">$protocol</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example_Mail_Protocol_Pop3_Knock</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">]);</span>
+
+        <span class="c1">// do our &quot;special&quot; thing</span>
+        <span class="k">foreach</span> <span class="p">((</span><span class="k">array</span><span class="p">)</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;knock_ports&#39;</span><span class="p">]</span> <span class="k">as</span> <span class="nv">$port</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nv">$protocol</span><span class="o">-&gt;</span><span class="na">knock</span><span class="p">(</span><span class="nv">$port</span><span class="p">);</span>
+        <span class="p">}</span>
+
+        <span class="c1">// get to correct state</span>
+        <span class="nv">$protocol</span><span class="o">-&gt;</span><span class="na">connect</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">],</span> <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;port&#39;</span><span class="p">]);</span>
+        <span class="nv">$protocol</span><span class="o">-&gt;</span><span class="na">login</span><span class="p">(</span><span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">],</span> <span class="nv">$params</span><span class="p">[</span><span class="s1">&#39;password&#39;</span><span class="p">]);</span>
+
+        <span class="c1">// initialize parent</span>
+        <span class="k">parent</span><span class="o">::</span><span class="na">__construct</span><span class="p">(</span><span class="nv">$protocol</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Example_Mail_Pop3_Knock</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;host&#39;</span>        <span class="o">=&gt;</span> <span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;user&#39;</span>        <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;password&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;test&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;knock_ports&#39;</span> <span class="o">=&gt;</span>
+                                              <span class="k">array</span><span class="p">(</span><span class="mi">1101</span><span class="p">,</span> <span class="mi">1105</span><span class="p">,</span> <span class="mi">1111</span><span class="p">)));</span>
+</pre></div>
+</td></tr></table></div>
+<p>As you see, we always assume we&#8217;re connected, logged in and, if supported, a folder is selected in the constructor
+of the main class. Thus if you assign your own protocol class, you always need to make sure that&#8217;s done or the next
+method will fail if the server doesn&#8217;t allow it in the current state.</p>
+</div>
+<div class="section" id="using-quota-since-1-5">
+<span id="zend-mail-read-advanced-quota"></span><h3>Using Quota (since 1.5)<a class="headerlink" href="#using-quota-since-1-5" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Writable\Maildir</span></tt> has support for Maildir++ quotas. It&#8217;s disabled by default, but it&#8217;s
+possible to use it manually, if the automatic checks are not desired (this means <tt class="docutils literal"><span class="pre">appendMessage()</span></tt>,
+<tt class="docutils literal"><span class="pre">removeMessage()</span></tt> and <tt class="docutils literal"><span class="pre">copyMessage()</span></tt> do no checks and do not add entries to the maildirsize file). If enabled,
+an exception is thrown if you try to write to the maildir and it&#8217;s already over quota.</p>
+<p>There are three methods used for quotas: <tt class="docutils literal"><span class="pre">getQuota()</span></tt>, <tt class="docutils literal"><span class="pre">setQuota()</span></tt> and <tt class="docutils literal"><span class="pre">checkQuota()</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$mail</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Mail\Storage\Writable\Maildir</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;dirname&#39;</span> <span class="o">=&gt;</span>
+                                                   <span class="s1">&#39;/home/test/mail/&#39;</span><span class="p">));</span>
+<span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">setQuota</span><span class="p">(</span><span class="k">true</span><span class="p">);</span> <span class="c1">// true to enable, false to disable</span>
+<span class="k">echo</span> <span class="s1">&#39;Quota check is now &#39;</span><span class="p">,</span> <span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">getQuota</span><span class="p">()</span> <span class="o">?</span> <span class="s1">&#39;enabled&#39;</span> <span class="o">:</span> <span class="s1">&#39;disabled&#39;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="c1">// check quota can be used even if quota checks are disabled</span>
+<span class="k">echo</span> <span class="s1">&#39;You are &#39;</span><span class="p">,</span> <span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">checkQuota</span><span class="p">()</span> <span class="o">?</span> <span class="s1">&#39;over quota&#39;</span> <span class="o">:</span> <span class="s1">&#39;not over quota&#39;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p><tt class="docutils literal"><span class="pre">checkQuota()</span></tt> can also return a more detailed response:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2
+3
+4
+5
+6
+7
+8</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$quota</span> <span class="o">=</span> <span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">checkQuota</span><span class="p">(</span><span class="k">true</span><span class="p">);</span>
+<span class="k">echo</span> <span class="s1">&#39;You are &#39;</span><span class="p">,</span> <span class="nv">$quota</span><span class="p">[</span><span class="s1">&#39;over_quota&#39;</span><span class="p">]</span> <span class="o">?</span> <span class="s1">&#39;over quota&#39;</span> <span class="o">:</span> <span class="s1">&#39;not over quota&#39;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="s1">&#39;You have &#39;</span><span class="p">,</span>
+     <span class="nv">$quota</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">],</span>
+     <span class="s1">&#39; of &#39;</span><span class="p">,</span>
+     <span class="nv">$quota</span><span class="p">[</span><span class="s1">&#39;quota&#39;</span><span class="p">][</span><span class="s1">&#39;count&#39;</span><span class="p">],</span>
+     <span class="s1">&#39; messages and use &#39;</span><span class="p">;</span>
+<span class="k">echo</span> <span class="nv">$quota</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">],</span> <span class="s1">&#39; of &#39;</span><span class="p">,</span> <span class="nv">$quota</span><span class="p">[</span><span class="s1">&#39;quota&#39;</span><span class="p">][</span><span class="s1">&#39;size&#39;</span><span class="p">],</span> <span class="s1">&#39; octets&#39;</span><span class="p">;</span>
+</pre></div>
+</td></tr></table></div>
+<p>If you want to specify your own quota instead of using the one specified in the maildirsize file you can do with
+<tt class="docutils literal"><span class="pre">setQuota()</span></tt>:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1
+2</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// message count and octet size supported, order does matter</span>
+<span class="nv">$quota</span> <span class="o">=</span> <span class="nv">$mail</span><span class="o">-&gt;</span><span class="na">setQuota</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="s1">&#39;size&#39;</span> <span class="o">=&gt;</span> <span class="mi">10000</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span> <span class="o">=&gt;</span> <span class="mi">100</span><span class="p">));</span>
+</pre></div>
+</td></tr></table></div>
+<p>To add your own quota checks use single letters as keys, and they will be preserved (but obviously not checked).
+It&#8217;s also possible to extend <tt class="docutils literal"><span class="pre">Zend\Mail\Storage\Writable\Maildir</span></tt> to define your own quota only if the
+maildirsize file is missing (which can happen in Maildir++):</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Example_Mail_Storage_Maildir</span> <span class="k">extends</span> <span class="nx">Zend\Mail\Storage\Writable\Maildir</span> <span class="p">{</span>
+    <span class="c1">// getQuota is called with $fromStorage = true by quota checks</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getQuota</span><span class="p">(</span><span class="nv">$fromStorage</span> <span class="o">=</span> <span class="k">false</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">try</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="k">parent</span><span class="o">::</span><span class="na">getQuota</span><span class="p">(</span><span class="nv">$fromStorage</span><span class="p">);</span>
+        <span class="p">}</span> <span class="k">catch</span> <span class="p">(</span><span class="nx">Zend\Mail\Storage\Exception</span> <span class="nv">$e</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nv">$fromStorage</span><span class="p">)</span> <span class="p">{</span>
+                <span class="c1">// unknown error:</span>
+                <span class="k">throw</span> <span class="nv">$e</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="c1">// maildirsize file must be missing</span>
+
+            <span class="k">list</span><span class="p">(</span><span class="nv">$count</span><span class="p">,</span> <span class="nv">$size</span><span class="p">)</span> <span class="o">=</span> <span class="nx">get_quota_from_somewhere_else</span><span class="p">();</span>
+            <span class="k">return</span> <span class="k">array</span><span class="p">(</span><span class="s1">&#39;count&#39;</span> <span class="o">=&gt;</span> <span class="nv">$count</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span> <span class="o">=&gt;</span> <span class="nv">$size</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Reading Mail Messages</a><ul>
+<li><a class="reference internal" href="#simple-example-using-pop3">Simple example using Pop3</a></li>
+<li><a class="reference internal" href="#opening-a-local-storage">Opening a local storage</a></li>
+<li><a class="reference internal" href="#opening-a-remote-storage">Opening a remote storage</a></li>
+<li><a class="reference internal" href="#fetching-messages-and-simple-methods">Fetching messages and simple methods</a></li>
+<li><a class="reference internal" href="#working-with-messages">Working with messages</a></li>
+<li><a class="reference internal" href="#checking-for-flags">Checking for flags</a></li>
+<li><a class="reference internal" href="#using-folders">Using folders</a></li>
+<li><a class="reference internal" href="#advanced-use">Advanced Use</a><ul>
+<li><a class="reference internal" href="#using-noop">Using NOOP</a></li>
+<li><a class="reference internal" href="#caching-instances">Caching instances</a></li>
+<li><a class="reference internal" href="#extending-protocol-classes">Extending Protocol Classes</a></li>
+<li><a class="reference internal" href="#using-quota-since-1-5">Using Quota (since 1.5)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.mail.read.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.mail.read.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.mail.read.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.mail.read.rst">
+                Reading Mail Messages
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

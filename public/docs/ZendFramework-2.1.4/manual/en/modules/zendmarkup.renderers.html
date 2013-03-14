@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ZendMarkup Renderers &mdash; Zend Framework 2 2.1.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.4 documentation" href="../index.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="zendmarkup-renderers">
+<span id="id1"></span><h1>ZendMarkup Renderers<a class="headerlink" href="#zendmarkup-renderers" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">ZendMarkup</span></tt> is currently shipped with one renderer, the <em>HTML</em> renderer.</p>
+<div class="section" id="adding-your-own-markups">
+<span id="zendmarkup-renderers-add"></span><h2>Adding your own markups<a class="headerlink" href="#adding-your-own-markups" title="Permalink to this headline">¶</a></h2>
+<p>By adding your own markups, you can add your own functionality to the <tt class="docutils literal"><span class="pre">ZendMarkup</span></tt> renderers. With the markup
+structure, you can add about any functionality you want. From simple markups, to complicated markup structures. A
+simple example for a &#8216;foo&#8217; markup:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Creates instance of Zend\Markup\Renderer\Html,</span>
+<span class="c1">// with Zend\Markup\Parser\BbCode as its parser</span>
+<span class="nv">$bbcode</span> <span class="o">=</span> <span class="nx">Zend\Markup\Markup</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;Bbcode&#39;</span><span class="p">);</span>
+
+<span class="c1">// this will create a simple &#39;foo&#39; markup</span>
+<span class="c1">// The first parameter defines the markup&#39;s name.</span>
+<span class="c1">// The second parameter takes an integer that defines the markups type.</span>
+<span class="c1">// The third parameter is an array that defines other things about a</span>
+<span class="c1">// markup, like the markup&#39;s group, and (in this case) a start and end markup.</span>
+<span class="nv">$bbcode</span><span class="o">-&gt;</span><span class="na">addMarkup</span><span class="p">(</span>
+    <span class="s1">&#39;foo&#39;</span><span class="p">,</span>
+    <span class="nx">Zend\Markup\Renderer\RendererAbstract</span><span class="o">::</span><span class="na">TYPE_REPLACE</span><span class="p">,</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;start&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;-bar-&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;end&#39;</span>   <span class="o">=&gt;</span> <span class="s1">&#39;-baz-&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;group&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;inline&#39;</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// now, this will output: &#39;my -bar-markup-baz-&#39;</span>
+<span class="k">echo</span> <span class="nv">$bbcode</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">&#39;my [foo]markup[/foo]&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+<p>Please note that creating your own markups only makes sense when your parser also supports it with a markup
+structure. Currently, only BBCode supports this. Textile doesn&#8217;t have support for custom markups.</p>
+<p>Some renderers (like the <em>HTML</em> renderer) also have support for a &#8216;markup&#8217; parameter. This replaces the &#8216;start&#8217; and
+&#8216;end&#8217; parameters, and it renders the markups including some default attributes and the closing markup.</p>
+<div class="section" id="add-a-callback-markup">
+<span id="zendmarkup-renderers-add-callback"></span><h3>Add a callback markup<a class="headerlink" href="#add-a-callback-markup" title="Permalink to this headline">¶</a></h3>
+<p>By adding a callback markup, you can do a lot more then just a simple replace of the markups. For instance, you can
+change the contents, use the parameters to influence the output etc.</p>
+<p>A callback is a class that implements the <tt class="docutils literal"><span class="pre">Zend\Markup\Renderer\TokenInterface</span></tt> interface. An example of a
+callback class:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10</pre></div></td><td class="code"><div class="highlight"><pre><span class="k">class</span> <span class="nc">My_Markup_Renderer_Html_Upper</span>
+    <span class="k">implements</span> <span class="nx">Zend\Markup\Renderer\TokenConverterInterface</span>
+<span class="p">{</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">convert</span><span class="p">(</span><span class="nx">Zend\Markup\Token</span> <span class="nv">$token</span><span class="p">,</span> <span class="nv">$text</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="s1">&#39;!up!&#39;</span> <span class="o">.</span> <span class="nx">strtoupper</span><span class="p">(</span><span class="nv">$text</span><span class="p">)</span> <span class="o">.</span> <span class="s1">&#39;!up!&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+
+<span class="p">}</span>
+</pre></div>
+</td></tr></table></div>
+<p>Now you can add the &#8216;upper&#8217; markup, with as callback, an instance of the <tt class="docutils literal"><span class="pre">My_Markup_Renderer_Html_Upper</span></tt> class. A
+simple example:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</pre></div></td><td class="code"><div class="highlight"><pre><span class="c1">// Creates instance of Zend\Markup\Renderer\Html,</span>
+<span class="c1">// with Zend\Markup\Parser\BbCode as its parser</span>
+<span class="nv">$bbcode</span> <span class="o">=</span> <span class="nx">Zend\Markup\Markup</span><span class="o">::</span><span class="na">factory</span><span class="p">(</span><span class="s1">&#39;Bbcode&#39;</span><span class="p">);</span>
+
+<span class="c1">// this will create a simple &#39;foo&#39; markup</span>
+<span class="c1">// The first parameter defines the markup&#39;s name.</span>
+<span class="c1">// The second parameter takes an integer that defines the markups type.</span>
+<span class="c1">// The third parameter is an array that defines other things about a</span>
+<span class="c1">// markup, like the markup&#39;s group, and (in this case) a start and end markup.</span>
+<span class="nv">$bbcode</span><span class="o">-&gt;</span><span class="na">addMarkup</span><span class="p">(</span>
+    <span class="s1">&#39;upper&#39;</span><span class="p">,</span>
+    <span class="nx">Zend\Markup\Renderer\RendererAbstract</span><span class="o">::</span><span class="na">TYPE_CALLBACK</span><span class="p">,</span>
+    <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;callback&#39;</span> <span class="o">=&gt;</span> <span class="k">new</span> <span class="nx">My_Markup_Renderer_Html_Upper</span><span class="p">(),</span>
+        <span class="s1">&#39;group&#39;</span>    <span class="o">=&gt;</span> <span class="s1">&#39;inline&#39;</span>
+    <span class="p">)</span>
+<span class="p">);</span>
+
+<span class="c1">// now, this will output: &#39;my !up!MARKUP!up!&#39;</span>
+<span class="k">echo</span> <span class="nv">$bbcode</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">&#39;my [upper]markup[/upper]&#39;</span><span class="p">);</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+<div class="section" id="list-of-markups">
+<span id="zendmarkup-renderers-list"></span><h2>List of markups<a class="headerlink" href="#list-of-markups" title="Permalink to this headline">¶</a></h2>
+<table border="1" class="docutils" id="zendmarkup-renderers-list-markups">
+<caption>List of markups</caption>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Sample input (bbcode)</th>
+<th class="head">Sample output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>[b]foo[/b]</td>
+<td>&lt;strong&gt;foo&lt;/strong&gt;</td>
+</tr>
+<tr class="row-odd"><td>[i]foo[/i]</td>
+<td>&lt;em&gt;foo&lt;/em&gt;</td>
+</tr>
+<tr class="row-even"><td>[cite]foo[/cite]</td>
+<td>&lt;cite&gt;foo&lt;/cite&gt;</td>
+</tr>
+<tr class="row-odd"><td>[del]foo[/del]</td>
+<td>&lt;del&gt;foo&lt;/del&gt;</td>
+</tr>
+<tr class="row-even"><td>[ins]foo[/ins]</td>
+<td>&lt;ins&gt;foo&lt;/ins&gt;</td>
+</tr>
+<tr class="row-odd"><td>[sup]foo[/sup]</td>
+<td>&lt;sup&gt;foo&lt;/sup&gt;</td>
+</tr>
+<tr class="row-even"><td>[sub]foo[/sub]</td>
+<td>&lt;sub&gt;foo&lt;/sub&gt;</td>
+</tr>
+<tr class="row-odd"><td>[span]foo[/span]</td>
+<td>&lt;span&gt;foo&lt;/span&gt;</td>
+</tr>
+<tr class="row-even"><td>[acronym title=&#8221;PHP Hypertext Preprocessor]PHP[/acronym]</td>
+<td>&lt;acronym title=&#8221;PHP Hypertext Preprocessor&#8221;&gt;PHP&lt;/acronym&gt;</td>
+</tr>
+<tr class="row-odd"><td>[url=http://framework.zend.com/]Zend Framework[/url]</td>
+<td>&lt;a href=&#8221;<a class="reference external" href="http://framework.zend.com/">http://framework.zend.com/</a>&#8220;&gt;Zend Framework&lt;/a&gt;</td>
+</tr>
+<tr class="row-even"><td>[h1]foobar[/h1]</td>
+<td>&lt;h1&gt;foobar&lt;/h1&gt;</td>
+</tr>
+<tr class="row-odd"><td>[img]http://framework.zend.com/images/logo.gif[/img]</td>
+<td>&lt;img src=&#8221;<a class="reference external" href="http://framework.zend.com/images/logo.gif">http://framework.zend.com/images/logo.gif</a>&#8221; /&gt;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ZendMarkup Renderers</a><ul>
+<li><a class="reference internal" href="#adding-your-own-markups">Adding your own markups</a><ul>
+<li><a class="reference internal" href="#add-a-callback-markup">Add a callback markup</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#list-of-markups">List of markups</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zendmarkup.renderers.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zendmarkup.renderers.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendmarkup.renderers.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zendmarkup.renderers.rst">
+                ZendMarkup Renderers
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

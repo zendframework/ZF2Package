@@ -1,0 +1,410 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Modules &mdash; Zend Framework 2 2.1.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.4 documentation" href="../index.html" />
+    <link rel="next" title="Routing and controllers" href="routing-and-controllers.html" />
+    <link rel="prev" title="Getting started: A skeleton application" href="skeleton-application.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="routing-and-controllers.html" title="Routing and controllers"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="skeleton-application.html" title="Getting started: A skeleton application"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="modules">
+<span id="user-guide-modules"></span><h1>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h1>
+<p>Zend Framework 2 uses a module system and you organise your main
+application-specific code within each module. The Application module provided by
+the skeleton is used to provide bootstrapping, error and routing configuration to
+the whole application. It is usually used to provide application level
+controllers for, say, the home page of an application, but we are not going to
+use the default one provided in this tutorial as we want our album list to be
+the home page, which will live in our own module.</p>
+<p>We are going to put all our code into the Album module which will contain our
+controllers, models, forms and views, along with configuration. We’ll also tweak
+the Application module as required.</p>
+<p>Let’s start with the directories required.</p>
+<div class="section" id="setting-up-the-album-module">
+<h2>Setting up the Album module<a class="headerlink" href="#setting-up-the-album-module" title="Permalink to this headline">¶</a></h2>
+<p>Start by creating a directory called <tt class="docutils literal"><span class="pre">Album</span></tt> under <tt class="docutils literal"><span class="pre">module</span></tt> with the following
+subdirectories to hold the module’s files:</p>
+<div class="highlight-text"><div class="highlight"><pre>zf2-tutorial/
+    /module
+        /Album
+            /config
+            /src
+                /Album
+                    /Controller
+                    /Form
+                    /Model
+            /view
+                /album
+                    /album
+</pre></div>
+</div>
+<p>As you can see the <tt class="docutils literal"><span class="pre">Album</span></tt> module has separate directories for the different
+types of files we will have. The PHP files that contain classes within the
+<tt class="docutils literal"><span class="pre">Album</span></tt> namespace live in the <tt class="docutils literal"><span class="pre">src/Album</span></tt> directory so that we can have
+multiple namespaces within our module should we require it. The view directory
+also has a sub-folder called <tt class="docutils literal"><span class="pre">album</span></tt> for our module’s view scripts.</p>
+<p>In order to load and configure a module, Zend Framework 2 has a
+<tt class="docutils literal"><span class="pre">ModuleManager</span></tt>. This will look for <tt class="docutils literal"><span class="pre">Module.php</span></tt> in the root of the module
+directory (<tt class="docutils literal"><span class="pre">module/Album</span></tt>) and expect to find a class called <tt class="docutils literal"><span class="pre">Album\Module</span></tt>
+within it. That is, the classes within a given module will have the namespace of
+the module’s name, which is the directory name of the module.</p>
+<p>Create <tt class="docutils literal"><span class="pre">Module.php</span></tt> in the <tt class="docutils literal"><span class="pre">Album</span></tt> module:
+Create a file called <tt class="docutils literal"><span class="pre">Module.php</span></tt> under <tt class="docutils literal"><span class="pre">zf2-tutorial/module/Album</span></tt>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">namespace</span> <span class="nx">Album</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Module</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getAutoloaderConfig</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;Zend\Loader\ClassMapAutoloader&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/autoload_classmap.php&#39;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s1">&#39;Zend\Loader\StandardAutoloader&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                <span class="s1">&#39;namespaces&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+                    <span class="nx">__NAMESPACE__</span> <span class="o">=&gt;</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/src/&#39;</span> <span class="o">.</span> <span class="nx">__NAMESPACE__</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">getConfig</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="k">include</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/config/module.config.php&#39;</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">ModuleManager</span></tt> will call <tt class="docutils literal"><span class="pre">getAutoloaderConfig()</span></tt> and <tt class="docutils literal"><span class="pre">getConfig()</span></tt>
+automatically for us.</p>
+<div class="section" id="autoloading-files">
+<h3>Autoloading files<a class="headerlink" href="#autoloading-files" title="Permalink to this headline">¶</a></h3>
+<p>Our <tt class="docutils literal"><span class="pre">getAutoloaderConfig()</span></tt> method returns an array that is compatible with
+ZF2’s <tt class="docutils literal"><span class="pre">AutoloaderFactory</span></tt>. We configure it so that we add a class map file to
+the <tt class="docutils literal"><span class="pre">ClassmapAutoloader</span></tt> and also add this module’s namespace to the
+<tt class="docutils literal"><span class="pre">StandardAutoloader</span></tt>. The standard autoloader requires a namespace and the
+path where to find the files for that namespace. It is PSR-0 compliant and so
+classes map directly to files as per the <a class="reference external" href="https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md">PSR-0 rules</a>.</p>
+<p>As we are in development, we don’t need to load files via the classmap, so we provide an empty array for the
+classmap autoloader. Create a file called <tt class="docutils literal"><span class="pre">autoload_classmap.php</span></tt> under <tt class="docutils literal"><span class="pre">zf2-tutorial/module/Album</span></tt>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">return</span> <span class="k">array</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>As this is an empty array, whenever the autoloader looks for a class within the
+<tt class="docutils literal"><span class="pre">Album</span></tt> namespace, it will fall back to the to <tt class="docutils literal"><span class="pre">StandardAutoloader</span></tt> for us.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Note that as we are using Composer, as an alternative, you could not implement
+<tt class="docutils literal"><span class="pre">getAutoloaderConfig()</span></tt> and instead add <tt class="docutils literal"><span class="pre">&quot;Application&quot;:</span>
+<span class="pre">&quot;module/Application/src&quot;</span></tt> to the <tt class="docutils literal"><span class="pre">psr-0</span></tt> key in <tt class="docutils literal"><span class="pre">composer.json</span></tt>. If you go
+this way, then you need to run <tt class="docutils literal"><span class="pre">php</span> <span class="pre">composer.phar</span> <span class="pre">update</span></tt> to update the
+composer autoloading files.</p>
+</div>
+</div>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>Having registered the autoloader, let’s have a quick look at the <tt class="docutils literal"><span class="pre">getConfig()</span></tt>
+method in <tt class="docutils literal"><span class="pre">Album\Module</span></tt>.  This method simply loads the
+<tt class="docutils literal"><span class="pre">config/module.config.php</span></tt> file.</p>
+<p>Create a file called <tt class="docutils literal"><span class="pre">module.config.php</span></tt> under <tt class="docutils literal"><span class="pre">zf2-tutorial/module/Album/config</span></tt>:</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;controllers&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;invokables&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;Album\Controller\Album&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;Album\Controller\AlbumController&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;view_manager&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;template_path_stack&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;album&#39;</span> <span class="o">=&gt;</span> <span class="nx">__DIR__</span> <span class="o">.</span> <span class="s1">&#39;/../view&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>The config information is passed to the relevant components by the
+<tt class="docutils literal"><span class="pre">ServiceManager</span></tt>.  We need two initial sections: <tt class="docutils literal"><span class="pre">controllers</span></tt> and
+<tt class="docutils literal"><span class="pre">view_manager</span></tt>. The controllers section provides a list of all the controllers
+provided by the module. We will need one controller, <tt class="docutils literal"><span class="pre">AlbumController</span></tt>, which
+we’ll reference as <tt class="docutils literal"><span class="pre">Album\Controller\Album</span></tt>. The controller key must
+be unique across all modules, so we prefix it with our module name.</p>
+<p>Within the <tt class="docutils literal"><span class="pre">view_manager</span></tt> section, we add our view directory to the
+<tt class="docutils literal"><span class="pre">TemplatePathStack</span></tt> configuration. This will allow it to find the view scripts for
+the <tt class="docutils literal"><span class="pre">Album</span></tt> module that are stored in our <tt class="docutils literal"><span class="pre">view/</span></tt> directory.</p>
+</div>
+<div class="section" id="informing-the-application-about-our-new-module">
+<h2>Informing the application about our new module<a class="headerlink" href="#informing-the-application-about-our-new-module" title="Permalink to this headline">¶</a></h2>
+<p>We now need to tell the <tt class="docutils literal"><span class="pre">ModuleManager</span></tt> that this new module exists. This is done
+in the application’s <tt class="docutils literal"><span class="pre">config/application.config.php</span></tt> file which is provided by the
+skeleton application. Update this file so that its <tt class="docutils literal"><span class="pre">modules</span></tt> section contains the
+<tt class="docutils literal"><span class="pre">Album</span></tt> module as well, so the file now looks like this:</p>
+<p>(Changes required are highlighted using comments.)</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span>
+<span class="k">return</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;modules&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;Application&#39;</span><span class="p">,</span>
+<span class="hll">        <span class="s1">&#39;Album&#39;</span><span class="p">,</span>                  <span class="c1">// &lt;-- Add this line</span>
+</span>    <span class="p">),</span>
+    <span class="s1">&#39;module_listener_options&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+        <span class="s1">&#39;config_glob_paths&#39;</span>    <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;config/autoload/{,*.}{global,local}.php&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="s1">&#39;module_paths&#39;</span> <span class="o">=&gt;</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;./module&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;./vendor&#39;</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">),</span>
+<span class="p">);</span>
+</pre></div>
+</div>
+<p>As you can see, we have added our <tt class="docutils literal"><span class="pre">Album</span></tt> module into the list of modules
+after the <tt class="docutils literal"><span class="pre">Application</span></tt> module.</p>
+<p>We have now set up the module ready for putting our custom code into it.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Modules</a><ul>
+<li><a class="reference internal" href="#setting-up-the-album-module">Setting up the Album module</a><ul>
+<li><a class="reference internal" href="#autoloading-files">Autoloading files</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+<li><a class="reference internal" href="#informing-the-application-about-our-new-module">Informing the application about our new module</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="skeleton-application.html"
+                        title="previous chapter">Getting started: A skeleton application</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="routing-and-controllers.html"
+                        title="next chapter">Routing and controllers</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/user-guide/modules.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/user-guide/modules.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/user-guide/modules.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="routing-and-controllers.html" title="Routing and controllers"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="skeleton-application.html" title="Getting started: A skeleton application"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/user-guide/modules.rst">
+                Modules
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

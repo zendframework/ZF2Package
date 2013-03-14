@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction to Zend\Di &mdash; Zend Framework 2 2.1.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.4 documentation" href="../index.html" />
+    <link rel="next" title="Zend\Di Quickstart" href="zend.di.quick-start.html" />
+    <link rel="prev" title="Zend\Db\Metadata" href="zend.db.metadata.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.di.quick-start.html" title="Zend\Di Quickstart"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.db.metadata.html" title="Zend\Db\Metadata"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction-to-zend-di">
+<span id="zend-di-intro"></span><h1>Introduction to Zend\Di<a class="headerlink" href="#introduction-to-zend-di" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="dependency-injection">
+<span id="zend-di-intro-di"></span><h2>Dependency Injection<a class="headerlink" href="#dependency-injection" title="Permalink to this headline">¶</a></h2>
+<p>Dependency Injection (here-in called DI) is a concept that has been talked about in numerous places over the web.
+Simply put, we&#8217;ll explain the act of injecting dependencies simply with this below code:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre>1</pre></div></td><td class="code"><div class="highlight"><pre><span class="nv">$b</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">MovieLister</span><span class="p">(</span><span class="k">new</span> <span class="nx">MovieFinder</span><span class="p">());</span>
+</pre></div>
+</td></tr></table></div>
+<p>Above, MovieFinder is a dependency of MovieLister, and MovieFinder was injected into MovieLister. If you are not
+familiar with the concept of DI, here are a couple of great reads: <a class="reference external" href="http://weierophinney.net/matthew/archives/260-Dependency-Injection-An-analogy.html">Matthew Weier O&#8217;Phinney&#8217;s Analogy</a>, <a class="reference external" href="http://ralphschindler.com/2011/05/18/learning-about-dependency-injection-and-php">Ralph
+Schindler&#8217;s Learning DI</a>, or <a class="reference external" href="http://fabien.potencier.org/article/11/what-is-dependency-injection">Fabien Potencier&#8217;s Series</a> on DI.</p>
+</div>
+<div class="section" id="dependency-injection-containers">
+<span id="zend-di-intro-dic"></span><h2>Dependency Injection Containers<a class="headerlink" href="#dependency-injection-containers" title="Permalink to this headline">¶</a></h2>
+<p>When your code is written in such a way that all your dependencies are injected into consuming objects, you might
+find that the simple act of wiring an object has gotten more complex. When this becomes the case, and you find that
+this wiring is creating more boilerplate code, this makes for an excellent opportunity to utilize a Dependency
+Injection Container.</p>
+<p>In it&#8217;s simplest form, a Dependency Injection Container (here-in called a DiC for brevity), is an object that is
+capable of creating objects on request and managing the &#8220;wiring&#8221;, or the injection of required dependencies, for
+those requested objects. Since the patterns that developers employ in writing DI capable code vary, DiC&#8217;s are
+generally either in the form of smallish objects that suit a very specific pattern, or larger DiC frameworks.</p>
+<p>Zend\Di is a DiC framework. While for the simplest code there is no configuration needed, and the use cases are
+quite simple; for more complex code, Zend\Di is capable of being configured to wire these complex use cases</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Introduction to Zend\Di</a><ul>
+<li><a class="reference internal" href="#dependency-injection">Dependency Injection</a></li>
+<li><a class="reference internal" href="#dependency-injection-containers">Dependency Injection Containers</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.db.metadata.html"
+                        title="previous chapter">Zend\Db\Metadata</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.di.quick-start.html"
+                        title="next chapter">Zend\Di Quickstart</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.di.introduction.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.di.introduction.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.di.introduction.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.di.quick-start.html" title="Zend\Di Quickstart"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.db.metadata.html" title="Zend\Db\Metadata"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.di.introduction.rst">
+                Introduction to Zend\Di
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>

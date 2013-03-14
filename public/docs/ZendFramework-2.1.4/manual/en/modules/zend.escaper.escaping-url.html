@@ -1,0 +1,332 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Escaping URLs &mdash; Zend Framework 2 2.1.4 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.1.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="Zend Framework 2 2.1.4 documentation" href="../index.html" />
+    <link rel="next" title="The EventManager" href="zend.event-manager.event-manager.html" />
+    <link rel="prev" title="Escaping Cascading Style Sheets" href="zend.escaper.escaping-css.html" />
+<style type="text/css">
+    /* Styles for floating Edit on GitHub box */
+    #editor-trap {
+        padding: 1em;
+        border: 1px solid white;
+        width: 250px;
+
+        display: none;
+        color: white;
+        background: #3f454b;
+        position: fixed;
+        bottom: 5px;
+        left: 175px;
+        font-size: 85%;
+        text-align: left;
+        z-index: 2;
+
+        box-shadow: 0 4px 6px #333;
+        -moz-box-shadow: 0 4px 6px #333;
+        -webkit-box-shadow: 0 4px 6px #333;
+        
+        cursor: pointer;
+    }
+
+    #editor-trap h3 {
+        margin: 0 0 0.5em 0;
+        padding: 0;
+    }
+
+    #editor-trap h3 > span {
+        padding: 0 6px;
+        border: solid white;
+        border-width: 0 1px 4px 1px;
+        font-size: 10px;
+    }
+
+    #editor-trap a {
+        color: #98DBCC;
+    }
+
+    #editor-trap ol {
+        margin: 0;
+        padding: 0 0 0 2em;
+    }
+
+    /* Hide trick */
+    #editor-trap.toggled > * {
+        display: none;
+    }
+
+
+    #editor-trap.toggled > h3 {
+        display: block;
+    }
+
+    #editor-trap.toggled > h3 > span {
+        border-width: 6px 1px 0 1px;
+    }
+    
+    #edit-button {
+        position: fixed;
+        bottom: 5px;
+        left: 5px;
+        z-index: 2;
+        width: 162px;
+        height: 42px;
+    }
+</style>
+
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="zend.event-manager.event-manager.html" title="The EventManager"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="zend.escaper.escaping-css.html" title="Escaping Cascading Style Sheets"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="escaping-urls">
+<span id="zend-escaper-escaping-url"></span><h1>Escaping URLs<a class="headerlink" href="#escaping-urls" title="Permalink to this headline">¶</a></h1>
+<p>This method is basically an alias for PHP&#8217;s <tt class="docutils literal"><span class="pre">rawurlencode()</span></tt> which has applied RFC 3986 since PHP 5.3. It is
+included primarily for consistency.</p>
+<p>URL escaping applies to data being inserted into a URL and not to the whole URL itself.</p>
+<div class="section" id="examples-of-bad-url-escaping">
+<span id="zend-escaper-escaping-url-bad-examples"></span><h2>Examples of Bad URL Escaping<a class="headerlink" href="#examples-of-bad-url-escaping" title="Permalink to this headline">¶</a></h2>
+<p>XSS attacks are easy if data inserted into URLs is not escaped properly:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="nx">header</span><span class="p">(</span><span class="s1">&#39;Content-Type: application/xhtml+xml; charset=UTF-8&#39;</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;!DOCTYPE html&gt;</span>
+<span class="cp">&lt;?php</span>
+<span class="nv">$input</span> <span class="o">=</span> <span class="s">&lt;&lt;&lt;INPUT</span>
+<span class="s">&quot; onmouseover=&quot;alert(&#39;zf2&#39;)</span>
+<span class="s">INPUT;</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;</span>
+<span class="x">&lt;head&gt;</span>
+<span class="x">    &lt;title&gt;Unescaped URL data&lt;/title&gt;</span>
+<span class="x">    &lt;meta charset=&quot;UTF-8&quot;/&gt;</span>
+<span class="x">&lt;/head&gt;</span>
+<span class="x">&lt;body&gt;</span>
+<span class="x">    &lt;a href=&quot;http://example.com/?name=</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$input</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;Click here!&lt;/a&gt;</span>
+<span class="x">&lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+<div class="section" id="examples-of-good-url-escaping">
+<span id="zend-escaper-escaping-url-good-examples"></span><h2>Examples of Good URL Escaping<a class="headerlink" href="#examples-of-good-url-escaping" title="Permalink to this headline">¶</a></h2>
+<p>By properly escaping data in URLs by using <tt class="docutils literal"><span class="pre">escapeUrl</span></tt>, we can prevent XSS attacks:</p>
+<div class="highlight-php"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre> 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+10
+11
+12
+13
+14
+15
+16
+17
+18</pre></div></td><td class="code"><div class="highlight"><pre><span class="o">&lt;?</span><span class="nx">php</span> <span class="nx">header</span><span class="p">(</span><span class="s1">&#39;Content-Type: application/xhtml+xml; charset=UTF-8&#39;</span><span class="p">);</span> <span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;!DOCTYPE html&gt;</span>
+<span class="cp">&lt;?php</span>
+<span class="nv">$input</span> <span class="o">=</span> <span class="s">&lt;&lt;&lt;INPUT</span>
+<span class="s">&quot; onmouseover=&quot;alert(&#39;zf2&#39;)</span>
+<span class="s">INPUT;</span>
+<span class="nv">$escaper</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Zend\Escaper\Escaper</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">);</span>
+<span class="nv">$output</span> <span class="o">=</span> <span class="nv">$escaper</span><span class="o">-&gt;</span><span class="na">escapeUrl</span><span class="p">(</span><span class="nv">$input</span><span class="p">);</span>
+<span class="cp">?&gt;</span><span class="x"></span>
+<span class="x">&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;</span>
+<span class="x">&lt;head&gt;</span>
+<span class="x">    &lt;title&gt;Unescaped URL data&lt;/title&gt;</span>
+<span class="x">    &lt;meta charset=&quot;UTF-8&quot;/&gt;</span>
+<span class="x">&lt;/head&gt;</span>
+<span class="x">&lt;body&gt;</span>
+<span class="x">    &lt;a href=&quot;http://example.com/?name=</span><span class="cp">&lt;?php</span> <span class="k">echo</span> <span class="nv">$output</span><span class="p">;</span> <span class="cp">?&gt;</span><span class="x">&quot;&gt;Click here!&lt;/a&gt;</span>
+<span class="x">&lt;/body&gt;</span>
+<span class="x">&lt;/html&gt;</span>
+</pre></div>
+</td></tr></table></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="../index.html">
+              <img class="logo" src="../_static/zf2_logo.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Escaping URLs</a><ul>
+<li><a class="reference internal" href="#examples-of-bad-url-escaping">Examples of Bad URL Escaping</a></li>
+<li><a class="reference internal" href="#examples-of-good-url-escaping">Examples of Good URL Escaping</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="zend.escaper.escaping-css.html"
+                        title="previous chapter">Escaping Cascading Style Sheets</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="zend.event-manager.event-manager.html"
+                        title="next chapter">The EventManager</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li>
+        <!--<a href="../_sources/modules/zend.escaper.escaping-url.txt"-->
+        <a href="https://github.com/zendframework/zf2-documentation/blob/master/docs/languages/en/modules/zend.escaper.escaping-url.rst"
+           rel="nofollow">Show Source</a></li>
+    <li><a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.escaper.escaping-url.rst"
+           rel="nofollow">Edit Source</a>
+    </li>
+  </ul>
+        <p style="font-size: 12px">
+            Note: You need to stay logged into your <a href="http://www.github.com">GitHub account</a> to contribute to the documentation.
+        </p>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="zend.event-manager.event-manager.html" title="The EventManager"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="zend.escaper.escaping-css.html" title="Escaping Cascading Style Sheets"
+             >previous</a> |</li>
+        <li><a href="../index.html">Zend Framework 2 2.1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, Zend Technologies Ltd..
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+<div id="edit-button">
+    <img src="../_static/edit.gif" alt="Edit this document" title="Edit this document" onclick="javascript:$('#editor-trap').toggle();">
+</div>
+     
+<div id="editor-trap">
+    <h3>Edit this document</h3>
+
+    <p>
+        The source code of this file is hosted on GitHub. Everyone can
+        update and fix errors in this document with few clicks -
+        no downloads needed.
+    <p>
+
+    <ol>
+
+        <li>
+            Login with your <a href="http://www.github.com">GitHub</a> account.
+        </li>
+
+        <li>
+            Go to
+            <a href="https://github.com/zendframework/zf2-documentation/edit/master/docs/languages/en/modules/zend.escaper.escaping-url.rst">
+                Escaping URLs
+            </a> on GitHub.
+        </li>
+
+        <li>
+            Edit file contents using GitHub's text editor in your web browser
+        </li>
+
+        <li>
+            Fill in the <b>Commit message</b> text box at the end of the page telling <i>why</i>
+            you did the changes. Press <b>Propose file change</b> button next to it when done.
+        </li>
+
+
+        <li>
+            On <i>Send a pull request</i> page you don't need to fill in text anymore. Just
+            press <b>Send pull request</b> button.
+        </li>
+
+        <li>
+            Your changes are now queued for review under project's <a href="https://github.com/zendframework/zf2-documentation/pulls">Pull requests</a> tab on GitHub.
+        </li>
+    </ol>
+
+</div>
+
+
+  </body>
+</html>
