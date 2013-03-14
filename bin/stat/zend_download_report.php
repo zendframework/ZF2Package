@@ -271,7 +271,7 @@ class Zend_Apache_Log_DownloadCount
                                                                // index (0, 1, 2, ...) as values
         ksort($resVersionSortIndexes);                         // Restore original order (corresponding to $this->_resources
                                                                // and $resNames arrays) with calculated sorting index
-        array_multisort($resNames, SORT_STRING, $resVersionSortIndexes, SORT_NUMERIC, $this->_resources);
+        array_multisort($resNames, SORT_STRING, $resVersionSortIndexes, SORT_DESC, $this->_resources);
 
         foreach (array_keys($this->_resources) as $resource) {
             $this->_resources[$resource] = $r++;
@@ -288,6 +288,9 @@ class Zend_Apache_Log_DownloadCount
         ++$monthRow;
         ++$dayRow;
 
+        $ZF2tot = 0;
+        $ZF2month = array();
+        
         ksort($this->_logData);
         foreach ($this->_logData as $year => $monthArray) {
             $yearTotal = array();
@@ -356,6 +359,23 @@ class Zend_Apache_Log_DownloadCount
 
                     ++$dayRow;
                 }
+                
+                // Get the summary information for ZF2 of the last year and the last 2 months
+                if ($year === (integer) date('Y')) {
+                    
+                   $tot = 0;
+                   foreach ($monthTotal as $zf => $value) {
+                        if (preg_match('/^ZF 2./', $zf) || ($zf === 'ZF2 from packagist.org')) {
+                            $tot += $value;
+                        }
+                   }
+                   
+                   if (($month === (integer) date('m') ||
+                        $month === (integer) date('m', strtotime('last month')))) {
+                       $ZF2month[$month] = $tot;
+                   }
+                   $ZF2tot += $tot;
+                }
 
                 /**
                  * Write date in month worksheet
@@ -410,6 +430,17 @@ class Zend_Apache_Log_DownloadCount
 
         $objWriter = new PHPExcel_Writer_Excel2007($workbook);
         $objWriter->save($workbookFilename);
+        
+        $month = (integer) date('m');
+        $lastMonth = $month - 1;
+	$year = date('Y');
+        
+        $output = sprintf("ZF 2.x downloads in %s %s (to date): %s\n", date('M'), $year, number_format($ZF2month[$month]));
+        if ($month !== 1) {
+            $output .= sprintf("ZF 2.x downloads in %s %s: %s\n", date('M', strtotime('last month')), $year, number_format($ZF2month[$lastMonth]));
+        }
+        $output .= sprintf("ZF 2.x downloads in %s (to date): %s\n", $year, number_format($ZF2tot));
+        return $output;
     }
 
     /**
@@ -806,6 +837,8 @@ foreach ($files as $pathname) {
     }
 }
 
+$output = '';
+
 # Pass 2: load serialized data and make report
 $report = new Zend_Apache_Log_DownloadCount();
 if ($spreadsheet) {
@@ -840,7 +873,7 @@ if ($spreadsheet) {
         echo "Saving spreadsheet $spreadsheet... ";
     }
     $report->setResourcesFilter(null);
-    $report->saveSpreadsheet($spreadsheet);
+    $output = $report->saveSpreadsheet($spreadsheet);
 
     if ($verbose) {
         echo "done.\n";
@@ -851,3 +884,5 @@ if ($verbose) {
     printf("Execution time: %.2f\n", microtime(true) - $start);
     printf("Memory usage: %d\n", memory_get_usage(true));
 }
+
+echo $output;

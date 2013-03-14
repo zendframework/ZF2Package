@@ -13,10 +13,12 @@
 : ${MAIL_MESSAGE:="Zend Framework downloads report: `date +%F`"}
 : ${MAIL_RECIPIENT_LIST:=`cat /var/www/packages.zendframework.com/bin/stat/data/email`}
 : ${SENDER:=`cat /var/www/packages.zendframework.com/bin/stat/data/sender`}
+: ${MSG_FILE:="/tmp/email_msg_stat_summary.txt"}
 
-${PHP} -d "memory_limit=-1" "${DOWNLOAD_REPORT_PHP}" -s "${REPORT_SPREADSHEET}" "${FRAMEWORK_LOG_DIR}"
+${PHP} -d "memory_limit=-1" "${DOWNLOAD_REPORT_PHP}" -s "${REPORT_SPREADSHEET}" "${FRAMEWORK_LOG_DIR}" > "${MSG_FILE}"
 ${ZIP} -qj "${REPORT_ZIP}" "${REPORT_SPREADSHEET}"
 
-echo "${MAIL_MESSAGE}" | ${MUTT} -e "my_hdr From:${SENDER}" -s "${MAIL_MESSAGE}" -a "${REPORT_ZIP}" ${MAIL_RECIPIENT_LIST}
+${MUTT} -e "my_hdr From:${SENDER}" -s "${MAIL_MESSAGE}" -a "${REPORT_ZIP}" ${MAIL_RECIPIENT_LIST} < "${MSG_FILE}"
 
-/bin/rm -f "${REPORT_SPREADSHEET}" "${REPORT_ZIP}"
+/bin/rm -f "${REPORT_SPREADSHEET}" "${REPORT_ZIP}" "${MSG_FILE}"
+
