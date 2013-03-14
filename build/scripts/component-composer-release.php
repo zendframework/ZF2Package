@@ -211,6 +211,9 @@ $zf2_metapackage['dev-develop'] = $dev_develop_package;
 
 $packages = [];
 foreach ($composers as $filename => $composer) {
+    if (!isset($composer['name'])) {
+        throw new DomainException(sprintf("Composer file '%s' contains an invalid structure; no name present\nDump:\n%s", $filename, var_export($composer, 1)));
+    }
     if (!isset($packages[$composer['name']])) {
         $packages[$composer['name']] = array();
     }
