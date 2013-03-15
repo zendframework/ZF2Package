@@ -289,7 +289,9 @@ class Zend_Apache_Log_DownloadCount
         ++$dayRow;
 
         $ZF2tot = 0;
+        $ZF1tot = 0;
         $ZF2month = array();
+        $ZF1month = array();
         
         ksort($this->_logData);
         foreach ($this->_logData as $year => $monthArray) {
@@ -360,21 +362,27 @@ class Zend_Apache_Log_DownloadCount
                     ++$dayRow;
                 }
                 
-                // Get the summary information for ZF2 of the last year and the last 2 months
+                // Get the summary information for ZF2 and ZF1 of the last year and the last 2 months
                 if ($year === (integer) date('Y')) {
                     
-                   $tot = 0;
+                   $totZF2 = 0;
+                   $totZF1 = 0;
                    foreach ($monthTotal as $zf => $value) {
                         if (preg_match('/^ZF 2./', $zf) || ($zf === 'ZF2 from packagist.org')) {
-                            $tot += $value;
+                            $totZF2 += $value;
+                        }
+                        if (preg_match('/^ZF 1./', $zf)) {
+                            $totZF1 += $value;
                         }
                    }
                    
                    if (($month === (integer) date('m') ||
                         $month === (integer) date('m', strtotime('last month')))) {
-                       $ZF2month[$month] = $tot;
+                       $ZF2month[$month] = $totZF2;
+                       $ZF1month[$month] = $totZF1;
                    }
-                   $ZF2tot += $tot;
+                   $ZF2tot += $totZF2;
+                   $ZF1tot += $totZF1;
                 }
 
                 /**
@@ -435,11 +443,21 @@ class Zend_Apache_Log_DownloadCount
         $lastMonth = $month - 1;
 	$year = date('Y');
         
+        // ZF2
         $output = sprintf("ZF 2.x downloads in %s %s (to date): %s\n", date('M'), $year, number_format($ZF2month[$month]));
         if ($month !== 1) {
             $output .= sprintf("ZF 2.x downloads in %s %s: %s\n", date('M', strtotime('last month')), $year, number_format($ZF2month[$lastMonth]));
         }
         $output .= sprintf("ZF 2.x downloads in %s (to date): %s\n", $year, number_format($ZF2tot));
+        $output .= "\n";
+        
+        // ZF1
+        $output .= sprintf("ZF 1.x downloads in %s %s (to date): %s\n", date('M'), $year, number_format($ZF1month[$month]));
+        if ($month !== 1) {
+            $output .= sprintf("ZF 1.x downloads in %s %s: %s\n", date('M', strtotime('last month')), $year, number_format($ZF1month[$lastMonth]));
+        }
+        $output .= sprintf("ZF 1.x downloads in %s (to date): %s\n", $year, number_format($ZF1tot));
+        
         return $output;
     }
 
