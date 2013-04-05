@@ -1,0 +1,157 @@
+{{Extension
+|name        = StubManager
+|status      = stable
+|type        = framework
+|author      = [[user:jldupont|Jean-Lou Dupont]]
+|image       =
+|version     = 1.3.0
+|update      =
+|mediawiki   = 1.7, 1.10, 1.11, 1.12
+|download    = @see Installation section
+|readme      =
+|changelog   = See SVN ($Id: StubManager.php 368 2007-10-03 17:10:25Z jeanlou.dupont $)
+|description = Framework extension for the vast majority of Jean-Lou Dupont's MediaWiki extensions
+|parameters  =
+|rights      =
+|example     =
+}}
+
+== Purpose==
+This extension is meant to address 'rare events' handling through class object 'stubs'. For infrequent events 
+(of course this is relative!), use this extension to instantiate a 'stub object' for the required hooks.
+The net effect is lower transaction times thereby speeding up MediaWiki based sites.
+
+== Features ==
+* Provides extension status messages through [[Special:Version]]
+** Customizable through [[MediaWiki:ExtensionState]] page
+* Handles 'hook' registration (e.g. <code>ArticleSave, UserCan</code> etc.)
+* Handles 'parser function' registration (e.g. <code>{{ #magicword: ... }} </code>)
+* Handles 'parser magic word' registration
+* Handles 'parser tag' registration (e.g. <code>< tag> </code>)
+* Handles extensions which implement logging functionality
+* Handles 'namespace triggering' & 'namespace exclusion'
+** reduces even further the load time per transaction
+
+== Audience ==
+This extension is meant for 'extension writers'.
+
+== Special:Version Customization ==
+Customization of the extensions' state message can be done through the page [[MediaWiki:ExtensionState]]. The first parameter passed to the template is the ''state'' variable.
+
+=== States ===
+{|class=datatable
+! Value !! Description
+|-
+|   0   ||  OK
+|-
+|   1   ||  ERROR
+|-
+|   2   ||  ATTENTION
+|-
+|   3   ||  DISABLED
+|}
+
+== Usage ==
+To create a stub, use: 
+<source lang=php>
+StubManager::createStub(  'class name', 
+                          'full path filename of class file',
+                          'full path filename of i18n file',						  
+                          array of hooks,
+						  $logging, // true if the extension requires logging support
+                          array of tags,
+                          array of parser function magic words,
+                          array of parser magic words,
+						  array of namespaces that trigger the extension
+                        );
+</source>
+or, for example:
+<source lang=php>
+	StubManager::createStub2(	
+		array(	'class' 		=> 'name-of-class-found-in-the-class-file', 
+		
+				// Class filename location
+				'classfilename'	=> dirname(__FILE__).'/XYZ.body.php',
+				// i18n file
+                'i18nfilename'  => dirname(__FILE__).'/XYZ.i18n.php',	
+                // Logging support
+                // NOTE that the i18n file must follow some rules
+                // See extensions such as UserLoginLogoutLog for examples.
+                'logging'		=> true OR false,
+				// Hooks:
+				// Hook handling will be performed in the class-file through the method names
+				// class::hHook-name1, class::hHook-name2 etc.
+				'hooks'			=> array( Hook-name1, Hook-name2, ...	),
+				// Tags
+				// < tag1> < /tag1> etc.
+				// Handler in class-file through the method name starting with 'tag_'
+				'tags'			=> array( tag1, tag2, ... ),
+				// Magic Words:
+				// Magic word handling will be done in the class-file through the method names:					
+				// class::mg_magic-word1, class::mg_magic-word2 etc.
+				'mgs'			=> array( magic-word1, magic-word2, ... )
+				// ess: namespace level EXCLUSION
+				// Don't execute ANY of the method of this class if the current article falls in these namespaces
+				// E.g. below:
+				'ess'           => array( NS_MEDIAWIKI, ... ),
+				// nss: namespace level TRIGGERS (aka 'inclusion')
+				// Execute the methods of this class ONLY in the following namespaces:
+				'nss'           => array( NS_MAIN, ... ),
+				)
+	);
+</source>
+in <code>LocalSettings.php</code> after the require line <code>require( ...'StubManager.php' );</code> 
+
+== Examples ==
+See [[Extension:EmailLog|Email Log extension]].
+
+== Dependency ==
+None.
+
+== Installation ==
+=== PEAR ===
+* Install PEAR channel 'http://mediawiki.googlecode.com/svn'
+** <code>pear channel-discover mediawiki.googlecode.com/svn</code>
+* Install extension through PEAR:
+** <code>pear install mediawiki/stubmanager</code>
+* Modification to <code>LocalSettings.php</code>
+<source lang=php>
+require 'MediaWiki/StubManager/StubManager.php';
+</source>
+
+=== SVN ===
+* Download archive: [http://mediawiki.googlecode.com/svn/tags/StubManager/ SVN]
+* Place extension files in /extensions
+* Modification to <code>LocalSettings.php</code>
+<source lang=php>
+require 'extensions/StubManager/StubManager.php';
+</source>
+
+== History ==
+
+{|class='datatable'
+! Version !! Notes
+|-
+| 1.0.1 || Adjusted for newest version of [[Extension:ExtensionManager]]
+|-
+| 1.0.2 || Updated to account for extra parameter to 'ArticleSaveComplete' hook introduced in MW1.11
+|-
+| 1.0.3 || Corrected minor bug in 'processArgList' which caused some erratic behavior in [[Extension:PageAfterAndBefore]] * Minor enhancement to the presentation in [[Special:Version]]
+|-
+| 1.0.4 || Small patch for even greater performance
+|-
+| 1.0.5 || Fix for bug in PHP v5.1.2 which caused [[Extension:HNP]] to misconfigure most of its parser functions
+|-
+| 1.0.6 || Added more allowable parameters to method ''__call'': this is to account for more parameter hungry extensions such as [[Extension:EmbedObject]]
+|-
+| 1.1.0 || Added ''ExtHelper'' class - no change to basic functionality (backward compatibility)
+|-
+| 1.1.1 || Minor bug fix
+|-
+| 1.2.0 || Added single/double-quotes sanitization to ExtHelper, Added check for ''restricted'' parameters
+|-
+| 1.2.1 || Fixed ''style'' for Special:Version
+|-
+| 1.3.0 || Added ''ExtImages'' class: provides access to images. This facility is intended for registered extensions in order to provide visual feedback regarding their state (e.g. functional / missing parameters etc.) * Added additional per-extension information in [[Special:Version]], Added method for registering extension state
+|}
+

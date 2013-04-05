@@ -1,0 +1,180 @@
+#!/user/bin/php
+<?php
+/**
+	Gets the current trunk revision of an extension
+	@author Jean-Lou Dupont
+	@package MediaWiki
+ */
+
+$svn_trunk	= 'http://mediawiki.googlecode.com/svn/trunk/extensions';
+$mw_root 	= @$_ENV['MW_INSTALL_PATH'];
+$extension	= @$argv[1];
+
+@require "PEAR/XMLParser.php";
+@require 'HTTP/Request.php';
+
+if (empty( $mw_root ))
+{
+	echo "getTrunk: expecting environment variable 'MW_INSTALL_PATH' to be set. E.g. use 'export MW_INSTALL_PATH=dir'\n";
+	die(0);	
+}
+$mw_root = str_replace("\\", '/', $mw_root );
+$mw_root = trim( $mw_root );
+if (substr( $mw_root, -1) !== '/' )
+	$mw_root .= '/';
+
+echo "getTrunk: assuming installation directory root: ".$mw_root."\n";
+
+// we'll use this directory for storing the files we 'wget'
+$useDir = $mw_root.'extensions/'.$extension.'/';
+
+echo "getTrunk: using target directory: ".$useDir."\n";
+
+if (!is_dir( $useDir ))
+{
+	echo "getTrunk: target does not exists ... trying to create ... ";
+	$r = @mkdir( $useDir );
+	echo $r ? "success!\n":"failure!\n";
+	if (!$r)
+		die(0);
+}
+
+if (!class_exists('PEAR_XMLParser'))
+{
+	echo 'getTrunk: requires library PEAR/XMLParser. Get it through PEAR.';
+	die(0);
+}
+if (!class_exists('HTTP_Request'))
+{
+	echo 'getTrunk: requires library HTTP/Request. Get it through PEAR.';
+	die(0);
+}
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+echo 'getTrunk: using base uri: '.$svn_trunk."\n";
+
+if (empty( $extension ))
+{
+	echo "getTrunk: expects extension directory as parameter.\n"; 
+	die(0);
+}
+
+$manifest_file = $svn_trunk.'/'.$extension.'/META-INF/manifest.xml';
+echo 'getTrunk: fetching manifest file ... ';
+$code = getTrunk::get( $manifest_file, $manifest_data );
+echo ($code==200) ? "success!\n":"failure! code=".$code."\n";
+if ( $code !== 200)
+	die(0);
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+$files = getTrunk::extractFiles( $manifest_data );
+
+if (empty( $files ))
+{
+	echo "getTrunk: nothing to do!\n";
+	die(0);
+}
+$errors = 0;
+foreach( $files as $fileEntry )
+{
+	$file = $fileEntry['file'];
+	echo "getTrunk: fetching file: ".$file." ... ";
+	
+	$uri = $svn_trunk.'/'.$extension.'/'.$file;
+	$code = getTrunk::get( $uri, $contents );
+	if ( 200 !== $code )
+	{
+		echo "error!\n";
+		$errors ++;
+		continue;
+	}
+	else
+		echo "success!\n";
+	
+	echo "getTrunk: writing file: ".$useDir.$file." ... ";	
+	
+	$bytes_written = @file_put_contents( $useDir.$file, $contents );
+	if ( $bytes_written !== strlen( $contents ))
+		echo "error writing file!\n";
+	else
+		echo "success!\n";
+}
+if ($errors === 0)
+{
+	echo "getTrunk: completed.\n";
+	die(1);
+}
+else
+	echo "getTrunk: errors!\n";
+die(0);
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+class getTrunk
+{
+	static $responseHeaders = null;
+	static $responseCode = null;
+	
+	static function get( $uri, &$document )
+	{
+		$request =& new HTTP_Request( $uri );
+		
+		$request->setMethod( "GET" );
+
+		$request->sendRequest();
+
+		// return all response headers.
+	    self::$responseHeaders =$request->getResponseHeader();
+		$document = $request->getResponseBody();
+		self::$responseCode = $code = $request->getResponseCode();
+	
+		return $code;
+	}
+	/**
+		Extracts the files from the manifest file
+	 */
+	static function extractFiles( &$m ) 
+	{
+		$parser = new PEAR_XMLParser;
+		$result = $parser->parse( $m );
+		if (!$result)
+			return false;
+		$data = $parser->getData();
+
+		#var_dump( $data );
+		if (empty( $data ))
+			return null;
+
+		$entries = $data['manifest:file-entry'];
+		if (empty( $entries ))
+			return null;
+		
+		$files = array();
+		foreach( $entries as &$e )
+		{
+			$a = $e['attribs'];
+			$mime = $a['manifest:media-type'];
+			$file = $a['manifest:full-path'];
+			
+			$files[] = array( 'file'=> $file, 'mime'=> $mime );
+		}
+		
+		return $files;
+	}
+}
+class DirHelper
+{
+	static function get( $cdirpath )
+	{
+		// make this work on both Windows & *nix
+		$cdirpath = str_replace("\\", "/", $cdirpath );
+
+		$parts = explode( '/', $cdirpath );
+		
+		$cdir = $parts[count( $parts ) -1 ];
+
+		return $cdir;
+	}
+}
