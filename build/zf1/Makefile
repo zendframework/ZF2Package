@@ -27,28 +27,35 @@ ZF_LANG=de en fr ja ru zh
 ZF_LANG_EXTRAS=en
 
 DOJO_URL=http://download.dojotoolkit.org/release-1.5.2/dojo-release-1.5.2-src.tar.gz
+STAGE_HOME=$(CURDIR)/stage
+
 ZF_ARCHIVE_URL=https://api.github.com/repos/zendframework
 ZF_PRODUCT_NAME=Zend Framework
 ZF_PRODUCTNAME=ZendFramework
 ZF_PRODUCT=$(ZF_PRODUCTNAME)-$(ZF_VERSION)
-ZF_EXPORT_DIR=$(CURDIR)/exports/$(ZF_PRODUCTNAME)-$(ZF_VERSION)
-STAGE_HOME=$(CURDIR)/stage
+
+ZF_EXPORT_DIR=$(CURDIR)/exports/$(ZF_PRODUCT)
 ZF_STAGE_DIR=$(STAGE_HOME)/$(ZF_PRODUCT)
 ZF_RELEASE_DIR=$(CURDIR)/../../public/releases/$(ZF_PRODUCTNAME)-$(ZF_VERSION)
 
+ZF_MINIMAL=$(ZF_PRODUCT)-minimal
+ZF_MINIMAL_EXPORT_DIR=$(CURDIR)/exports/$(ZF_MINIMAL)
+ZF_MINIMAL_STAGE_DIR=$(STAGE_HOME)/$(ZF_MINIMAL)
+
 ZF_ZIPBALL=$(ZF_PRODUCT).zip
 ZF_TARBALL=$(ZF_PRODUCT).tar.gz
+ZF_MINIMAL_ZIPBALL=$(ZF_MINIMAL).zip
+ZF_MINIMAL_TARBALL=$(ZF_MINIMAL).tar.gz
 
-API_DOC_DEST=$(ZF_STAGE_DIR)/documentation/api/core
-API_DOC_TITLE_CORE=Zend Framework API Documentation
 API_DOC_OUTPUT_STYLE=zend
-
+API_DOC_DEST_CORE=$(ZF_STAGE_DIR)/documentation/api/core
 API_DOC_DEST_EXTRAS=$(ZF_STAGE_DIR)/extras/documentation/api/extras
+API_DOC_TITLE_CORE=Zend Framework API Documentation
 API_DOC_TITLE_EXTRAS=Zend Framework Extras API Documentation
 
 .PHONY: version clean clean-docbook clean-export
 
-dist: version export stage zip tar
+dist: export stage archive
 
 version:
 	@if [ "$(ZF_VERSION)" = "false" ] ; then \
@@ -73,9 +80,9 @@ export: version
 	fi
 	@echo "...Done exporting files from git and source archives."
 
-stage: stage-files stage-docs stage-extras-docs stage-version
+stage: stage-files stage-version stage-docs stage-extras-docs stage-minimal stage-minimal-version
 
-stage-files: version
+stage-files: export
 	@echo "Staging files..."
 	@if [ -d "$(ZF_STAGE_DIR)" ] ; then \
 	    echo "Staging directory already exists ($(ZF_STAGE_DIR))" ; \
@@ -86,11 +93,28 @@ stage-files: version
 	fi
 	@echo "...Done staging files."
 
+stage-minimal: export
+	@echo "[Minimal] Staging files for distribution..."
+	@if [ -d "$(ZF_MINIMAL_STAGE_DIR)" ] ; then \
+	    echo "Staging directory already exists ($(ZF_MINIMAL_STAGE_DIR))" ; \
+	else \
+		echo "... Copying subset of ZF files for minimal distribution..." ; \
+		mkdir -p $(ZF_MINIMAL_EXPORT_DIR) ; \
+		(cd $(ZF_EXPORT_DIR) && rsync --quiet --archive --delete --recursive \
+			--files-from="$(CONFIGS)/include-files-minimal" \
+			./ $(ZF_MINIMAL_EXPORT_DIR)/) ; \
+		echo "... Staging minimal files..." ; \
+	    mkdir -p $(ZF_MINIMAL_STAGE_DIR) ; \
+	    (cd $(ZF_MINIMAL_EXPORT_DIR) && rsync --quiet --archive --delete \
+			--exclude-from="$(CONFIGS)/exclude-files-minimal" ./ $(ZF_MINIMAL_STAGE_DIR)/) ; \
+	fi
+	@echo "...[Minimal] Done staging files."
+
 stage-docs: docbook phpdoc
 
 docbook: docbook-core
 
-docbook-core: version
+docbook-core: stage-files
 	@echo "Building and staging DocBook documentation..."
 	@if [ -d "$(ZF_STAGE_DIR)/documentation/manual/core" ] ; then \
 		echo "DocBook documentation has already been staged" ; \
@@ -114,13 +138,13 @@ docbook-core: version
 
 phpdoc: phpdoc-core
 
-phpdoc-core: version
+phpdoc-core: stage-files
 	@echo "Building and staging PHP API documentation..."
-	@mkdir -p $(API_DOC_DEST)
-	@if [ ! -f $(API_DOC_DEST)/index.html -o `find $(ZF_STAGE_DIR)/library -newer $(API_DOC_DEST)/index.html 2>/dev/null | wc -l` -gt 0 ] ; then \
+	-mkdir -p $(API_DOC_DEST_CORE)
+	@if [ ! -f $(API_DOC_DEST_CORE)/index.html -o `find $(ZF_STAGE_DIR)/library -newer $(API_DOC_DEST_CORE)/index.html 2>/dev/null | wc -l` -gt 0 ] ; then \
 		$(PHPDOC) project:run \
 		  --verbose \
-	      --target $(API_DOC_DEST) \
+	      --target $(API_DOC_DEST_CORE) \
 	      --directory $(ZF_STAGE_DIR)/library \
 	      --title "$(API_DOC_TITLE_CORE)" \
 	      --template $(API_DOC_OUTPUT_STYLE) ; \
@@ -133,7 +157,7 @@ stage-extras-docs: extras-docbook extras-phpdoc
 
 extras-docbook: extras-docbook-core
 
-extras-docbook-core: version
+extras-docbook-core: stage-files
 	@echo "Building and staging Extras DocBook documentation..."
 	@if [ -d "$(ZF_STAGE_DIR)/extras/documentation/manual/extras" ] ; then \
 		echo "Extras DocBook documentation has already been staged" ; \
@@ -152,9 +176,9 @@ extras-docbook-core: version
 
 extras-phpdoc: extras-phpdoc-core
 
-extras-phpdoc-core: version
+extras-phpdoc-core: stage-files
 	@echo "Building and staging Extras PHP API documentation..."
-	@mkdir -p $(API_DOC_DEST_EXTRAS)
+	-mkdir -p $(API_DOC_DEST_EXTRAS)
 	@if [ ! -f $(API_DOC_DEST_EXTRAS)/index.html -o `find $(ZF_STAGE_DIR)/extras/library -newer $(API_DOC_DEST_EXTRAS)/index.html 2>/dev/null | wc -l` -gt 0 ] ; then \
 		$(PHPDOC) project:run \
 		  --verbose \
@@ -167,18 +191,31 @@ extras-phpdoc-core: version
 	fi
 	@echo "...Done building and staging PHP API documentation."
 
-stage-version: version
+stage-version: stage-files
 	@echo "Adding release date to release notes..."
-	@sed -e 's/ (\[INSERT REV NUM HERE\])//' \
+	-sed -e 's/ (\[INSERT REV NUM HERE\])//' \
 	    < $(ZF_STAGE_DIR)/README.md \
 	    > $(ZF_STAGE_DIR)/README.md.new
 	@ZF_RELEASE_DATE=`date +%Y-%m-%d` ; sed -e "s/<Month> <Day>, <Year>/$$ZF_RELEASE_DATE/" \
 	    < $(ZF_STAGE_DIR)/README.md.new \
 	    > $(ZF_STAGE_DIR)/README.md
-	@rm $(ZF_STAGE_DIR)/README.md.new
+	-rm $(ZF_STAGE_DIR)/README.md.new
 	@echo "...Done adding release date to release notes."
 
-zip: version
+stage-minimal-version: stage-minimal
+	@echo "[Minimal] Adding release date to release notes..."
+	-sed -e 's/ (\[INSERT REV NUM HERE\])//' \
+	    < $(ZF_MINIMAL_STAGE_DIR)/README.md \
+	    > $(ZF_MINIMAL_STAGE_DIR)/README.md.new
+	@ZF_RELEASE_DATE=`date +%Y-%m-%d` ; sed -e "s/<Month> <Day>, <Year>/$$ZF_RELEASE_DATE/" \
+	    < $(ZF_MINIMAL_STAGE_DIR)/README.md.new \
+	    > $(ZF_MINIMAL_STAGE_DIR)/README.md
+	-rm $(ZF_MINIMAL_STAGE_DIR)/README.md.new
+	@echo "...[Minimal] Done adding release date to release notes."
+
+archive: zip tar zip-minimal tar-minimal
+
+zip: stage
 	@echo "Creating ZIP archives..."
 	@if [ -f "$(STAGE_HOME)/$(ZF_ZIPBALL)" ] ; then \
 		echo "Code ZIP archive already exists" ; \
@@ -212,7 +249,12 @@ zip: version
 	done
 	@echo "...Done creating ZIP archives."
 
-tar: version
+zip-minimal: stage-minimal
+	@echo "[Minimal] Creating ZIP archives..."
+	@(cd $(STAGE_HOME) && $(ZIP) -rq $(ZF_MINIMAL_ZIPBALL) $(ZF_MINIMAL))
+	@echo "[Minimal] Code archive done..." ; \
+
+tar: stage
 	@echo "Creating TAR.GZ archives..."
 	@if [ -f "$(STAGE_HOME)/$(ZF_TARBALL)" ] ; then \
 		echo "Code TAR archive already exists" ; \
@@ -246,18 +288,26 @@ tar: version
 	done
 	@echo "...Done creating TAR.GZ archives."
 
+tar-minimal: stage-minimal
+	@echo "[Minimal] Creating TAR.GZ archives..."
+	@(cd $(STAGE_HOME) && $(TAR) -czf $(ZF_MINIMAL_TARBALL) $(ZF_MINIMAL))
+	@echo "[Minimal] Code archive done..." ; \
+
 clean: version
 	-rm -f $(DOWNLOADS)/*.tgz
 	-rm -rf $(ZF_STAGE_DIR)
 	-rm -f $(STAGE_HOME)/$(ZF_PRODUCT)*.zip
 	-rm -f $(STAGE_HOME)/$(ZF_PRODUCT)*.tar.gz
+	-rm -rf $(ZF_MINIMAL_STAGE_DIR)
+	-rm -f $(STAGE_HOME)/$(ZF_MINIMAL)*.zip
+	-rm -f $(STAGE_HOME)/$(ZF_MINIMAL)*.tar.gz
 
 clean-docbook: version
-	for language in $(ZF_EXPORT_DIR)/documentation/manual/$(ZF_LANG) $(ZF_EXPORT_DIR)/incubator/documentation/manual/$(ZF_LANG) ; do \
+	@for language in $(ZF_EXPORT_DIR)/documentation/manual/$(ZF_LANG) $(ZF_EXPORT_DIR)/incubator/documentation/manual/$(ZF_LANG) ; do \
 	    rm -rf $$language/autom4te.cache $$language/build/docbook-xsl $$language/html/*.html $$language/html/HTML.manifest $$language/config.* $$language/configure $$language/entities.ent $$language/Makefile ; \
 	done
 
-release: version dist
+release: dist
 	@echo "Copying release files to release directory ($(ZF_RELEASE_DIR))"
 	@if [ -d "$(ZF_RELEASE_DIR)" ] ; then \
 		echo "Release directory already exists ($(ZF_RELEASE_DIR))" ; \
@@ -270,3 +320,4 @@ release: version dist
 
 clean-export: version
 	-rm -rf $(ZF_EXPORT_DIR)
+	-rm -rf $(ZF_MINIMAL_EXPORT_DIR)
