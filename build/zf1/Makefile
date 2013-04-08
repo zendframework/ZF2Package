@@ -27,6 +27,7 @@ ZF_LANG=de en fr ja ru zh
 ZF_LANG_EXTRAS=en
 
 DOJO_URL=http://download.dojotoolkit.org/release-1.5.2/dojo-release-1.5.2-src.tar.gz
+RELEASES_HOME=$(CURDIR)/../../public/releases
 STAGE_HOME=$(CURDIR)/stage
 
 ZF_ARCHIVE_URL=https://api.github.com/repos/zendframework
@@ -36,7 +37,7 @@ ZF_PRODUCT=$(ZF_PRODUCTNAME)-$(ZF_VERSION)
 
 ZF_EXPORT_DIR=$(CURDIR)/exports/$(ZF_PRODUCT)
 ZF_STAGE_DIR=$(STAGE_HOME)/$(ZF_PRODUCT)
-ZF_RELEASE_DIR=$(CURDIR)/../../public/releases/$(ZF_PRODUCTNAME)-$(ZF_VERSION)
+ZF_RELEASE_DIR=$(RELEASES_HOME)/$(ZF_PRODUCT)
 
 ZF_MINIMAL=$(ZF_PRODUCT)-minimal
 ZF_MINIMAL_EXPORT_DIR=$(CURDIR)/exports/$(ZF_MINIMAL)
@@ -53,9 +54,20 @@ API_DOC_DEST_EXTRAS=$(ZF_STAGE_DIR)/extras/documentation/api/extras
 API_DOC_TITLE_CORE=Zend Framework API Documentation
 API_DOC_TITLE_EXTRAS=Zend Framework Extras API Documentation
 
+AMF_PRODUCT_NAME=Zend AMF
+AMF_PRODUCTNAME=ZendAMF
+AMF_PRODUCT=$(AMF_PRODUCTNAME)-$(ZF_VERSION)
+AMF_EXPORT_DIR=$(CURDIR)/exports/$(AMF_PRODUCT)
+AMF_STAGE_DIR=$(STAGE_HOME)/$(AMF_PRODUCT)
+AMF_RELEASE_DIR=$(RELEASES_HOME)/$(AMF_PRODUCT)
+AMF_APIDOC_DEST=$(AMF_STAGE_DIR)/documentation/api/core
+AMF_APIDOC_TITLE=Zend AMF API Documentation
+AMF_ZIPBALL=$(AMF_PRODUCT).zip
+AMF_TARBALL=$(AMF_PRODUCT).tar.gz
+
 .PHONY: version clean clean-docbook clean-export
 
-dist: export stage archive
+dist: stage archive
 
 version:
 	@if [ "$(ZF_VERSION)" = "false" ] ; then \
@@ -252,7 +264,7 @@ zip: stage
 zip-minimal: stage-minimal
 	@echo "[Minimal] Creating ZIP archives..."
 	@(cd $(STAGE_HOME) && $(ZIP) -rq $(ZF_MINIMAL_ZIPBALL) $(ZF_MINIMAL))
-	@echo "[Minimal] Code archive done..." ; \
+	@echo "...[Minimal] Done creating ZIP archives."
 
 tar: stage
 	@echo "Creating TAR.GZ archives..."
@@ -291,7 +303,7 @@ tar: stage
 tar-minimal: stage-minimal
 	@echo "[Minimal] Creating TAR.GZ archives..."
 	@(cd $(STAGE_HOME) && $(TAR) -czf $(ZF_MINIMAL_TARBALL) $(ZF_MINIMAL))
-	@echo "[Minimal] Code archive done..." ; \
+	@echo "...[Minimal] Done creating TAR.GZ archives." ; \
 
 clean: version
 	-rm -f $(DOWNLOADS)/*.tgz
@@ -307,17 +319,124 @@ clean-docbook: version
 	    rm -rf $$language/autom4te.cache $$language/build/docbook-xsl $$language/html/*.html $$language/html/HTML.manifest $$language/config.* $$language/configure $$language/entities.ent $$language/Makefile ; \
 	done
 
-release: dist
+release: version
 	@echo "Copying release files to release directory ($(ZF_RELEASE_DIR))"
 	@if [ -d "$(ZF_RELEASE_DIR)" ] ; then \
 		echo "Release directory already exists ($(ZF_RELEASE_DIR))" ; \
 	else \
 		mkdir -p $(ZF_RELEASE_DIR) ; \
-		cp $(STAGE_HOME)/$(ZF_PRODUCTNAME)-$(ZF_VERSION)*.zip $(ZF_RELEASE_DIR) ; \
-		cp $(STAGE_HOME)/$(ZF_PRODUCTNAME)-$(ZF_VERSION)*.tar.gz $(ZF_RELEASE_DIR) ; \
+		cp $(STAGE_HOME)/$(ZF_PRODUCT)*.zip $(ZF_RELEASE_DIR) ; \
+		cp $(STAGE_HOME)/$(ZF_PRODUCT)*.tar.gz $(ZF_RELEASE_DIR) ; \
 	fi
 	@echo "...Done copying release files to release directory" ; \
 
 clean-export: version
 	-rm -rf $(ZF_EXPORT_DIR)
 	-rm -rf $(ZF_MINIMAL_EXPORT_DIR)
+
+amf: stage-amf archive-amf
+
+stage-amf: stage-amf-files stage-amf-docs stage-amf-version
+
+stage-amf-files: export
+	@echo "[AMF] Staging files for distribution..."
+	@if [ -d "$(AMF_STAGE_DIR)" ] ; then \
+	    echo "Staging directory already exists ($(AMF_STAGE_DIR))" ; \
+	else \
+		mkdir -p $(AMF_STAGE_DIR) ; \
+		echo "... Copying subset of ZF files for AMF distribution..." ; \
+		(cd $(ZF_EXPORT_DIR) && rsync --quiet --archive --delete --recursive --recursive \
+			--files-from="$(CONFIGS)/include-files-amf" \
+			./ $(AMF_EXPORT_DIR)/) ; \
+		echo "... Altering documentation/manual/en/manual.xml.in..." ; \
+		cp $(DOC_UTILS)/zend-amf-manual.xml \
+		   $(AMF_EXPORT_DIR)/documentation/manual/en/manual.xml.in ; \
+		echo "... Altering tests/Zend/AllTests.php..." ; \
+		mv $(AMF_EXPORT_DIR)/tests/Zend/AllTests.php \
+		   $(AMF_EXPORT_DIR)/tests/Zend/AllTests-orig.php ; \
+		awk '{ \
+			if ($$0 ~ /require_once .Zend|addTest/ && $$0 !~ /[Aa]mf/) \
+			{ } \
+			else \
+			{ print; } \
+			}' \
+			$(AMF_EXPORT_DIR)/tests/Zend/AllTests-orig.php > \
+			$(AMF_EXPORT_DIR)/tests/Zend/AllTests.php ; \
+		echo "... Staging files..." ; \
+		(cd $(AMF_EXPORT_DIR) && rsync --quiet --archive --delete \
+			--exclude-from="$(CONFIGS)/exclude-files-amf" ./ $(AMF_STAGE_DIR)/) ; \
+	fi
+	@echo "...[AMF] Done staging files."
+
+stage-amf-docs: docbook-amf phpdoc-amf
+
+docbook-amf: stage-amf-files
+	@echo "[AMF] Building and staging DocBook documentation..."
+	@if [ -d "$(AMF_STAGE_DIR)/documentation/manual/core" ] ; then \
+		echo "DocBook documentation has already been staged" ; \
+	else \
+		mkdir -p $(AMF_STAGE_DIR)/documentation/manual/core ; \
+		src=$(AMF_EXPORT_DIR)/documentation/manual/en ; \
+		dest=$(AMF_STAGE_DIR)/documentation/manual/core/en ; \
+		echo "Converting manual to DocBook 5 for language..." ; \
+		( cd $$src && autoconf && sh ./configure && $(MAKE) manual.xml 2>&1 | tee err.txt) ; \
+		( $(DOC_UTILS)/fix-docbook.sh $$src/manual.xml ) ; \
+		( xsltproc --xinclude $(DOC_UTILS)/db4-upgrade.xsl $$src/manual.xml > $$src/manual.db5.xml | tee -a $$src/err.txt) ; \
+		echo "Building and staging DocBook documentation..." ; \
+		( $(DOC_UTILS)/pear/phd -g 'phpdotnet\phd\Highlighter_GeSHi' --xinclude -f zfpackage -d $$src/manual.db5.xml -o $$src/output ) ; \
+		rsync --archive --delete $$src/output/zf-package-chunked-xhtml/ $$dest ; \
+	fi
+	@echo "...[AMF] Done building and staging DocBook documentation."
+
+phpdoc-amf: stage-amf-files
+	@echo "[AMF] Building and staging PHP API documentation..."
+	-mkdir -p $(AMF_APIDOC_DEST)
+	@if [ ! -f $(AMF_APIDOC_DEST)/index.html -o `find $(AMF_STAGE_DIR)/library -newer $(AMF_APIDOC_DEST)/index.html 2>/dev/null | wc -l` -gt 0 ] ; then \
+		$(PHPDOC) project:run \
+		  --verbose \
+	      --target $(AMF_APIDOC_DEST) \
+	      --directory $(AMF_STAGE_DIR)/library \
+	      --title "$(AMF_APIDOC_TITLE)" \
+	      --template $(API_DOC_OUTPUT_STYLE) ; \
+	else \
+	    echo "PHP API documentation is already staged and up to date." ; \
+	fi
+	@echo "...[AMF] Done building and staging PHP API documentation."
+
+stage-amf-version: stage-amf-files
+	@echo "[AMF] Adding release date to release notes..."
+	-sed -e 's/ (\[INSERT REV NUM HERE\])//' \
+	    < $(AMF_STAGE_DIR)/README.md \
+	    > $(AMF_STAGE_DIR)/README.md.new
+	@AMF_RELEASE_DATE=`date +%Y-%m-%d` ; sed -e "s/<Month> <Day>, <Year>/$$AMF_RELEASE_DATE/" \
+	    < $(AMF_STAGE_DIR)/README.md.new \
+	    > $(AMF_STAGE_DIR)/README.md
+	-rm $(AMF_STAGE_DIR)/README.md.new
+	@echo "...[AMF] Done adding release date to release notes."
+
+archive-amf: zip-amf tar-amf
+
+zip-amf: stage-amf
+	@echo "[AMF] Creating ZIP archives..."
+	@(cd $(STAGE_HOME) && $(ZIP) -rq $(AMF_ZIPBALL) $(AMF_PRODUCT))
+	@echo "...[AMF] Done creating ZIP archives."
+
+tar-amf: stage-amf
+	@echo "[AMF] Creating TAR.GZ archives..."
+	@(cd $(STAGE_HOME) && $(TAR) -czf $(AMF_TARBALL) $(AMF_PRODUCT))
+	@echo "...[AMF] Done creating TAR.GZ archives." ; \
+
+release-amf: version
+	@echo "[AMF] Copying release files to release directory ($(AMF_RELEASE_DIR))"
+	@if [ -d "$(AMF_RELEASE_DIR)" ] ; then \
+		echo "Release directory already exists ($(AMF_RELEASE_DIR))" ; \
+	else \
+		mkdir -p $(AMF_RELEASE_DIR) ; \
+		cp $(STAGE_HOME)/$(AMF_PRODUCT).zip $(AMF_RELEASE_DIR) ; \
+		cp $(STAGE_HOME)/$(AMF_PRODUCT).tar.gz $(AMF_RELEASE_DIR) ; \
+	fi
+	@echo "...[AMF] Done copying release files to release directory" ; \
+
+gdata: export stage-gdata archive-gdata
+
+infocard: export stage-infocard archive-infocard
