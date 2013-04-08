@@ -20,7 +20,7 @@ fi
 
 echo "... Copying subset of ZF files..."
 mkdir -p $STAGE_DIR
-(cd "$SOURCE_EXPORT_DIR" && rsync --quiet --archive --delete --recursive \
+(cd "$SOURCE_EXPORT_DIR" && rsync --archive --delete --recursive \
     --files-from="$INCLUDE_FILES" ./ "$DEST_EXPORT_DIR/")
 echo "... Replacing documentation/manual/en/manual.xml.in..."
 cp "$MANUAL_XML" "$DEST_EXPORT_DIR/documentation/manual/en/manual.xml.in"
@@ -35,5 +35,5 @@ awk '{ \
     "$DEST_EXPORT_DIR/tests/Zend/AllTests-orig.php" > \
     "$DEST_EXPORT_DIR/tests/Zend/AllTests.php"
 echo "... Staging files..."
-(cd $DEST_EXPORT_DIR && rsync --quiet --archive --delete \
-    -exclude-from="$EXCLUDE_FILES" ./ "$STAGE_DIR/")
+(cd $DEST_EXPORT_DIR && rsync --archive --delete \
+    --exclude-from="$EXCLUDE_FILES" ./ "$STAGE_DIR/")
