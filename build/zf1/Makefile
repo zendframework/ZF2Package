@@ -146,16 +146,7 @@ phpdoc: phpdoc-core
 phpdoc-core: stage-files
 	@echo "Building and staging PHP API documentation..."
 	-mkdir -p $(API_DOC_DEST_CORE)
-	@if [ ! -f $(API_DOC_DEST_CORE)/index.html -o `find $(ZF_STAGE_DIR)/library -newer $(API_DOC_DEST_CORE)/index.html 2>/dev/null | wc -l` -gt 0 ] ; then \
-		$(PHPDOC) project:run \
-		  --verbose \
-	      --target $(API_DOC_DEST_CORE) \
-	      --directory $(ZF_STAGE_DIR)/library \
-	      --title "$(API_DOC_TITLE_CORE)" \
-	      --template $(API_DOC_OUTPUT_STYLE) ; \
-	else \
-	    echo "PHP API documentation is already staged and up to date." ; \
-	fi
+	-$(SCRIPTS)/phpdoc.sh "$(PHPDOC)" "$(ZF_STAGE_DIR)/library" "$(API_DOC_DEST_CORE)" "$(API_DOC_TITLE_CORE)" "$(API_DOC_OUTPUT_STYLE)"
 	@echo "...Done building and staging PHP API documentation."
 
 stage-extras-docs: extras-docbook extras-phpdoc
@@ -184,16 +175,7 @@ extras-phpdoc: extras-phpdoc-core
 extras-phpdoc-core: stage-files
 	@echo "Building and staging Extras PHP API documentation..."
 	-mkdir -p $(API_DOC_DEST_EXTRAS)
-	@if [ ! -f $(API_DOC_DEST_EXTRAS)/index.html -o `find $(ZF_STAGE_DIR)/extras/library -newer $(API_DOC_DEST_EXTRAS)/index.html 2>/dev/null | wc -l` -gt 0 ] ; then \
-		$(PHPDOC) project:run \
-		  --verbose \
-	      --target $(API_DOC_DEST_EXTRAS) \
-	      --directory $(ZF_STAGE_DIR)/extras/library \
-	      --title "$(API_DOC_TITLE_EXTRAS)" \
-	      --template $(API_DOC_OUTPUT_STYLE) ; \
-	else \
-	    echo "PHP API documentation is already staged and up to date." ; \
-	fi
+	-$(SCRIPTS)/phpdoc.sh "$(PHPDOC)" "$(ZF_STAGE_DIR)/extras/library" "$(API_DOC_DEST_EXTRAS)" "$(API_DOC_TITLE_EXTRAS)" "$(API_DOC_OUTPUT_STYLE)"
 	@echo "...Done building and staging PHP API documentation."
 
 stage-version: stage-files
@@ -368,16 +350,7 @@ docbook-amf: stage-amf-files
 phpdoc-amf: stage-amf-files
 	@echo "[AMF] Building and staging PHP API documentation..."
 	-mkdir -p $(AMF_APIDOC_DEST)
-	@if [ ! -f $(AMF_APIDOC_DEST)/index.html -o `find $(AMF_STAGE_DIR)/library -newer $(AMF_APIDOC_DEST)/index.html 2>/dev/null | wc -l` -gt 0 ] ; then \
-		$(PHPDOC) project:run \
-		  --verbose \
-	      --target $(AMF_APIDOC_DEST) \
-	      --directory $(AMF_STAGE_DIR)/library \
-	      --title "$(AMF_APIDOC_TITLE)" \
-	      --template $(API_DOC_OUTPUT_STYLE) ; \
-	else \
-	    echo "PHP API documentation is already staged and up to date." ; \
-	fi
+	-$(SCRIPTS)/phpdoc.sh "$(PHPDOC)" "$(AMF_STAGE_DIR)/library" "$(AMF_APIDOC_DEST)" "$(AMF_APIDOC_TITLE)" "$(API_DOC_OUTPUT_STYLE)"
 	@echo "...[AMF] Done building and staging PHP API documentation."
 
 stage-amf-version: stage-amf-files
