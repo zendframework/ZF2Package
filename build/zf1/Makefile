@@ -307,32 +307,7 @@ stage-amf: stage-amf-files stage-amf-docs stage-amf-version
 
 stage-amf-files: export
 	@echo "[AMF] Staging files for distribution..."
-	@if [ -d "$(AMF_STAGE_DIR)" ] ; then \
-	    echo "Staging directory already exists ($(AMF_STAGE_DIR))" ; \
-	else \
-		mkdir -p $(AMF_STAGE_DIR) ; \
-		echo "... Copying subset of ZF files for AMF distribution..." ; \
-		(cd $(ZF_EXPORT_DIR) && rsync --quiet --archive --delete --recursive --recursive \
-			--files-from="$(CONFIGS)/include-files-amf" \
-			./ $(AMF_EXPORT_DIR)/) ; \
-		echo "... Altering documentation/manual/en/manual.xml.in..." ; \
-		cp $(DOC_UTILS)/zend-amf-manual.xml \
-		   $(AMF_EXPORT_DIR)/documentation/manual/en/manual.xml.in ; \
-		echo "... Altering tests/Zend/AllTests.php..." ; \
-		mv $(AMF_EXPORT_DIR)/tests/Zend/AllTests.php \
-		   $(AMF_EXPORT_DIR)/tests/Zend/AllTests-orig.php ; \
-		awk '{ \
-			if ($$0 ~ /require_once .Zend|addTest/ && $$0 !~ /[Aa]mf/) \
-			{ } \
-			else \
-			{ print; } \
-			}' \
-			$(AMF_EXPORT_DIR)/tests/Zend/AllTests-orig.php > \
-			$(AMF_EXPORT_DIR)/tests/Zend/AllTests.php ; \
-		echo "... Staging files..." ; \
-		(cd $(AMF_EXPORT_DIR) && rsync --quiet --archive --delete \
-			--exclude-from="$(CONFIGS)/exclude-files-amf" ./ $(AMF_STAGE_DIR)/) ; \
-	fi
+	-$(SCRIPTS)/stage-files.sh "$(AMF_STAGE_DIR)" "$(ZF_EXPORT_DIR)" "$(AMF_EXPORT_DIR)" "$(CONFIGS)/include-files-amf" "$(CONFIGS)/exclude-files-amf" "$(DOC_UTILS)/zend-amf-manual.xml" "[Aa]mf"
 	@echo "...[AMF] Done staging files."
 
 stage-amf-docs: docbook-amf phpdoc-amf
