@@ -437,6 +437,9 @@ release-amf: version
 	fi
 	@echo "...[AMF] Done copying release files to release directory" ; \
 
+clean-docbook-amf: version
+	@(docdir=$(AMF_EXPORT_DIR)/documentation/manual/en ; rm -rf $$docdir/autom4te.cache $$docdir/html/*.{html,css} $$docdir/html/HTML.manifest $$docdir/config.* $$docdir/configure $$docdir/Makefile $$docdir/output $$docdir/*.txt $$docdir/manual.db5.xml)
+
 gdata: export stage-gdata archive-gdata
 
 infocard: export stage-infocard archive-infocard
