@@ -65,6 +65,17 @@ AMF_APIDOC_TITLE=Zend AMF API Documentation
 AMF_ZIPBALL=$(AMF_PRODUCT).zip
 AMF_TARBALL=$(AMF_PRODUCT).tar.gz
 
+GDATA_PRODUCT_NAME=Zend Gdata
+GDATA_PRODUCTNAME=ZendGdata
+GDATA_PRODUCT=$(GDATA_PRODUCTNAME)-$(ZF_VERSION)
+GDATA_EXPORT_DIR=$(CURDIR)/exports/$(GDATA_PRODUCT)
+GDATA_STAGE_DIR=$(STAGE_HOME)/$(GDATA_PRODUCT)
+GDATA_RELEASE_DIR=$(RELEASES_HOME)/$(GDATA_PRODUCT)
+GDATA_APIDOC_DEST=$(GDATA_STAGE_DIR)/documentation/api/core
+GDATA_APIDOC_TITLE=Zend Gdata API Documentation
+GDATA_ZIPBALL=$(GDATA_PRODUCT).zip
+GDATA_TARBALL=$(GDATA_PRODUCT).tar.gz
+
 .PHONY: version clean clean-docbook clean-export
 
 dist: stage archive
@@ -347,6 +358,55 @@ release-amf: version
 clean-docbook-amf: version
 	-$(SCRIPTS)/clean-docbook.sh "$(AMF_EXPORT_DIR)/documentation/manual/en"
 
-gdata: export stage-gdata archive-gdata
+gdata: stage-gdata archive-gdata
 
-infocard: export stage-infocard archive-infocard
+stage-gdata: stage-gdata-files stage-gdata-docs stage-gdata-version
+
+stage-gdata-files: export
+	@echo "[GData] Staging files for distribution..."
+	-$(SCRIPTS)/stage-files.sh "$(GDATA_STAGE_DIR)" "$(ZF_EXPORT_DIR)" "$(GDATA_EXPORT_DIR)" "$(CONFIGS)/include-files-gdata" "$(CONFIGS)/exclude-files-gdata" "$(DOC_UTILS)/zend-gdata-manual.xml" "[Gg]data"
+	@echo "...[GData] Done staging files."
+
+stage-gdata-docs: docbook-gdata phpdoc-gdata
+
+docbook-gdata: stage-gdata-files
+	@echo "[GData] Building and staging DocBook documentation..."
+	@if [ -d "$(GDATA_STAGE_DIR)/documentation/manual/core" ] ; then \
+		echo "DocBook documentation has already been staged" ; \
+	else \
+		mkdir -p $(GDATA_STAGE_DIR)/documentation/manual/core ; \
+		$(SCRIPTS)/docbook.sh "$(MAKE)" "$(DOC_UTILS)" "$(GDATA_EXPORT_DIR)/documentation/manual/en" "$(GDATA_STAGE_DIR)/documentation/manual/core/en" ; \
+	fi
+	@echo "...[GData] Done building and staging DocBook documentation."
+
+phpdoc-gdata: stage-gdata-files
+	@echo "[GData] Building and staging PHP API documentation..."
+	-mkdir -p $(GDATA_APIDOC_DEST)
+	-$(SCRIPTS)/phpdoc.sh "$(PHPDOC)" "$(GDATA_STAGE_DIR)/library" "$(GDATA_APIDOC_DEST)" "$(GDATA_APIDOC_TITLE)" "$(API_DOC_OUTPUT_STYLE)"
+	@echo "...[GData] Done building and staging PHP API documentation."
+
+stage-gdata-version: stage-gdata-files
+	@echo "[GData] Adding release date to release notes..."
+	-$(SCRIPTS)/stage-version.sh $(GDATA_STAGE_DIR)
+	@echo "...[GData] Done adding release date to release notes."
+
+archive-gdata: zip-gdata tar-gdata
+
+zip-gdata: stage-gdata
+	@echo "[GData] Creating ZIP archives..."
+	@(cd $(STAGE_HOME) && $(ZIP) -rq $(GDATA_ZIPBALL) $(GDATA_PRODUCT))
+	@echo "...[GData] Done creating ZIP archives."
+
+tar-gdata: stage-gdata
+	@echo "[GData] Creating TAR.GZ archives..."
+	@(cd $(STAGE_HOME) && $(TAR) -czf $(GDATA_TARBALL) $(GDATA_PRODUCT))
+	@echo "...[GData] Done creating TAR.GZ archives." ; \
+
+release-gdata: version
+	@echo "[GData] Copying release files to release directory ($(GDATA_RELEASE_DIR))"
+	-$(SCRIPTS)/release.sh "$(GDATA_PRODUCT)" "$(STAGE_HOME)" "$(GDATA_RELEASE_DIR)"
+	@echo "...[GData] Done copying release files to release directory" ; \
+
+clean-docbook-gdata: version
+	-$(SCRIPTS)/clean-docbook.sh "$(GDATA_EXPORT_DIR)/documentation/manual/en"
+
