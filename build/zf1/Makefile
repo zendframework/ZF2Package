@@ -87,7 +87,9 @@ INFOCARD_APIDOC_TITLE=Zend InfoCard API Documentation
 INFOCARD_ZIPBALL=$(INFOCARD_PRODUCT).zip
 INFOCARD_TARBALL=$(INFOCARD_PRODUCT).tar.gz
 
-.PHONY: version clean clean-docbook clean-export
+.PHONY: version clean-all
+
+all: dist amf gdata infocard release-all
 
 dist: stage archive
 
@@ -316,6 +318,8 @@ clean-export: version
 	-rm -rf $(ZF_EXPORT_DIR)
 	-rm -rf $(ZF_MINIMAL_EXPORT_DIR)
 	-rm -rf $(AMF_EXPORT_DIR)
+	-rm -rf $(GDATA_EXPORT_DIR)
+	-rm -rf $(INFOCARD_EXPORT_DIR)
 
 amf: stage-amf archive-amf
 
@@ -473,3 +477,6 @@ release-infocard: version
 clean-docbook-infocard: version
 	-$(SCRIPTS)/clean-docbook.sh "$(INFOCARD_EXPORT_DIR)/documentation/manual/en"
 
+release-all: release release-amf release-gdata release-infocard
+
+clean-all: clean clean-export
