@@ -287,13 +287,7 @@ clean-docbook: version
 
 release: version
 	@echo "Copying release files to release directory ($(ZF_RELEASE_DIR))"
-	@if [ -d "$(ZF_RELEASE_DIR)" ] ; then \
-		echo "Release directory already exists ($(ZF_RELEASE_DIR))" ; \
-	else \
-		mkdir -p $(ZF_RELEASE_DIR) ; \
-		cp $(STAGE_HOME)/$(ZF_PRODUCT)*.zip $(ZF_RELEASE_DIR) ; \
-		cp $(STAGE_HOME)/$(ZF_PRODUCT)*.tar.gz $(ZF_RELEASE_DIR) ; \
-	fi
+	-$(SCRIPTS)/release.sh "$(ZF_PRODUCT)" "$(STAGE_HOME)" "$(ZF_RELEASE_DIR)"
 	@echo "...Done copying release files to release directory" ; \
 
 clean-export: version
@@ -347,13 +341,7 @@ tar-amf: stage-amf
 
 release-amf: version
 	@echo "[AMF] Copying release files to release directory ($(AMF_RELEASE_DIR))"
-	@if [ -d "$(AMF_RELEASE_DIR)" ] ; then \
-		echo "Release directory already exists ($(AMF_RELEASE_DIR))" ; \
-	else \
-		mkdir -p $(AMF_RELEASE_DIR) ; \
-		cp $(STAGE_HOME)/$(AMF_PRODUCT).zip $(AMF_RELEASE_DIR) ; \
-		cp $(STAGE_HOME)/$(AMF_PRODUCT).tar.gz $(AMF_RELEASE_DIR) ; \
-	fi
+	-$(SCRIPTS)/release.sh "$(AMF_PRODUCT)" "$(STAGE_HOME)" "$(AMF_RELEASE_DIR)"
 	@echo "...[AMF] Done copying release files to release directory" ; \
 
 clean-docbook-amf: version
