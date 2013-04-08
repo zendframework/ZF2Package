@@ -76,6 +76,17 @@ GDATA_APIDOC_TITLE=Zend Gdata API Documentation
 GDATA_ZIPBALL=$(GDATA_PRODUCT).zip
 GDATA_TARBALL=$(GDATA_PRODUCT).tar.gz
 
+INFOCARD_PRODUCT_NAME=Zend InfoCard
+INFOCARD_PRODUCTNAME=ZendInfoCard
+INFOCARD_PRODUCT=$(INFOCARD_PRODUCTNAME)-$(ZF_VERSION)
+INFOCARD_EXPORT_DIR=$(CURDIR)/exports/$(INFOCARD_PRODUCT)
+INFOCARD_STAGE_DIR=$(STAGE_HOME)/$(INFOCARD_PRODUCT)
+INFOCARD_RELEASE_DIR=$(RELEASES_HOME)/$(INFOCARD_PRODUCT)
+INFOCARD_APIDOC_DEST=$(INFOCARD_STAGE_DIR)/documentation/api/core
+INFOCARD_APIDOC_TITLE=Zend InfoCard API Documentation
+INFOCARD_ZIPBALL=$(INFOCARD_PRODUCT).zip
+INFOCARD_TARBALL=$(INFOCARD_PRODUCT).tar.gz
+
 .PHONY: version clean clean-docbook clean-export
 
 dist: stage archive
@@ -409,4 +420,56 @@ release-gdata: version
 
 clean-docbook-gdata: version
 	-$(SCRIPTS)/clean-docbook.sh "$(GDATA_EXPORT_DIR)/documentation/manual/en"
+
+infocard: stage-infocard archive-infocard
+
+stage-infocard: stage-infocard-files stage-infocard-docs stage-infocard-version
+
+stage-infocard-files: export
+	@echo "[InfoCard] Staging files for distribution..."
+	-$(SCRIPTS)/stage-files.sh "$(INFOCARD_STAGE_DIR)" "$(ZF_EXPORT_DIR)" "$(INFOCARD_EXPORT_DIR)" "$(CONFIGS)/include-files-infocard" "$(CONFIGS)/exclude-files-infocard" "$(DOC_UTILS)/zend-infocard-manual.xml" "[Gg]data"
+	@echo "...[InfoCard] Done staging files."
+
+stage-infocard-docs: docbook-infocard phpdoc-infocard
+
+docbook-infocard: stage-infocard-files
+	@echo "[InfoCard] Building and staging DocBook documentation..."
+	@if [ -d "$(INFOCARD_STAGE_DIR)/documentation/manual/core" ] ; then \
+		echo "DocBook documentation has already been staged" ; \
+	else \
+		mkdir -p $(INFOCARD_STAGE_DIR)/documentation/manual/core ; \
+		$(SCRIPTS)/docbook.sh "$(MAKE)" "$(DOC_UTILS)" "$(INFOCARD_EXPORT_DIR)/documentation/manual/en" "$(INFOCARD_STAGE_DIR)/documentation/manual/core/en" ; \
+	fi
+	@echo "...[InfoCard] Done building and staging DocBook documentation."
+
+phpdoc-infocard: stage-infocard-files
+	@echo "[InfoCard] Building and staging PHP API documentation..."
+	-mkdir -p $(INFOCARD_APIDOC_DEST)
+	-$(SCRIPTS)/phpdoc.sh "$(PHPDOC)" "$(INFOCARD_STAGE_DIR)/library" "$(INFOCARD_APIDOC_DEST)" "$(INFOCARD_APIDOC_TITLE)" "$(API_DOC_OUTPUT_STYLE)"
+	@echo "...[InfoCard] Done building and staging PHP API documentation."
+
+stage-infocard-version: stage-infocard-files
+	@echo "[InfoCard] Adding release date to release notes..."
+	-$(SCRIPTS)/stage-version.sh $(INFOCARD_STAGE_DIR)
+	@echo "...[InfoCard] Done adding release date to release notes."
+
+archive-infocard: zip-infocard tar-infocard
+
+zip-infocard: stage-infocard
+	@echo "[InfoCard] Creating ZIP archives..."
+	@(cd $(STAGE_HOME) && $(ZIP) -rq $(INFOCARD_ZIPBALL) $(INFOCARD_PRODUCT))
+	@echo "...[InfoCard] Done creating ZIP archives."
+
+tar-infocard: stage-infocard
+	@echo "[InfoCard] Creating TAR.GZ archives..."
+	@(cd $(STAGE_HOME) && $(TAR) -czf $(INFOCARD_TARBALL) $(INFOCARD_PRODUCT))
+	@echo "...[InfoCard] Done creating TAR.GZ archives." ; \
+
+release-infocard: version
+	@echo "[InfoCard] Copying release files to release directory ($(INFOCARD_RELEASE_DIR))"
+	-$(SCRIPTS)/release.sh "$(INFOCARD_PRODUCT)" "$(STAGE_HOME)" "$(INFOCARD_RELEASE_DIR)"
+	@echo "...[InfoCard] Done copying release files to release directory" ; \
+
+clean-docbook-infocard: version
+	-$(SCRIPTS)/clean-docbook.sh "$(INFOCARD_EXPORT_DIR)/documentation/manual/en"
 
