@@ -205,24 +205,12 @@ extras-phpdoc-core: stage-files
 
 stage-version: stage-files
 	@echo "Adding release date to release notes..."
-	-sed -e 's/ (\[INSERT REV NUM HERE\])//' \
-	    < $(ZF_STAGE_DIR)/README.md \
-	    > $(ZF_STAGE_DIR)/README.md.new
-	@ZF_RELEASE_DATE=`date +%Y-%m-%d` ; sed -e "s/<Month> <Day>, <Year>/$$ZF_RELEASE_DATE/" \
-	    < $(ZF_STAGE_DIR)/README.md.new \
-	    > $(ZF_STAGE_DIR)/README.md
-	-rm $(ZF_STAGE_DIR)/README.md.new
+	-$(SCRIPTS)/stage-version.sh $(ZF_STAGE_DIR)
 	@echo "...Done adding release date to release notes."
 
 stage-minimal-version: stage-minimal
 	@echo "[Minimal] Adding release date to release notes..."
-	-sed -e 's/ (\[INSERT REV NUM HERE\])//' \
-	    < $(ZF_MINIMAL_STAGE_DIR)/README.md \
-	    > $(ZF_MINIMAL_STAGE_DIR)/README.md.new
-	@ZF_RELEASE_DATE=`date +%Y-%m-%d` ; sed -e "s/<Month> <Day>, <Year>/$$ZF_RELEASE_DATE/" \
-	    < $(ZF_MINIMAL_STAGE_DIR)/README.md.new \
-	    > $(ZF_MINIMAL_STAGE_DIR)/README.md
-	-rm $(ZF_MINIMAL_STAGE_DIR)/README.md.new
+	-$(SCRIPTS)/stage-version.sh $(ZF_MINIMAL_STAGE_DIR)
 	@echo "...[Minimal] Done adding release date to release notes."
 
 archive: zip tar zip-minimal tar-minimal
@@ -409,13 +397,7 @@ phpdoc-amf: stage-amf-files
 
 stage-amf-version: stage-amf-files
 	@echo "[AMF] Adding release date to release notes..."
-	-sed -e 's/ (\[INSERT REV NUM HERE\])//' \
-	    < $(AMF_STAGE_DIR)/README.md \
-	    > $(AMF_STAGE_DIR)/README.md.new
-	@AMF_RELEASE_DATE=`date +%Y-%m-%d` ; sed -e "s/<Month> <Day>, <Year>/$$AMF_RELEASE_DATE/" \
-	    < $(AMF_STAGE_DIR)/README.md.new \
-	    > $(AMF_STAGE_DIR)/README.md
-	-rm $(AMF_STAGE_DIR)/README.md.new
+	-$(SCRIPTS)/stage-version.sh $(AMF_STAGE_DIR)
 	@echo "...[AMF] Done adding release date to release notes."
 
 archive-amf: zip-amf tar-amf
@@ -442,7 +424,7 @@ release-amf: version
 	@echo "...[AMF] Done copying release files to release directory" ; \
 
 clean-docbook-amf: version
-	@(docdir=$(AMF_EXPORT_DIR)/documentation/manual/en ; rm -rf $$docdir/autom4te.cache $$docdir/html/*.{html,css} $$docdir/html/HTML.manifest $$docdir/config.* $$docdir/configure $$docdir/Makefile $$docdir/output $$docdir/*.txt $$docdir/manual.db5.xml)
+	@(docdir=$(AMF_EXPORT_DIR)/documentation/manual/en ; rm -rf $$docdir/autom4te.cache $$docdir/html/*.html $$docdir/html/*.css $$docdir/html/HTML.manifest $$docdir/config.* $$docdir/configure $$docdir/Makefile $$docdir/output $$docdir/*.txt $$docdir/manual.db5.xml)
 
 gdata: export stage-gdata archive-gdata
 
