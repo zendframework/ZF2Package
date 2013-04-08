@@ -134,15 +134,8 @@ docbook-core: stage-files
 	    mkdir -p $(ZF_STAGE_DIR)/documentation/manual/core ; \
 	    ( cd $(ZF_EXPORT_DIR) && $(PHP) $(DOC_UTILS)/mergeExtras.php '$(ZF_LANG)' ) ; \
 	    for lang in $(ZF_LANG) ; do \
-	        src=$(ZF_EXPORT_DIR)/documentation/manual/$$lang ; \
-	        dest=$(ZF_STAGE_DIR)/documentation/manual/core/$$lang ; \
-	        echo "Converting manual to DocBook 5 for language: $$lang..." ; \
-	        ( cd $$src && autoconf && sh ./configure && $(MAKE) manual.xml 2>&1 | tee err.txt) ; \
-	        ( $(DOC_UTILS)/fix-docbook.sh $$src/manual.xml ) ; \
-	        ( xsltproc --xinclude $(DOC_UTILS)/db4-upgrade.xsl $$src/manual.xml > $$src/manual.db5.xml | tee -a $$src/err.txt) ; \
-	        echo "Building and staging DocBook documentation for language: $$lang..." ; \
-	        ( $(DOC_UTILS)/pear/phd -g 'phpdotnet\phd\Highlighter_GeSHi' --xinclude -f zfpackage -d $$src/manual.db5.xml -o $$src/output ) ; \
-	        rsync --archive --delete $$src/output/zf-package-chunked-xhtml/ $$dest ; \
+			echo "Building manual for language $$lang..." ; \
+			$(SCRIPTS)/docbook.sh "$(MAKE)" "$(DOC_UTILS)" "$(ZF_EXPORT_DIR)/documentation/manual/$$lang" "$(ZF_STAGE_DIR)/documentation/manual/core/$$lang" ; \
 	        echo "...Done building and staging DocBook documentation for language: $$lang." ; \
 	    done ; \
 	fi
@@ -368,15 +361,7 @@ docbook-amf: stage-amf-files
 		echo "DocBook documentation has already been staged" ; \
 	else \
 		mkdir -p $(AMF_STAGE_DIR)/documentation/manual/core ; \
-		src=$(AMF_EXPORT_DIR)/documentation/manual/en ; \
-		dest=$(AMF_STAGE_DIR)/documentation/manual/core/en ; \
-		echo "Converting manual to DocBook 5 for language..." ; \
-		( cd $$src && autoconf && sh ./configure && $(MAKE) manual.xml 2>&1 | tee err.txt) ; \
-		( $(DOC_UTILS)/fix-docbook.sh $$src/manual.xml ) ; \
-		( xsltproc --xinclude $(DOC_UTILS)/db4-upgrade.xsl $$src/manual.xml > $$src/manual.db5.xml | tee -a $$src/err.txt) ; \
-		echo "Building and staging DocBook documentation..." ; \
-		( $(DOC_UTILS)/pear/phd -g 'phpdotnet\phd\Highlighter_GeSHi' --xinclude -f zfpackage -d $$src/manual.db5.xml -o $$src/output ) ; \
-		rsync --archive --delete $$src/output/zf-package-chunked-xhtml/ $$dest ; \
+		$(SCRIPTS)/docbook.sh "$(MAKE)" "$(DOC_UTILS)" "$(AMF_EXPORT_DIR)/documentation/manual/en" "$(AMF_STAGE_DIR)/documentation/manual/core/en" ; \
 	fi
 	@echo "...[AMF] Done building and staging DocBook documentation."
 
