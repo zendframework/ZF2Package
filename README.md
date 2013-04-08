@@ -47,6 +47,14 @@ Verify that:
 
 That's it. Then add the new files and the changed packages.json, commit, and
 push to the github repository.
+
+Building Zend Framework 1 packages
+----------------------------------
+
+Descend into `build/zf1/` and execute `make all
+ZF_VERSION=1.<minor>.<maintenance>`. 
+
+For more information, read the [ZF1 README file](build/zf1/README.md).
  
 Updating the site
 -----------------
