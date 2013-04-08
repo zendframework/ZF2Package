@@ -311,8 +311,11 @@ clean: version
 	-rm -f $(STAGE_HOME)/$(ZF_PRODUCT)*.zip
 	-rm -f $(STAGE_HOME)/$(ZF_PRODUCT)*.tar.gz
 	-rm -rf $(ZF_MINIMAL_STAGE_DIR)
-	-rm -f $(STAGE_HOME)/$(ZF_MINIMAL)*.zip
-	-rm -f $(STAGE_HOME)/$(ZF_MINIMAL)*.tar.gz
+	-rm -f $(STAGE_HOME)/$(ZF_MINIMAL).zip
+	-rm -f $(STAGE_HOME)/$(ZF_MINIMAL).tar.gz
+	-rm -rf $(AMF_STAGE_DIR)
+	-rm -f $(STAGE_HOME)/$(AMF_PRODUCT).zip
+	-rm -f $(STAGE_HOME)/$(AMF_PRODUCT).tar.gz
 
 clean-docbook: version
 	@for language in $(ZF_EXPORT_DIR)/documentation/manual/$(ZF_LANG) $(ZF_EXPORT_DIR)/incubator/documentation/manual/$(ZF_LANG) ; do \
@@ -333,6 +336,7 @@ release: version
 clean-export: version
 	-rm -rf $(ZF_EXPORT_DIR)
 	-rm -rf $(ZF_MINIMAL_EXPORT_DIR)
+	-rm -rf $(AMF_EXPORT_DIR)
 
 amf: stage-amf archive-amf
 
