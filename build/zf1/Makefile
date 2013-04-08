@@ -282,7 +282,7 @@ clean: version
 
 clean-docbook: version
 	@for language in $(ZF_EXPORT_DIR)/documentation/manual/$(ZF_LANG) $(ZF_EXPORT_DIR)/incubator/documentation/manual/$(ZF_LANG) ; do \
-	    rm -rf $$language/autom4te.cache $$language/build/docbook-xsl $$language/html/*.html $$language/html/HTML.manifest $$language/config.* $$language/configure $$language/entities.ent $$language/Makefile ; \
+		$(SCRIPTS)/clean-docbook.sh "$$language" ; \
 	done
 
 release: version
@@ -345,7 +345,7 @@ release-amf: version
 	@echo "...[AMF] Done copying release files to release directory" ; \
 
 clean-docbook-amf: version
-	@(docdir=$(AMF_EXPORT_DIR)/documentation/manual/en ; rm -rf $$docdir/autom4te.cache $$docdir/html/*.html $$docdir/html/*.css $$docdir/html/HTML.manifest $$docdir/config.* $$docdir/configure $$docdir/Makefile $$docdir/output $$docdir/*.txt $$docdir/manual.db5.xml)
+	-$(SCRIPTS)/clean-docbook.sh "$(AMF_EXPORT_DIR)/documentation/manual/en"
 
 gdata: export stage-gdata archive-gdata
 
