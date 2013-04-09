@@ -12,15 +12,19 @@
 VERSION?=false
 
 PHP=php
+TAR=tar
+ZIP=zip
+UNZIP=unzip
+
 COMPOSER=$(CURDIR)/composer.phar
 PUBLIC=$(CURDIR)/../../public
+PACKAGES=$(PUBLIC)/packages.json
+
+EXPORT_HOME=$(CURDIR)/exports
+RELEASE_HOME=$(PUBLIC)/releases
+STAGE_HOME=$(CURDIR)/stage
 
 .PHONY: clean
-
-composer: composer-vendor
-	@echo "Running satis to create composer repository..."
-	-$(PHP) $(CURDIR)/bin/satis build $(CURDIR)/satis.json $(PUBLIC)
-	@echo "[DONE] Running satis to create composer repository."
 
 composer-vendor:
 	@echo "Ensuring satis dependencies are installed..."
@@ -33,3 +37,46 @@ composer-vendor:
 		fi ; \
 	fi
 	@echo "[DONE] Ensuring satis dependencies are installed."
+
+composer: composer-vendor
+	@echo "Running satis to create composer repository..."
+	-$(PHP) $(CURDIR)/bin/satis build $(CURDIR)/satis.json $(PUBLIC)
+	@echo "[DONE] Running satis to create composer repository."
+
+version:
+	@if [ "$(VERSION)" = "false" ] ; then \
+		echo "Please pass the VERSION assignment for this target" ; \
+		exit 42 ; \
+	fi
+
+zf2-dist: version
+	@if [ -f "$(STAGE_HOME)/ZendFramework-$(VERSION).tgz" ] ; then \
+		echo "Zend Framework $(VERSION) is already staged" ; \
+		exit 0 ; \
+	fi
+	@echo "Determining composer package path for ZF version $(VERSION)"
+	$(eval ZIPPATH := $(shell $(PHP) "$(CURDIR)/bin/zf2-tarball-version.php" $(VERSION) $(PACKAGES)))
+	@echo "Found and using composer package at $(ZIPPATH)"
+	-$(UNZIP) -q -o -d $(EXPORT_HOME)/ZendFramework-$(VERSION) $(ZIPPATH)
+	@echo "Creating TGZ archive"
+	-(cd $(EXPORT_HOME) && $(TAR) czf $(STAGE_HOME)/ZendFramework-$(VERSION).tgz ZendFramework-$(VERSION))
+	@echo "Creating ZIP archive"
+	-(cd $(EXPORT_HOME) && $(ZIP) -r -q $(STAGE_HOME)/ZendFramework-$(VERSION).zip ZendFramework-$(VERSION))
+
+zf2-release: zf2-dist
+	@echo "Releasing Zend Framework $(VERSION)..."
+	$(eval RELEASE_PATH := "$(RELEASE_HOME)/ZendFramework-$(VERSION)")
+	@if [ -d "$(RELEASE_PATH)" ] ; then \
+		echo "Zend Framework $(VERSION) has already been released" ; \
+		exit 1 ; \
+	fi
+	-mkdir $(RELEASE_PATH)
+	-cp $(STAGE_HOME)/ZendFramework-$(VERSION).* "$(RELEASE_PATH)/"
+	@echo "[DONE] Releasing Zend Framework $(VERSION)."
+
+clean:
+	-rm -f $(STAGE_HOME)/*.zip
+	-rm -f $(STAGE_HOME)/*.tgz
+	-rm -Rf $(EXPORT_HOME)/Zend*
+	-rm -Rf $(EXPORT_HOME)/Component*
+	-rm -Rf $(EXPORT_HOME)/ZF*
