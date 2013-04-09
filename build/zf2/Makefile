@@ -28,14 +28,14 @@ STAGE_HOME=$(CURDIR)/stage
 
 composer-vendor:
 	@echo "Ensuring satis dependencies are installed..."
-	@if [ ! -f "$(CURDIR)/vendor/autoload.php" ] ; then \
-		echo "Installing composer dependencies for satis" ; \
-		$(PHP) $(COMPOSER) install ; \
-		if [ $? != 0 ] ; then \
-		    echo "Composer installation failed" ; \
-			exit 1 ; \
-		fi ; \
+ifeq ($(wildcard vendor/autoload.php),)
+	@echo "Installing composer dependencies for satis"
+	-$(PHP) $(COMPOSER) install
+	@if [ $$? -ne 0 ] ; then \
+		echo "Composer installation failed" ; \
+		exit 1 ; \
 	fi
+endif
 	@echo "[DONE] Ensuring satis dependencies are installed."
 
 composer: composer-vendor
@@ -44,34 +44,43 @@ composer: composer-vendor
 	@echo "[DONE] Running satis to create composer repository."
 
 version:
-	@if [ "$(VERSION)" = "false" ] ; then \
-		echo "Please pass the VERSION assignment for this target" ; \
-		exit 42 ; \
-	fi
+ifeq ("$(VERSION)", "false")
+	@echo "Please pass the VERSION assignment for this target"
+	exit 42
+endif
 
-zf2-dist: version
-	@if [ -f "$(STAGE_HOME)/ZendFramework-$(VERSION).tgz" ] ; then \
-		echo "Zend Framework $(VERSION) is already staged" ; \
-		exit 0 ; \
-	fi
-	@echo "Determining composer package path for ZF version $(VERSION)"
+zf2-export: version
+	@echo "Exporting composer package for ZF version $(VERSION)..."
+ifneq ($(wildcard $(EXPORT_HOME)/ZendFramework-$(VERSION)),)
+	@echo "Composer package for ZF version $(VERSION) is already exported"
+else
 	$(eval ZIPPATH := $(shell $(PHP) "$(CURDIR)/bin/zf2-tarball-version.php" $(VERSION) $(PACKAGES)))
 	@echo "Found and using composer package at $(ZIPPATH)"
-	-$(UNZIP) -q -o -d $(EXPORT_HOME)/ZendFramework-$(VERSION) $(ZIPPATH)
+	@$(UNZIP) -q -o -d $(EXPORT_HOME)/ZendFramework-$(VERSION) $(ZIPPATH)
+endif
+	@echo "[DONE] Exporting composer package for ZF version $(VERSION)."
+
+zf2-dist: zf2-export
+ifneq ($(wildcard $(STAGE_HOME)/ZendFramework-$(VERSION).tgz),)
+	echo "Zend Framework $(VERSION) is already staged"
+else
 	@echo "Creating TGZ archive"
 	-(cd $(EXPORT_HOME) && $(TAR) czf $(STAGE_HOME)/ZendFramework-$(VERSION).tgz ZendFramework-$(VERSION))
 	@echo "Creating ZIP archive"
 	-(cd $(EXPORT_HOME) && $(ZIP) -r -q $(STAGE_HOME)/ZendFramework-$(VERSION).zip ZendFramework-$(VERSION))
+endif
+
+zf2-apidoc: zf2-export
 
 zf2-release: zf2-dist
 	@echo "Releasing Zend Framework $(VERSION)..."
 	$(eval RELEASE_PATH := "$(RELEASE_HOME)/ZendFramework-$(VERSION)")
-	@if [ -d "$(RELEASE_PATH)" ] ; then \
-		echo "Zend Framework $(VERSION) has already been released" ; \
-		exit 1 ; \
-	fi
+ifneq ($(wildcard $(RELEASE_PATH)),)
+	@echo "Zend Framework $(VERSION) has already been released"
+else
 	-mkdir $(RELEASE_PATH)
 	-cp $(STAGE_HOME)/ZendFramework-$(VERSION).* "$(RELEASE_PATH)/"
+endif
 	@echo "[DONE] Releasing Zend Framework $(VERSION)."
 
 clean:
