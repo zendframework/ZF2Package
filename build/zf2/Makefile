@@ -5,28 +5,38 @@
 # - PHP=<path to php> (if you want to specify a specific PHP binary)
 # - VERSION=<version string> (required for end-user/api docs, zf2 tarball, and
 #   pyrus!)
+# - COMPONENTS=<space separated list of component names> (to override the
+#   defaults, for instance, to release a subset of components)
+# - SERVICES=<space separated list of service names> (to override the
+#   defaults, for instance, to release a single service)
 #
 # You can override any given parameter by passing it in the command line or
 # defining an equivalent ENV variable via export.
 
 VERSION?=false
 
+COMPONENTS?=Component_ZendAuthentication Component_ZendBarcode Component_ZendCache Component_ZendCaptcha Component_ZendCode Component_ZendConfig Component_ZendConsole Component_ZendCrypt Component_ZendDb Component_ZendDebug Component_ZendDi Component_ZendDom Component_ZendEscaper Component_ZendEventManager Component_ZendFeed Component_ZendFile Component_ZendFilter Component_ZendForm Component_ZendHttp Component_ZendI18n Component_ZendInputFilter Component_ZendJson Component_ZendLdap Component_ZendLoader Component_ZendLog Component_ZendMail Component_ZendMath Component_ZendMemory Component_ZendMime Component_ZendModuleManager Component_ZendMvc Component_ZendNavigation Component_ZendPaginator Component_ZendPermissionsAcl Component_ZendPermissionsRbac Component_ZendProgressBar Component_ZendSerializer Component_ZendServer Component_ZendServiceManager Component_ZendSession Component_ZendSoap Component_ZendStdlib Component_ZendTag Component_ZendTest Component_ZendText Component_ZendUri Component_ZendValidator Component_ZendVersion Component_ZendView Component_ZendXmlRpc
+
+SERVICES?=ZendCloud ZendGData ZendOAuth ZendOpenId ZendPdf ZendQueue ZendRest ZendService_AgileZen ZendService_Akismet ZendService_Amazon ZendService_Apple_Apns ZendService_Audioscrobbler ZendService_Delicious ZendService_DeveloperGarden ZendService_Flickr ZendService_GoGrid ZendService_Google_Gcm ZendService_LiveDocx ZendService_Nirvanix ZendService_Rackspace ZendService_ReCaptcha ZendService_SlideShare ZendService_StrikeIron ZendService_Technorati ZendService_Twitter ZendService_WindowsAzure
+
 PHP=php
-PHPDOC=$(CURDIR)/phpDocumentor.phar
+PHPDOC=$(CURDIR)/bin/phpDocumentor.phar
+PYRUS=$(CURDIR)/bin/pyrus.phar
 TAR=tar
 UNZIP=unzip
 WGET=wget
 ZIP=zip
 
-COMPOSER=$(CURDIR)/composer.phar
+COMPOSER=$(CURDIR)/bin/composer.phar
 PUBLIC=$(CURDIR)/../../public
 PACKAGES=$(PUBLIC)/packages.json
 
 EXPORT_HOME=$(CURDIR)/exports
+PYRUS_CHANNEL=packages.zendframework.com
 RELEASE_HOME=$(PUBLIC)/releases
 STAGE_HOME=$(CURDIR)/stage
 
-.PHONY: clean
+.PHONY: clean composer-vendor composer version zf2 zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-manual zf2-release pyrus-verify
 
 composer-vendor:
 	@echo "Ensuring satis dependencies are installed..."
@@ -58,7 +68,7 @@ zf2-export: version
 ifneq ($(wildcard $(EXPORT_HOME)/ZendFramework-$(VERSION)),)
 	@echo "Composer package for ZF version $(VERSION) is already exported"
 else
-	$(eval ZIPPATH := $(shell $(PHP) "$(CURDIR)/bin/zf2-tarball-version.php" $(VERSION) $(PACKAGES)))
+	$(eval ZIPPATH := $(shell $(PHP) "$(CURDIR)/bin/package-version-path.php" "zendframework/zendframework" $(VERSION) $(PACKAGES)))
 	@echo "Found and using composer package at $(ZIPPATH)"
 	@$(UNZIP) -q -o -d $(EXPORT_HOME)/ZendFramework-$(VERSION) $(ZIPPATH)
 endif
@@ -152,6 +162,13 @@ else
 	-cp $(STAGE_HOME)/ZendFramework*.zip "$(RELEASE_PATH)/"
 endif
 	@echo "[DONE] Releasing Zend Framework $(VERSION)."
+
+pyrus-verify:
+	@$(PHP) -dphar.readonly=0 $(PYRUS) list-channels | grep -q $(PYRUS_CHANNEL)
+	@if [ $$? -ne 0 ] ; then \
+		echo "The channel $(PYRUS_CHANNEL) is not in your channel list" ; \
+		exit 1 ; \
+	fi
 
 clean:
 	-rm -f $(STAGE_HOME)/*.zip
