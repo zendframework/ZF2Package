@@ -14,8 +14,9 @@ VERSION?=false
 PHP=php
 PHPDOC=$(CURDIR)/phpDocumentor.phar
 TAR=tar
-ZIP=zip
 UNZIP=unzip
+WGET=wget
+ZIP=zip
 
 COMPOSER=$(CURDIR)/composer.phar
 PUBLIC=$(CURDIR)/../../public
@@ -50,7 +51,7 @@ ifeq ("$(VERSION)", "false")
 	exit 42
 endif
 
-zf2: zf2-archives zf2-apidoc zf2-release
+zf2: zf2-archives zf2-docs zf2-release
 
 zf2-export: version
 	@echo "Exporting composer package for ZF version $(VERSION)..."
@@ -73,12 +74,14 @@ else
 	-(cd $(EXPORT_HOME) && $(ZIP) -rq $(STAGE_HOME)/ZendFramework-$(VERSION).zip ZendFramework-$(VERSION))
 endif
 
+zf2-docs: zf2-apidoc zf2-manual
+
 zf2-apidoc: zf2-export
 	@echo "Creating API documentation packages..."
 ifneq ($(wildcard $(STAGE_HOME)/ZendFramework-$(VERSION)-apidoc.tgz),)
 	@echo "API documentation packages already exist"
 else
-	$(eval PRODUCT := "ZendFramework-$(VERSION)")
+	$(eval PRODUCT := ZendFramework-$(VERSION))
 	$(eval SOURCE_DIR := "$(EXPORT_HOME)/$(PRODUCT)/library")
 	$(eval BUILD_DIR := "$(STAGE_HOME)/$(PRODUCT)-apidoc")
 	-mkdir -p $(BUILD_DIR)
@@ -99,6 +102,45 @@ else
 endif
 	@echo "[DONE] Creating API documentation packages."
 
+exports/zf2-documentation-$(VERSION).tar.gz: version
+ifeq ($(wildcard exports/zf2-documentation-$(VERSION).tar.gz),)
+	@echo "Downloading ZF2 documentation for version $(VERSION)..."
+	-$(WGET) https://github.com/zendframework/zf2-documentation/archive/release-$(VERSION).tar.gz -O exports/zf2-documentation-$(VERSION).tar.gz
+	@if [ $$? -ne 0 ] ; then \
+		echo "Failed retrieving ZF2 documentation for version $(VERSION)" ; \
+		exit 1 ; \
+	fi
+	@echo "[DONE] Downloading ZF2 documentation for version $(VERSION)."
+endif
+
+zf2-export-manual: exports/zf2-documentation-$(VERSION).tar.gz
+ifeq ($(wildcard exports/zf2-documentation-$(VERSION)),)
+	@echo "Extracting manual..."
+	$(eval DOCS_PATH := $(EXPORT_HOME)/zf2-documentation-$(VERSION))
+	-mkdir $(DOCS_PATH)
+	-(cd $(DOCS_PATH) && $(TAR) xzf ../zf2-documentation-$(VERSION).tar.gz --strip-components=1)
+	@echo "[DONE] Extracting manual..."
+endif
+
+zf2-manual: zf2-export-manual
+	@echo "Building and staging manual..."
+	$(eval PRODUCT := ZendFramework-$(VERSION))
+	$(eval DOCS_PATH := "$(EXPORT_HOME)/zf2-documentation-$(VERSION)/docs")
+ifeq ($(wildcard stage/ZendFramework-$(VERSION)-manual-en.tgz),)
+	@echo "Building manual..."
+	-(cd $(DOCS_PATH) && $(MAKE) html latexpdf epub)
+	@if [ $$? -ne 0 ] ; then \
+		echo "Failed to build manual" ; \
+		exit 1 ; \
+	fi
+	@echo "Packaging manual..."
+	-(cd $(DOCS_PATH)/_build/html && $(ZIP) -rq $(STAGE_HOME)/$(PRODUCT)-manual-en.zip .)
+	-(cd $(DOCS_PATH)/_build/html && $(TAR) czf $(STAGE_HOME)/$(PRODUCT)-manual-en.tgz .)
+	-cp $(DOCS_PATH)/_build/latex/ZendFramework2.pdf $(STAGE_HOME)/$(PRODUCT)-manual-en.pdf
+	-cp $(DOCS_PATH)/_build/epub/ZendFramework2.epub $(STAGE_HOME)/$(PRODUCT)-manual-en.epub
+endif
+	@echo "[DONE] Building and staging manual."
+
 zf2-release: version
 	@echo "Releasing Zend Framework $(VERSION)..."
 	$(eval RELEASE_PATH := "$(RELEASE_HOME)/ZendFramework-$(VERSION)")
@@ -114,6 +156,8 @@ endif
 clean:
 	-rm -f $(STAGE_HOME)/*.zip
 	-rm -f $(STAGE_HOME)/*.tgz
+	-rm -f $(STAGE_HOME)/*.epub
+	-rm -f $(STAGE_HOME)/*.pdf
 	-rm -Rf $(STAGE_HOME)/Zend*
 	-rm -Rf $(EXPORT_HOME)/Zend*
 	-rm -Rf $(EXPORT_HOME)/Component*
