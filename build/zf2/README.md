@@ -1,44 +1,135 @@
-Satis - Package Repository Generator
-====================================
+Build System for Zend Framework 2
+=================================
 
-Simple static Composer repository generator.
+This is the build system for Zend Framework 2. It utilizes the following
+technologies/projects:
 
-It uses any composer.json file as input and dumps all the required (according
-to their version constraints) packages to a Composer Repository file.
+- [Satis](https://github.com/composer/satis): handles creation of the
+  [Composer](http://getcomposer.org/) repository, including retrieving zipball
+  packages from GitHub.
+- [Pyrus](http://pear2.php.net/): handles creation of our Pyrus packages and
+  channel.
+- [phpDocumentor 2](http://phpdoc.org/): generation of API documentation.
 
-Usage
------
+Updating the Composer repository
+--------------------------------
 
-- Download Composer: `wget http://getcomposer.org/composer.phar`
-- Install satis: `php composer.phar create-project composer/satis --stability=dev`
-- Build a repository: `php bin/satis build <composer.json> <build-dir>`
+Updating the Composer repository is the simplest task, and the one task required
+to release any new version. The same command will update any packages that have
+new tags, and will also ensure that packages for existing branches are
+up-to-date.
 
-Read the more detailed instructions in the 
-[documentation](http://getcomposer.org/doc/articles/handling-private-packages-with-satis.md).
+*Usage:*
 
-Contributing
-------------
+```sh
+make composer
+```
 
-All code contributions - including those of people having commit access -
-must go through a pull request and approved by a core developer before being
-merged. This is to ensure proper review of all the code.
+Creating and releasing individual service Pyrus packages
+--------------------------------------------------------
 
-Fork the project, create a feature branch, and send us a pull request.
+Service components are released on a separate schedule from the framework
+itself. As such, you will typically only need to update the Composer repository,
+and then release the specific package version for Pyrus.
 
-Requirements
-------------
+The `VERSION` variable *must* be provided on the command line or via environment
+variable for this target.
 
-PHP 5.3+
+*Usage:*
 
-Authors
--------
+```sh
+make ZendService_AgileZen VERSION=2.0.1
+```
 
-Jordi Boggiano - <j.boggiano@seld.be> - <http://twitter.com/seldaek> - <http://seld.be><br />
-Nils Adermann - <naderman@naderman.de> - <http://twitter.com/naderman> - <http://www.naderman.de><br />
+Once created, release any Pyrus packages as follows:
 
-See also the list of [contributors](https://github.com/composer/satis/contributors) who participated in this project.
+```sh
+make pyrus-release
+```
 
-License
--------
+*Available services:*
 
-Satis is licensed under the MIT License - see the LICENSE file for details
+- `ZendCloud`
+- `ZendGData`
+- `ZendOAuth`
+- `ZendOpenId`
+- `ZendPdf`
+- `ZendQueue`
+- `ZendRest`
+- `ZendService_AgileZen`
+- `ZendService_Akismet`
+- `ZendService_Amazon`
+- `ZendService_Apple_Apns`
+- `ZendService_Audioscrobbler`
+- `ZendService_Delicious`
+- `ZendService_DeveloperGarden`
+- `ZendService_Flickr`
+- `ZendService_GoGrid`
+- `ZendService_Google_Gcm`
+- `ZendService_LiveDocx`
+- `ZendService_Nirvanix`
+- `ZendService_Rackspace`
+- `ZendService_ReCaptcha`
+- `ZendService_SlideShare`
+- `ZendService_StrikeIron`
+- `ZendService_Technorati`
+- `ZendService_Twitter`
+- `ZendService_WindowsAzure`
+
+Releasing a new ZF2 version
+---------------------------
+
+When a new Zend Framework 2 release is ready, besides updating Composer (per the
+above section) the following tasks must also be done:
+
+- Creation and release of the standalone archives
+- Creation and release of the end-user documentation archives
+- Creation and release of the API documentation archives
+- Creation and release of the `ZendFramework` Pyrus package, as well as all
+  individual component Pyrus packages
+
+These above tasks may be done with the `zf2` and `zf2-release` targets.
+
+*Usage:*
+
+```sh
+make zf2 VERSION=2.1.4
+make zf2-release VERSION=2.1.4
+```
+
+The `VERSION` variable *must* be provided on the command line or via environment
+variable for these targets.
+
+General release target
+----------------------
+
+Occasionally, you may want to build and stage many packages, and then release
+once. The following release targets exist:
+
+- `zf2-release` will release archive and documentation packages for a specific
+  ZF2 version.
+- `pyrus-release` will release any pending Pyrus packages.
+- `release` is a meta-target that combines the above.
+
+The `zf2-release`, and by extension, `release`, targets require that the
+`VERSION` variable be passed on the command line or via environment variable.
+
+*Usage:*
+
+```sh
+make zf2-release VERSION=2.1.4
+make pyrus-release
+make release VERSION=2.1.4
+```
+
+Cleaning up
+-----------
+
+After packaging and releasing, clean up after yourself; use the `clean` target
+to do this.
+
+*Usage:*
+
+```sh
+make clean
+```

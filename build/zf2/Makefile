@@ -40,7 +40,11 @@ RELEASE_HOME=$(PUBLIC)/releases
 STAGE_HOME=$(CURDIR)/stage
 PYRUS_HOME=$(STAGE_HOME)/pyrus
 
-.PHONY: clean composer-vendor composer version zf2 zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-manual zf2-release pyrus-verify pyrus-export
+.PHONY: clean composer-vendor composer version zf2 zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-manual zf2-release pyrus-verify pyrus-export release pyrus-release pyrus pyrus-zf2
+
+zf2: zf2-archives zf2-docs
+
+release: zf2-release pyrus-release
 
 # Build Pyrus package per component
 define ComponentPyrusBuildRule
@@ -122,8 +126,6 @@ ifeq ("$(VERSION)", "false")
 	@echo "Please pass the VERSION assignment for this target"
 	exit 42
 endif
-
-zf2: zf2-archives zf2-docs zf2-release
 
 zf2-export: version
 	@echo "Exporting composer package for ZF version $(VERSION)..."
@@ -225,7 +227,9 @@ else
 endif
 	@echo "[DONE] Releasing Zend Framework $(VERSION)."
 
-zf2-pyrus : zf2-export pyrus-verify $(PYRUS_HOME)
+pyrus : pyrus-zf2 $(COMPONENTS)
+
+pyrus-zf2 : zf2-export pyrus-verify $(PYRUS_HOME)
 	@echo "Building Zend Framework pyrus package..."
 ifeq ($(wildcard stage/pyrus/ZendFramework),)
 	@echo "Generating package"
