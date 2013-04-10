@@ -31,6 +31,7 @@ COMPOSER=$(CURDIR)/bin/composer.phar
 PUBLIC=$(CURDIR)/../../public
 PACKAGES=$(PUBLIC)/packages.json
 
+HOMEPAGE_TEMPLATE=$(CURDIR)/index.template.html
 EXPORT_HOME=$(CURDIR)/exports
 PYRUS_CHANNEL?=packages.zendframework.com
 PYRUS_COMMAND=$(PHP) -dphar.readonly=0 $(PYRUS)
@@ -121,6 +122,12 @@ endif
 composer: composer-vendor
 	@echo "Running satis to create composer repository..."
 	-$(PHP) $(CURDIR)/bin/satis build $(CURDIR)/satis.json $(PUBLIC)
+	@echo "Updating home page"
+	-$(PHP) $(CURDIR)/bin/composer-homepage.php $(HOMEPAGE_TEMPLATE) $(PUBLIC)/index.html
+ifeq ($$?,0)
+	@echo "Failed to update homepage!"
+	exit 1
+endif
 	@echo "[DONE] Running satis to create composer repository."
 
 version:
