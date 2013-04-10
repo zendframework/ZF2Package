@@ -384,6 +384,9 @@ $components = [
         'filter' => 'composer.json library/',
         'composer' => 'zendframework/zendservice-windowsazure',
     ],
+    'zftool' => [
+        'composer' => 'zendframework/zftool',
+    ],
 ];
 
 if (!isset($components[$package])) {

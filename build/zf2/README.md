@@ -25,6 +25,12 @@ up-to-date.
 make composer
 ```
 
+The `all` target is a synonym for `composer`:
+
+```sh
+make all
+```
+
 Creating and releasing individual service Pyrus packages
 --------------------------------------------------------
 
@@ -120,6 +126,25 @@ The `zf2-release`, and by extension, `release`, targets require that the
 make zf2-release VERSION=2.1.4
 make pyrus-release
 make release VERSION=2.1.4
+```
+
+ZFTool
+------
+
+You can rebuild and release `zftool.phar` using the targets `zftool.phar` and
+`zftool.phar-release`.
+
+*Usage:*
+
+```sh
+make zftool.phar
+make zftool.phar-release
+```
+
+Since `zftool.phar-release` depends on `zftool.phar`, you can shorten this to:
+
+```sh
+make zftool.phar-release
 ```
 
 Cleaning up

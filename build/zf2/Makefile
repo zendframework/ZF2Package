@@ -42,7 +42,9 @@ PYRUS_HOME=$(STAGE_HOME)/pyrus
 
 .PHONY: clean composer-vendor composer version zf2 zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-manual zf2-release pyrus-verify pyrus-export release pyrus-release pyrus pyrus-zf2
 
-zf2: zf2-archives zf2-docs
+all: composer
+
+zf2: zf2-archives zf2-docs pyrus
 
 release: zf2-release pyrus-release
 
@@ -286,6 +288,30 @@ else
 endif
 	@echo "[DONE] Releasing Pyrus packages."
 
+zftool.phar:
+	@echo "Creating zftool.phar..."
+ifeq ($(wildcard exports/ZFTool-dev-master),)
+	@echo "Exporting ZFTool package"
+	-$(CURDIR)/bin/export-package.sh ZFTool dev-master $(PACKAGES) $(PHP) $(UNZIP) $(CURDIR) $(EXPORT_HOME)
+ifeq ($$?,0)
+	@echo "Failed to export package; check the version"
+	exit 1
+endif
+endif
+	-(cd $(EXPORT_HOME)/ZFTool-dev-master && $(PHP) -dmemory_limit=-1 -dphar.readonly=0 $(COMPOSER) install)
+ifeq ($$?,0)
+	@echo "Failed to install dependencies via Composer; aborting"
+	exit 1
+endif
+	-(cd $(EXPORT_HOME)/ZFTool-dev-master && $(PHP) -dmemory_limit=-1 -dphar.readonly=0 bin/create-phar)
+	-mv $(EXPORT_HOME)/ZFTool-dev-master/bin/zftool.phar $(STAGE_HOME)/
+	@echo "[DONE] Creating zftool.phar."
+
+zftool.phar-release: zftool.phar
+	@echo "Releasing zftool.phar..."
+	-cp $(STAGE_HOME)/zftool.phar $(PUBLIC)/
+	@echo "[DONE] Releasing zftool.phar."
+
 clean:
-	-(cd $(STAGE_HOME) && rm -Rf *.zip *.tgz *.epub *pdf pyrus Zend*)
+	-(cd $(STAGE_HOME) && rm -Rf *.phar *.zip *.tgz *.epub *pdf pyrus Zend*)
 	-(cd $(EXPORT_HOME) && rm -Rf Zend* Component* ZF*)
