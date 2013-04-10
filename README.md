@@ -1,68 +1,88 @@
 README
 ======
 
-Building Pyrus, Composer & full/minimal packages
-------------------------------------------------
+Building Zend Framework 2 packages
+----------------------------------
 
-Copy ``build/build-config.php.dist`` to ``build/build-config.php``. Edit
-``build/build-config.php``, in particular to update the ``$release`` string at
-the top of the build. (If you want to control what is actually built, you can
-comment out various parts of this file.)
+Descend into `build/zf2/` and execute:
 
-First things first: make sure you have a clean working environment:
+- Updating the Composer channel:
 
-    php build/build-clean.php
+  ```sh
+  make composer
+  ```
 
-Now run:
+- Creating ZF2 packages:
 
-    php build/build.php
+  ```sh
+  make composer
+  make zf2 VERSION=2.1.4
+  make release
+  ```
 
-(I typically pipe this to "tee build.log" so I can check for errors if needed.)
+- Releasing a service component:
 
-Check the artifacts to see that everything was built. In particular, verify that
-you have 
+  ```sh
+  make composer
+  make ZendService_AgileZen VERSION=2.0.1
+  make pyrus-release
+  ```
 
-- Pyrus packages for each component, as well as the ZF metapackage; 
-- Composer packages for each component;
-- API documentation packages;
-- End-user documentation packages;
-- and both full and minimal ZF packages.
+Once done, add the packages to the repository, commit, and push; don't forget to
+also add `public/packages.json` and `public/index.html`.
 
-At this point, you can now release the packages:
+When done, run:
 
-    php build/release.php
+```sh
+make clean
+```
 
-(I typically pipe this to "tee release.log" so I can check for errors if needed.)
-
-Verify that:
-
-- Pyrus packages and XML were properly created, including phar, tgz, and zip
-  variants;
-- Composer packages were pushed to the public tree, and the packages.json
-  updated;
-- ZF full and minimal builds, API docs, and end-user doc packages were copied to
-  the public tree;
-- The manual and API docs were properly unpacked in the public tree, and the
-  "latest" link updated to the new release.
-
-That's it. Then add the new files and the changed packages.json, commit, and
-push to the github repository.
+For more information, read the [ZF2 README file](build/zf2/README.md).
 
 Building Zend Framework 1 packages
 ----------------------------------
 
-Descend into `build/zf1/` and execute `make all
-ZF_VERSION=1.<minor>.<maintenance>`. 
+Descend into `build/zf1/` and execute:
+
+```sh
+make all ZF_VERSION=1.<minor>.<maintenance>
+```
+
+Once done, add the packages to the repository, commit, and push.
+
+When done, run:
+
+```sh
+make clean
+```
 
 For more information, read the [ZF1 README file](build/zf1/README.md).
+
+Building ZFTool
+---------------
+
+Descend into `build/zf2/` and execute:
+
+```sh
+make zftool.phar-release
+```
+
+Once done, add `public/zftool.phar` to the repository, commit, and push.
+
+When done, run:
+
+```sh
+make clean
+```
+
+For more information, read the [ZF2 README file](build/zf2/README.md).
  
-Updating the site
------------------
-
-Edit the ``public/index.html`` file, and ensure the version strings in it
-reflect the new version. Commit and push the file.
-
 Deploying
 ---------
 
 Checkout from the server, where the actual channel is located.
+
+```sh
+git fetch origin
+git rebase origin/production
+```
