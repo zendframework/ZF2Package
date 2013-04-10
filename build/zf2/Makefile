@@ -222,6 +222,7 @@ ifeq ($$?,0)
 endif
 	-mv $(PYRUS_HOME)/ZendFramework/ZendFramework-$(VERSION).phar $(PYRUS_HOME)/
 	-rm -Rf $(PYRUS_HOME)/ZendFramework/
+	@echo "[DONE] Building Zend Framework pyrus package."
 
 pyrus-verify:
 	@$(PYRUS_COMMAND) list-channels | grep -q $(PYRUS_CHANNEL)
@@ -235,6 +236,17 @@ ifeq ($(wildcard stage/pyrus),)
 	@echo "Creating staging directory for Pyrus"
 	-mkdir $(PYRUS_HOME)
 endif
+
+pyrus-release: pyrus-verify
+	@echo "Releasing Pyrus packages..."
+ifeq ($(wildcard stage/pyrus/*.phar),)
+	@echo "Nothing to release at this time"
+else
+	@for filename in $(PYRUS_HOME)/*.phar ; do \
+		(cd $(PUBLIC) && $(PYRUS_COMMAND) scs-release $$filename) ; \
+	done
+endif
+	@echo "[DONE] Releasing Pyrus packages."
 
 clean:
 	-(cd $(STAGE_HOME) && rm -Rf *.zip *.tgz *.epub *pdf pyrus Zend*)
