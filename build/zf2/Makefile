@@ -35,6 +35,7 @@ EXPORT_HOME=$(CURDIR)/exports
 PYRUS_CHANNEL?=packages.zendframework.com
 PYRUS_COMMAND=$(PHP) -dphar.readonly=0 $(PYRUS)
 PYRUS_TEMPLATES?=$(CURDIR)/pyrus-templates
+PYRUS_META_TEMPLATES?=$(CURDIR)/pyrus-meta-templates
 RELEASE_HOME=$(PUBLIC)/releases
 STAGE_HOME=$(CURDIR)/stage
 PYRUS_HOME=$(STAGE_HOME)/pyrus
@@ -190,10 +191,39 @@ else
 endif
 	@echo "[DONE] Releasing Zend Framework $(VERSION)."
 
+zf2-pyrus : zf2-export pyrus-verify $(PYRUS_HOME)
+	@echo "Building Zend Framework pyrus package..."
+ifeq ($(wildcard stage/pyrus/ZendFramework),)
+	@echo "Generating package"
+	-(cd $(PYRUS_HOME) && $(PYRUS_COMMAND) generate-pear2 ZendFramework $(PYRUS_CHANNEL))
+	-rm -Rf $(PYRUS_HOME)/ZendFramework/src
+	-cp -r $(PYRUS_META_TEMPLATES)/* $(PYRUS_HOME)/ZendFramework/
+ifneq ($(wildcard stage/pyrus/ZendFramework/library),)
+	-mv $(PYRUS_HOME)/ZendFramework/library $(PYRUS_HOME)/ZendFramework/src
+endif
+	-mv $(PYRUS_HOME)/ZendFramework/RELEASE-0.1.0 $(PYRUS_HOME)/ZendFramework/RELEASE-$(VERSION)
+	-mv $(PYRUS_HOME)/ZendFramework/API-0.1.0 $(PYRUS_HOME)/ZendFramework/API-$(VERSION)
+	-rm $(PYRUS_HOME)/ZendFramework/package_compatible.xml
+	-rm $(PYRUS_HOME)/ZendFramework/stub.php
+	-rm -Rf $(PYRUS_HOME)/ZendFramework/tests/
+	-rm -Rf $(PYRUS_HOME)/ZendFramework/www/
+	-rm -Rf $(PYRUS_HOME)/ZendFramework/example/
+	-rm -Rf $(PYRUS_HOME)/ZendFramework/data/
+endif
+	-$(PHP) $(CURDIR)/bin/pyrus-create-metapackage-stub.php ZendFramework $(VERSION) $(EXPORT_HOME)/ZendFramework-$(VERSION)/composer.json $(PYRUS_TEMPLATES) $(PYRUS_HOME)/ZendFramework
+ifeq ($$?,0)
+	echo "Failed creating metapackage stub for ZendFramework Pyrus package"
+	exit 1
+endif
+	-$(CURDIR)/bin/pyrus-make.sh ZendFramework "$(PYRUS_COMMAND)" $(PYRUS_HOME)
+ifeq ($$?,0)
+	@echo "Failed to compile Pyrus package"
+	exit 1
+endif
+	-mv $(PYRUS_HOME)/ZendFramework/ZendFramework-$(VERSION).phar $(PYRUS_HOME)/
+	-rm -Rf $(PYRUS_HOME)/ZendFramework/
+
 pyrus: pyrus-export
-	@for component in $(COMPONENTS) ; do \
-		$(MAKE) -f Makefile-Pyrus COMPONENT=$$component VERSION=$(VERSION) SOURCE_DIR=$(EXPORT_HOME)/$(COMPONENT)-$(VERSION) PYRUS=$(PYRUS) PHP=$(PHP) ; \
-	done
 
 pyrus-verify:
 	@$(PYRUS_COMMAND) list-channels | grep -q $(PYRUS_CHANNEL)
@@ -207,7 +237,6 @@ ifeq ($(wildcard stage/pyrus),)
 	@echo "Creating staging directory for Pyrus"
 	-mkdir $(PYRUS_HOME)
 endif
-
 
 clean:
 	-rm -f $(STAGE_HOME)/*.zip

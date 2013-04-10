@@ -1,14 +1,15 @@
 <?php
-if ($argc != 5) {
+if ($argc != 6) {
     printf("[%s] Invalid arguments (requires 4, received %d)\n", $argv[0], $argc);
-    printf("Usage:\n    %s [package] [version] [pyrus-templates path] [build path]\n", $argv[0]);
+    printf("Usage:\n    %s [package] [version] [composer.json] [pyrus-templates path] [build path]\n", $argv[0]);
     exit(1);
 }
 
 $package         = $argv[1];
 $package_version = $argv[2];
-$pyrus_templates = $argv[3];
-$package_dir     = $argv[4];
+$composer        = $argv[3];
+$pyrus_templates = $argv[4];
+$package_dir     = $argv[5];
 
 require_once __DIR__ . '/functions.php';
 
@@ -19,11 +20,10 @@ $file_replacements['{PACKAGE_NAME}'] = $package;
 $file_replacements['{PACKAGE_RELEASE}'] = $package_version;
 $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] = null;
 
-$composer     = get_composer($package_dir);
 $content      = file_get_contents($composer);
 $composer     = json_decode($content, true);
 $package_info = array('required' => array(), 'optional' => array());
-foreach ($composer['require'] as $dep => $version) {
+foreach ($composer['replace'] as $dep => $version) {
     $vendor = $name = $dep;
     if (strpos($dep, '/')) {
         list($vendor, $name) = explode('/', $dep, 2);
@@ -60,6 +60,3 @@ if (isset($package_info['optional'])) {
 }
 echo 'Writing: packagexmlsetup.php' . PHP_EOL;
 file_put_contents('packagexmlsetup.php', $packagexmlsetup_content);
-
-echo 'Writing: stub.php' . PHP_EOL;
-file_put_contents('stub.php', '<' . "?php\n" . trim(apply_replacements(file_get_contents($pyrus_templates . '/stub.php'), $file_replacements)));
