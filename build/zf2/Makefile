@@ -15,28 +15,55 @@
 
 VERSION?=false
 
-COMPONENTS?=Component_ZendAuthentication Component_ZendBarcode Component_ZendCache Component_ZendCaptcha Component_ZendCode Component_ZendConfig Component_ZendConsole Component_ZendCrypt Component_ZendDb Component_ZendDebug Component_ZendDi Component_ZendDom Component_ZendEscaper Component_ZendEventManager Component_ZendFeed Component_ZendFile Component_ZendFilter Component_ZendForm Component_ZendHttp Component_ZendI18n Component_ZendInputFilter Component_ZendJson Component_ZendLdap Component_ZendLoader Component_ZendLog Component_ZendMail Component_ZendMath Component_ZendMemory Component_ZendMime Component_ZendModuleManager Component_ZendMvc Component_ZendNavigation Component_ZendPaginator Component_ZendPermissionsAcl Component_ZendPermissionsRbac Component_ZendProgressBar Component_ZendSerializer Component_ZendServer Component_ZendServiceManager Component_ZendSession Component_ZendSoap Component_ZendStdlib Component_ZendTag Component_ZendTest Component_ZendText Component_ZendUri Component_ZendValidator Component_ZendVersion Component_ZendView Component_ZendXmlRpc
+COMPONENTS?=Zend_Authentication Zend_Barcode Zend_Cache Zend_Captcha Zend_Code Zend_Config Zend_Console Zend_Crypt Zend_Db Zend_Debug Zend_Di Zend_Dom Zend_Escaper Zend_EventManager Zend_Feed Zend_File Zend_Filter Zend_Form Zend_Http Zend_I18n Zend_InputFilter Zend_Json Zend_Ldap Zend_Loader Zend_Log Zend_Mail Zend_Math Zend_Memory Zend_Mime Zend_ModuleManager Zend_Mvc Zend_Navigation Zend_Paginator Zend_Permissions_Acl Zend_Permissions_Rbac Zend_Progressbar Zend_Serializer Zend_Server Zend_ServiceManager Zend_Session Zend_Soap Zend_Stdlib Zend_Tag Zend_Test Zend_Text Zend_Uri Zend_Validator Zend_Version Zend_View Zend_Xmlrpc
 
 SERVICES?=ZendCloud ZendGData ZendOAuth ZendOpenId ZendPdf ZendQueue ZendRest ZendService_AgileZen ZendService_Akismet ZendService_Amazon ZendService_Apple_Apns ZendService_Audioscrobbler ZendService_Delicious ZendService_DeveloperGarden ZendService_Flickr ZendService_GoGrid ZendService_Google_Gcm ZendService_LiveDocx ZendService_Nirvanix ZendService_Rackspace ZendService_ReCaptcha ZendService_SlideShare ZendService_StrikeIron ZendService_Technorati ZendService_Twitter ZendService_WindowsAzure
 
-PHP=php
-PHPDOC=$(CURDIR)/bin/phpDocumentor.phar
-PYRUS=$(CURDIR)/bin/pyrus.phar
-TAR=tar
-UNZIP=unzip
-WGET=wget
-ZIP=zip
+PHP?=php
+PHPDOC?=$(CURDIR)/bin/phpDocumentor.phar
+PYRUS?=$(CURDIR)/bin/pyrus.phar
+TAR?=tar
+UNZIP?=unzip
+WGET?=wget
+ZIP?=zip
 
 COMPOSER=$(CURDIR)/bin/composer.phar
 PUBLIC=$(CURDIR)/../../public
 PACKAGES=$(PUBLIC)/packages.json
 
 EXPORT_HOME=$(CURDIR)/exports
-PYRUS_CHANNEL=packages.zendframework.com
+PYRUS_CHANNEL?=packages.zendframework.com
+PYRUS_COMMAND=$(PHP) -dphar.readonly=0 $(PYRUS)
+PYRUS_TEMPLATES?=$(CURDIR)/pyrus-templates
 RELEASE_HOME=$(PUBLIC)/releases
 STAGE_HOME=$(CURDIR)/stage
+PYRUS_HOME=$(STAGE_HOME)/pyrus
 
-.PHONY: clean composer-vendor composer version zf2 zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-manual zf2-release pyrus-verify
+# Build Pyrus package per component
+define PyrusBuildRule
+dst=$1
+$$(dst) : zf2-export pyrus-verify $(PYRUS_HOME)
+	@echo "Building pyrus package for $$@..."
+ifeq ($(wildcard stage/pyrus/$$@),)
+	@echo "Generating package"
+	-(cd $(PYRUS_HOME) && $(PYRUS_COMMAND) generate-pear2 $$@ $(PYRUS_CHANNEL))
+endif
+	-$(CURDIR)/bin/pyrus-stage-package.sh $$@ $(VERSION) $(PHP) $(TAR) $(CURDIR) $(EXPORT_HOME)/ZendFramework-$(VERSION) $(PYRUS_HOME) $(PYRUS_TEMPLATES)
+ifeq ($$?,0)
+	@echo "Failed to stage Pyrus package"
+	exit 1
+endif
+	-$(CURDIR)/bin/pyrus-make.sh $$@ "$(PYRUS_COMMAND)" $(PYRUS_HOME)
+ifeq ($$?,0)
+	@echo "Failed to compile Pyrus package"
+	exit 1
+endif
+	-mv $(PYRUS_HOME)/$$@/$$@-$(VERSION).phar $(PYRUS_HOME)/
+	-rm -Rf $(PYRUS_HOME)/$$@/
+endef
+$(foreach component, $(COMPONENTS),$(eval $(call PyrusBuildRule,$(component))))
+
+.PHONY: clean composer-vendor composer version zf2 zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-manual zf2-release pyrus-verify pyrus-export
 
 composer-vendor:
 	@echo "Ensuring satis dependencies are installed..."
@@ -163,18 +190,31 @@ else
 endif
 	@echo "[DONE] Releasing Zend Framework $(VERSION)."
 
+pyrus: pyrus-export
+	@for component in $(COMPONENTS) ; do \
+		$(MAKE) -f Makefile-Pyrus COMPONENT=$$component VERSION=$(VERSION) SOURCE_DIR=$(EXPORT_HOME)/$(COMPONENT)-$(VERSION) PYRUS=$(PYRUS) PHP=$(PHP) ; \
+	done
+
 pyrus-verify:
-	@$(PHP) -dphar.readonly=0 $(PYRUS) list-channels | grep -q $(PYRUS_CHANNEL)
+	@$(PYRUS_COMMAND) list-channels | grep -q $(PYRUS_CHANNEL)
 	@if [ $$? -ne 0 ] ; then \
 		echo "The channel $(PYRUS_CHANNEL) is not in your channel list" ; \
 		exit 1 ; \
 	fi
+
+$(PYRUS_HOME):
+ifeq ($(wildcard stage/pyrus),)
+	@echo "Creating staging directory for Pyrus"
+	-mkdir $(PYRUS_HOME)
+endif
+
 
 clean:
 	-rm -f $(STAGE_HOME)/*.zip
 	-rm -f $(STAGE_HOME)/*.tgz
 	-rm -f $(STAGE_HOME)/*.epub
 	-rm -f $(STAGE_HOME)/*.pdf
+	-rm -Rf $(STAGE_HOME)/pyrus
 	-rm -Rf $(STAGE_HOME)/Zend*
 	-rm -Rf $(EXPORT_HOME)/Zend*
 	-rm -Rf $(EXPORT_HOME)/Component*

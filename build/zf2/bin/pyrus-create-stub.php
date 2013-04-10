@@ -1,0 +1,91 @@
+<?php
+if ($argc != 5) {
+    printf("[%s] Invalid arguments (requires 4, received %d)\n", $argv[0], $argc);
+    printf("Usage:\n    %s [package] [version] [pyrus-templates path] [build path]\n", $argv[0]);
+    exit(1);
+}
+
+$package         = $argv[1];
+$package_version = $argv[2];
+$pyrus_templates = $argv[3];
+$package_dir     = $argv[4];
+
+
+chdir($package_dir);
+
+$file_replacements = array();
+$file_replacements['{PACKAGE_NAME}'] = $package;
+$file_replacements['{PACKAGE_RELEASE}'] = $package_version;
+$file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] = null;
+
+$composer     = get_composer($package_dir);
+$content      = file_get_contents($composer);
+$composer     = json_decode($content, true);
+$package_info = array('required' => array(), 'optional' => array());
+foreach ($composer['require'] as $dep => $version) {
+    $vendor = $name = $dep;
+    if (strpos($dep, '/')) {
+        list($vendor, $name) = explode('/', $dep, 2);
+    }
+    if ($vendor == 'zendframework') {
+        $package_info['required'][] = composer_name_to_package_name($name);
+    }
+}
+if (isset($composer['suggest'])) {
+    foreach($composer['suggest'] as $dep => $version) {
+        $vendor = $name = $dep;
+        if (strpos($dep, '/')) {
+            list($vendor, $name) = explode('/', $dep, 2);
+        }
+        if ($vendor == 'zendframework') {
+            $package_info['optional'][] = composer_name_to_package_name($name);
+        }
+    }
+}
+
+$packagexmlsetup_content = '<' . '?php' . PHP_EOL;
+if (isset($package_info['required'])) {
+    foreach ($package_info['required'] as $dependency) {
+        $file_replacements['{PACKAGE_REQUIRE_DEPENDENCIES}'] .= 'require_once \'' . $dependency . '-' . trim($package_version) . '.phar\';' . "\n";
+        $file_replacements['{PACKAGE_DEPENDENCY}'] = trim($dependency);
+        $packagexmlsetup_content .= apply_replacements(file_get_contents($pyrus_templates . '/packagexmlsetup-required.php'), $file_replacements);
+    }
+}
+if (isset($package_info['optional'])) {
+    foreach ($package_info['optional'] as $dependency) {
+        $file_replacements['{PACKAGE_DEPENDENCY}'] = trim($dependency);
+        $packagexmlsetup_content .= apply_replacements(file_get_contents($pyrus_templates . '/packagexmlsetup-optional.php'), $file_replacements);
+    }
+}
+echo 'Writing: packagexmlsetup.php' . PHP_EOL;
+file_put_contents('packagexmlsetup.php', $packagexmlsetup_content);
+
+echo 'Writing: stub.php' . PHP_EOL;
+file_put_contents('stub.php', '<' . "?php\n" . trim(apply_replacements(file_get_contents($pyrus_templates . '/stub.php'), $file_replacements)));
+
+function apply_replacements($source, $replacements) 
+{
+    foreach ($replacements as $var => $value) {
+        $source = str_replace($var, $value, $source);
+    }
+    return $source;
+}
+
+function composer_name_to_package_name($composer_name) 
+{
+    $composer_name = ucwords(str_replace('-', ' ', $composer_name));
+    return str_replace(
+        array(' ', 'manager', 'Zendservice', 'Docbook', 'Inputfilter', 'Progressbar', 'Agilezen', 'Gogrid', 'Livedocx', 'Strikeiron', 'Windowsazure', 'Timesync', 'Xmlrpc'),
+        array('_', 'Manager', 'ZendService', 'DocBook', 'InputFilter', 'ProgressBar', 'AgileZen', 'GoGrid', 'LiveDocx', 'StrikeIron', 'WindowsAzure', 'TimeSync', 'XmlRpc'),
+        $composer_name
+    );
+}
+
+function get_composer($source)
+{
+    $found = shell_exec(sprintf("find %s -name 'composer.json'", $source));
+    $files = explode("\n", $found);
+    $file  = array_shift($files);
+    $file  = trim($file);
+    return $file;
+}
