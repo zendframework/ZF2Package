@@ -57,6 +57,25 @@ make clean
 ```
 
 For more information, read the [ZF1 README file](build/zf1/README.md).
+
+Building ZFTool
+---------------
+
+Descend into `build/zf2/` and execute:
+
+```sh
+make zftool.phar-release
+```
+
+Once done, add `public/zftool.phar` to the repository, commit, and push.
+
+When done, run:
+
+```sh
+make clean
+```
+
+For more information, read the [ZF2 README file](build/zf2/README.md).
  
 Deploying
 ---------
