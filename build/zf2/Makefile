@@ -40,8 +40,10 @@ RELEASE_HOME=$(PUBLIC)/releases
 STAGE_HOME=$(CURDIR)/stage
 PYRUS_HOME=$(STAGE_HOME)/pyrus
 
+.PHONY: clean composer-vendor composer version zf2 zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-manual zf2-release pyrus-verify pyrus-export
+
 # Build Pyrus package per component
-define PyrusBuildRule
+define ComponentPyrusBuildRule
 dst=$1
 $$(dst) : zf2-export pyrus-verify $(PYRUS_HOME)
 	@echo "Building pyrus package for $$@..."
@@ -61,10 +63,42 @@ ifeq ($$?,0)
 endif
 	-mv $(PYRUS_HOME)/$$@/$$@-$(VERSION).phar $(PYRUS_HOME)/
 	-rm -Rf $(PYRUS_HOME)/$$@/
+	@echo "[DONE] Building pyrus package for $$@..."
 endef
-$(foreach component, $(COMPONENTS),$(eval $(call PyrusBuildRule,$(component))))
+$(foreach component, $(COMPONENTS),$(eval $(call ComponentPyrusBuildRule,$(component))))
 
-.PHONY: clean composer-vendor composer version zf2 zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-manual zf2-release pyrus-verify pyrus-export
+# Build Pyrus package per service component
+define ServicePyrusBuildRule
+dst=$1
+$$(dst) : pyrus-verify $(PYRUS_HOME) version
+	@echo "Building pyrus package for $$@..."
+ifeq ($(wildcard exports/$$@-$(VERSION)),)
+	@echo "Exporting package"
+	-$(CURDIR)/bin/export-package.sh $$@ $(VERSION) $(PACKAGES) $(PHP) $(UNZIP) $(CURDIR) $(EXPORT_HOME)
+ifeq ($$?,0)
+	@echo "Failed to export package; check the version"
+	exit 1
+endif
+endif
+ifeq ($(wildcard stage/pyrus/$$@),)
+	@echo "Generating package"
+	-(cd $(PYRUS_HOME) && $(PYRUS_COMMAND) generate-pear2 $$@ $(PYRUS_CHANNEL))
+endif
+	-$(CURDIR)/bin/pyrus-stage-package.sh $$@ $(VERSION) $(PHP) $(TAR) $(CURDIR) $(EXPORT_HOME)/$$@-$(VERSION) $(PYRUS_HOME) $(PYRUS_TEMPLATES)
+ifeq ($$?,0)
+	@echo "Failed to stage Pyrus package"
+	exit 1
+endif
+	-$(CURDIR)/bin/pyrus-make.sh $$@ "$(PYRUS_COMMAND)" $(PYRUS_HOME)
+ifeq ($$?,0)
+	@echo "Failed to compile Pyrus package"
+	exit 1
+endif
+	-mv $(PYRUS_HOME)/$$@/$$@-$(VERSION).phar $(PYRUS_HOME)/
+	-rm -Rf $(PYRUS_HOME)/$$@/
+	@echo "[DONE] Building pyrus package for $$@..."
+endef
+$(foreach component, $(SERVICES),$(eval $(call ServicePyrusBuildRule,$(component))))
 
 composer-vendor:
 	@echo "Ensuring satis dependencies are installed..."
