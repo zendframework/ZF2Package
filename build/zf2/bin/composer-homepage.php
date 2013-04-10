@@ -1,11 +1,12 @@
 <?php
-if ($argc != 3) {
-    printf("[%s] Invalid arguments (requires 2, received %d)\n", $argv[0], $argc);
-    printf("Usage:\n    %s [template] [index.html]\n", $argv[0]);
+if ($argc != 4) {
+    printf("[%s] Invalid arguments (requires 3, received %d)\n", $argv[0], $argc);
+    printf("Usage:\n    %s [template] [index.html] [packages.json]\n", $argv[0]);
     exit(1);
 }
-$template  = $argv[1];
-$indexHtml = $argv[2];
+$template     = $argv[1];
+$indexHtml    = $argv[2];
+$packagesJson = $argv[3];
 
 $dom = new DOMDocument();
 $dom->loadHTMLFile($indexHtml);
@@ -22,6 +23,25 @@ $content = preg_replace('/^.*?(<h3>)/s', '$1', $content);
 $content = preg_replace('/<\/div>\s*$/s', '', $content);
 $content = str_replace('h3>', 'h4>', $content);
 
+$packages = file_get_contents($packagesJson);
+$packages = json_decode($packages, true);
+$packages = $packages['packages']['zendframework/zendframework'];
+$packages = array_keys($packages);
+
+$version = array_reduce($packages, function ($version, $compare) {
+    if (!preg_match('/^\d+\.\d+\.\d+/', $compare)) {
+        return $version;
+    }
+    if (version_compare($version, $compare, 'lt')) {
+        return $compare;
+    }
+    return $version;
+}, '2.0.0');
+$minor = explode('.', $version);
+$minor = sprintf('%d.%d', $minor[0], $minor[1]);
+
 $template = file_get_contents($template);
 $newIndex = str_replace('{%packages%}', $content, $template);
+$newIndex = str_replace('{%ZF_VERSION%}', $version, $newIndex);
+$newIndex = str_replace('{%ZF_VERSION_MINOR%}', $minor, $newIndex);
 file_put_contents($indexHtml, $newIndex);
