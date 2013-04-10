@@ -71,10 +71,10 @@ composer-vendor:
 ifeq ($(wildcard vendor/autoload.php),)
 	@echo "Installing composer dependencies for satis"
 	-$(PHP) $(COMPOSER) install
-	@if [ $$? -ne 0 ] ; then \
-		echo "Composer installation failed" ; \
-		exit 1 ; \
-	fi
+ifeq ($$?,0)
+	@echo "Composer installation failed"
+	exit 1
+endif
 endif
 	@echo "[DONE] Ensuring satis dependencies are installed."
 
@@ -130,10 +130,10 @@ else
 		--directory $(SOURCE_DIR) \
 		--title "Zend Framework" \
 		--template zf2
-	@if [ $$? -ne 0 ] ; then \
-		echo "[FAILED] Failed to build API documentation" ; \
-		exit 1 ; \
-	fi
+ifeq ($$?,0)
+	@echo "[FAILED] Failed to build API documentation"
+	exit 1
+endif
 	@echo "Packaging API documentation"
 	-(cd $(STAGE_HOME) && $(TAR) czf $(PRODUCT)-apidoc.tgz $(PRODUCT)-apidoc)
 	-(cd $(STAGE_HOME) && $(ZIP) -rq $(PRODUCT)-apidoc.zip $(PRODUCT)-apidoc)
@@ -144,10 +144,10 @@ exports/zf2-documentation-$(VERSION).tar.gz: version
 ifeq ($(wildcard exports/zf2-documentation-$(VERSION).tar.gz),)
 	@echo "Downloading ZF2 documentation for version $(VERSION)..."
 	-$(WGET) https://github.com/zendframework/zf2-documentation/archive/release-$(VERSION).tar.gz -O exports/zf2-documentation-$(VERSION).tar.gz
-	@if [ $$? -ne 0 ] ; then \
-		echo "Failed retrieving ZF2 documentation for version $(VERSION)" ; \
-		exit 1 ; \
-	fi
+ifeq ($$?,0)
+	@echo "Failed retrieving ZF2 documentation for version $(VERSION)"
+	exit 1
+endif
 	@echo "[DONE] Downloading ZF2 documentation for version $(VERSION)."
 endif
 
@@ -167,10 +167,10 @@ zf2-manual: zf2-export-manual
 ifeq ($(wildcard stage/ZendFramework-$(VERSION)-manual-en.tgz),)
 	@echo "Building manual..."
 	-(cd $(DOCS_PATH) && $(MAKE) html latexpdf epub)
-	@if [ $$? -ne 0 ] ; then \
-		echo "Failed to build manual" ; \
-		exit 1 ; \
-	fi
+ifeq ($$?,0)
+	@echo "Failed to build manual"
+	exit 1
+endif
 	@echo "Packaging manual..."
 	-(cd $(DOCS_PATH)/_build/html && $(ZIP) -rq $(STAGE_HOME)/$(PRODUCT)-manual-en.zip .)
 	-(cd $(DOCS_PATH)/_build/html && $(TAR) czf $(STAGE_HOME)/$(PRODUCT)-manual-en.tgz .)
@@ -223,14 +223,12 @@ endif
 	-mv $(PYRUS_HOME)/ZendFramework/ZendFramework-$(VERSION).phar $(PYRUS_HOME)/
 	-rm -Rf $(PYRUS_HOME)/ZendFramework/
 
-pyrus: pyrus-export
-
 pyrus-verify:
 	@$(PYRUS_COMMAND) list-channels | grep -q $(PYRUS_CHANNEL)
-	@if [ $$? -ne 0 ] ; then \
-		echo "The channel $(PYRUS_CHANNEL) is not in your channel list" ; \
-		exit 1 ; \
-	fi
+ifeq ($$?,0)
+	@echo "The channel $(PYRUS_CHANNEL) is not in your channel list"
+	exit 1
+endif
 
 $(PYRUS_HOME):
 ifeq ($(wildcard stage/pyrus),)
@@ -239,12 +237,5 @@ ifeq ($(wildcard stage/pyrus),)
 endif
 
 clean:
-	-rm -f $(STAGE_HOME)/*.zip
-	-rm -f $(STAGE_HOME)/*.tgz
-	-rm -f $(STAGE_HOME)/*.epub
-	-rm -f $(STAGE_HOME)/*.pdf
-	-rm -Rf $(STAGE_HOME)/pyrus
-	-rm -Rf $(STAGE_HOME)/Zend*
-	-rm -Rf $(EXPORT_HOME)/Zend*
-	-rm -Rf $(EXPORT_HOME)/Component*
-	-rm -Rf $(EXPORT_HOME)/ZF*
+	-(cd $(STAGE_HOME) && rm -Rf *.zip *.tgz *.epub *pdf pyrus Zend*)
+	-(cd $(EXPORT_HOME) && rm -Rf Zend* Component* ZF*)
