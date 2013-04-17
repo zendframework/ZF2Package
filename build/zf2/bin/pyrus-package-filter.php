@@ -228,6 +228,11 @@ $components = [
         'filter' => 'library/Zend/Tag',
         'composer' => 'zendframework/zend-tag',
     ],
+    'zend_test' => [
+        'pyrus' => 'zend_test',
+        'filter' => 'library/Zend/Test',
+        'composer' => 'zendframework/zend-test',
+    ],
     'zend_text' => [
         'pyrus' => 'zend_text',
         'filter' => 'library/Zend/Text',
