@@ -45,7 +45,7 @@ PYRUS_HOME=$(STAGE_HOME)/pyrus
 
 all: composer
 
-zf2: zf2-archives zf2-docs pyrus
+zf2: zf2-archives zf2-minimal-archives zf2-docs pyrus
 
 release: zf2-release pyrus-release
 
@@ -147,6 +147,16 @@ else
 endif
 	@echo "[DONE] Exporting composer package for ZF version $(VERSION)."
 
+zf2-minimal-export: zf2-export
+	@echo "Exporting minimal distribution for ZF version $(VERSION)..."
+ifneq ($(wildcard $(EXPORT_HOME)/ZendFramework-minimal-$(VERSION)),)
+	@echo "Minimal distribution for ZF version $(VERSION) is already exported"
+else
+	-cp -a $(EXPORT_HOME)/ZendFramework-$(VERSION) $(EXPORT_HOME)/ZendFramework-minimal-$(VERSION)
+	-rm -Rf $(EXPORT_HOME)/ZendFramework-minimal-$(VERSION)/demos
+endif
+	@echo "[DONE] Exporting minimal distribution for ZF version $(VERSION)."
+
 zf2-archives: zf2-export
 ifneq ($(wildcard $(STAGE_HOME)/ZendFramework-$(VERSION).tgz),)
 	@echo "Zend Framework $(VERSION) is already staged"
@@ -155,6 +165,16 @@ else
 	-(cd $(EXPORT_HOME) && $(TAR) czf $(STAGE_HOME)/ZendFramework-$(VERSION).tgz ZendFramework-$(VERSION))
 	@echo "Creating ZIP archive"
 	-(cd $(EXPORT_HOME) && $(ZIP) -rq $(STAGE_HOME)/ZendFramework-$(VERSION).zip ZendFramework-$(VERSION))
+endif
+
+zf2-minimal-archives: zf2-minimal-export
+ifneq ($(wildcard $(STAGE_HOME)/ZendFramework-minimal-$(VERSION).tgz),)
+	@echo "Zend Framework minimal $(VERSION) is already staged"
+else
+	@echo "Creating TGZ archive"
+	-(cd $(EXPORT_HOME) && $(TAR) czf $(STAGE_HOME)/ZendFramework-minimal-$(VERSION).tgz ZendFramework-minimal-$(VERSION))
+	@echo "Creating ZIP archive"
+	-(cd $(EXPORT_HOME) && $(ZIP) -rq $(STAGE_HOME)/ZendFramework-minimal-$(VERSION).zip ZendFramework-minimal-$(VERSION))
 endif
 
 zf2-docs: zf2-apidoc zf2-manual
