@@ -65,6 +65,7 @@ make pyrus-release
 - `ZendService_AgileZen`
 - `ZendService_Akismet`
 - `ZendService_Amazon`
+- `ZendService_Api`
 - `ZendService_Apple_Apns`
 - `ZendService_Audioscrobbler`
 - `ZendService_Delicious`
@@ -74,6 +75,7 @@ make pyrus-release
 - `ZendService_Google_Gcm`
 - `ZendService_LiveDocx`
 - `ZendService_Nirvanix`
+- `ZendService_OpenStack`
 - `ZendService_Rackspace`
 - `ZendService_ReCaptcha`
 - `ZendService_SlideShare`

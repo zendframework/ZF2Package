@@ -319,6 +319,11 @@ $components = [
         'filter' => 'composer.json library/',
         'composer' => 'zendframework/zendservice-apple-apns',
     ],
+    'zendserviceapi' => [
+        'pyrus' => 'zendserviceapi',
+        'filter' => 'composer.json library/',
+        'composer' => 'zendframework/zendservice-api',
+    ],
     'zendserviceaudioscrobbler' => [
         'pyrus' => 'zendserviceaudioscrobbler',
         'filter' => 'composer.json library/',
@@ -353,6 +358,11 @@ $components = [
         'pyrus' => 'zendservicenirvanix',
         'filter' => 'composer.json library/',
         'composer' => 'zendframework/zendservice-nirvanix',
+    ],
+    'zendserviceopenstack' => [
+        'pyrus' => 'zendserviceopenstack',
+        'filter' => 'composer.json library/',
+        'composer' => 'zendframework/zendservice-openstack',
     ],
     'zendservicerackspace' => [
         'pyrus' => 'zendservicerackspace',
