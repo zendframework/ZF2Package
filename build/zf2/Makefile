@@ -378,5 +378,5 @@ zftool.phar-release: zftool.phar
 	@echo "[DONE] Releasing zftool.phar."
 
 clean:
-	-(cd $(STAGE_HOME) && rm -Rf *.phar *.zip *.tgz *.epub *pdf pyrus Zend*)
-	-(cd $(EXPORT_HOME) && rm -Rf Zend* Component* ZF*)
+	-(cd $(STAGE_HOME) && rm -Rf *.phar *.zip *.tgz *.epub *pdf pyrus Zend* *.json)
+	-(cd $(EXPORT_HOME) && rm -Rf Zend* Component* ZF* *.json)
