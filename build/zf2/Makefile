@@ -40,12 +40,13 @@ PYRUS_META_TEMPLATES?=$(CURDIR)/pyrus-meta-templates
 RELEASE_HOME=$(PUBLIC)/releases
 STAGE_HOME=$(CURDIR)/stage
 PYRUS_HOME=$(STAGE_HOME)/pyrus
+ZPK_FILES=$(CURDIR)/zpk
 
-.PHONY: clean composer-vendor composer version zf2 zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-manual zf2-release pyrus-verify pyrus-export release pyrus-release pyrus pyrus-zf2
+.PHONY: clean composer-vendor composer version zf2 zf2-zpk zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-zpk-export zf2-manual zf2-release pyrus-verify pyrus-export release pyrus-release pyrus pyrus-zf2
 
 all: composer
 
-zf2: zf2-archives zf2-minimal-archives zf2-docs pyrus
+zf2: zf2-archives zf2-minimal-archives zf2-zpk zf2-docs pyrus
 
 release: zf2-release pyrus-release
 
@@ -157,6 +158,18 @@ else
 endif
 	@echo "[DONE] Exporting minimal distribution for ZF version $(VERSION)."
 
+zf2-zpk-export: zf2-minimal-export
+	@echo "Exporting ZPK distribution for ZF version $(VERSION)..."
+ifneq ($(wildcard $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)),)
+	@echo "ZPK distribution for ZF version $(VERSION) is already exported"
+else
+	-cp -a $(EXPORT_HOME)/ZendFramework-minimal-$(VERSION) $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)
+	-cp $(ZPK_FILES)/*.* $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/
+	-mv $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/deployment.xml.dist $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/deployment.xml
+	-sed --in-place 's/{VERSION}/$(VERSION)/g' $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/deployment.xml
+endif
+	@echo "[DONE] Exporting ZPK distribution for ZF version $(VERSION)."
+
 zf2-archives: zf2-export
 ifneq ($(wildcard $(STAGE_HOME)/ZendFramework-$(VERSION).tgz),)
 	@echo "Zend Framework $(VERSION) is already staged"
@@ -204,6 +217,14 @@ endif
 	-(cd $(STAGE_HOME) && $(ZIP) -rq $(PRODUCT)-apidoc.zip $(PRODUCT)-apidoc)
 endif
 	@echo "[DONE] Creating API documentation packages."
+
+zf2-zpk: zf2-zpk-export
+ifneq ($(wildcard $(STAGE_HOME)/ZendFramework-$(VERSION).zpk),)
+	@echo "Zend Framework $(VERSION) ZPK is already staged"
+else
+	@echo "Creating ZPK"
+	-(cd $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION) && $(ZIP) -rq $(STAGE_HOME)/ZendFramework-$(VERSION).zpk .)
+endif
 
 exports/zf2-documentation-$(VERSION).tar.gz: version
 ifeq ($(wildcard exports/zf2-documentation-$(VERSION).tar.gz),)
@@ -253,6 +274,7 @@ else
 	-mkdir $(RELEASE_PATH)
 	-cp $(STAGE_HOME)/ZendFramework*.tgz "$(RELEASE_PATH)/"
 	-cp $(STAGE_HOME)/ZendFramework*.zip "$(RELEASE_PATH)/"
+	-cp $(STAGE_HOME)/ZendFramework*.zpk "$(RELEASE_PATH)/"
 	-cp $(STAGE_HOME)/ZendFramework*.epub "$(RELEASE_PATH)/"
 	-cp $(STAGE_HOME)/ZendFramework*.pdf "$(RELEASE_PATH)/"
 endif
