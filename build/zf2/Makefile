@@ -41,6 +41,7 @@ RELEASE_HOME=$(PUBLIC)/releases
 STAGE_HOME=$(CURDIR)/stage
 PYRUS_HOME=$(STAGE_HOME)/pyrus
 ZPK_FILES=$(CURDIR)/zpk
+ZPK_RELEASE=$(PUBLIC)/zpk
 
 .PHONY: clean composer-vendor composer version zf2 zf2-zpk zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-zpk-export zf2-manual zf2-release pyrus-verify pyrus-export release pyrus-release pyrus pyrus-zf2
 
@@ -48,7 +49,7 @@ all: composer
 
 zf2: zf2-archives zf2-minimal-archives zf2-zpk zf2-docs pyrus
 
-release: zf2-release pyrus-release
+release: zf2-release zf2-zpk-release pyrus-release
 
 # Build Pyrus package per component
 define ComponentPyrusBuildRule
@@ -167,6 +168,8 @@ else
 	-cp $(ZPK_FILES)/*.* $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/
 	-mv $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/deployment.xml.dist $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/deployment.xml
 	-sed --in-place 's/{VERSION}/$(VERSION)/g' $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/deployment.xml
+	-mv $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/zf2_up.json $(EXPORT_HOME)/zf2_up-$(VERSION).json
+	-sed --in-place 's/{VERSION}/$(VERSION)/g' $(EXPORT_HOME)/zf2_up-$(VERSION).json
 endif
 	@echo "[DONE] Exporting ZPK distribution for ZF version $(VERSION)."
 
@@ -224,6 +227,8 @@ ifneq ($(wildcard $(STAGE_HOME)/ZendFramework-$(VERSION).zpk),)
 else
 	@echo "Creating ZPK"
 	-(cd $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION) && $(ZIP) -rq $(STAGE_HOME)/ZendFramework-$(VERSION).zpk .)
+	@echo "Staging zf2_up.json"
+	-(cp $(EXPORT_HOME)/zf2_up-$(VERSION).json $(STAGE_HOME)/)
 endif
 
 exports/zf2-documentation-$(VERSION).tar.gz: version
@@ -279,6 +284,16 @@ else
 	-cp $(STAGE_HOME)/ZendFramework*.pdf "$(RELEASE_PATH)/"
 endif
 	@echo "[DONE] Releasing Zend Framework $(VERSION)."
+
+zf2-zpk-release: version
+	@echo "Releasing Zend Framework $(VERSION) ZPK..."
+ifneq ($(wildcard $(ZPK_RELEASE)/ZendFramework-$(VERSION).zpk),)
+	@echo "Zend Framework $(VERSION) ZPK has already been released"
+else
+	-cp $(STAGE_HOME)/ZendFramework-$(VERSION).zpk "$(ZPK_RELEASE)/"
+	-cp $(STAGE_HOME)/zf2_up-$(VERSION).json "$(ZPK_RELEASE)/zf2_up.json"
+endif
+	@echo "[DONE] Releasing Zend Framework $(VERSION) ZPK."
 
 pyrus : pyrus-zf2 $(COMPONENTS)
 
