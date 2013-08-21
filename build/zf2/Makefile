@@ -279,7 +279,6 @@ else
 	-mkdir $(RELEASE_PATH)
 	-cp $(STAGE_HOME)/ZendFramework*.tgz "$(RELEASE_PATH)/"
 	-cp $(STAGE_HOME)/ZendFramework*.zip "$(RELEASE_PATH)/"
-	-cp $(STAGE_HOME)/ZendFramework*.zpk "$(RELEASE_PATH)/"
 	-cp $(STAGE_HOME)/ZendFramework*.epub "$(RELEASE_PATH)/"
 	-cp $(STAGE_HOME)/ZendFramework*.pdf "$(RELEASE_PATH)/"
 endif
