@@ -17,7 +17,7 @@ VERSION?=false
 
 COMPONENTS?=Zend_Authentication Zend_Barcode Zend_Cache Zend_Captcha Zend_Code Zend_Config Zend_Console Zend_Crypt Zend_Db Zend_Debug Zend_Di Zend_Dom Zend_Escaper Zend_EventManager Zend_Feed Zend_File Zend_Filter Zend_Form Zend_Http Zend_I18n Zend_InputFilter Zend_Json Zend_Ldap Zend_Loader Zend_Log Zend_Mail Zend_Math Zend_Memory Zend_Mime Zend_ModuleManager Zend_Mvc Zend_Navigation Zend_Paginator Zend_Permissions_Acl Zend_Permissions_Rbac Zend_Progressbar Zend_Serializer Zend_Server Zend_ServiceManager Zend_Session Zend_Soap Zend_Stdlib Zend_Tag Zend_Test Zend_Text Zend_Uri Zend_Validator Zend_Version Zend_View Zend_Xmlrpc
 
-SERVICES?=ZendCloud ZendGData ZendOAuth ZendOpenId ZendPdf ZendQueue ZendRest ZendService_AgileZen ZendService_Akismet ZendService_Amazon ZendService_Api ZendService_Apple_Apns ZendService_Audioscrobbler ZendService_Delicious ZendService_DeveloperGarden ZendService_Flickr ZendService_GoGrid ZendService_Google_Gcm ZendService_LiveDocx ZendService_Nirvanix ZendService_OpenStack ZendService_Rackspace ZendService_ReCaptcha ZendService_SlideShare ZendService_StrikeIron ZendService_Technorati ZendService_Twitter ZendService_WindowsAzure
+SERVICES?=ZendCloud ZendGData ZendOAuth ZendOpenId ZendPdf ZendQueue ZendRest ZendService_AgileZen ZendService_Akismet ZendService_Amazon ZendService_Api ZendService_Apple_Apns ZendService_Audioscrobbler ZendService_Delicious ZendService_DeveloperGarden ZendService_Flickr ZendService_GoGrid ZendService_Google_Gcm ZendService_LiveDocx ZendService_Nirvanix ZendService_OpenStack ZendService_Rackspace ZendService_ReCaptcha ZendService_SlideShare ZendService_StrikeIron ZendService_Technorati ZendService_Twitter ZendService_WindowsAzure ZendXml
 
 PHP?=php
 PHPDOC?=$(CURDIR)/bin/phpDocumentor.phar
@@ -43,11 +43,11 @@ PYRUS_HOME=$(STAGE_HOME)/pyrus
 ZPK_FILES=$(CURDIR)/zpk
 ZPK_RELEASE=$(PUBLIC)/zpk
 
-.PHONY: clean composer-vendor composer version zf2 zf2-zpk zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-zpk-export zf2-manual zf2-release pyrus-verify pyrus-export release pyrus-release pyrus pyrus-zf2
+.PHONY: clean composer-vendor composer version packagesjson zf2 zf2-zpk zf2-export zf2-archives zf2-docs zf2-apidoc zf2-export-manual zf2-zpk-export zf2-manual zf2-release pyrus-verify pyrus-export release pyrus-release pyrus pyrus-zf2
 
 all: composer
 
-zf2: zf2-archives zf2-minimal-archives zf2-zpk zf2-docs pyrus
+zf2: zf2-archives zf2-zpk zf2-docs pyrus
 
 release: zf2-release zf2-zpk-release pyrus-release
 
@@ -79,7 +79,7 @@ $(foreach component, $(COMPONENTS),$(eval $(call ComponentPyrusBuildRule,$(compo
 # Build Pyrus package per service component
 define ServicePyrusBuildRule
 dst=$1
-$$(dst) : pyrus-verify $(PYRUS_HOME) version
+$$(dst) : pyrus-verify $(PYRUS_HOME) version packagesjson
 	@echo "Building pyrus package for $$@..."
 ifeq ($(wildcard exports/$$@-$(VERSION)),)
 	@echo "Exporting package"
@@ -138,7 +138,23 @@ ifeq ("$(VERSION)", "false")
 	exit 42
 endif
 
-zf2-export: version
+packagesjson:
+	@echo "Fetching most recent packages.json from site..."
+	-wget -O $(PACKAGES) "https://packages.zendframework.com/packages.json"
+	@echo "[DONE] Fetching most recent packages.json from site"
+
+zendxml-export: packagesjson
+	@echo "Exporting ZendXml package..."
+ifneq ($(wildcard $(EXPORT_HOME)/ZendXml-1.0.0),)
+	@echo "Composer package for ZendXml already exported"
+else
+	$(eval ZIPPATH := $(shell $(PHP) "$(CURDIR)/bin/package-version-path.php" "zendframework/zendxml" "1.0.0" $(PACKAGES)))
+	@echo "Found and using ZendXml composer package at $(ZIPPATH)"
+	@$(UNZIP) -q -o -d $(EXPORT_HOME)/ZendXml-1.0.0 $(ZIPPATH)
+endif
+	@echo "[DONE] Exporting composer package for ZendXml."
+
+zf2-export: version packagesjson zendxml-export
 	@echo "Exporting composer package for ZF version $(VERSION)..."
 ifneq ($(wildcard $(EXPORT_HOME)/ZendFramework-$(VERSION)),)
 	@echo "Composer package for ZF version $(VERSION) is already exported"
@@ -146,25 +162,17 @@ else
 	$(eval ZIPPATH := $(shell $(PHP) "$(CURDIR)/bin/package-version-path.php" "zendframework/zendframework" $(VERSION) $(PACKAGES)))
 	@echo "Found and using composer package at $(ZIPPATH)"
 	@$(UNZIP) -q -o -d $(EXPORT_HOME)/ZendFramework-$(VERSION) $(ZIPPATH)
+	@echo "Copying ZendXml library into ZendFramework source tree"
+	-cp -a $(EXPORT_HOME)/ZendXml-1.0.0/library/ZendXml $(EXPORT_HOME)/ZendFramework-$(VERSION)/library/
 endif
 	@echo "[DONE] Exporting composer package for ZF version $(VERSION)."
 
-zf2-minimal-export: zf2-export
-	@echo "Exporting minimal distribution for ZF version $(VERSION)..."
-ifneq ($(wildcard $(EXPORT_HOME)/ZendFramework-minimal-$(VERSION)),)
-	@echo "Minimal distribution for ZF version $(VERSION) is already exported"
-else
-	-cp -a $(EXPORT_HOME)/ZendFramework-$(VERSION) $(EXPORT_HOME)/ZendFramework-minimal-$(VERSION)
-	-rm -Rf $(EXPORT_HOME)/ZendFramework-minimal-$(VERSION)/demos
-endif
-	@echo "[DONE] Exporting minimal distribution for ZF version $(VERSION)."
-
-zf2-zpk-export: zf2-minimal-export
+zf2-zpk-export: zf2-export
 	@echo "Exporting ZPK distribution for ZF version $(VERSION)..."
 ifneq ($(wildcard $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)),)
 	@echo "ZPK distribution for ZF version $(VERSION) is already exported"
 else
-	-cp -a $(EXPORT_HOME)/ZendFramework-minimal-$(VERSION) $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)
+	-cp -a $(EXPORT_HOME)/ZendFramework-$(VERSION) $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)
 	-cp $(ZPK_FILES)/*.* $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/
 	-mv $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/deployment.xml.dist $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/deployment.xml
 	-sed --in-place 's/{VERSION}/$(VERSION)/g' $(EXPORT_HOME)/ZendFramework-zpk-$(VERSION)/deployment.xml
@@ -181,16 +189,6 @@ else
 	-(cd $(EXPORT_HOME) && $(TAR) czf $(STAGE_HOME)/ZendFramework-$(VERSION).tgz ZendFramework-$(VERSION))
 	@echo "Creating ZIP archive"
 	-(cd $(EXPORT_HOME) && $(ZIP) -rq $(STAGE_HOME)/ZendFramework-$(VERSION).zip ZendFramework-$(VERSION))
-endif
-
-zf2-minimal-archives: zf2-minimal-export
-ifneq ($(wildcard $(STAGE_HOME)/ZendFramework-minimal-$(VERSION).tgz),)
-	@echo "Zend Framework minimal $(VERSION) is already staged"
-else
-	@echo "Creating TGZ archive"
-	-(cd $(EXPORT_HOME) && $(TAR) czf $(STAGE_HOME)/ZendFramework-minimal-$(VERSION).tgz ZendFramework-minimal-$(VERSION))
-	@echo "Creating ZIP archive"
-	-(cd $(EXPORT_HOME) && $(ZIP) -rq $(STAGE_HOME)/ZendFramework-minimal-$(VERSION).zip ZendFramework-minimal-$(VERSION))
 endif
 
 zf2-docs: zf2-apidoc zf2-manual

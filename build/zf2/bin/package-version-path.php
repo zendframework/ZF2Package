@@ -22,4 +22,11 @@ if (!isset($packages->{$version})) {
 }
 $package = $packages->{$version}->dist->url;
 $path = realpath(dirname($packagesJson)) . parse_url($package, PHP_URL_PATH);
+if (!file_exists($path)) {
+    system(sprintf('wget -O "%s" "%s"', $path, $package));
+}
+if (!file_exists($path)) {
+    file_put_contents('php://stderr', "Failed to download package from packages site!\n");
+    exit(1);
+}
 file_put_contents('php://stdout',  $path);
