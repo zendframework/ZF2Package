@@ -229,7 +229,7 @@ zip: stage
 			$(ZF_PRODUCT)/documentation/api ) ; \
 		echo "Documentation archive for API doc done..." ; \
 	fi
-	@if [ -f "$(STAGE_HOME)/$(ZF_PRODUCT)-apidoc.zip" ] ; then \
+	@if [ -f "$(STAGE_HOME)/$(ZF_PRODUCT)-manual-en.zip" ] ; then \
 		echo "Manual documentation (en) ZIP archive already exists" ; \
 	else \
 		( cd $(STAGE_HOME) && $(ZIP) -rq $(ZF_PRODUCT)-manual-en.zip \
@@ -268,7 +268,7 @@ tar: stage
 			$(ZF_PRODUCT)/documentation/api ) ; \
 		echo "Documentation archive for API doc done..." ; \
 	fi
-	@if [ -f "$(STAGE_HOME)/$(ZF_PRODUCT)-apidoc.tar.gz" ] ; then \
+	@if [ -f "$(STAGE_HOME)/$(ZF_PRODUCT)-manual-en.tar.gz" ] ; then \
 		echo "Manual documentation (en) TAR archive already exists" ; \
 	else \
 		( cd $(STAGE_HOME) && $(TAR) -czf $(ZF_PRODUCT)-manual-en.tar.gz \
