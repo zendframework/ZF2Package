@@ -87,6 +87,9 @@ INFOCARD_APIDOC_TITLE=Zend InfoCard API Documentation
 INFOCARD_ZIPBALL=$(INFOCARD_PRODUCT).zip
 INFOCARD_TARBALL=$(INFOCARD_PRODUCT).tar.gz
 
+ZPK_FILES=$(CURDIR)/zpk
+ZPK_RELEASE=$(PUBLIC)/zpk
+
 .PHONY: version clean-all
 
 all: dist amf gdata infocard release-all
@@ -115,6 +118,20 @@ export: version
 		(cd $(ZF_EXPORT_DIR)/externals/dojo && $(TAR) xzf $(DOWNLOADS)/dojo.tgz --strip-components=1 --overwrite) ; \
 	fi
 	@echo "...Done exporting files from git and source archives."
+
+export-zpk: export
+	@echo "Exporting ZPK distribution for ZF version $(ZF_VERSION)..."
+ifneq ($(wildcard $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)),)
+	@echo "ZPK distribution for ZF version $(ZF_VERSION) is already exported"
+else
+	-cp -a $(ZF_EXPORT_DIR)/ZendFramework-$(ZF_VERSION) $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)
+	-cp $(ZPK_FILES)/*.* $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/
+	-mv $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/deployment.xml.dist $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/deployment.xml
+	-sed --in-place 's/{VERSION}/$(ZF_VERSION)/g' $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/deployment.xml
+	-mv $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/zf1_up.json $(ZF_EXPORT_DIR)/zf1_up-$(ZF_VERSION).json
+	-sed --in-place 's/{VERSION}/$(ZF_VERSION)/g' $(ZF_EXPORT_DIR)/zf1_up-$(ZF_VERSION).json
+endif
+	@echo "[DONE] Exporting ZPK distribution for ZF version $(ZF_VERSION)."
 
 stage: stage-files stage-version stage-docs stage-extras-docs stage-minimal stage-minimal-version
 
@@ -212,7 +229,7 @@ stage-minimal-version: stage-minimal
 	-$(SCRIPTS)/stage-version.sh $(ZF_MINIMAL_STAGE_DIR)
 	@echo "...[Minimal] Done adding release date to release notes."
 
-archive: zip tar zip-minimal tar-minimal
+archive: zip tar zip-minimal tar-minimal zpk
 
 zip: stage
 	@echo "Creating ZIP archives..."
@@ -292,6 +309,16 @@ tar-minimal: stage-minimal
 	@(cd $(STAGE_HOME) && $(TAR) -czf $(ZF_MINIMAL_TARBALL) $(ZF_MINIMAL))
 	@echo "...[Minimal] Done creating TAR.GZ archives." ; \
 
+zpk: export-zpk
+ifneq ($(wildcard $(STAGE_HOME)/ZendFramework-$(ZF_VERSION).zpk),)
+	@echo "Zend Framework $(ZF_VERSION) ZPK is already staged"
+else
+	@echo "Creating ZPK"
+	-(cd $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION) && $(ZIP) -rq $(STAGE_HOME)/ZendFramework-$(ZF_VERSION).zpk .)
+	@echo "Staging zf1_up.json"
+	-(cp $(ZF_EXPORT_DIR)/zf1_up-$(ZF_VERSION).json $(STAGE_HOME)/)
+endif
+
 clean: version
 	-rm -f $(DOWNLOADS)/*.tgz
 	-rm -rf $(ZF_STAGE_DIR)
@@ -313,6 +340,12 @@ release: version
 	@echo "Copying release files to release directory ($(ZF_RELEASE_DIR))"
 	-$(SCRIPTS)/release.sh "$(ZF_PRODUCT)" "$(STAGE_HOME)" "$(ZF_RELEASE_DIR)"
 	@echo "...Done copying release files to release directory" ; \
+
+release-zpk: zpk
+	@echo "Releasing $(ZF_VERSION) zpk files to directory ($(ZPK_RELEASE))"
+	-cp $(STAGE_HOME)/ZendFramework-$(ZF_VERSION).zpk "$(ZPK_RELEASE)/"
+	-cp $(STAGE_HOME)/zf1_up-$(ZF_VERSION).json "$(ZPK_RELEASE)/zf1_up.json"
+	@echo "[DONE] Releasing Zend Framework $(ZF_VERSION) ZPK."
 
 clean-export: version
 	-rm -rf $(ZF_EXPORT_DIR)
@@ -477,6 +510,6 @@ release-infocard: version
 clean-docbook-infocard: version
 	-$(SCRIPTS)/clean-docbook.sh "$(INFOCARD_EXPORT_DIR)/documentation/manual/en"
 
-release-all: release release-amf release-gdata release-infocard
+release-all: release release-amf release-gdata release-infocard release-zpk
 
 clean-all: clean clean-export
