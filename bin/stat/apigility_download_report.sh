@@ -19,4 +19,4 @@ ${ZIP} -qj "${REPORT_ZIP}" "${REPORT_SPREADSHEET}"
 
 ${MUTT} -e "my_hdr From:${SENDER}" -s "${MAIL_MESSAGE}" -a "${REPORT_ZIP}" ${MAIL_RECIPIENT_LIST} < "${MSG_FILE}"
 
-/bin/rm -f "${REPORT_SPREADSHEET}" "${REPORT_ZIP}"
+/bin/rm -f "${REPORT_ZIP}"
