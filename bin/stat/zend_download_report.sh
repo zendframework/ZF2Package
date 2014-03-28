@@ -11,7 +11,7 @@
 : ${ZIP:="/usr/bin/zip"}
 : ${MUTT:="/usr/bin/mutt"}
 : ${MAIL_MESSAGE:="Zend Framework downloads report: `date +%F`"}
-: ${MAIL_RECIPIENT_LIST:=`cat /var/www/packages.zendframework.com/bin/stat/data/email`}
+: ${MAIL_RECIPIENT_LIST:=`cat /var/www/packages.zendframework.com/bin/stat/data/zendframework.email`}
 : ${SENDER:=`cat /var/www/packages.zendframework.com/bin/stat/data/sender`}
 : ${MSG_FILE:="/tmp/email_msg_stat_summary.txt"}
 
