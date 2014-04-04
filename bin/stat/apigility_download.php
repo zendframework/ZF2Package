@@ -119,8 +119,8 @@ if (!isset($argv[0]) || !is_dir($argv[0])) {
 }
 
 // Configuration
-$filestat      = 'data/apigility.ser';
-$excelFile     = 'data/apigility_download.xlsx';
+$filestat      = __DIR__ . '/data/apigility.ser';
+$excelFile     = __DIR__ . '/data/apigility_download.xlsx';
 $apacheLogPath = $argv[0];
 
 $projects = array(
