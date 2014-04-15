@@ -126,6 +126,12 @@ ifneq ($(wildcard $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)),)
 else
 	-cp -a $(ZF_EXPORT_DIR)/ZendFramework-$(ZF_VERSION) $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)
 	-cp $(ZPK_FILES)/*.* $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/
+	-rm -Rf $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/documentation
+	-rm -Rf $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/extras/documentation
+	-rm -Rf $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/demos
+	-rm -Rf $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/puppet
+	-rm -Rf $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/tests
+	-rm -Rf $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/extras/tests
 	-mv $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/deployment.xml.dist $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/deployment.xml
 	-sed --in-place 's/{VERSION}/$(ZF_VERSION)/g' $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/deployment.xml
 	-mv $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/zf1_up.json $(ZF_EXPORT_DIR)/zf1_up-$(ZF_VERSION).json
