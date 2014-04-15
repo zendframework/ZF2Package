@@ -29,18 +29,19 @@ ZF_LANG_EXTRAS=en
 DOJO_URL=http://download.dojotoolkit.org/release-1.5.2/dojo-release-1.5.2-src.tar.gz
 RELEASES_HOME=$(CURDIR)/../../public/releases
 STAGE_HOME=$(CURDIR)/stage
+EXPORT_HOME=$(CURDIR)/exports
 
 ZF_ARCHIVE_URL=https://api.github.com/repos/zendframework
 ZF_PRODUCT_NAME=Zend Framework
 ZF_PRODUCTNAME=ZendFramework
 ZF_PRODUCT=$(ZF_PRODUCTNAME)-$(ZF_VERSION)
 
-ZF_EXPORT_DIR=$(CURDIR)/exports/$(ZF_PRODUCT)
+ZF_EXPORT_DIR=$(EXPORT_HOME)/$(ZF_PRODUCT)
 ZF_STAGE_DIR=$(STAGE_HOME)/$(ZF_PRODUCT)
 ZF_RELEASE_DIR=$(RELEASES_HOME)/$(ZF_PRODUCT)
 
 ZF_MINIMAL=$(ZF_PRODUCT)-minimal
-ZF_MINIMAL_EXPORT_DIR=$(CURDIR)/exports/$(ZF_MINIMAL)
+ZF_MINIMAL_EXPORT_DIR=$(EXPORT_HOME)/$(ZF_MINIMAL)
 ZF_MINIMAL_STAGE_DIR=$(STAGE_HOME)/$(ZF_MINIMAL)
 
 ZF_ZIPBALL=$(ZF_PRODUCT).zip
@@ -57,7 +58,7 @@ API_DOC_TITLE_EXTRAS=Zend Framework Extras API Documentation
 AMF_PRODUCT_NAME=Zend AMF
 AMF_PRODUCTNAME=ZendAMF
 AMF_PRODUCT=$(AMF_PRODUCTNAME)-$(ZF_VERSION)
-AMF_EXPORT_DIR=$(CURDIR)/exports/$(AMF_PRODUCT)
+AMF_EXPORT_DIR=$(EXPORT_HOME)/$(AMF_PRODUCT)
 AMF_STAGE_DIR=$(STAGE_HOME)/$(AMF_PRODUCT)
 AMF_RELEASE_DIR=$(RELEASES_HOME)/$(AMF_PRODUCT)
 AMF_APIDOC_DEST=$(AMF_STAGE_DIR)/documentation/api/core
@@ -68,7 +69,7 @@ AMF_TARBALL=$(AMF_PRODUCT).tar.gz
 GDATA_PRODUCT_NAME=Zend Gdata
 GDATA_PRODUCTNAME=ZendGdata
 GDATA_PRODUCT=$(GDATA_PRODUCTNAME)-$(ZF_VERSION)
-GDATA_EXPORT_DIR=$(CURDIR)/exports/$(GDATA_PRODUCT)
+GDATA_EXPORT_DIR=$(EXPORT_HOME)/$(GDATA_PRODUCT)
 GDATA_STAGE_DIR=$(STAGE_HOME)/$(GDATA_PRODUCT)
 GDATA_RELEASE_DIR=$(RELEASES_HOME)/$(GDATA_PRODUCT)
 GDATA_APIDOC_DEST=$(GDATA_STAGE_DIR)/documentation/api/core
@@ -79,7 +80,7 @@ GDATA_TARBALL=$(GDATA_PRODUCT).tar.gz
 INFOCARD_PRODUCT_NAME=Zend InfoCard
 INFOCARD_PRODUCTNAME=ZendInfoCard
 INFOCARD_PRODUCT=$(INFOCARD_PRODUCTNAME)-$(ZF_VERSION)
-INFOCARD_EXPORT_DIR=$(CURDIR)/exports/$(INFOCARD_PRODUCT)
+INFOCARD_EXPORT_DIR=$(EXPORT_HOME)/$(INFOCARD_PRODUCT)
 INFOCARD_STAGE_DIR=$(STAGE_HOME)/$(INFOCARD_PRODUCT)
 INFOCARD_RELEASE_DIR=$(RELEASES_HOME)/$(INFOCARD_PRODUCT)
 INFOCARD_APIDOC_DEST=$(INFOCARD_STAGE_DIR)/documentation/api/core
@@ -87,8 +88,9 @@ INFOCARD_APIDOC_TITLE=Zend InfoCard API Documentation
 INFOCARD_ZIPBALL=$(INFOCARD_PRODUCT).zip
 INFOCARD_TARBALL=$(INFOCARD_PRODUCT).tar.gz
 
+ZPK_EXPORT_DIR=$(EXPORT_HOME)/$(ZF_PRODUCTNAME)-zpk-$(ZF_VERSION)
 ZPK_FILES=$(CURDIR)/zpk
-ZPK_RELEASE=$(PUBLIC)/zpk
+ZPK_RELEASE=$(CURDIR)/../../public/zpk
 
 .PHONY: version clean-all
 
@@ -124,18 +126,18 @@ export-zpk: export
 ifneq ($(wildcard $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)),)
 	@echo "ZPK distribution for ZF version $(ZF_VERSION) is already exported"
 else
-	-cp -a $(ZF_EXPORT_DIR)/ZendFramework-$(ZF_VERSION) $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)
-	-cp $(ZPK_FILES)/*.* $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/
-	-rm -Rf $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/documentation
-	-rm -Rf $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/extras/documentation
-	-rm -Rf $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/demos
-	-rm -Rf $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/puppet
-	-rm -Rf $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/tests
-	-rm -Rf $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/extras/tests
-	-mv $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/deployment.xml.dist $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/deployment.xml
-	-sed --in-place 's/{VERSION}/$(ZF_VERSION)/g' $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/deployment.xml
-	-mv $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION)/zf1_up.json $(ZF_EXPORT_DIR)/zf1_up-$(ZF_VERSION).json
-	-sed --in-place 's/{VERSION}/$(ZF_VERSION)/g' $(ZF_EXPORT_DIR)/zf1_up-$(ZF_VERSION).json
+	-cp -a $(ZF_EXPORT_DIR) $(ZPK_EXPORT_DIR)
+	-cp $(ZPK_FILES)/*.* $(ZPK_EXPORT_DIR)/
+	-rm -Rf $(ZPK_EXPORT_DIR)/documentation
+	-rm -Rf $(ZPK_EXPORT_DIR)/extras/documentation
+	-rm -Rf $(ZPK_EXPORT_DIR)/demos
+	-rm -Rf $(ZPK_EXPORT_DIR)/puppet
+	-rm -Rf $(ZPK_EXPORT_DIR)/tests
+	-rm -Rf $(ZPK_EXPORT_DIR)/extras/tests
+	-mv $(ZPK_EXPORT_DIR)/deployment.xml.dist $(ZPK_EXPORT_DIR)/deployment.xml
+	-sed --in-place 's/{VERSION}/$(ZF_VERSION)/g' $(ZPK_EXPORT_DIR)/deployment.xml
+	-mv $(ZPK_EXPORT_DIR)/zf1_up.json $(EXPORT_HOME)/zf1_up-$(ZF_VERSION).json
+	-sed --in-place 's/{VERSION}/$(ZF_VERSION)/g' $(EXPORT_HOME)/zf1_up-$(ZF_VERSION).json
 endif
 	@echo "[DONE] Exporting ZPK distribution for ZF version $(ZF_VERSION)."
 
@@ -320,9 +322,9 @@ ifneq ($(wildcard $(STAGE_HOME)/ZendFramework-$(ZF_VERSION).zpk),)
 	@echo "Zend Framework $(ZF_VERSION) ZPK is already staged"
 else
 	@echo "Creating ZPK"
-	-(cd $(ZF_EXPORT_DIR)/ZendFramework-zpk-$(ZF_VERSION) && $(ZIP) -rq $(STAGE_HOME)/ZendFramework-$(ZF_VERSION).zpk .)
+	-(cd $(ZPK_EXPORT_DIR) && $(ZIP) -rq $(STAGE_HOME)/ZendFramework-$(ZF_VERSION).zpk .)
 	@echo "Staging zf1_up.json"
-	-(cp $(ZF_EXPORT_DIR)/zf1_up-$(ZF_VERSION).json $(STAGE_HOME)/)
+	-(cp $(EXPORT_HOME)/zf1_up-$(ZF_VERSION).json $(STAGE_HOME)/)
 endif
 
 clean: version
