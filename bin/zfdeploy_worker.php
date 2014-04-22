@@ -51,6 +51,20 @@ function zfdeploy($job)
         return false;
     }
 
+    // install dependencies
+    exec('rm -Rf ./vendor', $output, $return);
+    if (0 !== $return) {
+        $job->sendFail();
+        chdir($startDir);
+        return false;
+    }
+    exec('/usr/local/bin/composer install', $output, $return);
+    if (0 !== $return) {
+        $job->sendFail();
+        chdir($startDir);
+        return false;
+    }
+
     // Replace version constant
     $deployClass = file_get_contents('src/Deploy.php');
     $deployClass = preg_replace('/(\s+VERSION = \')([^\']+)\';/', '$1@package_version@\';', $deployClass);
