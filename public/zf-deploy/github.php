@@ -19,7 +19,7 @@ if ($method !== 'POST') {
 
 // Check for a payload
 $json = file_get_contents('php://input');
-if (empty($data)) {
+if (empty($json)) {
     header('HTTP/1.1 400 Bad Request');
     exit(0);
 }
