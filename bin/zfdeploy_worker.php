@@ -31,6 +31,11 @@ function zfdeploy($job)
     $version = $job->workload();
     $appDir  = dirname(__DIR__);
 
+    // Normalize version; only need first 8 chars of sha1
+    if (preg_match('/^[a-f0-9]{32}$/i', $version)) {
+        $version = substr($version, 0, 8);
+    }
+
     // chdir /var/local/zf-deploy
     chdir('/var/local/zf-deploy');
 
@@ -48,10 +53,18 @@ function zfdeploy($job)
         return false;
     }
 
+    // Replace version constant
+    $deployClass = file_get_contents('src/Deploy.php');
+    $deployClass = preg_replace('/(\s+VERSION = \')([^\']+)\';/', '$1@package_version@\';', $deployClass);
+    file_put_contents('src/Deploy.php', $deployClass);
+
     // /usr/local/bin/box build
     exec(sprintf('/usr/local/bin/box build', $version), $output, $return);
     if (0 !== $return) {
         $job->sendFail();
+
+        // cleanup
+        exec('/usr/local/bin/git checkout -- src/Deploy.php');
         return false;
     }
 
@@ -59,11 +72,15 @@ function zfdeploy($job)
     $releaseFile = sprintf('%s/public/zf-deploy/zfdeploy-%s.phar', $appDir, $version);
     if (false === copy('zfdeploy.phar', $releaseFile)) {
         $job->sendFail();
+
+        // cleanup
+        exec('/usr/local/bin/git checkout -- src/Deploy.php');
         exec('/usr/local/bin/git checkout -- zfdeploy.phar');
         return false;
     }
 
-    // git checkout -- zfdeploy.phar
+    // cleanup
+    exec('/usr/local/bin/git checkout -- src/Deploy.php');
     exec('/usr/local/bin/git checkout -- zfdeploy.phar');
     
     // $hash = hash_file('sha1', __DIR__ . '/../public/zf-deploy/zfdeploy-$version.phar');
