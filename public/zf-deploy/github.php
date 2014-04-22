@@ -72,7 +72,7 @@ switch (true) {
 
     // Push
     case (isset($data->after)):
-        $version = $data->after;
+        $version = substr($data->after, 0, 8);
         break;
 
     // Release

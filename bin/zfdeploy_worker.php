@@ -31,11 +31,6 @@ function zfdeploy($job)
     $version = $job->workload();
     $appDir  = dirname(__DIR__);
 
-    // Normalize version; only need first 8 chars of sha1
-    if (preg_match('/^[a-f0-9]{32}$/i', $version)) {
-        $version = substr($version, 0, 8);
-    }
-
     // chdir /var/local/zf-deploy
     $startDir = getcwd();
     chdir('/var/local/zf-deploy');
