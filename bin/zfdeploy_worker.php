@@ -37,12 +37,14 @@ function zfdeploy($job)
     }
 
     // chdir /var/local/zf-deploy
+    $startDir = getcwd();
     chdir('/var/local/zf-deploy');
 
     // git fetch origin
     exec('/usr/local/bin/git fetch origin', $output, $return);
     if (0 !== $return) {
         $job->sendFail();
+        chdir($startDir);
         return false;
     }
 
@@ -50,6 +52,7 @@ function zfdeploy($job)
     exec(sprintf('/usr/local/bin/git checkout %s', $version), $output, $return);
     if (0 !== $return) {
         $job->sendFail();
+        chdir($startDir);
         return false;
     }
 
@@ -65,6 +68,7 @@ function zfdeploy($job)
 
         // cleanup
         exec('/usr/local/bin/git checkout -- src/Deploy.php');
+        chdir($startDir);
         return false;
     }
 
@@ -76,6 +80,7 @@ function zfdeploy($job)
         // cleanup
         exec('/usr/local/bin/git checkout -- src/Deploy.php');
         exec('/usr/local/bin/git checkout -- zfdeploy.phar');
+        chdir($startDir);
         return false;
     }
 
@@ -95,7 +100,7 @@ function zfdeploy($job)
     );
 
     // open manifest file, parse, array_shift, array_push manifest
-    $manifestFile = sprintf('%s/public/zf-deploy/manifest.json');
+    $manifestFile = sprintf('%s/public/zf-deploy/manifest.json', $appDir);
     $json = file_get_contents($manifestFile);
     $data = json_decode($json, true);
     array_shift($data);
@@ -105,6 +110,12 @@ function zfdeploy($job)
     // write manifest file
     file_put_contents($manifestFile, $json);
 
+    // symlink zfdeploy.phar to new version
+    chdir($appDir);
+    unlink('public/zf-deploy/zfdeploy.phar');
+    symlink(sprintf('public/zf-deploy/zfdeploy-%s.phar', $version), 'public/zf-deploy/zfdeploy.phar');
+
+    chdir($startDir);
     $job->sendComplete(json_encode(array('version' => $version)));
     return true;
 }
