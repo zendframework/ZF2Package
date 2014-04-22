@@ -54,50 +54,40 @@ if (json_last_error() !== JSON_ERROR_NONE) {
     exit(0);
 }
 
-// Check if we have an event, and if it's of the correct type
-if (! isset($data->type)
-    || ! in_array($data->type, array('ping', 'push', 'release'))
+// Check if we have a recognized payload type
+if (! isset($data->after)
+    && ! isset($data->release)
+    && ! isset($data->zen)
 ) {
     header('HTTP/1.1 422 Unprocessable Entity');
+    echo json_encode(array('error' => 'unexpected event'));
     exit(0);
 }
 
-// Check if we have a payload
-if (! isset($data->payload)) {
-    header('HTTP/1.1 422 Unprocessable Entity');
-    exit(0);
-}
-
-$payload = $data->payload;
-
-switch ($data->type) {
-    case 'ping':
-        if (! isset($payload->zen)) {
-            header('HTTP/1.1 422 Unprocessable Entity');
-            exit(0);
-        }
-        echo json_encode(array('ack' => $payload->zen));
+switch (true) {
+    // Ping
+    case (isset($data->zen)):
+        echo json_encode(array('ack' => $data->zen));
         break;
 
-    case 'push':
-        if (! isset($payload->head)) {
-            header('HTTP/1.1 422 Unprocessable Entity');
-            exit(0);
-        }
-
-        $version = $payload->head;
+    // Push
+    case (isset($data->after)):
+        $version = $data->after;
         break;
 
-    case 'release':
-        if (! isset($payload->release) || ! isset($payload->release->tag_name)) {
+    // Release
+    case isset($data->release):
+        if (! isset($data->release->tag_name)) {
             header('HTTP/1.1 422 Unprocessable Entity');
+            echo json_encode(array('error' => 'missing tag name in release object'));
             exit(0);
         }
 
-        $version = $payload->release->tag_name;
+        $version = $data->release->tag_name;
         break;
 
     default:
+        echo json_encode(array('error' => 'unexpected event'));
         header('HTTP/1.1 422 Unprocessable Entity');
         exit(0);
 }
