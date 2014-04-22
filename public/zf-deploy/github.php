@@ -28,6 +28,29 @@ if (empty($json)) {
 $data = json_decode($json);
 if (json_last_error() !== JSON_ERROR_NONE) {
     header('HTTP/1.1 415 Unsupported Media Type');
+    $message = '';
+    switch (json_last_error()) {
+        case JSON_ERROR_DEPTH:
+            $message = 'Maximum depth has been exceeded';
+            break;
+        case JSON_ERROR_STATE_MISMATCH:
+            $message = 'Invalid or malformed JSON';
+            break;
+        case JSON_ERROR_CTRL_CHAR:
+            $message = 'Control character error, possibly incorrectly encoded';
+            break;
+        case JSON_ERROR_SYNTAX:
+            $message = 'Syntax error';
+            break;
+        case JSON_ERROR_UTF8:
+            $message = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+            break;
+        default:
+            $message = 'Unknown error decoding JSON';
+            break;
+    }
+
+    echo json_encode(array('error' => $message));
     exit(0);
 }
 
