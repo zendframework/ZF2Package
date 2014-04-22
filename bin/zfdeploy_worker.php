@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /**
  * Gearman worker: create new zfdeploy.phar and make it available for self-update
@@ -5,6 +6,8 @@
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
+
+ini_set('memory_limit', -1);
 
 $worker = new GearmanWorker();
 $worker->addServer();
@@ -14,7 +17,6 @@ $worker->addFunction('zfdeploy', 'zfdeploy');
 while ($worker->work()) {
     if ($worker->returnCode() !== GEARMAN_SUCCESS) {
         printf("[%s] (%s) %s\n", date('Y-m-d H:i:s'), $worker->returnCode(), $worker->error());
-        break;
     }
 }
 
