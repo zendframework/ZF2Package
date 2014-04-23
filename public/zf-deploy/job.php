@@ -55,45 +55,36 @@ function zfdeploy($version)
     $output = array();
     exec('/usr/local/bin/git fetch origin', $output, $return);
     if (0 !== $return) {
-        file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+        return reportError(array(
             'error' => 'Failed to retrieve changes via git',
-        )));
-        chdir($startDir);
-        return false;
+        ), $startDir, false);
     }
 
     // git checkout $version
     $output = array();
     exec(sprintf('/usr/local/bin/git checkout %s', $version), $output, $return);
     if (0 !== $return) {
-        file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+        return reportError(array(
             'error' => 'Failed to checkout version',
-        )));
-        chdir($startDir);
-        return false;
+        ), $startDir, false);
     }
 
     // install dependencies
     $output = array();
     exec('rm -Rf ./vendor', $output, $return);
     if (0 !== $return) {
-        file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+        return reportError(array(
             'error' => 'Failed to remove vendor directory',
-        )));
-        chdir($startDir);
-        return false;
+        ), $startDir, false);
     }
     $output = array();
     exec('COMPOSER_HOME=/var/www/apache/.composer /usr/local/zend/bin/php /usr/local/bin/composer install -n', $output, $return);
     if (0 !== $return) {
-        file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+        return reportError(array(
             'error' => 'Failed to install dependencies',
             'output' => $output,
             'return' => $return,
-        )));
-        exec('/usr/local/bin/git checkout -- .');
-        chdir($startDir);
-        return false;
+        ), $startDir);
     }
 
     // if not a tagged version, get normalized version
@@ -111,25 +102,17 @@ function zfdeploy($version)
     unlink('zfdeploy.phar');
     createPhar($version, getcwd());
     if (! file_exists('zfdeploy.phar')) {
-        // cleanup
-        file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+        return reportError(array(
             'error' => 'Failed to build phar',
-        )));
-        exec('/usr/local/bin/git checkout -- .');
-        chdir($startDir);
-        return false;
+        ), $startDir);
     }
 
     // cp zfdeploy.phar __DIR__ . '/../public/zf-deploy/zfdeploy-$version.phar'
     $releaseFile = sprintf('%s/zfdeploy-%s.phar', $appDir, $version);
     if (false === copy('zfdeploy.phar', $releaseFile)) {
-        // cleanup
-        file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+        return reportError(array(
             'error' => 'Failed to copy phar to public directory',
-        )));
-        exec('/usr/local/bin/git checkout -- .');
-        chdir($startDir);
-        return false;
+        ), $startdir);
     }
 
     // cleanup
@@ -208,4 +191,14 @@ function createPhar($version, $path)
     );
 
     chdir($origin);
+}
+
+function reportError($error, $origin, $restore = true)
+{
+    file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode($error));
+    if ($restore) {
+        exec('/usr/local/bin/git checkout -- .');
+    }
+    chdir($origin);
+    return false;
 }
