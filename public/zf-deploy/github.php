@@ -101,7 +101,7 @@ $id    = $queue->createHttpJob(
         'scheduled_time' => date('Y-m-d H:i:s', time() + 10),
     )
 );
-if (! $Id) {
+if (! $id) {
     header('HTTP/1.1 500 Internal Server Error');
     echo json_encode(array('error' => 'Failed to queue job'));
     exit(0);
