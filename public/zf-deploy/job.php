@@ -6,6 +6,11 @@
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
+use Herrera\Box\Box;
+use Herrera\Box\StubGenerator;
+
+require __DIR__ . '/../../box/vendor/autoload.php';
+
 if ($_SERVER['REMOTE_ADDR'] !== $_SERVER['SERVER_ADDR']) {
     file_put_contents(sys_get_temp_dir() . '/last_job.json', json_encode(array(
         'error'       => 'Unauthorized caller',
@@ -96,17 +101,14 @@ function zfdeploy($version)
     $deployClass = preg_replace('/(\s+VERSION = \')([^\']+)\';/s', '$1@package_version@\';', $deployClass);
     file_put_contents('src/Deploy.php', $deployClass);
 
-    // /usr/local/bin/box build
+    // Build phar
     $output = array();
     unlink('zfdeploy.phar');
-    exec(sprintf('/usr/local/zend/bin/php /var/www/apache/box/bin/createPhar.php %s', $version), $output, $return);
-    if (0 !== $return) {
+    createPhar($version, getcwd());
+    if (! file_exists('zfdeploy.phar')) {
         // cleanup
         file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
             'error' => 'Failed to build phar',
-            'output' => $output,
-            'return' => $return,
-            'user'   => getenv('USER'),
         )));
         exec('/usr/local/bin/git checkout -- .');
         chdir($startDir);
@@ -157,4 +159,104 @@ function zfdeploy($version)
 
     chdir($startDir);
     return true;
+}
+
+function createPhar($version, $path)
+{
+
+    $origin = getcwd();
+    $path   = realpath($path);
+
+    chdir($path);
+
+    $box = Box::create($path . '/zfdeploy.phar');
+    $box->setValues(array(
+        'package_version' => $version,
+    ));
+
+    $rdi = new RecursiveDirectoryIterator(
+        $path,
+        FilesystemIterator::KEY_AS_PATHNAME
+        | FilesystemIterator::CURRENT_AS_FILEINFO
+        | FilesystemIterator::SKIP_DOTS
+    );
+    $rii = new RecursiveIteratorIterator($rdi);
+    $filtered = new PharFilter($rii, $path);
+
+    $box->buildFromIterator($filtered, $path);
+    $box->addFile($path . '/LICENSE.txt');
+    $box->getPhar()->setStub(
+        StubGenerator::create()
+            ->index('bin/zfdeploy.php')
+            ->alias('zfdeploy.phar')
+            ->generate()
+    );
+
+    chdir($origin);
+}
+
+class PharFilter extends FilterIterator
+{
+    protected $basePath;
+
+    public function __construct($iterator, $basePath)
+    {
+        parent::__construct($iterator);
+        $this->basePath  = $basePath;
+
+        $this->pathsIncludeRegex = array(
+            '#^' . $basePath . '/bin#',
+            '#^' . $basePath . '/config#',
+            '#^' . $basePath . '/src#',
+            '#^' . $basePath . '/vendor#',
+        );
+
+        $this->pathsExcludeRegex = array(
+            '#^' . $basePath . '/vendor/.*?/tests#',
+        );
+
+        $this->filesIncludeRegex = array(
+            '#\.(json|php|xml|xsd|png)$#',
+        );
+    }
+
+    public function accept()
+    {
+        $file = $this->getInnerIterator()->current();
+
+        if (! $file instanceof SplFileInfo) {
+            return false;
+        }
+
+        $path = $file->getRealPath();
+
+        $inInclude = false;
+        foreach ($this->pathsIncludeRegex as $regex) {
+            if (preg_match($regex, $path)) {
+                $inInclude = true;
+                break;
+            }
+        }
+        if (! $inInclude) {
+            return false;
+        }
+
+        foreach ($this->pathsExcludeRegex as $regex) {
+            if (preg_match($regex, $path)) {
+                return false;
+            }
+        }
+
+        if (! $file->isFile()) {
+            return true;
+        }
+
+        foreach ($this->filesIncludeRegex as $regex) {
+            if (preg_match($regex, $path)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
