@@ -40,7 +40,7 @@ exit(0);
  */
 function zfdeploy($version)
 {
-    $appDir  = dirname(__DIR__);
+    $appDir  = __DIR__;
 
     // chdir /var/local/zf-deploy
     $startDir = getcwd();
@@ -98,7 +98,8 @@ function zfdeploy($version)
 
     // /usr/local/bin/box build
     $output = array();
-    exec('HOME=/var/www/apache /usr/local/zend/bin/php /usr/local/bin/box build -vvv -n', $output, $return);
+    unlink('zfdeploy.phar');
+    exec(sprintf('/usr/local/zend/bin/php /var/www/apache/box/bin/createPhar.php %s', $version), $output, $return);
     if (0 !== $return) {
         // cleanup
         file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
@@ -113,7 +114,7 @@ function zfdeploy($version)
     }
 
     // cp zfdeploy.phar __DIR__ . '/../public/zf-deploy/zfdeploy-$version.phar'
-    $releaseFile = sprintf('%s/public/zf-deploy/zfdeploy-%s.phar', $appDir, $version);
+    $releaseFile = sprintf('%s/zfdeploy-%s.phar', $appDir, $version);
     if (false === copy('zfdeploy.phar', $releaseFile)) {
         // cleanup
         file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
@@ -139,7 +140,7 @@ function zfdeploy($version)
     );
 
     // open manifest file, parse, array_shift, array_push manifest
-    $manifestFile = sprintf('%s/public/zf-deploy/manifest.json', $appDir);
+    $manifestFile = sprintf('%s/manifest.json', $appDir);
     $json = file_get_contents($manifestFile);
     $data = json_decode($json, true);
     array_shift($data);
@@ -151,8 +152,8 @@ function zfdeploy($version)
 
     // symlink zfdeploy.phar to new version
     chdir($appDir);
-    unlink('public/zf-deploy/zfdeploy.phar');
-    symlink(sprintf('public/zf-deploy/zfdeploy-%s.phar', $version), 'public/zf-deploy/zfdeploy.phar');
+    unlink('zfdeploy.phar');
+    symlink(sprintf('zfdeploy-%s.phar', $version), 'zfdeploy.phar');
 
     chdir($startDir);
     return true;
