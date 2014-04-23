@@ -96,9 +96,14 @@ function zfdeploy($version)
         return false;
     }
 
+    // if not a tagged version, get normalized version
+    if (! preg_match('#^\d+\.\d+\.\d+(?:-[a-z][a-z0-9]*)?$#', $version)) {
+        $version = getTagVersion($version);
+    }
+
     // Replace version constant
     $deployClass = file_get_contents('src/Deploy.php');
-    $deployClass = preg_replace('/(\s+VERSION = \')([^\']+)\';/s', '$1@package_version@\';', $deployClass);
+    $deployClass = preg_replace('/(\s+VERSION = \')([^\']+)\';/s', '$1' . $version . '\';', $deployClass);
     file_put_contents('src/Deploy.php', $deployClass);
 
     // Build phar
@@ -161,6 +166,20 @@ function zfdeploy($version)
     return true;
 }
 
+function getTagVersion($version)
+{
+    $tags = array();
+    exec('/usr/local/bin/git tag', $tags);
+
+    if (empty($tags)) {
+        return sprintf('%s-%s', '0.1.0', $version);
+    }
+
+    usort($tags, 'version_compare');
+    $tag = array_pop($tags);
+    return sprintf('%s-%s', $tag, $version);
+}
+
 function createPhar($version, $path)
 {
 
@@ -170,10 +189,6 @@ function createPhar($version, $path)
     chdir($path);
 
     $box = Box::create($path . '/zfdeploy.phar');
-    $box->setValues(array(
-        'package_version' => $version,
-    ));
-
     $rdi = new RecursiveDirectoryIterator(
         $path,
         FilesystemIterator::KEY_AS_PATHNAME
