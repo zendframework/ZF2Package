@@ -94,7 +94,7 @@ function zfdeploy($version)
 
     // Replace version constant
     $deployClass = file_get_contents('src/Deploy.php');
-    $deployClass = preg_replace('/(\s+VERSION = \')([^\']+)\';/s', '$1' . $version . '\';', $deployClass);
+    $deployClass = preg_replace('/(\n\s+const VERSION\s+= \')([^\']+)\';/s', '${1}' . $version . '\';', $deployClass);
     file_put_contents('src/Deploy.php', $deployClass);
 
     // Build phar
