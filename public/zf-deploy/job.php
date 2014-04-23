@@ -102,6 +102,11 @@ function zfdeploy($version)
     $deployClass = preg_replace('/(\n\s+const VERSION\s+= \')([^\']+)\';/s', '${1}' . $version . '\';', $deployClass);
     file_put_contents('src/Deploy.php', $deployClass);
 
+    // Strip shebang from script
+    $script = file_get_contents('bin/zfdeploy.php');
+    $script = str_replace("#!/usr/bin/env php\n", '', $script);
+    file_put_contents('bin/zfdeploy.php', $script);
+
     // Build phar
     $output = array();
     unlink('zfdeploy.phar');
@@ -198,6 +203,8 @@ function createPhar($version, $path)
     $box->getPhar()->setStub(
         StubGenerator::create()
             ->index('bin/zfdeploy.php')
+            ->extract(true)
+            ->intercept(true)
             ->alias('zfdeploy.phar')
             ->generate()
     );
