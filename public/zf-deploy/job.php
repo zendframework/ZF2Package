@@ -51,6 +51,11 @@ function zfdeploy($version)
     $startDir = getcwd();
     chdir('/var/local/zf-deploy');
 
+    // open manifest file, parse, array_shift, array_push manifest
+    $manifestFile = sprintf('%s/manifest.json', $appDir);
+    $json         = file_get_contents($manifestFile);
+    $manifests    = json_decode($json, true);
+
     // git fetch origin
     $output = array();
     exec('/usr/local/bin/git fetch origin', $output, $return);
@@ -89,7 +94,7 @@ function zfdeploy($version)
 
     // if not a tagged version, get normalized version
     if (! preg_match('#^\d+\.\d+\.\d+(?:-[a-z][a-z0-9]*)?$#', $version)) {
-        $version = getTagVersion($version);
+        $version = getTagVersion($version, $manifests);
     }
 
     // Replace version constant
@@ -129,16 +134,11 @@ function zfdeploy($version)
         'version' => $version,
     );
 
-    // open manifest file, parse, array_shift, array_push manifest
-    $manifestFile = sprintf('%s/manifest.json', $appDir);
-    $json = file_get_contents($manifestFile);
-    $data = json_decode($json, true);
-    array_shift($data);
-    array_push($data, $manifest);
-    $json = json_encode($data);
+    // Add manifest to list
+    array_push($manifests, $manifest);
 
     // write manifest file
-    file_put_contents($manifestFile, $json);
+    file_put_contents($manifestFile, json_encode($manifests));
 
     // symlink zfdeploy.phar to new version
     chdir($appDir);
@@ -149,18 +149,30 @@ function zfdeploy($version)
     return true;
 }
 
-function getTagVersion($version)
+function getTagVersion($version, array $manifests)
 {
     $tags = array();
     exec('/usr/local/bin/git tag', $tags);
 
     if (empty($tags)) {
-        return sprintf('%s-%s', '0.1.0', $version);
+        $tag = '0.1.0';
+    } else {
+        usort($tags, 'version_compare');
+        $tag = array_pop($tags);
     }
 
-    usort($tags, 'version_compare');
-    $tag = array_pop($tags);
-    return sprintf('%s-%s', $tag, $version);
+    $increment = 1;
+    $pcreTag = preg_quote($tag);
+    foreach ($manifests as $manifest) {
+        $manifestVersion = $manifest['version'];
+        if (preg_match('#^' . $pcreTag . '-(?P<inc>\d+)-(?:[a-f0-9]{8})$#', $manifestVersion, $matches)) {
+            if ($increment <= (int) $matches['inc']) {
+                $increment = $matches['inc'] + 1;
+            }
+        }
+    }
+
+    return sprintf('%s-%d-%s', $tag, $increment, $version);
 }
 
 function createPhar($version, $path)
