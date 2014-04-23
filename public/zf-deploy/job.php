@@ -7,12 +7,21 @@
  */
 
 if ($_SERVER['REMOTE_ADDR'] !== $_SERVER['SERVER_ADDR']) {
+    file_put_contents(sys_get_temp_dir() . '/last_job.json', json_encode(array(
+        'error'       => 'Unauthorized caller',
+        'remote_addr' => $_SERVER['REMOTE_ADDR'],
+        'server_addr' => $_SERVER['SERVER_ADDR'],
+    )));
     header('HTTP/1.1 403 Forbidden');
     exit(1);
 }
 
 $params = ZendJobQueue::getCurrentJobParams();
+file_put_contents(sys_get_temp_dir() . '/last_job.json', json_encode($params));
 if (! isset($params['version'])) {
+    file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+        'error' => 'missing version parameter',
+    )));
     ZendJobQueue::setCurrentJobStatus(ZendJobQueue::FAILED);
     exit(1);
 }
@@ -38,40 +47,66 @@ function zfdeploy($version)
     chdir('/var/local/zf-deploy');
 
     // git fetch origin
+    $output = array();
     exec('/usr/local/bin/git fetch origin', $output, $return);
     if (0 !== $return) {
+        file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+            'error' => 'Failed to retrieve changes via git',
+        )));
         chdir($startDir);
         return false;
     }
 
     // git checkout $version
+    $output = array();
     exec(sprintf('/usr/local/bin/git checkout %s', $version), $output, $return);
     if (0 !== $return) {
+        file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+            'error' => 'Failed to checkout version',
+        )));
         chdir($startDir);
         return false;
     }
 
     // install dependencies
+    $output = array();
     exec('rm -Rf ./vendor', $output, $return);
     if (0 !== $return) {
+        file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+            'error' => 'Failed to remove vendor directory',
+        )));
         chdir($startDir);
         return false;
     }
-    exec('/usr/local/bin/composer install', $output, $return);
+    $output = array();
+    exec('COMPOSER_HOME=/var/www/apache/.composer /usr/local/zend/bin/php /usr/local/bin/composer install -n', $output, $return);
     if (0 !== $return) {
+        file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+            'error' => 'Failed to install dependencies',
+            'output' => $output,
+            'return' => $return,
+        )));
+        exec('/usr/local/bin/git checkout -- .');
         chdir($startDir);
         return false;
     }
 
     // Replace version constant
     $deployClass = file_get_contents('src/Deploy.php');
-    $deployClass = preg_replace('/(\s+VERSION = \')([^\']+)\';/', '$1@package_version@\';', $deployClass);
+    $deployClass = preg_replace('/(\s+VERSION = \')([^\']+)\';/s', '$1@package_version@\';', $deployClass);
     file_put_contents('src/Deploy.php', $deployClass);
 
     // /usr/local/bin/box build
-    exec(sprintf('/usr/local/bin/box build', $version), $output, $return);
+    $output = array();
+    exec('HOME=/var/www/apache /usr/local/zend/bin/php /usr/local/bin/box build -vvv -n', $output, $return);
     if (0 !== $return) {
         // cleanup
+        file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+            'error' => 'Failed to build phar',
+            'output' => $output,
+            'return' => $return,
+            'user'   => getenv('USER'),
+        )));
         exec('/usr/local/bin/git checkout -- .');
         chdir($startDir);
         return false;
@@ -81,6 +116,9 @@ function zfdeploy($version)
     $releaseFile = sprintf('%s/public/zf-deploy/zfdeploy-%s.phar', $appDir, $version);
     if (false === copy('zfdeploy.phar', $releaseFile)) {
         // cleanup
+        file_put_contents(sys_get_temp_dir() . '/last_job_error.json', json_encode(array(
+            'error' => 'Failed to copy phar to public directory',
+        )));
         exec('/usr/local/bin/git checkout -- .');
         chdir($startDir);
         return false;

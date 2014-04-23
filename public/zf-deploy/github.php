@@ -94,7 +94,7 @@ switch (true) {
 
 $queue = new ZendJobQueue();
 $id    = $queue->createHttpJob(
-    '/zf-deploy/job.php',
+    'http://jobs.zendframework.com/zf-deploy/job.php',
     array('version' => $version),
     array(
         'name'           => 'Rebuild zfdeploy.phar',
