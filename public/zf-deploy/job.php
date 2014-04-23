@@ -1,34 +1,36 @@
-#!/usr/bin/env php
 <?php
 /**
- * Gearman worker: create new zfdeploy.phar and make it available for self-update
+ * ZendJobQueue: Create new zfdeploy.phar and make it available for self-update
  *
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
-ini_set('memory_limit', -1);
-
-$worker = new GearmanWorker();
-$worker->addServer();
-
-$worker->addFunction('zfdeploy', 'zfdeploy');
-
-while ($worker->work()) {
-    if ($worker->returnCode() !== GEARMAN_SUCCESS) {
-        printf("[%s] (%s) %s\n", date('Y-m-d H:i:s'), $worker->returnCode(), $worker->error());
-    }
+if ($_SERVER['REMOTE_ADDR'] !== $_SERVER['SERVER_ADDR']) {
+    header('HTTP/1.1 403 Forbidden');
+    exit(1);
 }
+
+$params = ZendJobQueue::getCurrentJobParams();
+if (! isset($params['version'])) {
+    ZendJobQueue::setCurrentJobStatus(ZendJobQueue::FAILED);
+    exit(1);
+}
+if (false === zfdeploy($params['version'])) {
+    ZendJobQueue::setCurrentJobStatus(ZendJobQueue::FAILED);
+    exit(1);
+}
+ZendJobQueue::setCurrentJobStatus(ZendJobQueue::OK);
+exit(0);
+
 
 /**
  * Rebuild the phar file.
  * 
- * @param mixed $job 
- * @return void
+ * @param string $version 
  */
-function zfdeploy($job)
+function zfdeploy($version)
 {
-    $version = $job->workload();
     $appDir  = dirname(__DIR__);
 
     // chdir /var/local/zf-deploy
@@ -38,7 +40,6 @@ function zfdeploy($job)
     // git fetch origin
     exec('/usr/local/bin/git fetch origin', $output, $return);
     if (0 !== $return) {
-        $job->sendFail();
         chdir($startDir);
         return false;
     }
@@ -46,7 +47,6 @@ function zfdeploy($job)
     // git checkout $version
     exec(sprintf('/usr/local/bin/git checkout %s', $version), $output, $return);
     if (0 !== $return) {
-        $job->sendFail();
         chdir($startDir);
         return false;
     }
@@ -54,13 +54,11 @@ function zfdeploy($job)
     // install dependencies
     exec('rm -Rf ./vendor', $output, $return);
     if (0 !== $return) {
-        $job->sendFail();
         chdir($startDir);
         return false;
     }
     exec('/usr/local/bin/composer install', $output, $return);
     if (0 !== $return) {
-        $job->sendFail();
         chdir($startDir);
         return false;
     }
@@ -73,10 +71,8 @@ function zfdeploy($job)
     // /usr/local/bin/box build
     exec(sprintf('/usr/local/bin/box build', $version), $output, $return);
     if (0 !== $return) {
-        $job->sendFail();
-
         // cleanup
-        exec('/usr/local/bin/git checkout -- src/Deploy.php');
+        exec('/usr/local/bin/git checkout -- .');
         chdir($startDir);
         return false;
     }
@@ -84,18 +80,14 @@ function zfdeploy($job)
     // cp zfdeploy.phar __DIR__ . '/../public/zf-deploy/zfdeploy-$version.phar'
     $releaseFile = sprintf('%s/public/zf-deploy/zfdeploy-%s.phar', $appDir, $version);
     if (false === copy('zfdeploy.phar', $releaseFile)) {
-        $job->sendFail();
-
         // cleanup
-        exec('/usr/local/bin/git checkout -- src/Deploy.php');
-        exec('/usr/local/bin/git checkout -- zfdeploy.phar');
+        exec('/usr/local/bin/git checkout -- .');
         chdir($startDir);
         return false;
     }
 
     // cleanup
-    exec('/usr/local/bin/git checkout -- src/Deploy.php');
-    exec('/usr/local/bin/git checkout -- zfdeploy.phar');
+    exec('/usr/local/bin/git checkout -- .');
     
     // $hash = hash_file('sha1', __DIR__ . '/../public/zf-deploy/zfdeploy-$version.phar');
     $hash = hash_file('sha1', $releaseFile);
@@ -125,6 +117,5 @@ function zfdeploy($job)
     symlink(sprintf('public/zf-deploy/zfdeploy-%s.phar', $version), 'public/zf-deploy/zfdeploy.phar');
 
     chdir($startDir);
-    $job->sendComplete(json_encode(array('version' => $version)));
     return true;
 }

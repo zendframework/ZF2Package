@@ -92,12 +92,18 @@ switch (true) {
         exit(0);
 }
 
-$gearman = new GearmanClient();
-$gearman->addServer();
-$gearman->doBackground('zfdeploy', $version);
-if ($gearman->returnCode() !== GEARMAN_SUCCESS) {
+$queue = new ZendJobQueue();
+$id    = $queue->createHttpJob(
+    '/zf-deploy/job.php',
+    array('version' => $version),
+    array(
+        'name'           => 'Rebuild zfdeploy.phar',
+        'scheduled_time' => date('Y-m-d H:i:s', time() + 10),
+    )
+);
+if (! $Id) {
     header('HTTP/1.1 500 Internal Server Error');
-    echo json_encode(array('error' => $gearman->error()));
+    echo json_encode(array('error' => 'Failed to queue job'));
     exit(0);
 }
 
