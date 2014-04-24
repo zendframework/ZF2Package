@@ -17,10 +17,27 @@ if ($method !== 'POST') {
     exit(0);
 }
 
+// Check for event
+if (! isset($_SERVER['HTTP_X_GITHUB_EVENT'])) {
+    header('HTTP/1.1 400 Bad Request');
+    header('Content-Type: application/json');
+    printf('%s', json_encode(array('error' => 'missing event')));
+    exit(0);
+}
+$event = $_SERVER['HTTP_X_GITHUB_EVENT'];
+if (! in_array($event, array('create', 'ping', 'push', 'release'))) {
+    header('HTTP/1.1 400 Bad Request');
+    header('Content-Type: application/json');
+    printf('%s', json_encode(array('error' => 'invalid event')));
+    exit(0);
+}
+
 // Check for a payload
 $json = file_get_contents('php://input');
 if (empty($json)) {
     header('HTTP/1.1 400 Bad Request');
+    header('Content-Type: application/json');
+    printf('%s', json_encode(array('error' => 'missing payload')));
     exit(0);
 }
 
@@ -28,6 +45,7 @@ if (empty($json)) {
 $data = json_decode($json);
 if (json_last_error() !== JSON_ERROR_NONE) {
     header('HTTP/1.1 415 Unsupported Media Type');
+    header('Content-Type: application/json');
     $message = '';
     switch (json_last_error()) {
         case JSON_ERROR_DEPTH:
@@ -55,28 +73,35 @@ if (json_last_error() !== JSON_ERROR_NONE) {
 }
 
 // Check if we have a recognized payload type
-if (! isset($data->after)
-    && ! isset($data->release)
-    && ! isset($data->zen)
-) {
-    header('HTTP/1.1 422 Unprocessable Entity');
-    echo json_encode(array('error' => 'unexpected event'));
-    exit(0);
-}
-
-switch (true) {
+switch ($event) {
     // Ping
-    case (isset($data->zen)):
+    case 'ping':
         echo json_encode(array('ack' => $data->zen));
         break;
 
     // Push
-    case (isset($data->after)):
+    case 'push':
+        if ($data->ref !== 'refs/heads/master') {
+            // Not against master; nothing to do
+            header('HTTP/1.1 204 No Content');
+            exit(0);
+        }
+
         $version = substr($data->after, 0, 8);
         break;
 
+    // Create (tag)
+    case 'tag':
+        if ($data->ref_type !== 'tag') {
+            // Not a tag; nothing to do
+            header('HTTP/1.1 204 No Content');
+            exit(0);
+        }
+        $version = $data->ref;
+        break;
+
     // Release
-    case isset($data->release):
+    case 'release':
         if (! isset($data->release->tag_name)) {
             header('HTTP/1.1 422 Unprocessable Entity');
             echo json_encode(array('error' => 'missing tag name in release object'));
@@ -87,8 +112,9 @@ switch (true) {
         break;
 
     default:
+        header('HTTP/1.1 400 Bad Request');
+        header('Content-Type: application/json');
         echo json_encode(array('error' => 'unexpected event'));
-        header('HTTP/1.1 422 Unprocessable Entity');
         exit(0);
 }
 
@@ -103,6 +129,7 @@ $id    = $queue->createHttpJob(
 );
 if (! $id) {
     header('HTTP/1.1 500 Internal Server Error');
+    header('Content-Type: application/json');
     echo json_encode(array('error' => 'Failed to queue job'));
     exit(0);
 }
