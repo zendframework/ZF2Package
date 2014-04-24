@@ -9,6 +9,13 @@
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
+if (! isset($_GET['secret'])
+    || $_GET['secret'] !== get_cfg_var('zfdeploy.secret')
+) {
+    header('HTTP/1.1 400 Bad Request');
+    exit(0);
+}
+
 // Verify request method
 $method = $_SERVER['REQUEST_METHOD'];
 if ($method !== 'POST') {
