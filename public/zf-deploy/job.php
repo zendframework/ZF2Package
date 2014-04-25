@@ -98,12 +98,17 @@ function zfdeploy($version)
     }
 
     // Replace version constant
+    // Older versions defined it in the Deploy class
     $deployClass = file_get_contents('src/Deploy.php');
     $deployClass = preg_replace('/(\n\s+const VERSION\s+= \')([^\']+)\';/s', '${1}' . $version . '\';', $deployClass);
     file_put_contents('src/Deploy.php', $deployClass);
 
-    // Strip shebang from script
+    // Newer versions define the version in the script
     $script = file_get_contents('bin/zfdeploy.php');
+    $quoted = preg_quote("define('VERSION', '");
+    $script = preg_replace('/' . $quoted . '[^\']+\'\);/', '${1}' . $version . '\');', $script);
+
+    // Strip shebang from script
     $script = str_replace("#!/usr/bin/env php\n", '', $script);
     file_put_contents('bin/zfdeploy.php', $script);
 
