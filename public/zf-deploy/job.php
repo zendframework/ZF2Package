@@ -105,8 +105,8 @@ function zfdeploy($version)
 
     // Newer versions define the version in the script
     $script = file_get_contents('bin/zfdeploy.php');
-    $quoted = preg_quote("define('VERSION', '");
-    $script = preg_replace('/' . $quoted . '[^\']+\'\);/', '${1}' . $version . '\');', $script);
+    $quoted = preg_quote("define('VERSION', ");
+    $script = preg_replace('/(' . $quoted . ')\'[^\']+\'/s', '${1}\'' . $version . '\'', $script);
 
     // Strip shebang from script
     $script = str_replace("#!/usr/bin/env php\n", '', $script);
