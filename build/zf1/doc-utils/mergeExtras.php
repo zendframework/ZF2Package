@@ -39,8 +39,10 @@ foreach ($langs as $lang) {
     system("cp $pwd/extras/documentation/manual/en/module_specs/*.xml $pwd/documentation/manual/$lang/module_specs/");
 }
 
+libxml_disable_entity_loader(false);
+
 $extras = new DOMDocument();
-$extras->load("$pwd/extras/documentation/manual/en/manual.xml.in");
+$extras->load("$pwd/extras/documentation/manual/en/manual.xml.in", LIBXML_NOENT);
 $nodeList       = $extras->getElementsByTagName('chapter');
 $extrasChapters = array();
 for ($i = 0; $i < $nodeList->length; $i++) {
@@ -52,7 +54,7 @@ for ($i = 0; $i < $nodeList->length; $i++) {
 // Add Extras chapters into source
 echo "ADDING extras manual chapters to manual source\n";
 $manual = new DOMDocument();
-$manual->load("$pwd/documentation/manual/en/manual.xml.in");
+$manual->load("$pwd/documentation/manual/en/manual.xml.in", LIBXML_NOENT);
 $xpath = new DOMXPath($manual);
 if (version_compare($version, '1.9.7', '<=')) {
     $parts = $xpath->query("//chapter");
