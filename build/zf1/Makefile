@@ -32,6 +32,8 @@ STAGE_HOME=$(CURDIR)/stage
 EXPORT_HOME=$(CURDIR)/exports
 
 ZF_ARCHIVE_URL=https://api.github.com/repos/zendframework
+ZF_REPO_URL=https://github.com/zendframework/zf1.git
+ZF_EXTRAS_REPO_URL=https://github.com/zendframework/zf1-extras.git
 ZF_PRODUCT_NAME=Zend Framework
 ZF_PRODUCTNAME=ZendFramework
 ZF_PRODUCT=$(ZF_PRODUCTNAME)-$(ZF_VERSION)
@@ -109,12 +111,10 @@ export: version
 	@if [ -d "$(ZF_EXPORT_DIR)" ] ; then \
 	    echo "Export directory already exists ($(ZF_EXPORT_DIR))" ; \
 	else \
-		mkdir -p $(ZF_EXPORT_DIR) ; \
-		$(WGET) -nc $(ZF_ARCHIVE_URL)/zf1/tarball/release-$(ZF_VERSION) -O $(DOWNLOADS)/release-$(ZF_VERSION).tgz ; \
-		(cd $(ZF_EXPORT_DIR) && $(TAR) xzf $(DOWNLOADS)/release-$(ZF_VERSION).tgz --strip-components=1) ; \
-		$(WGET) -nc $(ZF_ARCHIVE_URL)/zf1-extras/tarball/master -O $(DOWNLOADS)/zf1-extras-release-$(ZF_VERSION).tgz ; \
-		mkdir -p $(ZF_EXPORT_DIR)/extras ; \
-		(cd $(ZF_EXPORT_DIR)/extras && $(TAR) xzf $(DOWNLOADS)/zf1-extras-release-$(ZF_VERSION).tgz --strip-components=1 --overwrite) ; \
+		(cd $(EXPORT_HOME) ; $(GIT) clone -b release-$(ZF_VERSION) $(ZF_REPO_URL) $(ZF_PRODUCT)) ; \
+	    (cd $(ZF_EXPORT_DIR) ; rm -Rf .git) ; \
+		(cd $(EXPORT_HOME) ; $(GIT) clone -b release-$(ZF_VERSION) $(ZF_EXTRAS_REPO_URL) $(ZF_PRODUCT)/extras) ; \
+	    (cd $(ZF_EXPORT_DIR)/extras ; rm -Rf .git) ; \
 		$(WGET) -nc $(DOJO_URL) -O $(DOWNLOADS)/dojo.tgz ; \
 		mkdir -p $(ZF_EXPORT_DIR)/externals/dojo ; \
 		(cd $(ZF_EXPORT_DIR)/externals/dojo && $(TAR) xzf $(DOWNLOADS)/dojo.tgz --strip-components=1 --overwrite) ; \
