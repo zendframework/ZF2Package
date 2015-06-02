@@ -26,10 +26,14 @@ TAR?=tar
 UNZIP?=unzip
 WGET?=wget
 ZIP?=zip
+COMPOSER_HOME?=/var/www/apache/.composer
+export COMPOSER_HOME
 
 COMPOSER=$(CURDIR)/bin/composer.phar
 PUBLIC=$(CURDIR)/../../public
 PACKAGES=$(PUBLIC)/packages.json
+PACKAGES_LOCAL=$(CURDIR)/packages.json
+GIT_REPOS?=/var/local/framework/components
 
 HOMEPAGE_TEMPLATE=$(CURDIR)/index.template.html
 EXPORT_HOME=$(CURDIR)/exports
@@ -83,7 +87,7 @@ $$(dst) : pyrus-verify $(PYRUS_HOME) version packagesjson
 	@echo "Building pyrus package for $$@..."
 ifeq ($(wildcard exports/$$@-$(VERSION)),)
 	@echo "Exporting package"
-	-$(CURDIR)/bin/export-package.sh $$@ $(VERSION) $(PACKAGES) $(PHP) $(UNZIP) $(CURDIR) $(EXPORT_HOME)
+	-$(CURDIR)/bin/export-package.sh $$@ $(VERSION) $(PACKAGES_LOCAL) $(PHP) $(UNZIP) $(CURDIR) $(EXPORT_HOME)
 ifeq ($$?,0)
 	@echo "Failed to export package; check the version"
 	exit 1
@@ -121,11 +125,22 @@ endif
 endif
 	@echo "[DONE] Ensuring satis dependencies are installed."
 
-composer: composer-vendor
+git-repos:
+	@echo "Syncing git repositories..."
+	@for repo in $(GIT_REPOS)/zendframework/* $(GIT_REPOS)/zfcampus/*;do \
+		echo "Updating $${repo}"; \
+		(cd $${repo} ; git fetch -q origin && git checkout -q master && git rebase -q origin/master) ; \
+		(cd $${repo} ; if [ `git branch --list develop` ];then git checkout -q develop && git rebase -q origin/develop ; else if [ `git branch --list -a origin/develop` ];then git checkout -b -q develop origin/develop ; fi ; fi) ; \
+	done
+	@echo "[DONE] Syncing git repositories."
+
+composer: composer-vendor git-repos
 	@echo "Running satis to create composer repository..."
-	-$(PHP) $(CURDIR)/bin/satis build $(CURDIR)/satis.json $(PUBLIC)
+	-$(PHP) $(CURDIR)/bin/satis build --skip-errors $(CURDIR)/satis-local.json $(PUBLIC)
+	@echo "Prepping packages.json for reference..."
+	-$(PHP) $(CURDIR)/bin/download_packages_json.php $(PACKAGES_LOCAL) $(PUBLIC)
 	@echo "Updating home page"
-	-$(PHP) $(CURDIR)/bin/composer-homepage.php $(HOMEPAGE_TEMPLATE) $(PUBLIC)/index.html $(PACKAGES)
+	-$(PHP) $(CURDIR)/bin/composer-homepage.php $(HOMEPAGE_TEMPLATE) $(PUBLIC)/index.html $(PACKAGES_LOCAL)
 ifeq ($$?,0)
 	@echo "Failed to update homepage!"
 	exit 1
@@ -140,7 +155,7 @@ endif
 
 packagesjson:
 	@echo "Fetching most recent packages.json from site..."
-	-wget -O $(PACKAGES) "https://packages.zendframework.com/packages.json"
+	-$(PHP) $(CURDIR)/bin/download_packages_json.php $(PACKAGES_LOCAL)
 	@echo "[DONE] Fetching most recent packages.json from site"
 
 zendxml-export: packagesjson
@@ -148,7 +163,7 @@ zendxml-export: packagesjson
 ifneq ($(wildcard $(EXPORT_HOME)/ZendXml-1.0.0),)
 	@echo "Composer package for ZendXml already exported"
 else
-	$(eval ZIPPATH := $(shell $(PHP) "$(CURDIR)/bin/package-version-path.php" "zendframework/zendxml" "1.0.0" $(PACKAGES)))
+	$(eval ZIPPATH := $(shell $(PHP) "$(CURDIR)/bin/package-version-path.php" "zendframework/zendxml" "1.0.0" $(PACKAGES_LOCAL)))
 	@echo "Found and using ZendXml composer package at $(ZIPPATH)"
 	@$(UNZIP) -q -o -d $(EXPORT_HOME)/ZendXml-1.0.0 $(ZIPPATH)
 endif
@@ -159,7 +174,7 @@ zf2-export: version packagesjson zendxml-export
 ifneq ($(wildcard $(EXPORT_HOME)/ZendFramework-$(VERSION)),)
 	@echo "Composer package for ZF version $(VERSION) is already exported"
 else
-	$(eval ZIPPATH := $(shell $(PHP) "$(CURDIR)/bin/package-version-path.php" "zendframework/zendframework" $(VERSION) $(PACKAGES)))
+	$(eval ZIPPATH := $(shell $(PHP) "$(CURDIR)/bin/package-version-path.php" "zendframework/zendframework" $(VERSION) $(PACKAGES_LOCAL)))
 	@echo "Found and using composer package at $(ZIPPATH)"
 	@$(UNZIP) -q -o -d $(EXPORT_HOME)/ZendFramework-$(VERSION) $(ZIPPATH)
 	@echo "Copying ZendXml library into ZendFramework source tree"
@@ -355,7 +370,7 @@ zftool.phar:
 	@echo "Creating zftool.phar..."
 ifeq ($(wildcard exports/ZFTool-dev-master),)
 	@echo "Exporting ZFTool package"
-	-$(CURDIR)/bin/export-package.sh ZFTool dev-master $(PACKAGES) $(PHP) $(UNZIP) $(CURDIR) $(EXPORT_HOME)
+	-$(CURDIR)/bin/export-package.sh ZFTool dev-master $(PACKAGES_LOCAL) $(PHP) $(UNZIP) $(CURDIR) $(EXPORT_HOME)
 ifeq ($$?,0)
 	@echo "Failed to export package; check the version"
 	exit 1

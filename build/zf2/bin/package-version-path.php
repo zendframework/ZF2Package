@@ -1,12 +1,13 @@
 <?php
-if ($argc != 4) {
-    printf("[%s] Invalid arguments (requires 3, received %d)\n", $argv[0], $argc);
+if ($argc != 5) {
+    printf("[%s] Invalid arguments (requires 4, received %d)\n", $argv[0], $argc);
     printf("Usage:\n    %s [package] [version] [packages.json]\n", $argv[0]);
     exit(1);
 }
 $packageName  = $argv[1];
 $version      = $argv[2];
 $packagesJson = $argv[3];
+$public       = $argv[4];
 
 $packages = file_get_contents($packagesJson);
 $packages = json_decode($packages);
@@ -21,7 +22,7 @@ if (!isset($packages->{$version})) {
     exit(1);
 }
 $package = $packages->{$version}->dist->url;
-$path = realpath(dirname($packagesJson)) . parse_url($package, PHP_URL_PATH);
+$path = realpath($public) . parse_url($package, PHP_URL_PATH);
 if (!file_exists($path)) {
     system(sprintf('wget -O "%s" "%s"', $path, $package));
 }
@@ -29,4 +30,4 @@ if (!file_exists($path)) {
     file_put_contents('php://stderr', "Failed to download package from packages site!\n");
     exit(1);
 }
-file_put_contents('php://stdout',  $path);
+file_put_contents('php://stdout', $path);

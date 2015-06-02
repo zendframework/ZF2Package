@@ -19,9 +19,14 @@ if ($nodes->length == 0) {
 $node = $nodes->item(0);
 $content = $dom->saveHTML($node);
 
+$intermediary = str_replace('.html', '.transition.html', $indexHtml);
+file_put_contents($intermediary, $content);
+
+/*
 $content = preg_replace('/^.*?(<h3>)/s', '$1', $content);
 $content = preg_replace('/<\/div>\s*$/s', '', $content);
 $content = str_replace('h3>', 'h4>', $content);
+ */
 
 $packages = file_get_contents($packagesJson);
 $packages = json_decode($packages, true);
