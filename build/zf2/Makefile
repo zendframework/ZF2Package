@@ -136,7 +136,7 @@ git-repos:
 
 composer: composer-vendor git-repos
 	@echo "Running satis to create composer repository..."
-	-$(PHP) $(CURDIR)/bin/satis build --skip-errors $(CURDIR)/satis-local.json $(PUBLIC)
+	-$(PHP) -d "memory_limit=-1" $(CURDIR)/bin/satis build --skip-errors $(CURDIR)/satis-local.json $(PUBLIC)
 	@echo "Prepping packages.json for reference..."
 	-$(PHP) $(CURDIR)/bin/download_packages_json.php $(PACKAGES_LOCAL) $(PUBLIC)
 	@echo "Updating home page"
