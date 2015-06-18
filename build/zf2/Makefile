@@ -129,7 +129,7 @@ git-repos:
 	@echo "Syncing git repositories..."
 	@for repo in $(GIT_REPOS)/zendframework/* $(GIT_REPOS)/zfcampus/*;do \
 		echo "Updating $${repo}"; \
-		(cd $${repo} ; git fetch -q origin && git checkout -q master && git rebase -q origin/master) ; \
+		(cd $${repo} ; git fetch -q origin && git fetch -q --tags origin && git checkout -q master && git rebase -q origin/master) ; \
 		(cd $${repo} ; if [ "$$(git branch --list develop)" != "" ];then git checkout -q develop && git rebase -q origin/develop ; else if [ "$$(git branch --list -a origin/develop)" != "" ];then git checkout -q -b develop origin/develop ; fi ; fi) ; \
 	done
 	@echo "[DONE] Syncing git repositories."
