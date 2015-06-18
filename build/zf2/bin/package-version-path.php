@@ -1,7 +1,7 @@
 <?php
 if ($argc != 5) {
     printf("[%s] Invalid arguments (requires 4, received %d)\n", $argv[0], $argc);
-    printf("Usage:\n    %s [package] [version] [packages.json]\n", $argv[0]);
+    printf("Usage:\n    %s [package] [version] [packages.json] [public]\n", $argv[0]);
     exit(1);
 }
 $packageName  = $argv[1];

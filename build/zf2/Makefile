@@ -174,7 +174,7 @@ zf2-export: version packagesjson zendxml-export
 ifneq ($(wildcard $(EXPORT_HOME)/ZendFramework-$(VERSION)),)
 	@echo "Composer package for ZF version $(VERSION) is already exported"
 else
-	$(eval ZIPPATH := $(shell $(PHP) "$(CURDIR)/bin/package-version-path.php" "zendframework/zendframework" $(VERSION) $(PACKAGES_LOCAL)))
+	$(eval ZIPPATH := $(shell $(PHP) "$(CURDIR)/bin/package-version-path.php" "zendframework/zendframework" $(VERSION) $(PACKAGES_LOCAL) $(PUBLIC)))
 	@echo "Found and using composer package at $(ZIPPATH)"
 	@$(UNZIP) -q -o -d $(EXPORT_HOME)/ZendFramework-$(VERSION) $(ZIPPATH)
 	@echo "Copying ZendXml library into ZendFramework source tree"
