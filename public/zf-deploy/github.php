@@ -2,7 +2,7 @@
 /**
  * GitHub webhook for accepting push/release/ping events
  *
- * Queues events to Gearman's "zfdeploy" queue, using the sha1 or tag name as 
+ * Queues events to Gearman's "zfdeploy" queue, using the sha1 or tag name as
  * the version.
  *
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
@@ -98,6 +98,7 @@ switch ($event) {
         break;
 
     // Create (tag)
+    case 'create':
     case 'tag':
         if ($data->ref_type !== 'tag') {
             // Not a tag; nothing to do
