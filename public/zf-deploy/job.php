@@ -1,4 +1,4 @@
-<?php
+<?php // @codingStandardsIgnoreFile
 /**
  * ZendJobQueue: Create new zfdeploy.phar and make it available for self-update
  *
@@ -62,6 +62,15 @@ function zfdeploy($version)
     if (0 !== $return) {
         return reportError(array(
             'error' => 'Failed to retrieve changes via git',
+        ), $startDir, false);
+    }
+
+    // Remove any unstaged changes (e.g., composer.lock)
+    $output = array();
+    exec('/usr/local/bin/git checkout -- .', $output, $return);
+    if (0 !== $return) {
+        return reportError(array(
+            'error' => 'Failed to remove unstaged files',
         ), $startDir, false);
     }
 
