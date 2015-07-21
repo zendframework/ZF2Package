@@ -84,7 +84,7 @@ function zfdeploy($version)
     }
     $output = array();
     exec(
-        'COMPOSER_HOME=/var/www/apache/.composer /usr/local/zend/bin/php /var/www/apache/bin/composer install -n',
+        'COMPOSER_HOME=/var/www/apache/.composer /usr/local/zend/bin/php /var/www/apache/bin/composer update -n',
         $output,
         $return
     );
