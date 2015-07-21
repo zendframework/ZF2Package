@@ -40,8 +40,8 @@ exit(0);
 
 /**
  * Rebuild the phar file.
- * 
- * @param string $version 
+ *
+ * @param string $version
  */
 function zfdeploy($version)
 {
@@ -83,7 +83,11 @@ function zfdeploy($version)
         ), $startDir, false);
     }
     $output = array();
-    exec('COMPOSER_HOME=/var/www/apache/.composer /usr/local/zend/bin/php /usr/local/bin/composer install -n', $output, $return);
+    exec(
+        'COMPOSER_HOME=/var/www/apache/.composer /usr/local/zend/bin/php /var/www/apache/bin/composer install -n',
+        $output,
+        $return
+    );
     if (0 !== $return) {
         return reportError(array(
             'error' => 'Failed to install dependencies',
