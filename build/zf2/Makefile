@@ -20,7 +20,7 @@ COMPONENTS?=Zend_Authentication Zend_Barcode Zend_Cache Zend_Captcha Zend_Code Z
 SERVICES?=ZendCloud ZendGData ZendOAuth ZendOpenId ZendPdf ZendQueue ZendRest ZendService_AgileZen ZendService_Akismet ZendService_Amazon ZendService_Api ZendService_Apple_Apns ZendService_Audioscrobbler ZendService_Delicious ZendService_DeveloperGarden ZendService_Flickr ZendService_GoGrid ZendService_Google_Gcm ZendService_LiveDocx ZendService_Nirvanix ZendService_OpenStack ZendService_Rackspace ZendService_ReCaptcha ZendService_SlideShare ZendService_StrikeIron ZendService_Technorati ZendService_Twitter ZendService_WindowsAzure ZendXml
 
 PHP?=php
-PHPDOC?=$(CURDIR)/bin/phpDocumentor.phar
+PHPDOC?=$(CURDIR)/vendor/bin/phpdoc
 PYRUS?=$(CURDIR)/bin/pyrus.phar
 TAR?=tar
 UNZIP?=unzip
@@ -223,7 +223,7 @@ else
 		--target $(BUILD_DIR) \
 		--directory $(SOURCE_DIR) \
 		--title "Zend Framework" \
-		--template zf2
+		--template zend
 ifeq ($$?,0)
 	@echo "[FAILED] Failed to build API documentation"
 	exit 1
