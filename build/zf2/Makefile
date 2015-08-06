@@ -223,7 +223,7 @@ else
 		--target $(BUILD_DIR) \
 		--directory $(SOURCE_DIR) \
 		--title "Zend Framework" \
-		--template zend
+		--template responsive
 ifeq ($$?,0)
 	@echo "[FAILED] Failed to build API documentation"
 	exit 1
